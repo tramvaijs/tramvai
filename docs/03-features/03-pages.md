@@ -152,7 +152,7 @@ File for `/login/` page must be named `login/index.tsx` instead of `login.tsx`, 
 
 :::
 
-[Example application](https://github.com/Tinkoff/tramvai/-/tree/master/examples/fs-routing)
+[Example application](https://github.com/tramvaijs/tramvai/-/tree/master/examples/fs-routing)
 
 ## Define routes manually
 
@@ -207,7 +207,7 @@ createApp({
 });
 ```
 
-[Example application](https://github.com/Tinkoff/tramvai/-/tree/master/examples/fs-pages)
+[Example application](https://github.com/tramvaijs/tramvai/-/tree/master/examples/fs-pages)
 
 Another way, for example if you want to define routes in different modules, is to use `ROUTES_TOKEN`:
 

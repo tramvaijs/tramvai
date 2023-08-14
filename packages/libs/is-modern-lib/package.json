@@ -12,7 +12,7 @@
     "build": "tsc",
     "watch": "tsc -w"
   },
-  "homepage": "https://github.com/Tinkoff/tramvai",
+  "homepage": "https://github.com/tramvaijs/tramvai",
   "repository": {
     "type": "git",
     "url": "git@github.com:Tinkoff/tramvai.git"

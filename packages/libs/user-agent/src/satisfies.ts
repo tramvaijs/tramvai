@@ -12,6 +12,13 @@ const deviceTypes: Record<string, string> = {
   desktop: 'desktop',
 };
 
+const browsersWithoutCompleteStat = {
+  Samsung: 'samsung',
+  Android: 'android',
+  UCAndroid: 'and_uc',
+  OperaMobile: 'op_mob',
+};
+
 type BrowserMap = Record<string, Record<string, number>>;
 
 const normalizedBrowserslist = (query: string[]) => {
@@ -55,7 +62,10 @@ const normalizedBrowserslist = (query: string[]) => {
 export const satisfies = (
   userAgent: UserAgent | string,
   browserslistConfig?: string[],
-  { env = 'defaults' }: { env?: 'modern' | 'defaults' } = {}
+  {
+    env = 'defaults',
+    forceMinimumUnknownVersions = false,
+  }: { env?: 'modern' | 'defaults'; forceMinimumUnknownVersions?: boolean } = {}
 ): boolean | null => {
   const ua = isString(userAgent) ? parseUserAgentHeader(userAgent) : userAgent;
   const {
@@ -88,6 +98,30 @@ export const satisfies = (
     browserslistConfig ?? browserslistFileConfig[env] ?? browserslistTinkoffConfig[env];
 
   const browsers = normalizedBrowserslist(targets);
+
+  // Browsers from query may not be present in https://caniuse.com/usage-table, and browserslist will return higher versions than requested.
+  // Example of this problem - https://github.com/babel/babel/issues/8545
+  // It is mean, that for this unknown versions babel will not add specific transforms, but still, transpiled code has a chance to work in required old browsers.
+  // And if `satisfies` will be used for example for old browser detection, we can force use minimum requested versions instead of minimum from caniuse data.
+  if (forceMinimumUnknownVersions) {
+    Object.keys(browsersWithoutCompleteStat).forEach((browser) => {
+      const target = targets.find((query) => query.startsWith(browser));
+
+      // @todo - respect other browserslist query patterns
+      if (target && target.includes('>=')) {
+        const [targetBrowser, targetMinVersion] = target.split(' >= ');
+        // @ts-expect-error
+        const browserKey = browsersWithoutCompleteStat[targetBrowser];
+        const mappedBrowser = BROWSERS_LIST_MAP[browserKey];
+
+        if (mappedBrowser && browsers[mappedBrowser.name]) {
+          if (Number(targetMinVersion) < Number(browsers[mappedBrowser.name][mappedBrowser.type])) {
+            browsers[mappedBrowser.name][mappedBrowser.type] = Number(targetMinVersion);
+          }
+        }
+      }
+    });
+  }
 
   let hasEntry = false;
 

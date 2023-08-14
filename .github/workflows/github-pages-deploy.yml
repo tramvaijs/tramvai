@@ -50,5 +50,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
-          personal_token: ${{ secrets.TINKOFF_BOT_PAT }}
+          personal_token: ${{ secrets.TRAMVAI_GH_PAGES_PAT }}
           publish_dir: ./tools/docSite/build

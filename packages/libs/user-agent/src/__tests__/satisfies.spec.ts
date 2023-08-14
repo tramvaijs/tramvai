@@ -14,7 +14,12 @@ function getDatasetLineLink(line: number, file: string) {
   return `${path.join(__dirname, 'uaDatasets', file)}:${line}`;
 }
 
-function testDatasets(datasetFiles: string[] = [], res: boolean | null, browsersListConfig?: any) {
+function testDatasets(
+  datasetFiles: string[] = [],
+  res: boolean | null,
+  browsersListConfig?: any,
+  forceMinimumUnknownVersions?: boolean
+) {
   datasetFiles.forEach((f) => {
     const userAgents = readDataset(f);
 
@@ -25,7 +30,7 @@ function testDatasets(datasetFiles: string[] = [], res: boolean | null, browsers
 
       it(`${ua}`, () => {
         try {
-          expect(satisfies(ua, browsersListConfig)).toBe(res);
+          expect(satisfies(ua, browsersListConfig, { forceMinimumUnknownVersions })).toBe(res);
         } catch (e: any) {
           e.message += `\n\n${ua}\n${getDatasetLineLink(i + 1, f)}\n`;
 
@@ -40,6 +45,11 @@ describe('user-agent/satisfies', () => {
   describe('default options from @tinkoff/browserslist-config', () => {
     describe('supported', () => {
       testDatasets(['supported.txt'], true);
+    });
+
+    // @todo - need to find any real Android 5 browser User-Agent
+    describe('supported with force minimum unknown versions', () => {
+      testDatasets(['supported_force.txt'], true, undefined, true);
     });
 
     describe('not supported', () => {

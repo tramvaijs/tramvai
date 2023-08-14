@@ -113,7 +113,7 @@ Also, default [retries](https://tanstack.com/query/v4/docs/react/guides/query-re
 
 ## Examples
 
-You can find and run examples in our [repo](https://github.com/Tinkoff/tramvai/-/tree/master/examples/how-to/react-query-usage)
+You can find and run examples in our [repo](https://github.com/tramvaijs/tramvai/-/tree/master/examples/how-to/react-query-usage)
 
 ### Basic Query
 

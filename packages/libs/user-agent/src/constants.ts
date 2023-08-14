@@ -52,6 +52,10 @@ export const BROWSERS_LIST_MAP: {
     type: 'mobile',
     name: 'firefox',
   },
+  samsung: {
+    type: 'mobile',
+    name: 'samsung browser',
+  },
 };
 
 export const CHROMIUM_BASED_BROWSERS = [
