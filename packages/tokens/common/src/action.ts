@@ -42,6 +42,13 @@ export interface ActionsRegistry {
   remove(type: string, actions?: PageAction[]): void;
 }
 
+export interface ActionPageRunner {
+  runActions(
+    actions: (Action | TramvaiAction<any, any, any>)[],
+    stopRunAtError?: (error: Error) => boolean
+  ): Promise<any>;
+}
+
 export interface ActionExecution {
   run<Params extends any[], Result, Deps>(
     action: TramvaiAction<Params, Result, Deps>,
@@ -64,13 +71,6 @@ export interface ActionExecution {
   ): Result extends Promise<any> ? Result : Promise<Result>;
 
   execution: Map<string, Record<string, any>>;
-}
-
-export interface ActionPageRunner {
-  runActions(
-    actions: (Action | TramvaiAction<any, any, any>)[],
-    stopRunAtError?: (error: Error) => boolean
-  ): Promise<any>;
 }
 
 export interface ActionConditionChecker<State = any> {
