@@ -24,7 +24,7 @@ export default MainPage;
 Page components support [global actions](concepts/action.md#global-actions) in `actions` static property, these actions will executed only for this page:
 
 ```tsx
-MainPage.actions = [fetchSomeDataAction];
+MainPage.actions = [fetchPageDataAction];
 ```
 
 This actions will be code-splitted with page component code.
