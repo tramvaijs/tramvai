@@ -4,6 +4,7 @@ import { createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 import { parse } from '@tinkoff/url';
 import { isNotFoundError, isRedirectFoundError, isHttpError } from '@tinkoff/errors';
+import { safeStringify } from '@tramvai/safe-strings';
 import type { LOGGER_TOKEN } from '@tramvai/module-common';
 import type { FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
 import type {
@@ -174,9 +175,9 @@ ${
           '</head>',
           [
             '<script>' +
-              `window.serverUrl = ${JSON.stringify(url)};` +
-              `window.serverError = new Error("${serializedError.message}");` +
-              `Object.assign(window.serverError, ${JSON.stringify(serializedError)});` +
+              `window.serverUrl = ${safeStringify(url)};` +
+              `window.serverError = new Error(${safeStringify(serializedError.message)});` +
+              `Object.assign(window.serverError, ${safeStringify(serializedError)});` +
               '</script>',
             extractor.getStyleTags(),
             extractor.getScriptTags(),

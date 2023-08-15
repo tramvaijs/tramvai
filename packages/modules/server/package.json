@@ -30,6 +30,7 @@
     "@tramvai/papi": "0.0.0-stub",
     "@tramvai/tokens-server": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub",
+    "@tramvai/safe-strings": "0.0.0-stub",
     "fastify": "^4.14.1",
     "@fastify/cookie": "^8.3.0",
     "@fastify/compress": "^6.2.0",
