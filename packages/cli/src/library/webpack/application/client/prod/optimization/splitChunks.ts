@@ -8,6 +8,8 @@ import type { ApplicationConfigEntry } from '../../../../../../typings/configEnt
 
 import type { SplitChunksOptions } from '../../../../types/webpack';
 
+const sharedChunksNameCache = new WeakMap<any, string>();
+
 // based on [nextjs code](https://github.com/vercel/next.js/blob/aaeb349ce3e8c4c3435a43a29af4379266818e7b/packages/next/build/webpack-config.ts#L707)
 const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]) => {
   const topLevelFrameworkPaths: string[] = [];
@@ -92,21 +94,26 @@ export const splitChunksConfig =
           minSize: splitChunks.granularChunksMinSize,
           reuseExistingChunk: true,
           priority: 30,
-        };
+          name: (module: webpack.Module, chunks: webpack.Chunk[] = []) => {
+            if (sharedChunksNameCache.has(module)) {
+              return sharedChunksNameCache.get(module);
+            }
 
-        // for development, default name implementation is faster and readable
-        if (env === 'production') {
-          shared.name = (module: any, chunks: webpack.Chunk[] = []) => {
-            return crypto
+            const name = crypto
               .createHash('sha1')
               .update(
                 chunks.reduce((acc: string, chunk: webpack.Chunk) => {
                   return acc + chunk.name;
                 }, '')
               )
-              .digest('hex');
-          };
-        }
+              .digest('hex')
+              .substring(0, 8);
+
+            sharedChunksNameCache.set(module, name);
+
+            return name;
+          },
+        };
 
         webpackSplitChunks = {
           chunks: 'all',

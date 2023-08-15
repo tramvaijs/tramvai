@@ -44,10 +44,6 @@ export const webpackClientConfig = ({
 
   config.batch(splitChunksConfig(configManager));
 
-  config.optimization
-    // namedChunks должно быть включено, чтобы webpack-flush-chunks смог определить имена чанков от которых зависит чанк бандла после обработчки через splitChunks
-    .set('chunkIds', 'named');
-
   config.stats('minimal');
 
   config.batch(

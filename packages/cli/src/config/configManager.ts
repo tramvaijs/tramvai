@@ -93,6 +93,7 @@ export type ConfigManager<
   };
 
 export const DEFAULT_PORT = 3000;
+export const DEFAULT_STATIC_HOST = 'localhost';
 export const DEFAULT_STATIC_PORT = 4000;
 export const DEFAULT_STATIC_MODULE_PORT = 4040;
 
@@ -135,7 +136,6 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
       'unknown',
     trace: false,
     host: '0.0.0.0',
-    staticHost: 'localhost',
     profile: false,
     noClientRebuild: false,
     noServerRebuild: false,
@@ -154,6 +154,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     buildType,
     debug,
     port: Number(settings.port ?? DEFAULT_PORT),
+    staticHost: settings.staticHost ?? DEFAULT_STATIC_HOST,
     staticPort: Number(
       settings.staticPort ?? (type === 'module' ? DEFAULT_STATIC_MODULE_PORT : DEFAULT_STATIC_PORT)
     ),

@@ -120,7 +120,7 @@
     "less-loader": "^8.1.1",
     "lightning-pool": "^2.4.0",
     "mdtable": "^0.3.1",
-    "mini-css-extract-plugin": "2.6.1",
+    "mini-css-extract-plugin": "2.7.6",
     "node-plop": "^0.26.0",
     "noop-stream": "^0.1.0",
     "null-loader": "^4.0.1",
