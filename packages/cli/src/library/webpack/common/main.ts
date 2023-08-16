@@ -26,6 +26,8 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
     'uniqueName',
     `${configManager.type}:${configManager.name}:${configManager.version}`
   );
+  // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
+  config.output.set('devtoolNamespace', '@tramvai/cli');
 
   config.context(path.resolve(__dirname, '..', '..', '..', '..'));
   config.batch(resolve(configManager));
