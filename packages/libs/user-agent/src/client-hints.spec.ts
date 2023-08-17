@@ -13,7 +13,7 @@ describe('low entropy headers only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "106",
-          "name": "google chrome",
+          "name": "chrome",
           "version": "106",
         },
         "cpu": {
@@ -50,7 +50,7 @@ describe('low entropy headers only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "106",
-          "name": "google chrome",
+          "name": "chrome",
           "version": "106",
         },
         "cpu": {
@@ -250,7 +250,7 @@ describe('low entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "google chrome",
+          "name": "chrome",
           "version": "114",
         },
         "cpu": {
@@ -267,7 +267,7 @@ describe('low entropy UADataValues only', () => {
         },
         "mobileOS": undefined,
         "os": {
-          "name": "macOS",
+          "name": "Mac OS",
           "version": undefined,
         },
         "sameSiteNoneCompatible": true,
@@ -300,7 +300,7 @@ describe('low entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "google chrome",
+          "name": "chrome",
           "version": "114",
         },
         "cpu": {
@@ -469,7 +469,7 @@ describe('high entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "google chrome",
+          "name": "chrome",
           "version": "114.0.5735.198",
         },
         "cpu": {
@@ -486,7 +486,7 @@ describe('high entropy UADataValues only', () => {
         },
         "mobileOS": undefined,
         "os": {
-          "name": "macOS",
+          "name": "Mac OS",
           "version": "13.2.1",
         },
         "sameSiteNoneCompatible": true,
@@ -536,7 +536,7 @@ describe('high entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "google chrome",
+          "name": "chrome",
           "version": "114.0.5735.198",
         },
         "cpu": {

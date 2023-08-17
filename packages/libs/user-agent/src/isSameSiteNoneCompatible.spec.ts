@@ -1,7 +1,8 @@
 import { UAParser } from 'ua-parser-js';
 import { isSameSiteNoneCompatible } from './isSameSiteNoneCompatible';
+import { parseClientHintsUserAgentData } from './client-hints';
 
-describe('isSameSiteNoneCompatible', () => {
+describe('isSameSiteNoneCompatible with user agent', () => {
   const negativeTestCases = {
     'Chrome 51':
       'Mozilla/5.0 doogiePIM/1.0.4.2 AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.84 Safari/537.36',
@@ -103,5 +104,33 @@ describe('isSameSiteNoneCompatible', () => {
     result.browser = undefined;
 
     expect(isSameSiteNoneCompatible(result)).toBe(true);
+  });
+});
+
+// In fact, all browsers with client hints support supports `isSameSiteNone` also.
+// What we are checking here is that result of `const result = parseClientHintsHeaders/parseClientHintsUserAgentData`
+// will be correct for `isSameSiteNoneCompatible(result)`
+describe('isSameSiteNoneCompatible with client hints', () => {
+  it('unsupported version of chrome', () => {
+    const result = parseClientHintsUserAgentData({
+      brands: [
+        {
+          brand: 'Not.A/Brand',
+          version: '8',
+        },
+        {
+          brand: 'Chromium',
+          version: '62',
+        },
+        {
+          brand: 'Google Chrome',
+          version: '62',
+        },
+      ],
+      mobile: false,
+      platform: 'macOS',
+    });
+
+    expect(isSameSiteNoneCompatible(result)).toBe(false);
   });
 });

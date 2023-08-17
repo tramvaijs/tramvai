@@ -36,7 +36,6 @@ export const parseUserAgentHeader = (userAgent: string): UserAgent => {
 
   const browserName = toLowerName(browser);
   const engineName = toLowerName(engine);
-  const sameSiteNoneCompatible = isSameSiteNoneCompatible(result);
 
   if (browserName === 'opera mobi') {
     result.device.type = 'mobile';
@@ -45,7 +44,7 @@ export const parseUserAgentHeader = (userAgent: string): UserAgent => {
   return {
     ...result,
     mobileOS: getMobileOs(os.name),
-    sameSiteNoneCompatible,
+    sameSiteNoneCompatible: isSameSiteNoneCompatible(result),
     browser: {
       ...browser,
       browserEngine: getBrowserEngine(browserName, engineName),

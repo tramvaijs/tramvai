@@ -59,13 +59,15 @@ const normalizedBrowserslist = (query: string[]) => {
   return result;
 };
 
+interface SatisfiesOptions {
+  env?: 'modern' | 'defaults';
+  forceMinimumUnknownVersions?: boolean;
+}
+
 export const satisfies = (
   userAgent: UserAgent | string,
   browserslistConfig?: string[],
-  {
-    env = 'defaults',
-    forceMinimumUnknownVersions = false,
-  }: { env?: 'modern' | 'defaults'; forceMinimumUnknownVersions?: boolean } = {}
+  { env = 'defaults', forceMinimumUnknownVersions = false }: SatisfiesOptions = {}
 ): boolean | null => {
   const ua = isString(userAgent) ? parseUserAgentHeader(userAgent) : userAgent;
   const {

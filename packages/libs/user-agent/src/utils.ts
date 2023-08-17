@@ -20,7 +20,7 @@ export const getBrowserEngine = (browserName?: string, engineName?: string): str
     // then define the `browserName` as `safari`, because all browsers
     // on iOS use webkit. Also, we are not handling mobile Safari separately,
     // as it webkit too. See https://en.wikipedia.org/wiki/WebKit
-    case browserName === 'safari' || engineName === 'webkit':
+    case browserName === 'safari' || browserName === 'mobile safari' || engineName === 'webkit':
       return 'safari';
     // We aren't using something like `browserName === 'chrome'` here,
     // because there are a lot of browsers based on chromium.

@@ -5,6 +5,14 @@ const KNOWN_VENDORS = new Set(['Opera', 'Google Chrome', 'Microsoft Edge', 'Fire
 
 const KNOWN_ENGINES = new Set(['Chromium']);
 
+const BACKWARD_COMPATIBILITY_BROWSER_NAME: Record<string, string> = {
+  'Google Chrome': 'chrome',
+};
+
+const BACKWARD_COMPATIBILITY_OS_NAME: Record<string, string> = {
+  macOS: 'Mac OS',
+};
+
 const parseQuotedString = (str: string | undefined): string | undefined => {
   if (!str) {
     return str;
@@ -33,7 +41,7 @@ const parseBrowserFromString = (brandsList: string): { browser: Browser; engine:
     const [name, version] = entry.split(/;\s*v=/).map(parseQuotedString);
 
     if (name && KNOWN_VENDORS.has(name)) {
-      browser.name = name.toLowerCase();
+      browser.name = BACKWARD_COMPATIBILITY_BROWSER_NAME[name] ?? name.toLowerCase();
       browser.version = version;
       browser.major = version;
     }
@@ -70,7 +78,7 @@ const parseBrowserFromUserAgentData = (
 
   brands.forEach(({ brand, version }) => {
     if (KNOWN_VENDORS.has(brand)) {
-      browser.name = brand.toLowerCase();
+      browser.name = BACKWARD_COMPATIBILITY_BROWSER_NAME[brand] ?? brand.toLowerCase();
       browser.version = version;
       [browser.major] = version.split('.');
     }
@@ -91,6 +99,14 @@ const parseBrowserFromUserAgentData = (
   return { browser, engine };
 };
 
+const getBackwardCompatibleOsName = (payload: string | undefined): string | undefined => {
+  if (payload === undefined) {
+    return undefined;
+  }
+
+  return BACKWARD_COMPATIBILITY_OS_NAME[payload] ?? payload;
+};
+
 /**
  *
  * @description
@@ -101,7 +117,7 @@ const parseBrowserFromUserAgentData = (
  * - CPU architecture
  * - device model
  *
- * To able to use data you should first provide header `Accept-CH` with the list of headers that client should send.
+ * To be able to use data you should first provide header `Accept-CH` with the list of headers that client should send.
  *
  * @param headers
  * @returns
@@ -120,7 +136,7 @@ export const parseClientHintsHeaders = (
     browser,
     engine,
     os: {
-      name: osName,
+      name: getBackwardCompatibleOsName(osName),
       version: parseQuotedString(headers['sec-ch-ua-platform-version'] as string),
     },
     cpu: {
@@ -148,6 +164,9 @@ export const parseClientHintsHeaders = (
  * @see https://wicg.github.io/ua-client-hints/#user-agent-model
  *
  * @param payload
+ *
+ * @example
+ * const clientHints = parseClientHintsUserAgentData(window.navigator.userAgentData)
  */
 export const parseClientHintsUserAgentData = (payload: UADataValues): UserAgent => {
   const { browser, engine } = parseBrowserFromUserAgentData(
@@ -158,7 +177,7 @@ export const parseClientHintsUserAgentData = (payload: UADataValues): UserAgent 
     browser,
     engine,
     os: {
-      name: payload.platform,
+      name: getBackwardCompatibleOsName(payload.platform),
       version: payload.platformVersion,
     },
     cpu: {
