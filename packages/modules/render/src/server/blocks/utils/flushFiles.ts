@@ -31,7 +31,7 @@ export const flushFiles = (
   // что при повторных вызовах flushChunks вызовет дублирование подключения manifest.js
   // из-за чего приложение может запускаться несколько раз
   // без поля namedChunkGroups flushChunks вернет только сами ассеты для чанков, без зависимостей
-  const { assetsByChunkName, namedChunkGroups } = webpackStats;
+  const { assetsByChunkName, namedChunkGroups, chunks: allChunks } = webpackStats;
 
   const resolvedChunks: string[] = [];
 
@@ -43,7 +43,18 @@ export const flushFiles = (
     }
   }
 
-  const files = flatten<string>(uniq(resolvedChunks).map((chunk) => assetsByChunkName[chunk]));
+  const files = flatten<string>(
+    uniq(resolvedChunks).map((chunk) => {
+      let assetFiles = assetsByChunkName[chunk];
+
+      if (!assetFiles && allChunks) {
+        const chunkById = allChunks.find((c) => c.id === chunk);
+        assetFiles = chunkById?.files;
+      }
+
+      return assetFiles;
+    })
+  );
 
   return getFilesByType(files);
 };

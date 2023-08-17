@@ -18,3 +18,10 @@ export const DEFAULT_STATS_FIELDS: string[] = [
   'namedChunkGroups',
   'entrypoints',
 ];
+
+export const DEV_STATS_OPTIONS = {
+  ...DEFAULT_STATS_OPTIONS,
+  chunks: true, // нужно, чтобы получить название файлов для shared чанков в development режиме
+};
+
+export const DEV_STATS_FIELDS = [...DEFAULT_STATS_FIELDS, 'chunks'];

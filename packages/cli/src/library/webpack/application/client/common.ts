@@ -18,13 +18,18 @@ import postcssAssets from '../../blocks/postcssAssets';
 import nodeClient from '../../blocks/nodeClient';
 import { pagesResolve } from '../../blocks/pagesResolve';
 import { configToEnv } from '../../blocks/configToEnv';
-import { DEFAULT_STATS_OPTIONS, DEFAULT_STATS_FIELDS } from '../../constants/stats';
+import {
+  DEFAULT_STATS_OPTIONS,
+  DEFAULT_STATS_FIELDS,
+  DEV_STATS_OPTIONS,
+  DEV_STATS_FIELDS,
+} from '../../constants/stats';
 import { pwaBlock } from '../../blocks/pwa/client';
 import type { ModuleFederationFixRangeOptions } from '../../plugins/ModuleFederationFixRange';
 import { ModuleFederationFixRange } from '../../plugins/ModuleFederationFixRange';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
-  const { polyfill, fileSystemPages, shared } = configManager;
+  const { polyfill, fileSystemPages, shared, env } = configManager;
 
   const portal = path.resolve(configManager.rootDir, `packages/${process.env.APP_ID}/portal.js`);
   const polyfillPath = path.resolve(configManager.rootDir, polyfill ?? 'src/polyfill');
@@ -65,8 +70,8 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .use(StatsWriterPlugin, [
       {
         filename: configManager.modern ? 'stats.modern.json' : 'stats.json',
-        stats: DEFAULT_STATS_OPTIONS,
-        fields: DEFAULT_STATS_FIELDS,
+        stats: env === 'development' ? DEV_STATS_OPTIONS : DEFAULT_STATS_OPTIONS,
+        fields: env === 'development' ? DEV_STATS_FIELDS : DEFAULT_STATS_FIELDS,
       },
     ])
     .end()
