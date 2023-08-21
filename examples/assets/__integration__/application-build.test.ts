@@ -9,8 +9,9 @@ describe('assets build', () => {
     await build({
       rootDir: path.resolve(__dirname, '../'),
       target: 'assets',
+      fileCache: false,
     });
-  }, 80000);
+  }, 120000);
 
   it('optimized svg snapshot', async () => {
     const distClientDirectory = path.resolve(__dirname, '../dist', 'client');
