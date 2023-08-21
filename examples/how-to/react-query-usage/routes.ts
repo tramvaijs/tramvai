@@ -23,6 +23,13 @@ export const routes: Array<typeof ROUTES_TOKEN> = [
     },
   },
   {
+    name: 'use-query-cancel',
+    path: '/use-query-cancel',
+    config: {
+      pageComponent: 'use-query-cancel',
+    },
+  },
+  {
     name: 'use-same-query-many-components',
     path: '/use-same-query-many-components',
     config: {

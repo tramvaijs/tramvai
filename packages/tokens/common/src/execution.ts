@@ -1,5 +1,4 @@
 import { createToken } from '@tinkoff/dippy';
-import type { AbortController, AbortSignal } from 'node-abort-controller';
 
 export interface ExecutionContextValues {
   [key: string]: any | undefined;

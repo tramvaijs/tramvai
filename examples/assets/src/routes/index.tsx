@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useIsomorphicLayoutEffect } from '@tinkoff/react-hooks';
 import logo from '../images/logo.svg';
 import Logo from '../images/logo.svg?react';
+import plus from '../images/plus.svg';
+
+console.log(plus);
 
 export const MainPage = () => {
   // prevent hydration mismatch error because it will break test case

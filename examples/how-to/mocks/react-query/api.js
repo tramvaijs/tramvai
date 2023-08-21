@@ -8,6 +8,11 @@ module.exports = {
       headers: {},
       payload: 'Hello, Mock!',
     },
+    'GET /api/cancel': async (req, res) => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      res.status(200);
+      res.send('Hello, Mock!');
+    },
     'GET /api/group/test-1': {
       status: 200,
       headers: {},

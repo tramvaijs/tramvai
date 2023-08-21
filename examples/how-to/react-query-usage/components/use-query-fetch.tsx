@@ -6,6 +6,7 @@ const query = createQuery({
   key: 'base',
   async fn(_) {
     const { payload } = await this.deps.apiClient.get<string>('api/base');
+
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     return payload;

@@ -1,4 +1,3 @@
-import type { AbortController, AbortSignal } from 'node-abort-controller';
 import type { ProvideDepsIterator } from '@tinkoff/dippy';
 import type { ConsumerContext, Dispatch, GetState } from './state';
 

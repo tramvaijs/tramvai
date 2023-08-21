@@ -11,6 +11,7 @@ const bundle = createBundle({
     'use-query-base': lazy(() => import('./components/use-query-base')),
     'use-query-prefetch': lazy(() => import('./components/use-query-prefetch')),
     'use-query-fetch': lazy(() => import('./components/use-query-fetch')),
+    'use-query-cancel': lazy(() => import('./components/use-query-cancel')),
     'use-same-query-many-components': lazy(
       () => import('./components/use-same-query-many-components')
     ),

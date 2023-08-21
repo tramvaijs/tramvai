@@ -528,6 +528,26 @@ export function Component() {
 }
 ```
 
+### AbortController
+
+Similar to [Actions AbortController](03-features/09-data-fetching/01-action.md#abortcontroller), `abortSignal` and `abortController` for current execution context available in `fn` context (`this`):
+
+```tsx
+const query = createQuery({
+  key: ['abortable'],
+  async fn() {
+    const signal = this.abortSignal;
+
+    return this.deps.httpClient.request({ path: '/api', signal });
+  },
+  deps: {
+    httpClient: HTTP_CLIENT_TOKEN,
+  },
+});
+```
+
+This signal has subscription to [react-query cancellation signal](https://tanstack.com/query/v4/docs/react/guides/query-cancellation), see example in [`use-query-cancel` example](https://github.com/tramvaijs/tramvai/-/tree/master/examples/how-to/react-query-usage/components/use-query-cancel)
+
 ### Use `@tanstack/react-query` directly
 
 :::caution

@@ -6,6 +6,8 @@ export const QUERY_PARAMETERS = '__query_parameters__';
 
 export interface ReactQueryContext<Deps extends ProviderDeps> {
   deps: ProvideDepsIterator<Deps>;
+  abortController?: AbortController;
+  abortSignal?: AbortSignal;
 }
 
 export type ReactQueryKeyOrString = ReactQueryKey | string;

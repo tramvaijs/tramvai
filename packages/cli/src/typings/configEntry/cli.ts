@@ -2,6 +2,8 @@ import type { Configuration } from 'webpack';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import type { ConfigEntry, OverridableOption } from './common';
 
+type SimplifiedSvgoConfig = string | { name: string; params: Record<string, any> };
+
 type Notifications = {
   /**
    * @title Defines when success notifications are shown
@@ -161,13 +163,10 @@ export interface CliConfigEntry extends ConfigEntry {
    */
   svgo?: {
     /**
-     * @title svgo plugins
+     * @title svgo plugins, you can find full types in PluginConfig inside `svgo` source code,
+     * but this interface too complex and heavy for schema
      */
-    plugins?: Array<{
-      name: string;
-      active: boolean;
-      [key: string]: any;
-    }>;
+    plugins?: SimplifiedSvgoConfig[];
   };
 
   /**

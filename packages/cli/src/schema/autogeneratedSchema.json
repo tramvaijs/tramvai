@@ -1015,19 +1015,27 @@
           "type": "object",
           "properties": {
             "plugins": {
-              "title": "svgo plugins",
+              "title": "svgo plugins, you can find full types in PluginConfig inside `svgo` source code,\nbut this interface too complex and heavy for schema",
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "params": {
+                        "type": "object",
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
                   },
-                  "active": {
-                    "type": "boolean"
+                  {
+                    "type": "string"
                   }
-                },
-                "additionalProperties": false
+                ]
               }
             }
           },
@@ -1133,23 +1141,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@6003": {
+                        "__@match@6176": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6005": {
+                        "__@replace@6178": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6008": {
+                        "__@search@6181": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6010": {
+                        "__@split@6183": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6012": {
+                        "__@matchAll@6185": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1668,19 +1676,27 @@
           "type": "object",
           "properties": {
             "plugins": {
-              "title": "svgo plugins",
+              "title": "svgo plugins, you can find full types in PluginConfig inside `svgo` source code,\nbut this interface too complex and heavy for schema",
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "params": {
+                        "type": "object",
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
                   },
-                  "active": {
-                    "type": "boolean"
+                  {
+                    "type": "string"
                   }
-                },
-                "additionalProperties": false
+                ]
               }
             }
           },
@@ -1786,23 +1802,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@6003": {
+                        "__@match@6176": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6005": {
+                        "__@replace@6178": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6008": {
+                        "__@search@6181": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6010": {
+                        "__@split@6183": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6012": {
+                        "__@matchAll@6185": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2321,19 +2337,27 @@
           "type": "object",
           "properties": {
             "plugins": {
-              "title": "svgo plugins",
+              "title": "svgo plugins, you can find full types in PluginConfig inside `svgo` source code,\nbut this interface too complex and heavy for schema",
               "type": "array",
               "items": {
-                "type": "object",
-                "properties": {
-                  "name": {
-                    "type": "string"
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "params": {
+                        "type": "object",
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
                   },
-                  "active": {
-                    "type": "boolean"
+                  {
+                    "type": "string"
                   }
-                },
-                "additionalProperties": false
+                ]
               }
             }
           },
@@ -2439,23 +2463,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@6003": {
+                        "__@match@6176": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6005": {
+                        "__@replace@6178": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6008": {
+                        "__@search@6181": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6010": {
+                        "__@split@6183": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6012": {
+                        "__@matchAll@6185": {
                           "type": "object",
                           "additionalProperties": false
                         }

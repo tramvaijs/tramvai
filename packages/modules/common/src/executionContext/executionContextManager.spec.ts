@@ -1,4 +1,3 @@
-import type { AbortController } from 'node-abort-controller';
 import { ExecutionContextManager } from './executionContextManager';
 
 const createMockPromise = () => {

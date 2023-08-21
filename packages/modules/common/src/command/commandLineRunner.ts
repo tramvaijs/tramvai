@@ -1,4 +1,3 @@
-import type { AbortController } from 'node-abort-controller';
 import { isSilentError } from '@tinkoff/errors';
 import type {
   CommandLineDescription,

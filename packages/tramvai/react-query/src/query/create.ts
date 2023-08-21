@@ -12,6 +12,7 @@ import type { ReactQueryContext, ReactQueryKeyOrString } from '../baseQuery/type
 import { QUERY_PARAMETERS } from '../baseQuery/types';
 import { normalizeKey } from '../shared/normalizeKey';
 import { resolveDI } from '../shared/resolveDI';
+import { mapQuerySignalToxecutionContext } from '../shared/signal';
 
 const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
   query: Query<Options, Result, Deps>,
@@ -27,8 +28,12 @@ const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
 
   const actionWrapper = declareAction({
     name: 'queryExecution',
-    async fn() {
-      return fn.call(ctx, options, ctx.deps);
+    async fn(queryContext: { signal?: AbortSignal }) {
+      const { abortSignal, abortController } = this;
+
+      mapQuerySignalToxecutionContext(queryContext, this);
+
+      return fn.call({ ...ctx, abortSignal, abortController }, options, ctx.deps);
     },
     deps,
     conditions,
@@ -41,9 +46,9 @@ const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
     tramvaiOptions: {
       conditions,
     },
-    queryFn: () => {
+    queryFn: (queryContext) => {
       const context = di.get(CONTEXT_TOKEN);
-      return context.executeAction(actionWrapper);
+      return context.executeAction(actionWrapper, queryContext);
     },
   };
 };

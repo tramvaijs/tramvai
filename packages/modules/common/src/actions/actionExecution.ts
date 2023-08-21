@@ -1,4 +1,3 @@
-import type { AbortController, AbortSignal } from 'node-abort-controller';
 import flatten from '@tinkoff/utils/array/flatten';
 import identity from '@tinkoff/utils/function/identity';
 import type { Action, ActionParameters, DI_TOKEN } from '@tramvai/core';

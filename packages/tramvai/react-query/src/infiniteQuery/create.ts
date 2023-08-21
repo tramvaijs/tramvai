@@ -11,6 +11,7 @@ import type { ReactQueryContext, ReactQueryKeyOrString } from '../baseQuery/type
 import { QUERY_PARAMETERS } from '../baseQuery/types';
 import { normalizeKey } from '../shared/normalizeKey';
 import { resolveDI } from '../shared/resolveDI';
+import { mapQuerySignalToxecutionContext } from '../shared/signal';
 
 const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps>(
   query: InfiniteQuery<Options, PageParam, Result, Deps>,
@@ -34,8 +35,17 @@ const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps
 
   const actionWrapper = declareAction({
     name: 'infiniteQueryExecution',
-    async fn(pageParam: PageParam) {
-      return fn.call(ctx, options, pageParam, ctx.deps);
+    async fn(queryContext: { pageParam?: PageParam; signal?: AbortSignal }) {
+      const { abortSignal, abortController } = this;
+
+      mapQuerySignalToxecutionContext(queryContext, this);
+
+      return fn.call(
+        { ...ctx, abortSignal, abortController },
+        options,
+        queryContext.pageParam!,
+        ctx.deps
+      );
     },
     conditionsFailResult: 'reject',
     deps,
@@ -50,9 +60,9 @@ const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps
     tramvaiOptions: {
       conditions,
     },
-    queryFn: ({ pageParam }) => {
+    queryFn: (queryContext) => {
       const context = di.get(CONTEXT_TOKEN);
-      return context.executeAction(actionWrapper, pageParam);
+      return context.executeAction(actionWrapper, queryContext);
     },
   };
 };

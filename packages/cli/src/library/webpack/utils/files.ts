@@ -1,4 +1,5 @@
 import type Config from 'webpack-chain';
+import type { PluginConfig, Config as SvgoConfig } from 'svgo';
 import type { ConfigManager } from '../../../config/configManager';
 import type { CliConfigEntry } from '../../../typings/configEntry/cli';
 import { addTranspilerLoader, getTranspilerConfig } from './transpiler';
@@ -27,17 +28,20 @@ export const addSvgrLoader = (
   svgrConfig.use('svgr').loader('@svgr/webpack').options({ babel: false, svgo: svgoOptions }).end();
 };
 
-export const getSvgoOptions = (configManager: ConfigManager<CliConfigEntry>) => {
+export const getSvgoOptions = (
+  configManager: ConfigManager<CliConfigEntry>
+): SvgoConfig & { configFile?: boolean } => {
   return {
     configFile: false,
-    plugins: configManager.svgo?.plugins ?? [
+    plugins: (configManager.svgo?.plugins as any as PluginConfig[]) ?? [
       {
-        name: 'cleanupIds',
-        active: false,
-      },
-      {
-        name: 'collapseGroups',
-        active: false,
+        name: 'preset-default',
+        params: {
+          overrides: {
+            cleanupIds: false,
+            collapseGroups: false,
+          },
+        },
       },
     ],
   };

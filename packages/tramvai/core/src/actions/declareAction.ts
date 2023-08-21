@@ -1,13 +1,13 @@
 import type { TramvaiAction, TramvaiActionDefinition } from '@tramvai/types-actions-state-context';
 import { ACTION_PARAMETERS } from '@tramvai/types-actions-state-context';
-import { AbortController } from 'node-abort-controller';
+import { AbortController as NodeAbortController } from 'node-abort-controller';
 
 export function declareAction<Params extends any[], Result, Deps = {}>(
   action: TramvaiActionDefinition<Params, Result, Deps>
 ): TramvaiAction<Params, Result, Deps> {
   // fallback to support compatibility with createAction
   const fn = (context: any, payload: any, deps: any) => {
-    const abortController = new AbortController();
+    const abortController = new NodeAbortController() as AbortController;
 
     return action.fn.apply(
       {
