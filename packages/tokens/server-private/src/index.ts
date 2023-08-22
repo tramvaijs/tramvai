@@ -143,3 +143,12 @@ export const EARLY_HINTS_MANAGER_TOKEN = createToken<EarlyHintsManager>('earlyHi
 export interface EarlyHintsManager {
   flushHints(): Promise<void>;
 }
+
+/**
+ * @description
+ * Subscription to papi initialization.
+ * It is called before papi routes registration
+ */
+export const PAPI_FASTIFY_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>('papi fastify init', {
+  multi: true,
+});

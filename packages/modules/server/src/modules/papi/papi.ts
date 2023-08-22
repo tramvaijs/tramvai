@@ -1,6 +1,6 @@
 import flatten from '@tinkoff/utils/array/flatten';
 
-import { Module, DI_TOKEN, provide } from '@tramvai/core';
+import { Module, DI_TOKEN, provide, optional } from '@tramvai/core';
 import toArray from '@tinkoff/utils/array/toArray';
 import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import {
@@ -9,7 +9,10 @@ import {
   SERVER_MODULE_PAPI_PRIVATE_URL,
   SERVER_MODULE_PAPI_PUBLIC_URL,
 } from '@tramvai/tokens-server';
-import { WEB_FASTIFY_APP_BEFORE_INIT_TOKEN } from '@tramvai/tokens-server-private';
+import {
+  PAPI_FASTIFY_INIT_TOKEN,
+  WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
+} from '@tramvai/tokens-server-private';
 import type { Papi } from '@tramvai/papi';
 import { createPapiMethod, getPapiParameters } from '@tramvai/papi';
 import { createApi } from './api';
@@ -25,7 +28,15 @@ import { papiExecutorProvider } from './server/executor';
     provide({
       provide: WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
       useFactory:
-        ({ di, logger, privateRoutes, publicRoutes, publicBaseUrl, privateBaseUrl }) =>
+        ({
+          di,
+          logger,
+          privateRoutes,
+          publicRoutes,
+          publicBaseUrl,
+          privateBaseUrl,
+          papiInitHandlers,
+        }) =>
         (app) => {
           if (process.env.NODE_ENV === 'development') {
             const papiListRoute = createPapiMethod({
@@ -65,6 +76,7 @@ import { papiExecutorProvider } from './server/executor';
               baseUrl: privateBaseUrl,
               di,
               logger,
+              papiInitHandlers,
             });
           }
 
@@ -73,6 +85,7 @@ import { papiExecutorProvider } from './server/executor';
               baseUrl: publicBaseUrl,
               di,
               logger,
+              papiInitHandlers,
             });
           }
         },
@@ -91,6 +104,7 @@ import { papiExecutorProvider } from './server/executor';
         },
         privateBaseUrl: SERVER_MODULE_PAPI_PRIVATE_URL,
         publicBaseUrl: SERVER_MODULE_PAPI_PUBLIC_URL,
+        papiInitHandlers: optional(PAPI_FASTIFY_INIT_TOKEN),
       },
       multi: true,
     }),

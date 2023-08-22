@@ -1,27 +1,39 @@
-import type { FastifyInstance, FastifySchema } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { fastifyCookie } from '@fastify/cookie';
 import fastifyFormBody from '@fastify/formbody';
 
 import type { Papi } from '@tramvai/papi';
 import { getPapiParameters } from '@tramvai/papi';
-import type { DI_TOKEN } from '@tramvai/core';
+import type { DI_TOKEN, ExtractDependencyType } from '@tramvai/core';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { FASTIFY_REQUEST, FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
 import { Scope, createChildContainer } from '@tinkoff/dippy';
 import { HttpError } from '@tinkoff/errors';
+import type {
+  WEB_FASTIFY_APP_TOKEN,
+  PAPI_FASTIFY_INIT_TOKEN,
+} from '@tramvai/tokens-server-private';
 import { PAPI_EXECUTOR } from '@tramvai/tokens-server-private';
 
 export interface CreateOptions {
   baseUrl: string;
   di: typeof DI_TOKEN;
   logger: typeof LOGGER_TOKEN;
+  papiInitHandlers: ExtractDependencyType<typeof PAPI_FASTIFY_INIT_TOKEN>;
 }
+
+const runHandlers = (
+  instance: ExtractDependencyType<typeof WEB_FASTIFY_APP_TOKEN>,
+  handlers: ExtractDependencyType<typeof PAPI_FASTIFY_INIT_TOKEN>
+) => {
+  return Promise.all([handlers && Promise.all(handlers.map((handler) => handler(instance)))]);
+};
 
 export function createApi(
   rootApp: FastifyInstance,
   papiList: Papi[],
-  { baseUrl, di, logger }: CreateOptions
+  { baseUrl, di, logger, papiInitHandlers }: CreateOptions
 ) {
   const paths = new Set();
   const papiLog = logger('papi');
@@ -30,6 +42,8 @@ export function createApi(
     async (app) => {
       await app.register(fastifyCookie);
       await app.register(fastifyFormBody, { bodyLimit: 2097152 }); // 2mb
+
+      await runHandlers(app, papiInitHandlers);
 
       for (const papi of papiList) {
         const papiParams = getPapiParameters(papi);

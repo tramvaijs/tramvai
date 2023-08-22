@@ -294,6 +294,36 @@ import { createPapiMethod } from '@tramvai/papi';
 export class PapiTestModule {}
 ```
 
+### Add CORS headers
+
+Under the hood, fastify server is used, and you can register any fastify middleware, for example `@fastify/cors`.
+
+:::warning
+
+Fastify server is stable, but some implementation details can be changed in the future.
+
+Because of that, all specific fastify tokens is available in `@tramvai/tokens-server-private` package.
+
+:::
+
+:::tip
+
+`@fastify/cookie` and `@fastify/formbody` middlewares already connected in papi handlers scope
+
+:::
+
+```ts
+import cors from '@fastify/cors';
+import { PAPI_FASTIFY_INIT_TOKEN } from '@tramvai/tokens-server-private';
+
+const provider = provide({
+  provide: PAPI_FASTIFY_INIT_TOKEN,
+  useValue: async (app) => {
+    await app.register(cors);
+  },
+});
+```
+
 ## API Reference
 
 ### createPapiMethod
