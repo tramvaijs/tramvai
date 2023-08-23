@@ -18,8 +18,35 @@ export const startSharedProviders: Provider[] = [
     provide: WEBPACK_COMPILER_TOKEN,
     useFactory: ({ clientConfig, serverConfig }) => {
       const configs = [clientConfig, serverConfig].filter(Boolean).map(toWebpackConfig);
+      const multiCompiler = webpack(configs);
+      const { inputFileSystem } = multiCompiler.compilers[0];
 
-      return webpack(configs);
+      // reuse input file system between compilers for faster builds, reference - https://github.com/vercel/next.js/pull/51879
+      multiCompiler.compilers.forEach((compiler) => {
+        // eslint-disable-next-line no-param-reassign
+        compiler.inputFileSystem = inputFileSystem;
+
+        // This is set for the initial compile. After that Watching class in webpack adds it.
+        // eslint-disable-next-line no-param-reassign
+        compiler.fsStartTime = Date.now();
+        // Ensure NodeEnvironmentPlugin doesn't purge the inputFileSystem. Purging is handled in `done` below.
+        // https://github.com/webpack/webpack/blob/main/lib/node/NodeEnvironmentPlugin.js#L51
+        compiler.hooks.beforeRun.intercept({
+          register(tapInfo: any) {
+            if (tapInfo.name === 'NodeEnvironmentPlugin') {
+              return null;
+            }
+            return tapInfo;
+          },
+        });
+      });
+
+      multiCompiler.hooks.done.tap('rebuildDone', () => {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        inputFileSystem.purge!();
+      });
+
+      return multiCompiler;
     },
     deps: {
       clientConfig: { token: WEBPACK_CLIENT_CONFIG_TOKEN, optional: true },

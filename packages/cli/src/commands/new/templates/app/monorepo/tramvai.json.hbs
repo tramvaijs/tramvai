@@ -5,7 +5,10 @@
       "name": "{{configEntry.name}}",
       "root": "apps/{{configEntry.name}}",
       "type": "application",
-      "sourceMap": true,
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
       "postcss": {
         "config": "apps/{{configEntry.name}}/postcss"
       },
