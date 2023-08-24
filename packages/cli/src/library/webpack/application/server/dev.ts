@@ -87,11 +87,11 @@ export const webpackServerConfig = ({
 
   config.plugin('runtime-path').use(RuntimePathPlugin, [
     {
-      publicPath:
-        process.env.ASSETS_PREFIX ??
-        `"http://${configManager.staticHost}:${
-          configManager.staticPort
-        }/${configManager.output.client.replace(/\/$/, '')}/"`,
+      publicPath: process.env.ASSETS_PREFIX
+        ? 'process.env.ASSETS_PREFIX'
+        : `"http://${configManager.staticHost}:${
+            configManager.staticPort
+          }/${configManager.output.client.replace(/\/$/, '')}/"`,
     },
   ]);
 
