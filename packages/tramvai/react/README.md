@@ -112,3 +112,22 @@ const LazyComponent = lazy(() => import('./components/foo'), {
 
 <LazyComponent />;
 ```
+
+### Handling chunk loading errors
+
+We suggest to use `@loadable` [approach](https://loadable-components.com/docs/error-boundaries/), which assumes, that you must wrap lazy components in ErrorBoundary:
+
+```tsx
+import { lazy, UniversalErrorBoundary } from '@tramvai/react';
+
+const Component = lazy(() => import('./Component'));
+
+const ComponentWrapper = () => {
+  return (
+    // feel free to use your own implementation
+    <UniversalErrorBoundary error={null} fallback={() => null}>
+      <Notifications />
+    </UniversalErrorBoundary>
+  );
+};
+```
