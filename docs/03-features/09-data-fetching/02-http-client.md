@@ -106,7 +106,7 @@ Most HTTP clients implement additional logic for requests, and inherit from `Api
 
 #### Common HTTP client
 
-The `HTTP_CLIENT` token provides a basic client for sending requests to any URLs, request caching is disabled.
+The `HTTP_CLIENT` token provides a basic client for sending requests to any URLs, [Circuit Breaker](https://tinkoff.github.io/tinkoff-request/docs/plugins/circuit-breaker.html) is disabled.
 
 **Token use:**
 

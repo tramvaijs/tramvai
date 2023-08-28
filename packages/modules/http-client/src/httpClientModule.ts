@@ -70,7 +70,6 @@ export const HttpClientModule = /* @__PURE__ */ Module({
       useFactory: ({ factory }) => {
         return factory({
           name: 'http-client',
-          disableCache: true,
           enableCircuitBreaker: false,
         });
       },
