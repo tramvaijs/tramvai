@@ -9,28 +9,56 @@ import type {
 } from '@tramvai/tokens-render';
 import each from '@tinkoff/utils/array/each';
 import type { ChunkExtractor } from '@loadable/server';
+import type {
+  SERVER_RESPONSE_STREAM,
+  SERVER_RESPONSE_TASK_MANAGER,
+} from '@tramvai/tokens-server-private';
 import { renderReact } from '../react';
 
 const RENDER_TIMEOUT = 500;
 
 class HtmlWritable extends Writable {
-  private chunks: Buffer[] = [];
-  private html = '';
+  responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
 
-  getHtml() {
-    return this.html;
+  responseStream: typeof SERVER_RESPONSE_STREAM;
+
+  constructor({
+    responseTaskManager,
+    responseStream,
+  }: {
+    responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
+    responseStream: typeof SERVER_RESPONSE_STREAM;
+  }) {
+    super();
+    this.responseTaskManager = responseTaskManager;
+    this.responseStream = responseStream;
   }
 
   _write(chunk, encoding, callback) {
-    this.chunks.push(chunk);
-    callback();
-  }
+    const html = chunk.toString('utf-8');
 
-  _final(callback) {
-    this.html = Buffer.concat(this.chunks).toString();
+    // delay writing HTML to response stream
+    // @todo some priorities, to prevent conflicts with deferred actions scripts?
+    this.responseTaskManager.push(async () => {
+      this.responseStream.push(html);
+    });
+
     callback();
   }
 }
+
+const Deferred = () => {
+  let resolve;
+  let reject;
+
+  // eslint-disable-next-line promise/param-names
+  const promise = new Promise((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+};
 
 export class ReactRenderServer {
   customRender: typeof CUSTOM_RENDER;
@@ -43,16 +71,31 @@ export class ReactRenderServer {
 
   log: ReturnType<typeof LOGGER_TOKEN>;
 
+  responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
+
+  responseStream: typeof SERVER_RESPONSE_STREAM;
+
   renderMode: typeof REACT_SERVER_RENDER_MODE;
 
   // eslint-disable-next-line sort-class-members/sort-class-members
-  constructor({ context, customRender, extendRender, di, renderMode, logger }) {
+  constructor({
+    context,
+    customRender,
+    extendRender,
+    di,
+    renderMode,
+    logger,
+    responseTaskManager,
+    responseStream,
+  }) {
     this.context = context;
     this.customRender = customRender;
     this.extendRender = extendRender;
     this.di = di;
     this.renderMode = renderMode;
     this.log = logger('module-render');
+    this.responseTaskManager = responseTaskManager;
+    this.responseStream = responseStream;
   }
 
   render(extractor: ChunkExtractor): Promise<string> {
@@ -71,28 +114,42 @@ export class ReactRenderServer {
     if (process.env.__TRAMVAI_CONCURRENT_FEATURES && this.renderMode === 'streaming') {
       return new Promise((resolve, reject) => {
         const { renderToPipeableStream } = require('react-dom/server');
-        const htmlWritable = new HtmlWritable();
-
-        htmlWritable.on('finish', () => {
-          resolve(htmlWritable.getHtml());
-        });
-
+        const { responseTaskManager, responseStream, log } = this;
+        const htmlWritable = new HtmlWritable({ responseTaskManager, responseStream });
+        const allReadyDeferred = Deferred();
         const start = Date.now();
-        const { log } = this;
+
+        // prevent sent reply before all suspended components are resolved
+        responseTaskManager.push(() => {
+          // eslint-disable-next-line promise/param-names
+          return allReadyDeferred.promise;
+        });
 
         log.info({
           event: 'streaming-render:start',
         });
 
         const { pipe, abort } = renderToPipeableStream(renderResult, {
-          onAllReady() {
+          onShellReady() {
             log.info({
-              event: 'streaming-render:complete',
+              event: 'streaming-render:shell-ready',
               duration: Date.now() - start,
             });
 
-            // here `write` will be called only once
+            // here all HTML are ready except suspended components
             pipe(htmlWritable);
+
+            // resolve empty HTML, because we will stream it later
+            resolve('');
+          },
+          onAllReady() {
+            log.info({
+              event: 'streaming-render:all-ready',
+              duration: Date.now() - start,
+            });
+
+            // here all suspended components are resolved
+            allReadyDeferred.resolve();
           },
           onError(error) {
             // error can be inside Suspense boundaries, this is not critical, continue rendering.

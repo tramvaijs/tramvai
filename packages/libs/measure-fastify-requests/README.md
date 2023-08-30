@@ -24,3 +24,4 @@ In the prom-client registry new metrics will be available:
 - `http_requests_total` - number of incoming requests;
 - `http_requests_errors` - number of errors in the incoming requests;
 - `http_requests_execution_time` - histogram with the request handler execution time.
+- `http_requests_first_byte_time` - histogram with the request handler first byte sent time.

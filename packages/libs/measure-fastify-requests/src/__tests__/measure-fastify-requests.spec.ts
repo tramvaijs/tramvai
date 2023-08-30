@@ -28,12 +28,15 @@ describe('libs/measure-fastify-requests', () => {
       url: '/',
     });
 
-    expect(mockedInc).toHaveBeenCalledTimes(3);
+    expect(mockedInc).toHaveBeenCalledTimes(5);
     expect(mockedInc).toHaveBeenNthCalledWith(1);
     expect(mockedInc).toHaveBeenNthCalledWith(2, { method: 'GET', status: 404 });
     expect(mockedInc).toHaveBeenNthCalledWith(3, { method: 'GET', status: 404 });
-    expect(mockedDuration).toHaveBeenCalledTimes(1);
+    expect(mockedInc).toHaveBeenNthCalledWith(4, { method: 'GET', status: 404 });
+    expect(mockedInc).toHaveBeenNthCalledWith(5, { method: 'GET', status: 404 });
+    expect(mockedDuration).toHaveBeenCalledTimes(2);
     expect(mockedDuration).toHaveBeenNthCalledWith(1, { method: 'GET', status: 404 });
+    expect(mockedDuration).toHaveBeenNthCalledWith(2, { method: 'GET', status: 404 });
   });
 
   it('filtering out paths', async () => {

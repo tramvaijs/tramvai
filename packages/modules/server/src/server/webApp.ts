@@ -6,7 +6,12 @@ import { ROOT_EXECUTION_CONTEXT_TOKEN, RESPONSE_MANAGER_TOKEN } from '@tramvai/t
 import type { COMMAND_LINE_RUNNER_TOKEN } from '@tramvai/core';
 import { Scope } from '@tramvai/core';
 import type { SERVER_TOKEN } from '@tramvai/tokens-server';
-import { FASTIFY_REQUEST, FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
+import {
+  FASTIFY_REQUEST,
+  FASTIFY_RESPONSE,
+  SERVER_RESPONSE_STREAM,
+  SERVER_RESPONSE_TASK_MANAGER,
+} from '@tramvai/tokens-server-private';
 import type {
   WEB_FASTIFY_APP_TOKEN,
   WEB_FASTIFY_APP_AFTER_INIT_TOKEN,
@@ -17,10 +22,9 @@ import type {
   WEB_FASTIFY_APP_AFTER_ERROR_TOKEN,
   WEB_FASTIFY_APP_METRICS_TOKEN,
 } from '@tramvai/tokens-server-private';
-import type { FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
+import { REACT_SERVER_RENDER_MODE, type FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
-import { provide } from '@tinkoff/dippy';
-
+import { optional, provide } from '@tinkoff/dippy';
 import { errorHandler } from './error';
 
 export const webAppFactory = ({ server }: { server: typeof SERVER_TOKEN }) => {
@@ -122,7 +126,13 @@ export const webAppInitCommand = ({
                 useValue: reply,
               },
             ]);
+            const serverResponseStream = di.get(SERVER_RESPONSE_STREAM);
+            const serverResponseTaskManager = di.get(SERVER_RESPONSE_TASK_MANAGER);
             const responseManager = di.get(RESPONSE_MANAGER_TOKEN);
+            // @todo incorrect type inference for optional provider
+            const renderMode = di.get(
+              optional(REACT_SERVER_RENDER_MODE)
+            ) as typeof REACT_SERVER_RENDER_MODE;
 
             if (reply.sent) {
               log.debug({
@@ -134,8 +144,36 @@ export const webAppInitCommand = ({
               reply
                 .header('content-type', 'text/html')
                 .headers(responseManager.getHeaders())
-                .status(responseManager.getStatus())
-                .send(responseManager.getBody());
+                .status(responseManager.getStatus());
+
+              if (renderMode === 'streaming') {
+                const appHtmlsAttrs = di.get('tramvai app html attributes');
+                // split HTML for sequential React HTML chunks streaming inside .application tag
+                const [headAndBodyStart, bodyEnd] = (responseManager.getBody() as string).split(
+                  `<div ${appHtmlsAttrs}></div>`
+                );
+
+                // https://fastify.dev/docs/latest/Reference/Reply/#streams
+                reply.send(serverResponseStream);
+
+                // send head and start of body tags immediately
+                serverResponseStream.push(`${headAndBodyStart}<div ${appHtmlsAttrs}>`);
+
+                // run all tasks, chunks for renderToPipeableStream will be sent here
+                // in future, it can be done earlier, e.g. as Early Hints module
+                serverResponseTaskManager.processQueue();
+
+                // wait all tasks
+                await serverResponseTaskManager.closeQueue();
+
+                // writing the end of body
+                serverResponseStream.push(`</div>${bodyEnd}`);
+
+                // end response
+                serverResponseStream.push(null);
+              } else {
+                reply.send(responseManager.getBody());
+              }
             }
           });
         } catch (err) {

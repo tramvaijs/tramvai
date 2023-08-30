@@ -7,6 +7,7 @@ import type {
 } from 'fastify';
 import { createToken } from '@tinkoff/dippy';
 import type { Papi } from '@tramvai/papi';
+import type { Duplex } from 'stream';
 
 type FastifyRequest = OriginalFastifyRequest & {
   cookies: Record<string, string>;
@@ -23,6 +24,29 @@ export const FASTIFY_REQUEST = createToken<FastifyRequest>('fastify request');
  * Direct reference to response object
  */
 export const FASTIFY_RESPONSE = createToken<FastifyReply>('fastify response');
+
+/**
+ * @description
+ * Read/Write stream, will be passed to FASTIFY_RESPONSE, method .send()
+ * https://lirantal.com/blog/avoid-fastify-reply-raw-and-reply-hijack-despite-being-a-powerful-http-streams-tool/
+ */
+export const SERVER_RESPONSE_STREAM = createToken<Duplex>('tramvai server response stream');
+
+export type ServerResponseTask = () => Promise<any>;
+
+export interface ServerResponseTaskManager {
+  push(task: ServerResponseTask): void;
+  processQueue(): void;
+  closeQueue(): Promise<any>;
+}
+
+/**
+ * @description
+ * Response stream to client will not be closed before all tasks in queue will be processed
+ */
+export const SERVER_RESPONSE_TASK_MANAGER = createToken<ServerResponseTaskManager>(
+  'tramvai server response task manager'
+);
 
 /**
  * @description

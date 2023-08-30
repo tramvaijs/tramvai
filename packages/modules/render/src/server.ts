@@ -28,6 +28,10 @@ import { satisfies } from '@tinkoff/user-agent';
 import { isRedirectFoundError } from '@tinkoff/errors';
 import { PageErrorStore, setPageErrorEvent, deserializeError } from '@tramvai/module-router';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
+import {
+  SERVER_RESPONSE_STREAM,
+  SERVER_RESPONSE_TASK_MANAGER,
+} from '@tramvai/tokens-server-private';
 import { RESOURCE_INLINER, RESOURCES_REGISTRY_CACHE, ResourcesInliner } from './resourcesInliner';
 import { ResourcesRegistry } from './resourcesRegistry';
 import { PageBuilder } from './server/PageBuilder';
@@ -224,6 +228,7 @@ Page Error Boundary will be rendered for the client`,
         renderFlowAfter: { token: RENDER_FLOW_AFTER_TOKEN, optional: true },
         logger: LOGGER_TOKEN,
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
+        di: DI_TOKEN,
       },
     }),
     provide({
@@ -236,6 +241,8 @@ Page Error Boundary will be rendered for the client`,
         di: DI_TOKEN,
         renderMode: { token: REACT_SERVER_RENDER_MODE, optional: true },
         logger: LOGGER_TOKEN,
+        responseTaskManager: SERVER_RESPONSE_TASK_MANAGER,
+        responseStream: SERVER_RESPONSE_STREAM,
       },
     }),
     provide({

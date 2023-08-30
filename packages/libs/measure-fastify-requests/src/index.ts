@@ -9,11 +9,13 @@ import type { Counter, Histogram } from 'prom-client';
 
 const METRICS_FASTIFY_HANDLED = '_metrics_handled';
 const METRICS_FASTIFY_TIMER = '_metrics_execution_timer';
+const METRICS_FASTIFY_TTFB_TIMER = '_metrics_execution_ttfb_timer';
 
 declare module 'fastify' {
   interface FastifyRequest {
     [METRICS_FASTIFY_HANDLED]: boolean;
     [METRICS_FASTIFY_TIMER]: (labels?: Record<string, any>) => void;
+    [METRICS_FASTIFY_TTFB_TIMER]: (labels?: Record<string, any>) => void;
   }
 }
 
@@ -82,6 +84,12 @@ export const fastifyMeasureRequests = fp<MeasureOptions<any>>(
       buckets: httpRequestsDurationBuckets || DEFAULT_BUCKETS,
       labelNames,
     });
+    const firstByte = metrics.histogram({
+      name: 'http_requests_first_byte_time',
+      help: 'HTTP requests time to first byte',
+      buckets: httpRequestsDurationBuckets || DEFAULT_BUCKETS,
+      labelNames,
+    });
 
     const excludePatterns = flatten(metricsExcludePaths).map((p) => pathToRegexp(p));
 
@@ -93,6 +101,25 @@ export const fastifyMeasureRequests = fp<MeasureOptions<any>>(
         requestInit.inc();
         req[METRICS_FASTIFY_HANDLED] = true;
         req[METRICS_FASTIFY_TIMER] = duration.startTimer();
+        req[METRICS_FASTIFY_TTFB_TIMER] = firstByte.startTimer();
+      }
+    });
+
+    // for streaming responses, important metric is when first byte is sent
+    fastify.addHook('onSend', async (req, res) => {
+      if (req[METRICS_FASTIFY_HANDLED]) {
+        const labels = {
+          method: req.method,
+          status: res.statusCode,
+          ...getAdditionalLabelValues(req, res),
+        };
+
+        if (res.statusCode >= 400) {
+          error.inc(labels);
+        }
+
+        request.inc(labels);
+        req[METRICS_FASTIFY_TTFB_TIMER](labels);
       }
     });
 

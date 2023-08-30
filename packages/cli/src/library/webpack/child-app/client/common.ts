@@ -24,7 +24,8 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
     .publicPath('auto')
     .library(configManager.name)
     .filename(`[name]_client@${version}.js`)
-    .chunkFilename('[name]_client.chunk.[contenthash].js');
+    .chunkFilename('[name]_client.chunk.[contenthash].js')
+    .crossOriginLoading('anonymous');
 
   config.batch(postcssAssets(configManager));
 

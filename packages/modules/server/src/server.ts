@@ -21,6 +21,8 @@ import {
   SERVER_FACTORY_TOKEN,
   WEB_FASTIFY_APP_FACTORY_TOKEN,
   WEB_FASTIFY_APP_METRICS_TOKEN,
+  SERVER_RESPONSE_STREAM,
+  SERVER_RESPONSE_TASK_MANAGER,
 } from '@tramvai/tokens-server-private';
 import {
   ENV_MANAGER_TOKEN,
@@ -31,11 +33,13 @@ import {
 import { MetricsModule } from '@tramvai/module-metrics';
 import { CacheWarmupModule } from '@tramvai/module-cache-warmup';
 import { ROOT_ERROR_BOUNDARY_COMPONENT_TOKEN } from '@tramvai/react';
+import { PassThrough } from 'stream';
 import { serverFactory, serverListenCommand } from './server/server';
 import { webAppFactory, webAppInitCommand } from './server/webApp';
 import { staticAppCommand } from './server/static';
 import { xHeadersFactory } from './server/xHeaders';
 import * as modules from './modules';
+import { ServerResponseTaskManager } from './server/taskManager';
 
 export * from '@tramvai/tokens-server';
 
@@ -180,6 +184,16 @@ EventEmitter.defaultMaxListeners = 50;
         appInfo: APP_INFO_TOKEN,
       },
     },
+    provide({
+      provide: SERVER_RESPONSE_STREAM,
+      scope: Scope.REQUEST,
+      useFactory: () => new PassThrough(),
+    }),
+    provide({
+      provide: SERVER_RESPONSE_TASK_MANAGER,
+      scope: Scope.REQUEST,
+      useClass: ServerResponseTaskManager,
+    }),
   ],
 })
 export class ServerModule {}

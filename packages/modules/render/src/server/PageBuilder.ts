@@ -14,7 +14,7 @@ import type {
 import { ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import { safeStringify } from '@tramvai/safe-strings';
 import { ChunkExtractor } from '@loadable/server';
-import type { ExtractDependencyType } from '@tinkoff/dippy';
+import type { DI_TOKEN, ExtractDependencyType } from '@tinkoff/dippy';
 import { bundleResource } from './blocks/bundleResource/bundleResource';
 import { polyfillResources } from './blocks/polyfill';
 import { addPreloadForCriticalJS } from './blocks/preload/preloadBlock';
@@ -59,6 +59,8 @@ export class PageBuilder {
 
   private fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
 
+  private di: typeof DI_TOKEN;
+
   constructor({
     renderSlots,
     pageService,
@@ -72,6 +74,7 @@ export class PageBuilder {
     renderFlowAfter,
     logger,
     fetchWebpackStats,
+    di,
   }) {
     this.htmlAttrs = htmlAttrs;
     this.renderSlots = flatten(renderSlots || []);
@@ -85,6 +88,7 @@ export class PageBuilder {
     this.renderFlowAfter = renderFlowAfter || [];
     this.log = logger('page-builder');
     this.fetchWebpackStats = fetchWebpackStats;
+    this.di = di;
   }
 
   async flow(): Promise<string> {
@@ -171,11 +175,14 @@ export class PageBuilder {
 
   async renderApp(extractor: ChunkExtractor) {
     const html = await this.reactRender.render(extractor);
+    const appHtmlAttrs = formatAttributes(this.htmlAttrs, 'app');
+
+    this.di.register({ provide: 'tramvai app html attributes', useValue: appHtmlAttrs });
 
     this.renderSlots = this.renderSlots.concat({
       type: ResourceType.asIs,
       slot: ResourceSlot.REACT_RENDER,
-      payload: `<div ${formatAttributes(this.htmlAttrs, 'app')}>${html}</div>`,
+      payload: `<div ${appHtmlAttrs}>${html}</div>`,
     });
   }
 }
