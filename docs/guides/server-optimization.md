@@ -56,13 +56,13 @@ More information:
 - [`@tramvai/module-request-limiter` documentation](references/modules/request-limiter.md)
 - [Article "How to scale SSR applications"](https://medium.com/its-tinkoff/ssr-applications-at-scale-d57892719024)
 
-### Semi space size :rocket:
+### Semi space size
 
 **TL;DR**: set Node.js `--max_semi_space_size` parameter to **64mb**
 
 During application performance profiling, you may observe that your code spends a significant amount of time on Garbage Collector (GC) work. By default, GC work too frequently, and we can reduce the number of GC runs by increasing the size of the semi space. This optimization will reduce the CPU workload and make your event loop less busy, resulting in faster response times, especially in the 95th and 99th percentiles.
 
-One small disadvantage of this optimization is that it slightly increases the memory usage of your application.
+One disadvantage of this optimization is that it will increases the memory usage of your application. **For environments, where memory is limited, for example test deployments, prefer not to use this optimization**.
 
 A good balance between performance and memory usage is achieved with a semi space size of **64mb**. Another possible value for this parameter is **128mb**, but it may not provide a significant improvement in performance and will increase the memory usage of your application. It is recommended to test this parameter in your specific application.
 
@@ -84,7 +84,7 @@ More information:
 - https://www.alibabacloud.com/blog/better-node-application-performance-through-gc-optimization_595119
 - https://github.com/nodejs/node/issues/42511
 
-### Agent keepAlive :rocket:
+### Agent keepAlive
 
 **TL;DR**: use `@tramvai/module-http-client` module
 

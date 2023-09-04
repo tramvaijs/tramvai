@@ -38,3 +38,9 @@ In order to emulate mobile or desktop device next user-agent strings are used:
 ## Debug
 
 This module logs with id `cache-warmup`
+
+## How to
+
+### How to disable cache warmup?
+
+Run application with env variable `CACHE_WARMUP_DISABLED=true` to prevent cache warmup in local or testing environments.
