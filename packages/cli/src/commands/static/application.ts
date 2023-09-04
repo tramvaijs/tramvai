@@ -73,25 +73,26 @@ export const staticApp = async (
 
   const staticServer = await startStaticServer(clientConfigManager);
   const staticAssetsPrefix = serverConfigManager.assetsPrefix;
+  const envVariables = {
+    ...(process.env.DANGEROUS_UNSAFE_ENV_FILES === 'true' || !envCi().isCi
+      ? {
+          ...safeRequire(path.resolve(process.cwd(), 'env.development'), true),
+          ...safeRequire(path.resolve(process.cwd(), 'env'), true),
+        }
+      : {}),
+    ...process.env,
+    NODE_ENV: 'production',
+    TRAMVAI_CLI_COMMAND: 'static',
+    CACHE_WARMUP_DISABLED: 'true',
+    PORT: `${port}`,
+    PORT_SERVER: `${port}`,
+    TRAMVAI_CLI_ASSETS_PREFIX: staticAssetsPrefix,
+    ASSETS_PREFIX: assetsPrefix ?? staticAssetsPrefix,
+  };
 
   const server = node(path.resolve(root, 'server.js'), [], {
     cwd: root,
-    env: {
-      ...(process.env.DANGEROUS_UNSAFE_ENV_FILES === 'true' || !envCi().isCi
-        ? {
-            ...safeRequire(path.resolve(process.cwd(), 'env.development'), true),
-            ...safeRequire(path.resolve(process.cwd(), 'env'), true),
-          }
-        : {}),
-      ...process.env,
-      NODE_ENV: 'production',
-      TRAMVAI_CLI_COMMAND: 'static',
-      CACHE_WARMUP_DISABLED: 'true',
-      PORT: `${port}`,
-      PORT_SERVER: `${port}`,
-      TRAMVAI_CLI_ASSETS_PREFIX: staticAssetsPrefix,
-      ASSETS_PREFIX: assetsPrefix ?? staticAssetsPrefix,
-    },
+    env: envVariables,
   });
 
   server.catch((reason) => {
@@ -110,12 +111,12 @@ export const staticApp = async (
     handleServerOutput(context.logger, chunk);
   });
 
-  const bundleInfoPath = `http://localhost:${port}/${name}/papi/bundleInfo`;
+  const readinessProbePath = `http://localhost:${envVariables.UTILITY_SERVER_PORT ?? port}/readyz`;
 
   await Promise.race([
     server,
     waitOn({
-      resources: [bundleInfoPath],
+      resources: [readinessProbePath],
       delay: 1000,
       interval: 250,
       timeout: 10 * 60 * 1000,
