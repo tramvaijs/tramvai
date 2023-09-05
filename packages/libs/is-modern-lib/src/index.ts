@@ -22,6 +22,7 @@ export const modernLibs = [
   `@storybook/addon-viewport`,
   '@pfa',
   '@tinkoff-codeceptjs',
+  '@adtech-web',
   'dippy',
   'hook-runner',
   'meta-tags-generate',
