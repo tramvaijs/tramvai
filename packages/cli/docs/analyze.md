@@ -35,3 +35,16 @@ npx whybundled ./dist/client/stats.json --by debug
 ```
 
 See more options [in the whybundled docs](https://github.com/d4rkr00t/whybundled)
+
+## Research your bundle stats
+
+One of the options is to use `statoscope` plugin to analyze your bundle.
+
+Statoscope is a toolkit for analyzing (with a UI-based report) and validate stats of your bundle.
+
+```sh
+# generates result json file
+npx tramvai analyze APP_ID --plugin statoscope
+```
+
+When the command is finished, pass the result file to https://statoscope.tech/ tool.
