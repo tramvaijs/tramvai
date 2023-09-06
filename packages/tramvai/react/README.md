@@ -126,8 +126,29 @@ const ComponentWrapper = () => {
   return (
     // feel free to use your own implementation
     <UniversalErrorBoundary error={null} fallback={() => null}>
-      <Notifications />
+      <Component />
     </UniversalErrorBoundary>
   );
 };
 ```
+
+### Using Suspense with lazy components
+
+If you are using React 18, you can display fallback UI for lazy component while it is loading. To do so, you need to pass `suspense: true` to lazy method options:
+
+```tsx
+import { Suspense } from 'react';
+import { lazy } from '@tramvai/react';
+
+const Component = lazy(() => import('./Component'), { suspense: true });
+
+const ComponentWrapper = () => {
+  return (
+    <Suspense fallback={<h4>Loading...</h4>}>
+      <Component />
+    </Suspense>
+  );
+};
+```
+
+See more in our [React 18 guide](https://tramvai.dev/docs/guides/react-18#error-handling)!

@@ -1,6 +1,6 @@
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import type { LoadableComponent, DefaultComponent } from '@loadable/component';
-import loadable from '@loadable/component';
+import loadable, { lazy as loadableLazy } from '@loadable/component';
 import type { TramvaiComponent, TramvaiComponentDecl } from '../typings/components';
 
 export const resolveLazyComponent = async (
@@ -32,6 +32,7 @@ export const resolveLazyComponent = async (
 
 interface Options {
   loading?: JSX.Element;
+  suspense?: boolean;
 }
 
 /**
@@ -78,6 +79,13 @@ the first argument should be transformed into a special object, but the current 
   // eslint-disable-next-line no-param-reassign
   load.importAsync = () =>
     originalImportAsync().catch((e: any) => __lazyErrorHandler(e, originalImportAsync));
+
+  // There is no typings for `suspense` param in the original `load`
+  // function signature, but it is using internally.
+  // https://github.com/gregberge/loadable-components/blob/09af82568fc6c0aa1c58501d1e6707561186b09b/packages/component/src/createLoadable.js#L361
+  if (options.suspense && process.env.__TRAMVAI_CONCURRENT_FEATURES) {
+    return loadableLazy(load);
+  }
 
   return loadable(load, {
     fallback: options.loading,

@@ -1,0 +1,1 @@
+export { BatchingExample } from './counter';

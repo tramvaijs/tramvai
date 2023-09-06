@@ -28,7 +28,21 @@ describe('react-18-integration', () => {
     expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
       .toMatchInlineSnapshot(`
       "Tramvai 🥳
+
       Main Page with React 18
+
+      Hooks
+      Batching state updates
+      UpdateUpdate sync
+
+      Renders: 0
+
+      Suspense
+
+      I am waiting for async component loaded too
+
+      Async component
+
       this Footer in react-18-integration"
     `);
 

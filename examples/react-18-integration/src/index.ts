@@ -13,15 +13,14 @@ import {
   ResourceSlot,
 } from '@tramvai/tokens-render';
 
-import { Header } from './components/features/Header/Header';
-import { Footer } from './components/features/Footer/Footer';
+import { Header, Footer } from './shared/ui';
 
 createApp({
   name: 'react-18-integration',
   modules: [
     CommonModule,
     SpaRouterModule,
-    RenderModule.forRoot({ useStrictMode: true }),
+    RenderModule.forRoot({ useStrictMode: false }),
     SeoModule,
     ServerModule,
     ErrorInterceptorModule,

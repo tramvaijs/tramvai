@@ -1,0 +1,1 @@
+export { SuspenseExample } from './async';
