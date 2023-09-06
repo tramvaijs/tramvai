@@ -6,6 +6,7 @@ import type {
   EXTEND_RENDER,
   CUSTOM_RENDER,
   REACT_SERVER_RENDER_MODE,
+  WebpackStats,
 } from '@tramvai/tokens-render';
 import each from '@tinkoff/utils/array/each';
 import type { ChunkExtractor } from '@loadable/server';
@@ -14,27 +15,81 @@ import type {
   SERVER_RESPONSE_TASK_MANAGER,
 } from '@tramvai/tokens-server-private';
 import { renderReact } from '../react';
+import { flushFiles } from './blocks/utils/flushFiles';
 
-const RENDER_TIMEOUT = 500;
+// @todo customize
+const RENDER_TIMEOUT = 30000;
 
 class HtmlWritable extends Writable {
   responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
-
   responseStream: typeof SERVER_RESPONSE_STREAM;
+  extractor: ChunkExtractor;
+  stats: WebpackStats;
+  alreadySentChunks: string[] | null = null;
 
   constructor({
     responseTaskManager,
     responseStream,
+    extractor,
+    stats,
   }: {
     responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
     responseStream: typeof SERVER_RESPONSE_STREAM;
+    extractor: ChunkExtractor;
+    stats: WebpackStats;
   }) {
     super();
     this.responseTaskManager = responseTaskManager;
     this.responseStream = responseStream;
+    this.extractor = extractor;
+    this.stats = stats;
   }
 
   _write(chunk, encoding, callback) {
+    if (!this.alreadySentChunks) {
+      // at first _write, all rendered lazy chunks will be saved here
+      this.alreadySentChunks = this.extractor.getMainAssets().map((entry) => entry.chunk);
+    } else {
+      // then, lazy chunks from resolved suspended components will be here
+      const newChunks = this.extractor.getMainAssets().map((entry) => entry.chunk);
+
+      newChunks.forEach((c) => {
+        if (this.alreadySentChunks.includes(c)) {
+          return;
+        }
+
+        this.alreadySentChunks.push(c);
+
+        // @todo a lot of duplicate code with `bundleResource`?
+        const { publicPath } = this.stats;
+        const { scripts, styles } = flushFiles([c], this.stats);
+        const genHref = (href) => `${publicPath}${href}`;
+        const html = [];
+
+        // we need to inject styles and scripts for lazy components before selective hydration
+        // https://github.com/reactwg/react-18/discussions/114
+        styles.forEach((s) => {
+          html.push(
+            `<link rel="stylesheet" href="${genHref(
+              s
+            )}" crossorigin="anonymous" data-critical="true" />`
+          );
+        });
+        // synchronius script, we can't use async here, will lead to hydration missmatch
+        scripts.forEach((s) => {
+          html.push(
+            `<script src="${genHref(
+              s
+            )}" charset="utf-8" crossorigin="anonymous" data-critical="true"></script>`
+          );
+        });
+
+        this.responseTaskManager.push(async () => {
+          this.responseStream.push(html.join('\n'));
+        });
+      });
+    }
+
     const html = chunk.toString('utf-8');
 
     // delay writing HTML to response stream
@@ -98,7 +153,13 @@ export class ReactRenderServer {
     this.responseStream = responseStream;
   }
 
-  render(extractor: ChunkExtractor): Promise<string> {
+  render({
+    extractor,
+    stats,
+  }: {
+    extractor: ChunkExtractor;
+    stats: WebpackStats;
+  }): Promise<string> {
     let renderResult = renderReact({ di: this.di }, this.context);
 
     each((render) => {
@@ -115,7 +176,12 @@ export class ReactRenderServer {
       return new Promise((resolve, reject) => {
         const { renderToPipeableStream } = require('react-dom/server');
         const { responseTaskManager, responseStream, log } = this;
-        const htmlWritable = new HtmlWritable({ responseTaskManager, responseStream });
+        const htmlWritable = new HtmlWritable({
+          responseTaskManager,
+          responseStream,
+          extractor,
+          stats,
+        });
         const allReadyDeferred = Deferred();
         const start = Date.now();
 
@@ -125,11 +191,19 @@ export class ReactRenderServer {
           return allReadyDeferred.promise;
         });
 
+        htmlWritable.on('finish', () => {
+          // here all suspended components are resolved
+          allReadyDeferred.resolve();
+        });
+
         log.info({
           event: 'streaming-render:start',
         });
 
         const { pipe, abort } = renderToPipeableStream(renderResult, {
+          // we need to run hydration only after first chunk is sent to client
+          // https://github.com/reactwg/react-18/discussions/114
+          bootstrapScriptContent: `typeof window.__TRAMVAI_DEFERRED_HYDRATION === 'function' ? window.__TRAMVAI_DEFERRED_HYDRATION() : window.__TRAMVAI_DEFERRED_HYDRATION = true;`,
           onShellReady() {
             log.info({
               event: 'streaming-render:shell-ready',
@@ -147,9 +221,6 @@ export class ReactRenderServer {
               event: 'streaming-render:all-ready',
               duration: Date.now() - start,
             });
-
-            // here all suspended components are resolved
-            allReadyDeferred.resolve();
           },
           onError(error) {
             // error can be inside Suspense boundaries, this is not critical, continue rendering.

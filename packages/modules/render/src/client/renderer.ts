@@ -28,7 +28,7 @@ const ExecuteRenderCallback: FC<{ callback: () => void; children?: React.ReactNo
   return children as any;
 };
 
-const renderer: Renderer = ({ element, container, callback, log }) => {
+const renderer: Renderer = ({ element, container, callback, log, renderMode }) => {
   if (process.env.__TRAMVAI_CONCURRENT_FEATURES && typeof hydrateRoot === 'function') {
     const wrappedElement = createElement(ExecuteRenderCallback, { callback }, element);
     let allErrors = new Map();
@@ -49,27 +49,43 @@ const renderer: Renderer = ({ element, container, callback, log }) => {
       });
     });
 
-    return startTransition(() => {
-      hydrateRoot(container, wrappedElement, {
-        onRecoverableError: (error, errorInfo) => {
-          const match = (error?.message ?? '').match(reactMinifiedErrorRegex);
-          const key = match?.[1] ?? error?.message;
+    const hydrateRootFn = () =>
+      startTransition(() => {
+        hydrateRoot(container, wrappedElement, {
+          onRecoverableError: (error, errorInfo) => {
+            const match = (error?.message ?? '').match(reactMinifiedErrorRegex);
+            const key = match?.[1] ?? error?.message;
 
-          // deduplicate by error type - too much noise otherwise
-          if (!allErrors.has(key)) {
-            // also too long stack traces are not very helpful but heavy for log collection
-            if (typeof errorInfo?.componentStack === 'string') {
-              // eslint-disable-next-line no-param-reassign
-              errorInfo.componentStack = shortenErrorStackTrace(errorInfo.componentStack);
+            // deduplicate by error type - too much noise otherwise
+            if (!allErrors.has(key)) {
+              // also too long stack traces are not very helpful but heavy for log collection
+              if (typeof errorInfo?.componentStack === 'string') {
+                // eslint-disable-next-line no-param-reassign
+                errorInfo.componentStack = shortenErrorStackTrace(errorInfo.componentStack);
+              }
+              allErrors.set(key, { error, errorInfo });
             }
-            allErrors.set(key, { error, errorInfo });
-          }
 
-          logHydrateRecoverableError();
-        },
+            logHydrateRecoverableError();
+          },
+        });
       });
-    });
+
+    if (renderMode === 'streaming') {
+      // we need to run hydration only after first chunk is sent to client
+      // https://github.com/reactwg/react-18/discussions/114
+      if ((window as any).__TRAMVAI_DEFERRED_HYDRATION) {
+        hydrateRootFn();
+      } else {
+        (window as any).__TRAMVAI_DEFERRED_HYDRATION = hydrateRootFn;
+      }
+    } else {
+      hydrateRootFn();
+    }
+
+    return;
   }
+
   const { hydrate } = require('react-dom');
   return hydrate(element, container, callback);
 };

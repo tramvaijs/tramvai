@@ -194,6 +194,7 @@ export const BACK_FORWARD_CACHE_ENABLED = createToken<boolean>('back forward cac
 
 export type ReactServerRenderMode = 'sync' | 'streaming';
 
+// @todo ReactServerRenderMode or () => ReactServerRenderMode
 export const REACT_SERVER_RENDER_MODE = createToken<ReactServerRenderMode>('reactServerRenderMode');
 
 export interface WebpackStats {

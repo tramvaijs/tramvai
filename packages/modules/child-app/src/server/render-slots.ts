@@ -39,6 +39,7 @@ export const registerChildAppRenderSlots = ({
     const extension = extname(entry);
 
     switch (extension) {
+      // @todo async scripts for streaming
       case '.js':
         result.push({
           type: ResourceType.script,

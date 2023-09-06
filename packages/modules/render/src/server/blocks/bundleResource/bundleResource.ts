@@ -1,12 +1,24 @@
 import has from '@tinkoff/utils/object/has';
 import last from '@tinkoff/utils/array/last';
 import type { ChunkExtractor } from '@loadable/server';
-import type { PageResource, FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
+import type {
+  PageResource,
+  FETCH_WEBPACK_STATS_TOKEN,
+  REACT_SERVER_RENDER_MODE,
+} from '@tramvai/tokens-render';
 import { ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 import { isFileSystemPageComponent, fileSystemPageToWebpackChunkName } from '@tramvai/experiments';
 import { PRELOAD_JS } from '../../constants/performance';
 import { flushFiles } from '../utils/flushFiles';
 
+const asyncScriptAttrs = {
+  defer: null,
+  async: 'async',
+};
+const deferScriptAttrs = {
+  defer: 'defer',
+  async: null,
+};
 let criticalChunks = [];
 
 try {
@@ -21,12 +33,14 @@ export const bundleResource = async ({
   extractor,
   pageComponent,
   fetchWebpackStats,
+  renderMode,
 }: {
   bundle: string;
   modern: boolean;
   extractor: ChunkExtractor;
   pageComponent?: string;
   fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
+  renderMode: typeof REACT_SERVER_RENDER_MODE | null;
 }) => {
   // for file-system pages preload page chunk against bundle chunk
   const chunkNameFromBundle = isFileSystemPageComponent(pageComponent)
@@ -64,6 +78,10 @@ export const bundleResource = async ({
     });
   }
 
+  // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible
+  // https://github.com/reactwg/react-18/discussions/114
+  const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
+
   styles.map((style) =>
     result.push({
       type: ResourceType.style,
@@ -71,10 +89,13 @@ export const bundleResource = async ({
       payload: genHref(style),
       attrs: {
         'data-critical': 'true',
-        onload: `${PRELOAD_JS}()`,
+        // looks like we don't need this scripts preload at all, but also it is official recommendation for streaming
+        // https://github.com/reactwg/react-18/discussions/114
+        onload: renderMode === 'streaming' ? null : `${PRELOAD_JS}()`,
       },
     })
   );
+
   baseScripts.map((script) =>
     result.push({
       type: ResourceType.script,
@@ -82,6 +103,7 @@ export const bundleResource = async ({
       payload: genHref(script),
       attrs: {
         'data-critical': 'true',
+        ...scriptTypeAttr,
       },
     })
   );
@@ -93,6 +115,7 @@ export const bundleResource = async ({
       payload: genHref(script),
       attrs: {
         'data-critical': 'true',
+        ...scriptTypeAttr,
       },
     })
   );

@@ -23,7 +23,7 @@ import {
   REACT_SERVER_RENDER_MODE,
   FETCH_WEBPACK_STATS_TOKEN,
 } from '@tramvai/tokens-render';
-import { Scope } from '@tinkoff/dippy';
+import { Scope, optional } from '@tinkoff/dippy';
 import { satisfies } from '@tinkoff/user-agent';
 import { isRedirectFoundError } from '@tinkoff/errors';
 import { PageErrorStore, setPageErrorEvent, deserializeError } from '@tramvai/module-router';
@@ -210,7 +210,6 @@ Page Error Boundary will be rendered for the client`,
         pageService: PAGE_SERVICE_TOKEN,
         bfcacheEnabled: BACK_FORWARD_CACHE_ENABLED,
       },
-      multi: true,
     }),
     provide({
       provide: 'htmlBuilder',
@@ -229,6 +228,7 @@ Page Error Boundary will be rendered for the client`,
         logger: LOGGER_TOKEN,
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
         di: DI_TOKEN,
+        renderMode: optional(REACT_SERVER_RENDER_MODE),
       },
     }),
     provide({

@@ -10,6 +10,8 @@ import type {
   RESOURCES_REGISTRY,
   RENDER_FLOW_AFTER_TOKEN,
   FETCH_WEBPACK_STATS_TOKEN,
+  REACT_SERVER_RENDER_MODE,
+  WebpackStats,
 } from '@tramvai/tokens-render';
 import { ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import { safeStringify } from '@tramvai/safe-strings';
@@ -61,6 +63,8 @@ export class PageBuilder {
 
   private di: typeof DI_TOKEN;
 
+  private renderMode: typeof REACT_SERVER_RENDER_MODE | null;
+
   constructor({
     renderSlots,
     pageService,
@@ -75,6 +79,7 @@ export class PageBuilder {
     logger,
     fetchWebpackStats,
     di,
+    renderMode,
   }) {
     this.htmlAttrs = htmlAttrs;
     this.renderSlots = flatten(renderSlots || []);
@@ -89,6 +94,7 @@ export class PageBuilder {
     this.log = logger('page-builder');
     this.fetchWebpackStats = fetchWebpackStats;
     this.di = di;
+    this.renderMode = renderMode;
   }
 
   async flow(): Promise<string> {
@@ -96,7 +102,7 @@ export class PageBuilder {
     const extractor = new ChunkExtractor({ stats, entrypoints: [] });
 
     // first we render the application, because we need to extract information about the data used by the components
-    await this.renderApp(extractor);
+    await this.renderApp({ extractor, stats });
 
     // load information and dependency for the current bundle and page
     await this.fetchChunksInfo(extractor);
@@ -121,9 +127,14 @@ export class PageBuilder {
   }
 
   dehydrateState() {
+    // for streaming we need to have initial state before application scripts,
+    // body end will be sent after suspended components will be resolved, but hydration will starl earlier
+    const slot =
+      this.renderMode === 'streaming' ? ResourceSlot.HEAD_DYNAMIC_SCRIPTS : ResourceSlot.BODY_END;
+
     this.resourcesRegistry.register({
       type: ResourceType.asIs,
-      slot: ResourceSlot.BODY_END,
+      slot,
       // String much better than big object, source https://v8.dev/blog/cost-of-javascript-2019#json
       payload: `<script id="__TRAMVAI_STATE__" type="application/json">${safeStringify(
         this.context.dehydrate().dispatcher
@@ -142,6 +153,7 @@ export class PageBuilder {
         extractor,
         pageComponent,
         fetchWebpackStats: this.fetchWebpackStats,
+        renderMode: this.renderMode,
       })
     );
     this.resourcesRegistry.register(
@@ -154,6 +166,12 @@ export class PageBuilder {
   }
 
   preloadBlock() {
+    // looks like we don't need this scripts preload at all, but also it is official recommendation for streaming
+    // https://github.com/reactwg/react-18/discussions/114
+    if (this.renderMode === 'streaming') {
+      return;
+    }
+
     const preloadResources = addPreloadForCriticalJS(this.resourcesRegistry.getPageResources());
 
     this.resourcesRegistry.register(preloadResources);
@@ -173,8 +191,8 @@ export class PageBuilder {
 
   private renderSlots: NarrowToArray<typeof RENDER_SLOTS>;
 
-  async renderApp(extractor: ChunkExtractor) {
-    const html = await this.reactRender.render(extractor);
+  async renderApp({ extractor, stats }: { extractor: ChunkExtractor; stats: WebpackStats }) {
+    const html = await this.reactRender.render({ extractor, stats });
     const appHtmlAttrs = formatAttributes(this.htmlAttrs, 'app');
 
     this.di.register({ provide: 'tramvai app html attributes', useValue: appHtmlAttrs });

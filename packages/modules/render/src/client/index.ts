@@ -2,6 +2,7 @@ import each from '@tinkoff/utils/array/each';
 import { createElement, StrictMode } from 'react';
 import type {
   EXTEND_RENDER,
+  REACT_SERVER_RENDER_MODE,
   RENDERER_CALLBACK,
   USE_REACT_STRICT_MODE,
 } from '@tramvai/tokens-render';
@@ -17,6 +18,7 @@ export function rendering({
   di,
   useStrictMode,
   rendererCallback,
+  renderMode,
 }: {
   logger: any;
   consumerContext: any;
@@ -25,6 +27,7 @@ export function rendering({
   di: any;
   useStrictMode: ExtractDependencyType<typeof USE_REACT_STRICT_MODE>;
   rendererCallback?: ExtractDependencyType<typeof RENDERER_CALLBACK>;
+  renderMode?: ExtractDependencyType<typeof REACT_SERVER_RENDER_MODE>;
 }) {
   const log = logger('module-render');
 
@@ -61,7 +64,7 @@ export function rendering({
       executeRendererCallbacks();
       resolve();
     };
-    const params = { element: renderResult, container, callback, log };
+    const params = { element: renderResult, container, callback, log, renderMode };
 
     try {
       renderer(params);

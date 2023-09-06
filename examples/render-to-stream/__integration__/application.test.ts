@@ -42,6 +42,7 @@ describe('render-to-stream', () => {
               this Footer in render-to-stream
               This is modal for index page!
             
+            
           "
     `);
   });

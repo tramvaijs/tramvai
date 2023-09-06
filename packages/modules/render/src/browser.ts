@@ -1,4 +1,4 @@
-import { Module, commandLineListTokens, DI_TOKEN, provide } from '@tramvai/core';
+import { Module, commandLineListTokens, DI_TOKEN, provide, optional } from '@tramvai/core';
 import { LOGGER_TOKEN, CONTEXT_TOKEN, STORE_TOKEN } from '@tramvai/tokens-common';
 import {
   EXTEND_RENDER,
@@ -8,6 +8,7 @@ import {
   RENDERER_CALLBACK,
   USE_REACT_STRICT_MODE,
   MODERN_SATISFIES_TOKEN,
+  REACT_SERVER_RENDER_MODE,
 } from '@tramvai/tokens-render';
 import { PageErrorStore, setPageErrorEvent, beforeResolveHooksToken } from '@tramvai/module-router';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
@@ -74,6 +75,7 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
         consumerContext: CONTEXT_TOKEN,
         di: DI_TOKEN,
         useStrictMode: USE_REACT_STRICT_MODE,
+        renderMode: optional(REACT_SERVER_RENDER_MODE),
       },
       multi: true,
     }),
