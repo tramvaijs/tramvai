@@ -114,11 +114,6 @@ export const fastifyMeasureRequests = fp<MeasureOptions<any>>(
           ...getAdditionalLabelValues(req, res),
         };
 
-        if (res.statusCode >= 400) {
-          error.inc(labels);
-        }
-
-        request.inc(labels);
         req[METRICS_FASTIFY_TTFB_TIMER](labels);
       }
     });
