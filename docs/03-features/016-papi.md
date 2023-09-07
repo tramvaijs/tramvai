@@ -113,7 +113,7 @@ createApp({
 });
 ```
 
-Now you can make a request to the address `http://localhost:3000/tincoin/papi/ping`, in the response we will receive an object with the property `payload: 'pong'`,  in the terminal with the running process `tramvai start ${APP_ID}` we will see the error log `/ping requested`.
+Now you can make a request to the address `http://localhost:3000/tincoin/papi/ping`, in the response we will receive an object with the property `payload: 'pong'`, in the terminal with the running process `tramvai start ${APP_ID}` we will see the error log `/ping requested`.
 
 ## How to
 
@@ -157,6 +157,12 @@ export const papi = createPapiMethod({
 
 It can be done with [responseManager](references/tokens/common.md#responsemanager-tokens)
 
+:::note
+
+If you're changing content-type then you should pass body within responseManager too and return nothing from the handler
+
+:::
+
 ```tsx
 import { createPapiMethod } from '@tramvai/papi';
 
@@ -164,8 +170,7 @@ export const papi = createPapiMethod({
   async handler({ responseManager }) {
     responseManager.setHeader('content-type', 'text/html');
     responseManager.setStatus(200);
-
-    return `<html>...</html>`;
+    responseManager.setBody(`<html>...</html>`);
   },
 });
 ```
