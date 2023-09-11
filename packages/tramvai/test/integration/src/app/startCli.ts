@@ -89,6 +89,8 @@ export const startCli = async (
       [serverUrl]: '${SERVER_URL}',
       // eslint-disable-next-line no-template-curly-in-string
       [staticUrl]: '${STATIC_URL}',
+      // for server error stacktraces
+      'server.js:\\d+:\\d+': 'server.js:[LINE]:[SYMBOL]',
     },
   });
 

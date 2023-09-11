@@ -1,26 +1,8 @@
 import { createEvent, createReducer } from '@tramvai/state';
+import type { AnyError, SerializedError } from '@tramvai/safe-strings';
+import { serializeError, deserializeError } from '@tramvai/safe-strings';
 
-type AnyError = Error & { [key: string]: any };
-
-export interface SerializedError {
-  message: string;
-  stack?: string;
-  [key: string]: any;
-}
-
-export function serializeError(error: AnyError): SerializedError {
-  return {
-    ...error,
-    message: error.message,
-    stack: error.stack,
-  };
-}
-
-export function deserializeError(serializedError: SerializedError): AnyError {
-  const error = new Error(serializedError.message);
-  Object.assign(error, serializedError);
-  return error;
-}
+export { serializeError, deserializeError, SerializedError };
 
 export type IPageErrorStore = SerializedError | null;
 

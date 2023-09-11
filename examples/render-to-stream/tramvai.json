@@ -16,7 +16,7 @@
       "sourceMap": true,
       "postcss": {
         "config": "src/postcss",
-        "cssLocalIdentName": {}
+        "cssLocalIdentName": "[name]__[local]_[hash:base64:5]"
       },
       "hotRefresh": {
         "enabled": true

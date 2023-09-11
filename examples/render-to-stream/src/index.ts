@@ -12,6 +12,7 @@ import {
   ResourceType,
   ResourceSlot,
   REACT_SERVER_RENDER_MODE,
+  RESOURCE_INLINE_OPTIONS,
 } from '@tramvai/tokens-render';
 
 import { Header } from './components/features/Header/Header';
@@ -52,6 +53,14 @@ createApp({
     provide({
       provide: REACT_SERVER_RENDER_MODE,
       useValue: 'streaming',
+    }),
+    // resource inlining disabled for stable tests
+    provide({
+      provide: RESOURCE_INLINE_OPTIONS,
+      useValue: {
+        types: [],
+        threshold: 0,
+      },
     }),
   ],
   // регистрируем экшены, которые будут выполняться для всех страниц приложения

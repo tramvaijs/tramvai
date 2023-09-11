@@ -1,0 +1,397 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render-to-stream server-side rendering deferred page 1`] = `
+"<!DOCTYPE html>
+<html class="no-js" lang="ru">
+  <head>
+    <meta charset="UTF-8" >
+    
+    <title data-meta-dynamic="true">Tramvai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    
+
+    
+
+    
+
+    
+    <link crossorigin="anonymous"
+      data-critical="true"
+      rel="stylesheet"
+      href="\${STATIC_URL}/dist/client/components-features-Title-Title.chunk.css"
+    >
+    <link crossorigin="anonymous" data-critical="true" rel="stylesheet" href="\${STATIC_URL}/dist/client/platform.css" >
+    
+
+    
+
+    
+
+    
+    <script id="__TRAMVAI_STATE__" type="application/json"></script>
+    
+
+    
+    <script></script>
+    <script></script>
+    <script></script>
+    <script></script>
+    <script></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/@_routes_deferred_index.chunk.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/components-features-Title-Title.chunk.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/hmr.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/platform.js"
+    ></script>
+    
+
+    
+
+    
+
+    
+
+    
+  </head>
+  <body>
+    
+
+    
+
+    
+    <div class="application">
+      <div>
+        <h1>
+          Tramvai
+          <span role="img" aria-label="Salute">🥳</span>
+        </h1>
+        <ul>
+          <li><a href="/">Main</a></li>
+          <li><a href="/second/">Second</a></li>
+          <li><a href="/deferred/">Deferred</a></li>
+          <li><a href="/non-deferred/">Non-deferred</a></li>
+        </ul>
+      </div>
+      <h3 class="Title__title_jjG8q">Deferred Page</h3>
+      <template id="B:0"></template>
+      <div>Loading long...</div>
+      
+      <div>
+        Response:
+        ok
+      </div>
+      
+      <div>
+        Error:
+        Failed Fast Deferred
+      </div>
+      <template id="B:1"></template>
+      <div>Loading long error...</div>
+      
+      <div class="Footer__footer_L7U1b"><div>this Footer in render-to-stream</div></div>
+      <script></script>
+      <script></script>
+      <script></script>
+      <link rel="stylesheet"
+        href="\${STATIC_URL}/dist/client/components-features-Data-Data.chunk.css"
+        crossorigin="anonymous"
+        data-critical="true"
+      >
+      <script src="\${STATIC_URL}/dist/client/components-features-Data-Data.chunk.js"
+        charset="utf-8"
+        crossorigin="anonymous"
+        data-critical="true"
+      ></script>
+      <div hidden id="S:0"><div class="Data__data_Q_cJh">Response: ok</div></div>
+      <script></script>
+      <div hidden id="S:1">
+        <div>
+          Error:
+          Failed Deferred
+        </div>
+      </div>
+      <script></script>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+  </body>
+</html>
+"
+`;
+
+exports[`render-to-stream server-side rendering main page 1`] = `
+"<!DOCTYPE html>
+<html class="no-js" lang="ru">
+  <head>
+    <meta charset="UTF-8" >
+    
+    <title data-meta-dynamic="true">Tramvai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    
+
+    
+
+    
+
+    
+    <link crossorigin="anonymous"
+      data-critical="true"
+      rel="stylesheet"
+      href="\${STATIC_URL}/dist/client/@_routes_index.chunk.css"
+    >
+    <link crossorigin="anonymous" data-critical="true" rel="stylesheet" href="\${STATIC_URL}/dist/client/platform.css" >
+    
+
+    
+
+    
+
+    
+    <script id="__TRAMVAI_STATE__" type="application/json"></script>
+    
+
+    
+    <script></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/@_routes_index.chunk.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/hmr.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/platform.js"
+    ></script>
+    
+
+    
+
+    
+
+    
+
+    
+  </head>
+  <body>
+    
+
+    
+
+    
+    <div class="application">
+      <div>
+        <h1>
+          Tramvai
+          <span role="img" aria-label="Salute">🥳</span>
+        </h1>
+        <ul>
+          <li><a href="/">Main</a></li>
+          <li><a href="/second/">Second</a></li>
+          <li><a href="/deferred/">Deferred</a></li>
+          <li><a href="/non-deferred/">Non-deferred</a></li>
+        </ul>
+      </div>
+      <div>
+        Main Page
+        <div>Child Component</div>
+        <template data-msg="Error"
+          data-stck="
+    at ErrorComponent (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at Suspense
+    at ErrorBoundary (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at div
+    at MainPage
+    at InnerLoadable (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at LoadableWithChunkExtractor
+    at Loadable
+    at UniversalErrorBoundary (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at PageErrorBoundary (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at PageRenderComponent (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at RenderChildrenComponent (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at NestedLayoutRenderComponent (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at RenderChildren (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at RenderChildren (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at RenderChildren (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at Layout (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at LayoutRenderComponent (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at Root (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at Provider (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at Provider (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])
+    at ChunkExtractorManager (\${STATIC_URL}/dist/server/server.js:[LINE]:[SYMBOL])"
+        ></template>Error fallback
+      </div>
+      <div class="Footer__footer_L7U1b">
+        <div>this Footer in render-to-stream</div>
+        <p class="main__MainModal_wPdhA">This is modal for index page!</p>
+      </div>
+      <script></script>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+  </body>
+</html>
+"
+`;
+
+exports[`render-to-stream server-side rendering non-deferred page 1`] = `
+"<!DOCTYPE html>
+<html class="no-js" lang="ru">
+  <head>
+    <meta charset="UTF-8" >
+    
+    <title data-meta-dynamic="true">Tramvai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" >
+    
+
+    
+
+    
+
+    
+    <link crossorigin="anonymous" data-critical="true" rel="stylesheet" href="\${STATIC_URL}/dist/client/platform.css" >
+    
+
+    
+
+    
+
+    
+    <script id="__TRAMVAI_STATE__" type="application/json"></script>
+    
+
+    
+    <script></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/@_routes_non-deferred_index.chunk.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/hmr.js"
+    ></script>
+    <script charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      async="async"
+      src="\${STATIC_URL}/dist/client/platform.js"
+    ></script>
+    
+
+    
+
+    
+
+    
+
+    
+  </head>
+  <body>
+    
+
+    
+
+    
+    <div class="application">
+      <div>
+        <h1>
+          Tramvai
+          <span role="img" aria-label="Salute">🥳</span>
+        </h1>
+        <ul>
+          <li><a href="/">Main</a></li>
+          <li><a href="/second/">Second</a></li>
+          <li><a href="/deferred/">Deferred</a></li>
+          <li><a href="/non-deferred/">Non-deferred</a></li>
+        </ul>
+      </div>
+      <div>Loading...</div>
+      <div class="Footer__footer_L7U1b"><div>this Footer in render-to-stream</div></div>
+      <script></script>
+    </div>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+  </body>
+</html>
+"
+`;

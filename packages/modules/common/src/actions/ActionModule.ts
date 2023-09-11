@@ -1,4 +1,12 @@
-import { Module, Scope, ACTIONS_LIST_TOKEN, DI_TOKEN, provide, createToken } from '@tramvai/core';
+import {
+  Module,
+  Scope,
+  ACTIONS_LIST_TOKEN,
+  DI_TOKEN,
+  provide,
+  createToken,
+  optional,
+} from '@tramvai/core';
 import {
   LOGGER_TOKEN,
   CONTEXT_TOKEN,
@@ -10,7 +18,12 @@ import {
   COMBINE_REDUCERS,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
+  DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
+import {
+  SERVER_RESPONSE_STREAM,
+  SERVER_RESPONSE_TASK_MANAGER,
+} from '@tramvai/tokens-server-private';
 import { actionTramvaiReducer } from './actionTramvaiReducer';
 import { ActionExecution } from './actionExecution';
 import { ActionRegistry } from './actionRegistry';
@@ -22,6 +35,7 @@ import { onlyServer } from './conditions/onlyServer';
 import { onlyBrowser } from './conditions/onlyBrowser';
 import { pageServer } from './conditions/pageServer';
 import { pageBrowser } from './conditions/pageBrowser';
+import { providers as deferredProviders } from './deferred/providers';
 
 export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser };
 
@@ -68,6 +82,9 @@ const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeR
         store: STORE_TOKEN,
         limitTime: LIMIT_ACTION_GLOBAL_TIME_RUN,
         logger: LOGGER_TOKEN,
+        deferredMap: DEFERRED_ACTIONS_MAP_TOKEN,
+        responseTaskManager: optional(SERVER_RESPONSE_TASK_MANAGER),
+        serverResponseStream: optional(SERVER_RESPONSE_STREAM),
       },
     }),
     provide({
@@ -79,6 +96,7 @@ const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeR
       multi: true,
       useValue: [alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser],
     }),
+    ...deferredProviders,
   ],
 })
 class ActionModule {}

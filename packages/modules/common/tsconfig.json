@@ -72,6 +72,9 @@
         },
         {
             "path": "../../tokens/core-private"
+        },
+        {
+            "path": "../../libs/safe-strings"
         }
     ]
 }

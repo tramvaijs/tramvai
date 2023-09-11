@@ -8,10 +8,16 @@ import type {
   EXECUTION_CONTEXT_MANAGER_TOKEN,
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   ACTION_EXECUTION_TOKEN,
+  DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
 import { isSilentError } from '@tinkoff/errors';
+import type {
+  SERVER_RESPONSE_STREAM,
+  SERVER_RESPONSE_TASK_MANAGER,
+} from '@tramvai/tokens-server-private';
 import { actionServerStateEvent } from './actionTramvaiReducer';
-import type { ActionExecution } from './actionExecution';
+import { Deferred } from './deferred/deferred';
+import { generateDeferredReject, generateDeferredResolve } from './deferred/clientScriptsUtils';
 
 const DEFAULT_PAYLOAD = {};
 
@@ -23,6 +29,9 @@ declare module '@tramvai/tokens-common' {
 
 export class ActionPageRunner implements ActionPageRunnerInterface {
   private log: ReturnType<ExtractDependencyType<typeof LOGGER_TOKEN>>;
+  private deferredMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
+  private responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
+  private serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
 
   constructor(
     private deps: {
@@ -34,9 +43,15 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
       >;
       limitTime: number;
       logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
+      deferredMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
+      responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
+      serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
     }
   ) {
     this.log = deps.logger('action:action-page-runner');
+    this.deferredMap = deps.deferredMap;
+    this.responseTaskManager = deps.responseTaskManager;
+    this.serverResponseStream = deps.serverResponseStream;
   }
 
   // TODO stopRunAtError нужен только для редиректов на стороне сервера в экшенах. И нужно пересмотреть реализацию редиректов
@@ -76,14 +91,64 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
           };
 
           const actionMapper = (action: Action | TramvaiAction<any[], any, any>) => {
+            const isDeferredAction =
+              ACTION_PARAMETERS in action && action[ACTION_PARAMETERS].deferred;
+
+            if (isDeferredAction && !this.deferredMap.get(action.name)) {
+              const deferred = new Deferred();
+              // avoid unhandled promise rejection
+              deferred.promise.catch(() => {});
+              this.deferredMap.set(action.name, deferred);
+            }
+
             return Promise.resolve()
-              .then(() =>
-                this.deps.actionExecution.runInContext(
+              .then(() => {
+                const promise = this.deps.actionExecution.runInContext(
                   executionContext,
                   action as TramvaiAction<any[], any, any>,
                   DEFAULT_PAYLOAD
-                )
-              )
+                );
+
+                if (isDeferredAction) {
+                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                  const deferred = this.deferredMap.get(action.name)!;
+
+                  // eslint-disable-next-line promise/no-nesting
+                  promise.then(deferred.resolve).catch(deferred.reject);
+
+                  this.responseTaskManager?.push(async () => {
+                    // scripts will already be present on the page HTML
+                    if (deferred.isResolved() || deferred.isRejected()) {
+                      return;
+                    }
+
+                    // eslint-disable-next-line promise/no-nesting
+                    await deferred.promise
+                      .then((data: any) => {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        this.serverResponseStream!.push(
+                          `<script>${generateDeferredResolve({
+                            key: action.name,
+                            data,
+                          })}</script>`
+                        );
+                      })
+                      .catch((reason: any) => {
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        this.serverResponseStream!.push(
+                          `<script>${generateDeferredReject({
+                            key: action.name,
+                            error: reason,
+                          })}</script>`
+                        );
+                      });
+                  });
+
+                  // eslint-disable-next-line promise/no-return-wrap
+                  return Promise.resolve();
+                }
+                return promise;
+              })
               .catch((error) => {
                 const isCriticalError = stopRunAtError(error);
 

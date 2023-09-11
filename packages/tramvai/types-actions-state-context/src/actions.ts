@@ -25,6 +25,7 @@ export interface ActionParameters<Payload, Result, Deps = {}> {
   /* Ограничения для исполнения. К примеру: авторизован ли пользователь */
   conditions?: ActionConditionsParameters;
   conditionsFailResult?: 'reject' | 'empty';
+  deferred?: boolean;
 }
 
 export const ACTION_PARAMETERS = '__action_parameters__';
@@ -79,6 +80,7 @@ export interface TramvaiActionDefinition<Params extends any[], Result, Deps> {
   deps?: Deps;
   conditions?: ActionConditionsParameters;
   conditionsFailResult?: 'reject' | 'empty';
+  deferred?: boolean;
 }
 
 export interface TramvaiAction<Params extends any[], Result, Deps>

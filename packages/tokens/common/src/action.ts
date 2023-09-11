@@ -88,3 +88,24 @@ export type ActionCondition = {
   key: string;
   fn: (checker: ActionConditionChecker) => void;
 };
+
+export interface Deferred<Data = any> {
+  promise: Promise<Data>;
+  resolve: (data: Data) => void;
+  reject: (reason: Error) => void;
+  resolveData?: Data;
+  rejectReason?: Error;
+  isResolved: () => boolean;
+  isRejected: () => boolean;
+}
+
+export interface DeferredActionsMap {
+  get(key: string): Deferred | undefined;
+  set(key: string, value: Deferred): void;
+  has(key: string): boolean;
+  forEach(callback: (value: Deferred, key: string) => void): void;
+}
+
+export const DEFERRED_ACTIONS_MAP_TOKEN = createToken<DeferredActionsMap>(
+  'tramvai deferred actions map'
+);

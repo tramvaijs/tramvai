@@ -75,7 +75,7 @@ class HtmlWritable extends Writable {
             )}" crossorigin="anonymous" data-critical="true" />`
           );
         });
-        // synchronius script, we can't use async here, will lead to hydration missmatch
+        // synchronous script, we can't use async here, will lead to hydration mismatch
         scripts.forEach((s) => {
           html.push(
             `<script src="${genHref(
@@ -90,12 +90,10 @@ class HtmlWritable extends Writable {
       });
     }
 
-    const html = chunk.toString('utf-8');
-
     // delay writing HTML to response stream
     // @todo some priorities, to prevent conflicts with deferred actions scripts?
     this.responseTaskManager.push(async () => {
-      this.responseStream.push(html);
+      this.responseStream.push(chunk);
     });
 
     callback();
