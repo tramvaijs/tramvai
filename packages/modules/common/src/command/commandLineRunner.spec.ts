@@ -49,6 +49,8 @@ const factoryTestActions = (actual: string[]) => {
 
 const LoggerMock: any = (name: any) => ({ log: () => {}, error: () => {}, debug: () => {} });
 
+const ExecutionEndHandlerMock = jest.fn();
+
 function generateBaseIt(type: string, status: string, result: string[]) {
   const actual: string[] = [];
   const { di } = factoryTestActions(actual);
@@ -58,14 +60,20 @@ function generateBaseIt(type: string, status: string, result: string[]) {
     rootDi: di,
     logger: LoggerMock,
     executionContextManager: new ExecutionContextManager(),
+    executionEndHandlers: [ExecutionEndHandlerMock],
   });
 
   return flow.run(type as any, status).then(() => {
     expect(actual).toEqual(result);
+    expect(ExecutionEndHandlerMock).toHaveBeenCalledTimes(1);
   });
 }
 
 describe('CommandLineRunner', () => {
+  afterEach(() => {
+    ExecutionEndHandlerMock.mockClear();
+  });
+
   // eslint-disable-next-line jest/expect-expect
   it('Запуск действий при инициализации на сервере', () => {
     return generateBaseIt('server', 'init', ['fable', 'book', 'magic']);
@@ -113,13 +121,18 @@ describe('CommandLineRunner', () => {
         rootDi: di,
         logger: LoggerMock,
         executionContextManager: new ExecutionContextManager(),
+        executionEndHandlers: [ExecutionEndHandlerMock],
       });
 
-      expect.assertions(1);
+      expect.assertions(3);
+
+      expect(ExecutionEndHandlerMock).not.toHaveBeenCalled();
 
       await expect(flow.run('server', 'init')).rejects.toMatchObject({
         message: 'Token not found "fff" at "A"',
       });
+
+      expect(ExecutionEndHandlerMock).toHaveBeenCalledTimes(1);
     });
   });
 });

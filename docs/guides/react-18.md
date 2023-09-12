@@ -9,7 +9,7 @@ title: React 18 features
 
 Many of the features in React 18 are built on top of the brand-new mechanism – concurrent renderer, that allows to interrupt rendering. It is increase performance of the client rendering overall.
 
-Worth noting, that concurrent rendering [automatically enables](https://tramvai.dev/docs/features/rendering/hydration/#selective-hydration) only for parts, those using it. That's why migration to React 18 will not be a problem.
+Worth noting, that concurrent rendering [automatically enables](03-features/010-rendering/03-hydration.md) only for parts, those using it. That's why migration to React 18 will not be a problem.
 
 ### Batching updates
 
@@ -17,7 +17,7 @@ Batching is the process of grouping multiple updates into one single render. Pre
 
 Also, if you are using `unstable_batchedUpdates` you can stop using it safely.
 
-You can see code examples [here](https://github.com/tramvaijs/tramvai/-/tree/master/examples/react-18-integration/src/features/batching).
+You can see code examples [here](https://github.com/tramvaijs/tramvai/blob/main/examples/react-18-integration/src/features/batching/counter.tsx).
 
 ### Transitions
 
@@ -32,7 +32,7 @@ Any updates are urgent by default, but `startTransition` and `useTransition` let
 
 As far as you know, content wrapped in `Suspense` can be suspended for different reasons. To recall:
 
-- there is [lazy](https://tramvai.dev/docs/references/tramvai/react#lazy) component render, wrapped in `Suspense`;
+- there is [lazy](references/tramvai/react.md#lazy) component render, wrapped in `Suspense`;
 - there is data loading in a component, wrapped in `Suspense`. Tramvai does not support it yet, but you can look into [Relay implementation](https://relay.dev/docs/guided-tour/rendering/loading-states/), or [origin RFC](https://github.com/acdlite/rfcs/blob/first-class-promises/text/0000-first-class-support-for-promises.md);
 - content, wrapped in `Suspense` is waiting for corresponding CSS (currently in development by React team);
 
@@ -44,7 +44,7 @@ To recap: any update of the state (`const [, setState] = useState(true)`), wrapp
 
 `Suspense` lets to display `fallback` content for the parts of UI, that not ready to be displayed yet. In Tramvai it is suitable only for lazy components at the moment.
 
-As far as you know Tramvai ships its own [way](https://tramvai.dev/docs/references/tramvai/react#lazy) for lazy code loading – `@tramvai/lazy`. In comparison to classic `React.lazy`, Tramvai version has some advantages:
+As far as you know Tramvai ships its own [way](references/tramvai/react.md#lazy) for lazy code loading – `@tramvai/lazy`. In comparison to classic `React.lazy`, Tramvai version has some advantages:
 
 - it optimized for SSR;
 - code of a component loads on the client before hydration;
@@ -53,31 +53,31 @@ That's why we recommend using only `@tramvai/lazy` in Tramvai apps.
 
 Note, that all the content, wrapped in `Suspense`, even if it not suspends by self reasons, will be suspended.
 
-Also, `Suspense` usage enables selective hydration. We have a [guide](https://tramvai.dev/docs/features/rendering/hydration) about it already. Check it out!
+Also, `Suspense` usage enables selective hydration. We have a [guide](03-features/010-rendering/03-hydration.md) about it already. Check it out!
 
-In addition, `Suspense` allows to [intercept](https://tramvai.dev/docs/guides/react-18#error-handling) server-side and hydration errors.
+In addition, `Suspense` allows to [intercept](#error-handling) server-side and hydration errors.
 
 ### Strict mode
 
-In order for components to work properly in the future, a new behavior has been added to `StrictMode` called `StrictEffects`. The idea is to catch effects that don't work properly during development by React mounting the component twice, i.e.: `mount => unmount => mount`, calling corresponding effects and unsubscribe functions. It works only in DEV environment. You can enable it [such](https://tramvai.dev/docs/references/modules/render/#react-strict-mode) way.
+In order for components to work properly in the future, a new behavior has been added to `StrictMode` called `StrictEffects`. The idea is to catch effects that don't work properly during development by React mounting the component twice, i.e.: `mount => unmount => mount`, calling corresponding effects and unsubscribe functions. It works only in DEV environment. You can enable it [such](references/modules/render.md#react-strict-mode) way.
 
-## Tramvai features with React 18
+## Tramvai integration
 
 When you are using React 18, several features will be allowed to use:
 
 ### Streaming rendering
 
-We have an article about [streaming rendering](https://tramvai.dev/docs/features/rendering/streaming/), check it out.
+We have an article about [streaming rendering](03-features/010-rendering/06-streaming.md), check it out.
 
 ### Selective hydration
 
-`hydrateRoot` wraps in `startTransition` on the client automatically. See [more](https://tramvai.dev/docs/features/rendering/hydration).
+`hydrateRoot` wraps in `startTransition` on the client automatically. See [more](03-features/010-rendering/03-hydration.md).
 
 ### Suspense in Child App
 
 Each Child App wraps into `Suspense` automatically.
 
-## React 18 use cases in Tramvai apps
+## Tramvai use cases
 
 ### Suspense
 
@@ -86,7 +86,7 @@ Each Child App wraps into `Suspense` automatically.
 - displaying a fallback UI, during `lazy` component load
 - handling server-side errors;
 
-Look to the code example [here](https://github.com/tramvaijs/tramvai/-/tree/master/examples/react-18-integration/src/features/suspense).
+Look to the code example [here](https://github.com/tramvaijs/tramvai/blob/main/examples/react-18-integration/src/features/suspense/async.tsx).
 
 ### startTransition/useTransition
 
@@ -99,19 +99,19 @@ Outside the components you should use `startTransition` function, instead of `us
 - wrap a navigation between tabs, when you have heavy to render tab components;
 - don't show fallback UI for suspended components;
 
-Take a look to the [example](https://github.com/tramvaijs/tramvai/-/tree/master/examples/react-18-integration/src/features/hooks/use-transition). Try to switch to the `Slow` tab, and then to the `Another` tab immediately. Navigation will happen straight away, despite slow rendering of the `Slow` tab. Also, there is no loading state for suspended content, when click to the `Switch` button.
+Take a look to the [example](https://github.com/tramvaijs/tramvai/blob/main/examples/react-18-integration/src/features/hooks/use-transition.tsx). Try to switch to the `Slow` tab, and then to the `Another` tab immediately. Navigation will happen straight away, despite slow rendering of the `Slow` tab. Also, there is no loading state for suspended content, when click to the `Switch` button.
 
 ### useId
 
 Hook to generate same identifiers on server and client. Without it, if you will do it by yourself, e.g. just calling `uuid`, result values will be different on server and client. Also, you can't use simple counter (`nextId++`) for it, because React does not guarantee the order in which the client components are hydrated. Don't use it for generating keys in a list.
 
-There is an [example](https://github.com/tramvaijs/tramvai/-/tree/master/examples/react-18-integration/src/features/hooks/use-id) in our repo. Run the app, go to the `/hooks` and look to the console. There is a hydration error for the `WithoutHook` component, and no such error for `WithHook`.
+There is an [example](https://github.com/tramvaijs/tramvai/blob/main/examples/react-18-integration/src/features/hooks/use-id.tsx) in our repo. Run the app, go to the `/hooks` and look to the console. There is a hydration error for the `WithoutHook` component, and no such error for `WithHook`.
 
 ### useDeferredValue
 
 Lets you defer re-rendering a non-urgent part of the UI.
 
-Look at [example](https://github.com/tramvaijs/tramvai/-/tree/master/examples/react-18-integration/src/features/hooks/use-deferred-value).
+Look at [example](https://github.com/tramvaijs/tramvai/blob/main/examples/react-18-integration/src/features/hooks/use-deferred-value.tsx).
 
 #### How it works?
 
@@ -157,7 +157,7 @@ That's why we are strongly recommend to wrap in `Suspense` boundary important pa
 </ErrorBoundary>
 ```
 
-Note, that Tramvai add ErrorBoundary by default. See [more](https://tramvai.dev/docs/features/error-boundaries).
+Note, that Tramvai add ErrorBoundary by default. See [more](03-features/05-error-boundaries.md).
 
 Also, Tramvai log the rendering errors and deduplicate them, to avoid noise. In general, we are recommend do not ignore hydration errors, because they are affect performance. As the last resort you can [use](https://react.dev/reference/react-dom/hydrate#suppressing-unavoidable-hydration-mismatch-errors) `suppressHydrationWarning={true}` on the React component, e.g. to display time.
 

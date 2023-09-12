@@ -113,7 +113,7 @@ Also, default [retries](https://tanstack.com/query/v4/docs/react/guides/query-re
 
 ## Examples
 
-You can find and run examples in our [repo](https://github.com/tramvaijs/tramvai/-/tree/master/examples/how-to/react-query-usage)
+You can find and run examples in our [repo](https://github.com/tramvaijs/tramvai/tree/main/examples/how-to/react-query-usage)
 
 ### Basic Query
 
@@ -546,7 +546,7 @@ const query = createQuery({
 });
 ```
 
-This signal has subscription to [react-query cancellation signal](https://tanstack.com/query/v4/docs/react/guides/query-cancellation), see example in [`use-query-cancel` example](https://github.com/tramvaijs/tramvai/-/tree/master/examples/how-to/react-query-usage/components/use-query-cancel)
+This signal has subscription to [react-query cancellation signal](https://tanstack.com/query/v4/docs/react/guides/query-cancellation), see example in [`use-query-cancel` example](https://github.com/tramvaijs/tramvai/tree/main/examples/how-to/react-query-usage/components/use-query-cancel)
 
 ### Use `@tanstack/react-query` directly
 
