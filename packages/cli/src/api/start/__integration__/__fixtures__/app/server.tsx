@@ -1,3 +1,4 @@
+import { setDefaultResultOrder } from 'dns';
 import mapObj from '@tinkoff/utils/object/map';
 import fastify from 'fastify';
 import { renderToString } from 'react-dom/server';
@@ -6,6 +7,10 @@ import browserslistConfig from '@tramvai/cli/lib/external/browserslist-normalize
 import Api from '@tramvai/cli/lib/external/api';
 import Pages from '@tramvai/cli/lib/external/pages';
 import App from './App';
+
+if (typeof setDefaultResultOrder === 'function') {
+  setDefaultResultOrder('ipv4first');
+}
 
 const bundlesMap = {
   main: () => import('./bundles/main'),

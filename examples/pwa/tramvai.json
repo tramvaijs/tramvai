@@ -13,7 +13,6 @@
       "splitChunks": {
         "mode": "granularChunks"
       },
-      "sourceMap": true,
       "postcss": {
         "config": "src/postcss",
         "cssLocalIdentName": {}
@@ -21,7 +20,16 @@
       "hotRefresh": {
         "enabled": false
       },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
       "experiments": {
+        "transpilation": {
+          "loader": {
+            "development": "swc"
+          }
+        },
         "pwa": {
           "sw": {
             "src": "service-worker.ts",

@@ -11,6 +11,14 @@ import { ClientHintsModule } from '@tramvai/module-client-hints';
 import { routes } from './routes';
 import { FAKE_API_CLIENT } from '../shared/tokens';
 
+if (typeof window === 'undefined') {
+  const { setDefaultResultOrder } = require('dns');
+
+  if (typeof setDefaultResultOrder === 'function') {
+    setDefaultResultOrder('ipv4first');
+  }
+}
+
 createApp({
   name: 'root-app',
   bundles: {

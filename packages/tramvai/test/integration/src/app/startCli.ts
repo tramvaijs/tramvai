@@ -46,6 +46,8 @@ export const startCli = async (
     // build cache made tests unstable in CI, because of cache writing process are async,
     // and there is no way to wait this process (`idleTimeoutForInitialStore: 0` helps sometimes, but no guarantees)
     fileCache: !ciInfo.isCi,
+    // faster builds with debug flag, sm still will be disabled by default
+    sourceMap: cliOptions.sourceMap ?? false,
     ...(typeof targetOrConfig === 'string'
       ? { target: targetOrConfig }
       : {
@@ -53,6 +55,14 @@ export const startCli = async (
             {
               // disable hot-refresh that may break checks for full page load because of never-ending request
               hotRefresh: { enabled: false },
+              // faster builds
+              sourceMap: false,
+              // faster builds
+              experiments: {
+                transpilation: {
+                  loader: 'swc',
+                },
+              },
             },
             targetOrConfig
           ),
@@ -76,6 +86,7 @@ export const startCli = async (
   try {
     await waitOn({
       resources: [`${utilityServerUrl}/readyz`],
+      timeout: 2 * 60 * 1000,
     });
   } catch (e) {
     logger.error('[@tramvai/cli] /readyz wait failed:', e);
@@ -90,7 +101,7 @@ export const startCli = async (
       // eslint-disable-next-line no-template-curly-in-string
       [staticUrl]: '${STATIC_URL}',
       // for server error stacktraces
-      'server.js:\\d+:\\d+': 'server.js:[LINE]:[SYMBOL]',
+      '/([a-zA-Z0-9_.-]+?)(?:\\.es)?.((?:js|ts)x?)\\??:\\d+:\\d+': '/$1.$2?:[LINE]:[SYMBOL]',
     },
   });
 

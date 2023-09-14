@@ -273,6 +273,13 @@ export const serverRunner = ({
 
         worker = await pool.acquire();
 
+        worker.on('error', (error) => {
+          if (pool.state !== PoolState.CLOSED) {
+            console.error('[worker] error:', error);
+            hasExitedUnexpectedly = true;
+          }
+        });
+
         worker.on('exit', async () => {
           hasExitedUnexpectedly = true;
           workerPort = null;
@@ -284,7 +291,9 @@ export const serverRunner = ({
 
           worker = null;
 
-          console.error(EXITED_UNEXPECTEDLY);
+          if (pool.state !== PoolState.CLOSED) {
+            console.error(EXITED_UNEXPECTEDLY);
+          }
         });
 
         worker.once('message', ({ cmd, port }) => {

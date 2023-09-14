@@ -3,6 +3,7 @@ import type Config from 'webpack-chain';
 import path from 'path';
 import { existsSync } from 'fs-extra';
 import findCacheDir from 'find-cache-dir';
+import { ignoreWarnings } from '../utils/warningsFilter';
 import resolve from '../blocks/resolve';
 import ignoreLocales from '../blocks/ignoreLocales';
 import type { ConfigManager } from '../../../config/configManager';
@@ -28,6 +29,10 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
   );
   // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
   config.output.set('devtoolNamespace', '@tramvai/cli');
+
+  if (!configManager.debug) {
+    config.set('ignoreWarnings', ignoreWarnings);
+  }
 
   config.context(path.resolve(__dirname, '..', '..', '..', '..'));
   config.batch(resolve(configManager));

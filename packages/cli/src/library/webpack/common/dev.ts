@@ -1,6 +1,5 @@
 import type Config from 'webpack-chain';
 import CaseSensitivePathsPlugin from 'case-sensitive-paths-webpack-plugin';
-import { ignoreWarnings } from '../utils/warningsFilter';
 import type { CliConfigEntry, ConfigManager } from '../../../api';
 import { dedupe } from '../blocks/dedupe';
 
@@ -12,8 +11,6 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
     // отключает уведомление об успешной компиляции, его уже выводит webpackbar
     warningsCount: false,
   });
-
-  config.set('ignoreWarnings', ignoreWarnings);
 
   config.set('infrastructureLogging', { level: 'warn' });
 

@@ -7,6 +7,15 @@
       "type": "application",
       "hotRefresh": {
         "enabled": true
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc"
+        }
       }
     },
     "base": {

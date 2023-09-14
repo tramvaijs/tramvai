@@ -24,6 +24,7 @@ export const startRootApp = ({
       rootDir: EXAMPLE_DIR,
       env,
       resolveSymlinks: false,
+      fileCache: true,
     }
   );
 };

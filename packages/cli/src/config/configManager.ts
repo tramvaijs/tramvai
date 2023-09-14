@@ -159,7 +159,13 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
       settings.staticPort ?? (type === 'module' ? DEFAULT_STATIC_MODULE_PORT : DEFAULT_STATIC_PORT)
     ),
     modern,
-    sourceMap: debug ? true : getOption('sourceMap', [settings, normalizedConfigEntry], false),
+    // eslint-disable-next-line no-nested-ternary
+    sourceMap: debug
+      ? // allow to disable sourcemaps with debug flag, when sourceMap passed to cli api
+        typeof settings.sourceMap === 'boolean'
+        ? settings.sourceMap
+        : true
+      : getOption('sourceMap', [settings, normalizedConfigEntry], false),
     target,
     buildPath: '',
     withSettings(overrideSettings) {

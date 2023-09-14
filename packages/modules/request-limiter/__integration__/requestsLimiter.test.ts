@@ -32,11 +32,12 @@ describe('modules/requestsLimiter', () => {
         name: 'requestsLimiter',
         root,
         type: 'application',
-        sourceMap: true,
+        sourceMap: false,
       },
       env,
       port,
       staticPort,
+      fileCache: false,
     });
 
     await waitOn({

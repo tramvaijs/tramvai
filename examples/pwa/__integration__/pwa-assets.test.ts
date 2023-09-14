@@ -18,6 +18,7 @@ describe('packages/modules/pwa - assets', () => {
       rootDir: path.resolve(__dirname, '../'),
       disableProdOptimization: true,
       target: 'pwa',
+      fileCache: false,
     });
 
     const distClientDirectory = path.resolve(__dirname, '../dist', 'client');

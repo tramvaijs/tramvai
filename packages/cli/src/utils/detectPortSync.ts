@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import stripAnsi from 'strip-ansi';
 
 interface Payload {
   request?: number;
@@ -17,7 +18,7 @@ export const detectPortSync = ({ request, fallback }: Payload): number => {
     return request;
   }
 
-  const commandResult = execSync(`npx detect-port ${request ?? fallback}`);
+  const commandResult = execSync(`npx detect-port ${request ?? fallback}`, { encoding: 'utf-8' });
 
-  return parseInt(commandResult.toString('utf-8'), 10);
+  return parseInt(stripAnsi(commandResult.toString()), 10);
 };

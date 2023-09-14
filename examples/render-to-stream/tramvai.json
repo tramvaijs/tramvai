@@ -13,13 +13,21 @@
       "splitChunks": {
         "mode": "granularChunks"
       },
-      "sourceMap": true,
       "postcss": {
         "config": "src/postcss",
         "cssLocalIdentName": "[name]__[local]_[hash:base64:5]"
       },
       "hotRefresh": {
         "enabled": true
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc"
+        }
       }
     }
   }
