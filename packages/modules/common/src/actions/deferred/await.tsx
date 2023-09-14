@@ -21,7 +21,7 @@ export function Await<Result>({
     throw new Error(`Action ${action.name} is not deferred`);
   }
 
-  // for SPA-transitions, when actions will be called after rendering
+  // will be created when spa run actions mode is "after"
   if (!deferred) {
     deferred = new Deferred();
     // avoid unhandled promise rejection

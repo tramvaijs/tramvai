@@ -71,10 +71,14 @@ export interface ActionExecution {
   ): Result extends Promise<any> ? Result : Promise<Result>;
 
   execution: Map<string, Record<string, any>>;
+
+  canExecute<Params extends any[], Result, Deps>(
+    action: TramvaiAction<Params, Result, Deps>
+  ): boolean;
+  canExecute<Payload, Result, Deps>(action: Action<Payload, Result, Deps>): boolean;
 }
 
 export interface ActionConditionChecker<State = any> {
-  payload: any;
   parameters: any;
   conditions: Record<string, any>;
   type: 'global' | 'local';
@@ -97,6 +101,7 @@ export interface Deferred<Data = any> {
   rejectReason?: Error;
   isResolved: () => boolean;
   isRejected: () => boolean;
+  reset: () => void;
 }
 
 export interface DeferredActionsMap {

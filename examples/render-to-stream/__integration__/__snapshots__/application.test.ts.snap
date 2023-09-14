@@ -94,6 +94,9 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
           <li><a href="/second/">Second</a></li>
           <li><a href="/deferred/">Deferred</a></li>
           <li><a href="/non-deferred/">Non-deferred</a></li>
+          <li><a href="/deferred/foo/">Deferred Foo</a></li>
+          <li><a href="/deferred/bar/">Deferred Bar</a></li>
+          <li><a href="/deferred/baz/">Deferred Baz</a></li>
         </ul>
       </div>
       <h3 class="Title__title_jjG8q">Deferred Page</h3>
@@ -238,6 +241,9 @@ exports[`render-to-stream server-side rendering main page 1`] = `
           <li><a href="/second/">Second</a></li>
           <li><a href="/deferred/">Deferred</a></li>
           <li><a href="/non-deferred/">Non-deferred</a></li>
+          <li><a href="/deferred/foo/">Deferred Foo</a></li>
+          <li><a href="/deferred/bar/">Deferred Bar</a></li>
+          <li><a href="/deferred/baz/">Deferred Baz</a></li>
         </ul>
       </div>
       <div>
@@ -372,6 +378,9 @@ exports[`render-to-stream server-side rendering non-deferred page 1`] = `
           <li><a href="/second/">Second</a></li>
           <li><a href="/deferred/">Deferred</a></li>
           <li><a href="/non-deferred/">Non-deferred</a></li>
+          <li><a href="/deferred/foo/">Deferred Foo</a></li>
+          <li><a href="/deferred/bar/">Deferred Bar</a></li>
+          <li><a href="/deferred/baz/">Deferred Baz</a></li>
         </ul>
       </div>
       <div>Loading...</div>

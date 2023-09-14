@@ -13,6 +13,9 @@ export const providers = [
   provide({
     provide: DEFERRED_ACTIONS_MAP_TOKEN,
     useFactory: () => {
+      if (!window.__TRAMVAI_DEFERRED_ACTIONS) {
+        window.__TRAMVAI_DEFERRED_ACTIONS = {};
+      }
       return {
         get(key: string) {
           return window.__TRAMVAI_DEFERRED_ACTIONS[key];

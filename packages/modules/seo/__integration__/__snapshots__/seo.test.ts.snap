@@ -44,6 +44,12 @@ exports[`seo ssr test common meta 1`] = `
       charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -93,6 +99,12 @@ exports[`seo ssr test default meta pack 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
       charset="utf-8"
@@ -259,6 +271,12 @@ exports[`seo ssr test og meta 1`] = `
       charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -312,6 +330,12 @@ exports[`seo ssr test twitter meta 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
       charset="utf-8"

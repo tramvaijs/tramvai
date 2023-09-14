@@ -25,6 +25,7 @@ describe('actionPageRunnerBrowser', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const actionRunner = new ActionPageRunner({
       actionExecution,
@@ -53,6 +54,7 @@ describe('actionPageRunnerBrowser', () => {
         // @ts-ignore
         context: contextMock,
         executionContextManager,
+        deferredActionsMap: new Map(),
       });
       const instance = new ActionPageRunner({
         actionExecution: instanceExecution,
@@ -88,6 +90,7 @@ describe('actionPageRunnerBrowser', () => {
         // @ts-ignore
         context: contextMock,
         executionContextManager,
+        deferredActionsMap: new Map(),
       });
       const instance = new ActionPageRunner({
         actionExecution: instanceExecution,

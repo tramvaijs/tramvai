@@ -1,5 +1,5 @@
 import type { StartCliResult } from '@tramvai/test-integration';
-import { startCli } from '@tramvai/test-integration';
+import { sleep, startCli } from '@tramvai/test-integration';
 import { initPlaywright } from '@tramvai/test-pw';
 import path from 'path';
 import { Writable } from 'stream';
@@ -41,7 +41,7 @@ describe('render-to-stream', () => {
         '<!DOCTYPE html>',
         // actions, resolved before response
         `window.__TRAMVAI_DEFERRED_ACTIONS['fastDeferred'].resolve({"data":"ok"});</script>`,
-        `window.__TRAMVAI_DEFERRED_ACTIONS['failedFastDeferred'].reject({"executionContextName":"root.command-line:resolve_page_deps.pageActions.failedFastDeferred","message":"Failed Fast Deferred"`,
+        `window.__TRAMVAI_DEFERRED_ACTIONS['failedFastDeferred'].reject({"message":"Failed Fast Deferred"`,
         '<div class="application">',
         // lazy component outside Suspense
         'Deferred Page',
@@ -50,7 +50,7 @@ describe('render-to-stream', () => {
       const deferredChunksContent = [
         // deferred actions promises teleportation
         `<script>window.__TRAMVAI_DEFERRED_ACTIONS['longDeferred'].resolve({"data":"ok"});</script>`,
-        `<script>window.__TRAMVAI_DEFERRED_ACTIONS['failedDeferred'].reject({"executionContextName":"root.command-line:resolve_page_deps.pageActions.failedDeferred","message":"Failed Deferred"`,
+        `<script>window.__TRAMVAI_DEFERRED_ACTIONS['failedDeferred'].reject({"message":"Failed Deferred"`,
         // lazy component inside Suspense, blocking assets
         'components-features-Data-Data.chunk.css',
         'components-features-Data-Data.chunk.js',
@@ -89,6 +89,8 @@ describe('render-to-stream', () => {
             expect(finalHTML).toContain(chunk);
           });
 
+          expect.assertions(19);
+
           done();
         });
     });
@@ -122,18 +124,21 @@ describe('render-to-stream', () => {
 
       expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
         .toMatchInlineSnapshot(`
-              "Tramvai 🥳
-              Main
-              Second
-              Deferred
-              Non-deferred
-              Main Page
-              Child Component
-              Error boundary
-              this Footer in render-to-stream
+        "Tramvai 🥳
+        Main
+        Second
+        Deferred
+        Non-deferred
+        Deferred Foo
+        Deferred Bar
+        Deferred Baz
+        Main Page
+        Child Component
+        Error boundary
+        this Footer in render-to-stream
 
-              This is modal for index page!"
-          `);
+        This is modal for index page!"
+      `);
 
       await browser.close();
     });
@@ -150,11 +155,79 @@ describe('render-to-stream', () => {
         Second
         Deferred
         Non-deferred
+        Deferred Foo
+        Deferred Bar
+        Deferred Baz
         Deferred Page
         Response: ok
         Response: ok
         Error: Failed Fast Deferred
         Error: Failed Deferred
+        this Footer in render-to-stream"
+      `);
+
+      await browser.close();
+    });
+
+    it('deferred page with parameter', async () => {
+      const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
+
+      const { page } = await getPageWrapper(`${app.serverUrl}/deferred/foo/`);
+
+      expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
+        .toMatchInlineSnapshot(`
+        "Tramvai 🥳
+        Main
+        Second
+        Deferred
+        Non-deferred
+        Deferred Foo
+        Deferred Bar
+        Deferred Baz
+        Deferred Id Page
+        Response: foo
+        this Footer in render-to-stream"
+      `);
+
+      await browser.close();
+    });
+
+    it('SPA-transition between same deferred page with different parameters', async () => {
+      const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
+
+      const { page, router } = await getPageWrapper(`${app.serverUrl}/deferred/foo/`);
+
+      await router.navigate('/deferred/bar/');
+
+      expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
+        .toMatchInlineSnapshot(`
+        "Tramvai 🥳
+        Main
+        Second
+        Deferred
+        Non-deferred
+        Deferred Foo
+        Deferred Bar
+        Deferred Baz
+        Deferred Id Page
+        Loading long...
+        this Footer in render-to-stream"
+      `);
+
+      await sleep(1000);
+
+      expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
+        .toMatchInlineSnapshot(`
+        "Tramvai 🥳
+        Main
+        Second
+        Deferred
+        Non-deferred
+        Deferred Foo
+        Deferred Bar
+        Deferred Baz
+        Deferred Id Page
+        Response: bar
         this Footer in render-to-stream"
       `);
 

@@ -7,7 +7,7 @@ const layoutAction = declareAction({
     console.log('layout action!');
   },
   conditions: {
-    always: true,
+    dynamic: true,
   },
 });
 

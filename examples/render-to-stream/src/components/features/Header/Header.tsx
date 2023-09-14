@@ -21,6 +21,15 @@ export const Header = () => (
       <li>
         <Link url="/non-deferred/">Non-deferred</Link>
       </li>
+      <li>
+        <Link url="/deferred/foo/">Deferred Foo</Link>
+      </li>
+      <li>
+        <Link url="/deferred/bar/">Deferred Bar</Link>
+      </li>
+      <li>
+        <Link url="/deferred/baz/">Deferred Baz</Link>
+      </li>
     </ul>
   </div>
 );

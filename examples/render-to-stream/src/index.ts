@@ -1,6 +1,6 @@
 import { createApp, provide } from '@tramvai/core';
 import { CommonModule } from '@tramvai/module-common';
-import { SpaRouterModule } from '@tramvai/module-router';
+import { ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { RenderModule } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
 import { ErrorInterceptorModule } from '@tramvai/module-error-interceptor';
@@ -61,6 +61,11 @@ createApp({
         types: [],
         threshold: 0,
       },
+    }),
+    provide({
+      provide: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
+      useValue:
+        (process.env.SPA_ACTIONS_RUN_MODE as typeof ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN) ?? 'after',
     }),
   ],
   // регистрируем экшены, которые будут выполняться для всех страниц приложения

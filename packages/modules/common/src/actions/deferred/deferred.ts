@@ -9,7 +9,25 @@ export class Deferred implements IDeferred {
   rejectReason: any;
 
   constructor() {
-    this.promise = new Promise((resolve, reject) => {
+    this.promise = this.initPromise();
+  }
+
+  isResolved() {
+    return typeof this.resolveData !== 'undefined';
+  }
+
+  isRejected() {
+    return typeof this.rejectReason !== 'undefined';
+  }
+
+  reset() {
+    this.resolveData = undefined;
+    this.rejectReason = undefined;
+    this.promise = this.initPromise();
+  }
+
+  private initPromise() {
+    return new Promise((resolve, reject) => {
       this.resolve = (value: any) => {
         this.resolveData = value;
         resolve(value);
@@ -19,13 +37,5 @@ export class Deferred implements IDeferred {
         reject(reason);
       };
     });
-  }
-
-  isResolved() {
-    return typeof this.resolveData !== 'undefined';
-  }
-
-  isRejected() {
-    return typeof this.rejectReason !== 'undefined';
   }
 }

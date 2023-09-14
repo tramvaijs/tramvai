@@ -4,6 +4,7 @@ import {
   ACTION_EXECUTION_TOKEN,
   ACTION_CONDITIONALS,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
+  DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
 import {
   createConsumerContext,
@@ -72,6 +73,10 @@ export const createMockContext = ({
       provide: EXECUTION_CONTEXT_MANAGER_TOKEN,
       useClass: ExecutionContextManager,
     });
+    di.register({
+      provide: DEFERRED_ACTIONS_MAP_TOKEN,
+      useFactory: () => new Map(),
+    });
 
     di.register({
       provide: ACTION_EXECUTION_TOKEN,
@@ -86,6 +91,7 @@ export const createMockContext = ({
           optional: true,
         },
         executionContextManager: EXECUTION_CONTEXT_MANAGER_TOKEN,
+        deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
       },
     });
   }

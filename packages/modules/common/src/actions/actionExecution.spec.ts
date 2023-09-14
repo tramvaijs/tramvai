@@ -45,6 +45,7 @@ describe('actionExecution in global page', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -111,6 +112,7 @@ describe('actionExecution in global page', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -165,6 +167,7 @@ describe('actionExecution in global page', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -243,6 +246,7 @@ describe('actionExecution in global page', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -288,6 +292,7 @@ describe('actionExecution in global page', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
 
     const result: any[] = [];
@@ -351,6 +356,7 @@ describe('actionExecution in global page', () => {
         }
         return action;
       },
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -409,6 +415,7 @@ describe('actionExecution in actions', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -468,6 +475,7 @@ describe('actionExecution in actions', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -519,6 +527,7 @@ describe('action conditions', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -574,6 +583,7 @@ describe('action conditions', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const result: string[] = [];
 
@@ -626,6 +636,7 @@ describe('cancelling actions', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
 
     const innerAction1 = declareAction({

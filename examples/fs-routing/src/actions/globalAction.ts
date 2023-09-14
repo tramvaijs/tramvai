@@ -6,6 +6,6 @@ export const globalAction = declareAction({
     // Выполняется на каждый переход на сервере и на клиенте
   },
   conditions: {
-    always: true,
+    dynamic: true,
   },
 });

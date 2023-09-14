@@ -408,12 +408,13 @@ const provider = provide({
 
 #### Predefined presets
 
-- _`always`_ - the action is executed on the server, then in the browser and on each SPA transition within the application
+- _`dynamic`_ - the action is executed on the server and on each SPA transition within the application
+- _`always`_ - the action is executed on the server, then in the browser and on each SPA transition within the application - completely without caches
 - _`onlyBrowser`_ - the action is executed only in the browser
 - _`onlyServer`_ - the action is executed only on the server
 - _`pageBrowser`_ - the [global](#global-actions) action is executed only in the browser
 - _`pageServer`_ - the [global](#global-actions) action is executed only on the server
-- _`always`_ + _`onlyBrowser`_ - the action is executed in the browser and for each SPA transition within the application
+- _`dynamic`_ + _`onlyBrowser`_ - the action is executed in the browser and for each SPA transition within the application
 
 ### Dynamic parameters and SPA-transitions
 
@@ -445,8 +446,8 @@ const preparePageAction = creareAction({
     // ...
   },
   conditions: {
-    // with always: true, the action will always be called and not cached
-    always: true,
+    // with dynamic: true, the action will always be called for SPA-transitions and not cached
+    dynamic: true,
   },
 });
 
@@ -465,7 +466,7 @@ const preparePageAction = creareAction({
     await loadConcert(id);
   },
   conditions: {
-    always: true,
+    dynamic: true,
   },
 });
 

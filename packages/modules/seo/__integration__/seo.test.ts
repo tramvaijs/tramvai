@@ -63,7 +63,7 @@ describe('seo', () => {
       expect(await page.title()).toBe('WoW, such dynamic!');
     });
 
-    it.only('should allow to update meta in browser page actions on first render', async () => {
+    it('should allow to update meta in browser page actions on first render', async () => {
       const { page, router } = await getPageWrapper('/seo/dynamic-client/');
 
       await sleep(300);

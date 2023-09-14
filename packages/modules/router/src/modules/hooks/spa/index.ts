@@ -6,10 +6,12 @@ import {
   ACTION_REGISTRY_TOKEN,
   ACTION_PAGE_RUNNER_TOKEN,
   STORE_TOKEN,
+  DEFERRED_ACTIONS_MAP_TOKEN,
+  ACTION_EXECUTION_TOKEN,
 } from '@tramvai/tokens-common';
 import { afterNavigateHooksToken, beforeNavigateHooksToken } from '../../tokens';
 import { runCommandsAfterSpa, runCommandsSpa } from './runCommands';
-import { runActionsFactory } from '../runActions';
+import { resetDeferredActions, runActionsFactory } from '../runActions';
 
 export const spaHooks: Provider[] = [
   {
@@ -34,11 +36,15 @@ export const spaHooks: Provider[] = [
     provide: commandLineListTokens.spaTransition,
     multi: true,
     useFactory: ({ spaMode, ...deps }: any) => {
-      if (spaMode !== 'after') {
-        return runActionsFactory(deps);
-      }
+      return () => {
+        // we need to reset dynamic deferred actions promises befor page render with updated route,
+        // defered promise will be fresh and fallback will be shown
+        resetDeferredActions(deps);
 
-      return noop;
+        if (spaMode !== 'after') {
+          return runActionsFactory(deps)();
+        }
+      };
     },
     deps: {
       store: STORE_TOKEN,
@@ -49,6 +55,8 @@ export const spaHooks: Provider[] = [
         token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
         optional: true,
       },
+      deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
+      actionExecution: ACTION_EXECUTION_TOKEN,
     },
   },
   {

@@ -94,13 +94,6 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
             const isDeferredAction =
               ACTION_PARAMETERS in action && action[ACTION_PARAMETERS].deferred;
 
-            if (isDeferredAction && !this.deferredMap.get(action.name)) {
-              const deferred = new Deferred();
-              // avoid unhandled promise rejection
-              deferred.promise.catch(() => {});
-              this.deferredMap.set(action.name, deferred);
-            }
-
             return Promise.resolve()
               .then(() => {
                 const promise = this.deps.actionExecution.runInContext(
@@ -110,13 +103,10 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
                 );
 
                 if (isDeferredAction) {
-                  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                  const deferred = this.deferredMap.get(action.name)!;
-
-                  // eslint-disable-next-line promise/no-nesting
-                  promise.then(deferred.resolve).catch(deferred.reject);
-
                   this.responseTaskManager?.push(async () => {
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    const deferred = this.deferredMap.get(action.name)!;
+
                     // scripts will already be present on the page HTML
                     if (deferred.isResolved() || deferred.isRejected()) {
                       return;
@@ -143,10 +133,8 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
                         );
                       });
                   });
-
-                  // eslint-disable-next-line promise/no-return-wrap
-                  return Promise.resolve();
                 }
+
                 return promise;
               })
               .catch((error) => {

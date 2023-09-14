@@ -50,14 +50,14 @@ export const fetchPokemonAction = declareAction({
   },
   conditions: {
     // disable caching of the action, since it must be executed again for different name values
-    always: true,
+    dynamic: true,
   },
 });
 ```
 
 :::tip
 
-You can read more about the need to add an `always` condition to an action that depends on page parameters in [Action documentation](concepts/action.md#peculiarities)
+You can read more about the need to add an `dynamic` condition to an action that depends on page parameters in [Action documentation](concepts/action.md#peculiarities)
 
 :::
 

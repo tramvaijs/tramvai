@@ -35,9 +35,10 @@ import { onlyServer } from './conditions/onlyServer';
 import { onlyBrowser } from './conditions/onlyBrowser';
 import { pageServer } from './conditions/pageServer';
 import { pageBrowser } from './conditions/pageBrowser';
+import { dynamicCondition } from './conditions/dynamic';
 import { providers as deferredProviders } from './deferred/providers';
 
-export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser };
+export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser, dynamicCondition };
 
 const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeRun');
 
@@ -69,6 +70,7 @@ const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeR
           token: 'actionTransformAction',
           optional: true,
         },
+        deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
       },
     }),
     provide({
@@ -94,7 +96,14 @@ const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeR
     provide({
       provide: ACTION_CONDITIONALS,
       multi: true,
-      useValue: [alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser],
+      useValue: [
+        alwaysCondition,
+        onlyServer,
+        onlyBrowser,
+        pageServer,
+        pageBrowser,
+        dynamicCondition,
+      ],
     }),
     ...deferredProviders,
   ],

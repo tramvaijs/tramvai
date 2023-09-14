@@ -32,6 +32,7 @@ describe('execution', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const instance = new ActionPageRunner({
       logger,
@@ -40,6 +41,9 @@ describe('execution', () => {
       limitTime: 500,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      deferredMap: new Map(),
+      responseTaskManager: null as any,
+      serverResponseStream: null as any,
     });
     const result: any[] = [];
     const action1 = createAction({
@@ -84,6 +88,7 @@ describe('errors', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const instance = new ActionPageRunner({
       logger,
@@ -92,6 +97,9 @@ describe('errors', () => {
       limitTime: 500,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      deferredMap: new Map(),
+      responseTaskManager: null as any,
+      serverResponseStream: null as any,
     });
     const result: number[] = [];
     await instance.runActions([
@@ -124,6 +132,7 @@ describe('errors', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const instance = new ActionPageRunner({
       logger,
@@ -132,6 +141,9 @@ describe('errors', () => {
       limitTime: 500,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      deferredMap: new Map(),
+      responseTaskManager: null as any,
+      serverResponseStream: null as any,
     });
 
     expect.assertions(1);
@@ -161,6 +173,7 @@ describe('errors', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const instance = new ActionPageRunner({
       logger,
@@ -169,6 +182,9 @@ describe('errors', () => {
       limitTime: 500,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      deferredMap: new Map(),
+      responseTaskManager: null as any,
+      serverResponseStream: null as any,
     });
 
     const stopRunAtError = (error: Error) => {
@@ -211,6 +227,7 @@ describe('limits', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const instance = new ActionPageRunner({
       logger,
@@ -219,6 +236,9 @@ describe('limits', () => {
       limitTime: 500,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      deferredMap: new Map(),
+      responseTaskManager: null as any,
+      serverResponseStream: null as any,
     });
     const result: number[] = [];
     const prom = instance.runActions([
@@ -272,6 +292,7 @@ describe('limits', () => {
       // @ts-ignore
       context: contextMock,
       executionContextManager,
+      deferredActionsMap: new Map(),
     });
     const instance = new ActionPageRunner({
       logger,
@@ -280,6 +301,9 @@ describe('limits', () => {
       limitTime: 500,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      deferredMap: new Map(),
+      responseTaskManager: null as any,
+      serverResponseStream: null as any,
     });
     const result: number[] = [];
 
