@@ -4,6 +4,7 @@ import { FAKE_API_CLIENT } from '../fakeApiClient';
 
 const query = createQuery({
   key: (parameter: string) => ['api-group', parameter],
+  actionNamePostfix: 'apiGroupQueryAction',
   async fn(parameter) {
     const { payload } = await this.deps.apiClient.get<string>(`api/group/${parameter}`);
 

@@ -19,6 +19,8 @@ export type QueryKey<Options, Deps extends ProviderDeps> =
 export interface BaseCreateQueryOptions<Options, Deps extends ProviderDeps> {
   key: QueryKey<Options, Deps>;
 
+  actionNamePostfix?: string;
+
   fn: Function;
 
   deps?: Deps;
@@ -36,6 +38,8 @@ export interface BaseQuery<Options, TCreateQuery, TQuery, TUseQuery> {
   raw(context: ActionContext, options?: Options): TUseQuery;
 
   prefetchAction(options?: Options): TramvaiAction<[], Promise<void>, any>;
+
+  actionNamePostfix: string;
 }
 
 export const isQuery = <Options, Result, TCreateQuery, TQuery, TUseQuery>(

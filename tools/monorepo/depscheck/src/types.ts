@@ -9,6 +9,7 @@ export type Config = {
   ignorePeerDependencies?: string[];
   ignorePatterns?: string[];
   ignoreUnused?: string[];
+  ignoreWorkspaces?: string[];
   fix?: boolean;
   depcheck?: DepcheckConfig;
   collector: CollectorInterface['collect'];

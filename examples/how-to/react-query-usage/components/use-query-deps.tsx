@@ -6,6 +6,7 @@ const query = createQuery({
   key() {
     return `base/${this.deps.pageService.getCurrentUrl().query.route}`;
   },
+  actionNamePostfix: 'someQuery',
   async fn(_) {
     const { apiClient, pageService } = this.deps;
     const { payload } = await apiClient.get<string>('api/by-route', {

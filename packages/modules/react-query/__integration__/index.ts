@@ -14,6 +14,7 @@ const bundle = createBundle({
   components: {
     'use-query-base': lazy(() => import('./components/use-query-base')),
     'use-query-prefetch': lazy(() => import('./components/use-query-prefetch')),
+    'use-query-multiple-prefetch': lazy(() => import('./components/use-query-multiple-prefetch')),
     'use-query-fetch': lazy(() => import('./components/use-query-fetch')),
     'use-same-query-many-components': lazy(
       () => import('./components/use-same-query-many-components')
@@ -22,6 +23,9 @@ const bundle = createBundle({
     'use-query-options': lazy(() => import('./components/use-query-options')),
     'use-query-fail': lazy(() => import('./components/use-query-fail')),
     'use-infinite-query': lazy(() => import('./components/use-infinite-query')),
+    'use-infinite-query-multiple-prefetch': lazy(
+      () => import('./components/use-infinite-query-multiple-prefetch')
+    ),
     'use-mutation': lazy(() => import('./components/use-mutation')),
     'use-query-conditions': lazy(() => import('./components/use-query-conditions')),
     'use-queries': lazy(() => import('./components/use-queries')),

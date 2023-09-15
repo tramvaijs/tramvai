@@ -47,6 +47,7 @@ describe('deps', () => {
         expectTypeOf(this.deps).toEqualTypeOf({});
         return '';
       },
+      actionNamePostfix: 'testQueryPostfix',
       async fn() {
         expectTypeOf(this.deps).toEqualTypeOf({});
         return '';
@@ -61,6 +62,7 @@ describe('deps', () => {
         }>();
         return '';
       },
+      actionNamePostfix: 'testQueryPostfix',
       async fn() {
         expectTypeOf(this.deps).toEqualTypeOf<{
           num: number;

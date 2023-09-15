@@ -64,6 +64,14 @@ export async function depscheck(config: Config) {
       continue;
     }
 
+    const ignorePattern = config.ignoreWorkspaces?.find((pattern) => {
+      return minimatch.match([pkg.path, pkg.name], pattern).length;
+    });
+    if (ignorePattern) {
+      logger.info(`${pkg.name} ignored by ${ignorePattern} in 'ignorePkgs' parameter or config`);
+      continue;
+    }
+
     logger.start('Processing', pkg.name);
 
     const res = (await depcheck(pkg.absPath, depcheckConfig)) as CheckResults;

@@ -5,6 +5,7 @@ import type { ReactElement } from 'react';
 import { testHook } from '@tramvai/test-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createToken, provide } from '@tinkoff/dippy';
+import { createUniqueActionKeyForQuery } from '../shared/createUniqueActionKeyForQuery';
 import { createQuery } from './create';
 import { useQuery } from './use';
 
@@ -56,6 +57,7 @@ describe('deps', () => {
         mockKey(this.deps);
         return `num: ${this.deps.num}, str: ${this.deps.str}`;
       },
+      actionNamePostfix: 'testActionNameWithKeyAsFunction',
       async fn() {
         mockRequest(this.deps);
         return '';

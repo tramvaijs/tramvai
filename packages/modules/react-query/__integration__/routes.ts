@@ -16,6 +16,13 @@ export const routes: Array<typeof ROUTES_TOKEN> = [
     },
   },
   {
+    name: 'use-query-multiple-prefetch',
+    path: '/use-query-multiple-prefetch',
+    config: {
+      pageComponent: 'use-query-multiple-prefetch',
+    },
+  },
+  {
     name: 'use-query-fetch',
     path: '/use-query-fetch',
     config: {
@@ -55,6 +62,13 @@ export const routes: Array<typeof ROUTES_TOKEN> = [
     path: '/use-infinite-query',
     config: {
       pageComponent: 'use-infinite-query',
+    },
+  },
+  {
+    name: 'use-infinite-query-multiple-prefetch',
+    path: '/use-infinite-query-multiple-prefetch',
+    config: {
+      pageComponent: 'use-infinite-query-multiple-prefetch',
     },
   },
   {

@@ -29,6 +29,12 @@ const args = buildResultCliWithCollectorOpts(collector)
     description:
       'List of module patterns that should not generate error when dependency is not used',
   })
+  .option('ignore-workspaces', {
+    type: 'array',
+    default: [],
+    description:
+      'List of package names or package paths patterns, that should not be checked. Applied on packages list, returned by collector',
+  })
   .option('depcheck-ignore-matches', {
     group: 'depcheck',
     type: 'array',

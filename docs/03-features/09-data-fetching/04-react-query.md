@@ -169,6 +169,7 @@ Page.actions = [query.prefetchAction()];
 For example, you have route like `/blog/:article/`, and a few specific urls on it - `/blog/first/` and `/blog/second/`. From any article you can made SPA-transition to another article.
 
 This case can be a little bit tricky for data prefetching:
+
 - for `prefetchAction`, you can't pass slug, and need to resolve it from `PAGE_SERVICE_TOKEN` in `key` and `fn`
 - for SPA-transitions on the same route, you need to pass slug to `useQuery` in component, and can resolve it from `useRoute` hook.
 
@@ -181,16 +182,15 @@ import { useRoute, PAGE_SERVICE_TOKEN } from '@tramvai/module-router';
 const query = createQuery({
   key: (slug?: string) => {
     // get slug from query options, otherwise from page service
-    const articleId = slug
-      || this.deps.pageService.getCurrentRoute().params.article;
+    const articleId = slug || this.deps.pageService.getCurrentRoute().params.article;
 
     // it is important, any dynamic part of query need to be saved in key
     return ['article', articleId];
   },
+  actionNamePostfix: 'getArticleById',
   async fn(slug?: string) {
     // get slug from query options, otherwise from page service
-    const articleId = slug
-      || this.deps.pageService.getCurrentRoute().params.article;
+    const articleId = slug || this.deps.pageService.getCurrentRoute().params.article;
 
     return this.deps.apiService.fetchArticle(articleId);
   },
@@ -232,6 +232,7 @@ const query = createQuery({
   key() {
     return `base/${this.deps.pageService.getCurrentUrl().query.route}`;
   },
+  actionNamePostfix: 'requestByRoute',
   async fn() {
     const { apiClient, pageService } = this.deps;
 
@@ -286,7 +287,6 @@ const Child2 = () => {
 };
 
 export function Component() {
-
   return (
     <>
       <Child1 />
@@ -311,6 +311,7 @@ import { createQuery, useQuery } from '@tramvai/react-query';
 
 const query = createQuery({
   key: (parameter: string) => ['api-group', parameter],
+  actionNamePostfix: 'requestGroup',
   async fn(parameter) {
     await sleep(100);
     return `Response ${parameter} from API`;
@@ -645,11 +646,18 @@ As a parameter `key` you can use:
 - a function that takes the parameters with which `query` is called and returns a string - `key: (this: { deps }, options) => 'query-name'`. Where through `this.deps` you can get resolved deps for the query.
 - a function that accepts parameters, with which `query` is called, and returns an array, where any serializable data can be used as elements - `key: (this: { deps }, options) => ['query-name', options, { bar: 'baz' }]`
 
+::: note
+
+If you pass parameter `key` as a function, you should pass actionNamePostfix to avoid duplicates in the server-client cache
+
+:::
+
 ```ts
 import { createQuery, useQuery } from '@tramvai/react-query';
 
 const query = createQuery({
   key: (id: number) => ['user', id],
+  actionNamePostfix: 'requestUser',
   async fn(id) {
     const { apiClient } = this.deps;
     const { payload } = await apiClient.get(`api/user/${id}`);

@@ -6,13 +6,14 @@ import type { UseQueryOptions } from '@tanstack/react-query';
 import type { ActionContext } from '@tramvai/core';
 import { declareAction } from '@tramvai/core';
 import { QUERY_CLIENT_TOKEN } from '@tramvai/module-react-query';
-import { CONTEXT_TOKEN } from '@tramvai/tokens-common';
+import { CONTEXT_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import type { CreateQueryOptions, Query } from './types';
 import type { ReactQueryContext, ReactQueryKeyOrString } from '../baseQuery/types';
 import { QUERY_PARAMETERS } from '../baseQuery/types';
 import { normalizeKey } from '../shared/normalizeKey';
 import { resolveDI } from '../shared/resolveDI';
 import { mapQuerySignalToxecutionContext } from '../shared/signal';
+import { createUniqueActionKeyForQuery } from '../shared/createUniqueActionKeyForQuery';
 
 const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
   query: Query<Options, Result, Deps>,
@@ -27,7 +28,7 @@ const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
   const queryKey = normalizeKey(rawQueryKey as ReactQueryKeyOrString);
 
   const actionWrapper = declareAction({
-    name: 'queryExecution',
+    name: `queryExecution:${query.actionNamePostfix}`,
     async fn(queryContext: { signal?: AbortSignal }) {
       const { abortSignal, abortController } = this;
 
@@ -52,6 +53,7 @@ const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
     },
   };
 };
+
 export const createQuery = <Options = unknown, Result = unknown, Deps extends ProviderDeps = {}>(
   queryParameters: CreateQueryOptions<Options, Result, Deps>
 ): Query<Options, Result, Deps> => {
@@ -59,6 +61,7 @@ export const createQuery = <Options = unknown, Result = unknown, Deps extends Pr
 
   const query: Query<Options, Result, Deps> = {
     [QUERY_PARAMETERS]: queryParameters,
+    actionNamePostfix: createUniqueActionKeyForQuery(queryParameters),
     fork: (options: UseQueryOptions<Result, Error>) => {
       return createQuery({
         ...queryParameters,
@@ -73,7 +76,7 @@ export const createQuery = <Options = unknown, Result = unknown, Deps extends Pr
     },
     prefetchAction: (options: Options) => {
       return declareAction({
-        name: 'queryPrefetch',
+        name: `queryPrefetch:${query.actionNamePostfix}`,
         fn() {
           return this.deps.queryClient.prefetchQuery(
             convertToRawQuery(query, this.deps.di, options)
@@ -82,19 +85,21 @@ export const createQuery = <Options = unknown, Result = unknown, Deps extends Pr
         deps: {
           di: DI_TOKEN,
           queryClient: QUERY_CLIENT_TOKEN,
+          logger: LOGGER_TOKEN,
         },
         conditions,
       });
     },
     fetchAction: (options: Options) => {
       return declareAction({
-        name: 'queryFetch',
+        name: `queryFetch:${query.actionNamePostfix}`,
         fn() {
           return this.deps.queryClient.fetchQuery(convertToRawQuery(query, this.deps.di, options));
         },
         deps: {
           di: DI_TOKEN,
           queryClient: QUERY_CLIENT_TOKEN,
+          logger: LOGGER_TOKEN,
         },
         conditions,
       });

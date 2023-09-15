@@ -56,6 +56,7 @@ describe('deps', () => {
         mockKey(this.deps);
         return `num: ${this.deps.num}, str: ${this.deps.str}`;
       },
+      actionNamePostfix: 'testActionWithDepsInKey',
       async fn() {
         mockRequest(this.deps);
         return '';
