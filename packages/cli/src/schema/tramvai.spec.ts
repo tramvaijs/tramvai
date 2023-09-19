@@ -9,7 +9,7 @@ jest.mock('resolve');
 
 describe('JSON schema для tramvai.json', () => {
   it('Схема успешно компилируется', () => {
-    const ajv = new Ajv();
+    const ajv = new Ajv({ strict: true, strictSchema: false, allowUnionTypes: true });
 
     expect(() => ajv.compile(schema)).not.toThrow();
   });
@@ -35,7 +35,13 @@ describe('JSON schema для tramvai.json', () => {
 
     const originalConfig = clone(config);
 
-    const ajv = new Ajv({ allErrors: true, useDefaults: true, strictDefaults: 'log' });
+    const ajv = new Ajv({
+      allErrors: true,
+      useDefaults: true,
+      strict: true,
+      strictSchema: false,
+      allowUnionTypes: true,
+    });
     const validate = ajv.compile(schema);
     const valid = validate(config);
 

@@ -53,6 +53,7 @@ export const modernLibs = [
   'tinkoff-push-web',
   'cacheable-lookup',
   'node-abort-controller',
+  '@hubert',
 ];
 
 const regexStringFactory = ({ except }: { except?: boolean } = {}) =>

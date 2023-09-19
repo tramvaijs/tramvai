@@ -74,7 +74,7 @@
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/tools-check-versions": "0.0.0-stub",
     "@tramvai/tools-migrate": "0.0.0-stub",
-    "ajv": "^6.12.6",
+    "ajv": "^8.12.0",
     "ansi-escapes": "^4.3.2",
     "autoprefixer": "^10.4.8",
     "babel-loader": "^8.2.5",

@@ -81,9 +81,15 @@ export class ConfigManager {
       configParameters.projects[projectName] = merge(projectsConfig, entry);
     });
 
-    const ajv = new Ajv({ useDefaults: true });
+    const ajv = new Ajv({
+      useDefaults: true,
+      allowUnionTypes: true,
+      strict: true,
+      strictSchema: false,
+    });
 
-    ajv.addKeyword('cli_overridable', {
+    ajv.addKeyword({
+      keyword: 'cli_overridable',
       modifying: true,
       errors: false,
       validate(schemaValue, currentValue, propSchema) {

@@ -440,3 +440,86 @@ it('should populate defaults for overridable options', () => {
     }
   `);
 });
+
+it('should throw an error if added aditional unknown property', () => {
+  const config: any = {
+    projects: {
+      app: {
+        unknownOption: 'something',
+        name: 'test-app',
+        root: 'src',
+        type: 'application',
+        output: {
+          client: 'assets/compiled',
+        },
+        sourceMap: false,
+        externals: ['test'],
+        fileSystemPages: { enabled: true },
+        experiments: {
+          webpack: {
+            backCompat: true,
+          },
+          transpilation: {
+            loader: {
+              development: 'swc',
+            },
+          },
+        },
+        dedupe: {
+          strategy: 'semver',
+        },
+        define: {
+          shared: {
+            'process.env.APP_ID': 'app',
+          },
+        },
+        svgo: {
+          plugins: [
+            {
+              name: 'test-plugin',
+            },
+          ],
+        },
+      },
+      'child-app': {
+        name: 'test-child-app',
+        root: 'packages/child-app',
+        type: 'child-app',
+        sourceMap: {
+          development: true,
+        },
+        experiments: {
+          transpilation: {
+            loader: {},
+          },
+        },
+        define: {
+          shared: {
+            commonProp: 'unknown',
+          },
+          production: {
+            'process.env.PROD': 'true',
+          },
+        },
+        webpack: {
+          resolveAlias: {
+            stream: 'browser-stream',
+          },
+          provide: {
+            Buffer: ['buffer', 'Buffer'],
+          },
+        },
+      },
+    },
+  };
+
+  expect.assertions(2);
+  try {
+    const configManager = new ConfigManager({ config, syncConfigFile });
+  } catch (e: any) {
+    // eslint-disable-next-line jest/no-conditional-expect
+    expect(e.message).toMatch('Config validation failed');
+    // eslint-disable-next-line jest/no-conditional-expect
+    expect(true).toBeTruthy();
+  }
+});

@@ -17,6 +17,7 @@
       "patternProperties": {
         "^[$a-zA-Z_-][0-9a-zA-Z_$-]*$": {
           "if": {
+            "type": "object",
             "properties": {
               "type": {
                 "const": "application"
@@ -1433,6 +1434,7 @@
           },
           "else": {
             "if": {
+              "type": "object",
               "properties": {
                 "type": {
                   "const": "module"
@@ -2102,6 +2104,7 @@
             },
             "else": {
               "if": {
+                "type": "object",
                 "properties": {
                   "type": {
                     "const": "child-app"
