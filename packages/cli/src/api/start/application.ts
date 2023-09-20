@@ -21,6 +21,7 @@ import { registerProviders } from '../../utils/di';
 
 export const startApplication = async (di: Container): Result => {
   const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
+
   const { buildType } = options;
 
   const shouldBuildClient = buildType !== 'server';

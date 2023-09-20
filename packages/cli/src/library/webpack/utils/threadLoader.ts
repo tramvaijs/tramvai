@@ -23,7 +23,7 @@ const createWorkerPoolConfig = (configManager: ConfigManager<CliConfigEntry>) =>
 
 const isApplicable = (configManager: ConfigManager<CliConfigEntry>) => {
   return (
-    // thread-loader uses child_process.fork underhood, and sometimes (50/50) work in these processes does not get into inspector.Session profile
+    // thread-loader uses child_process.fork under the hood, and sometimes (50/50) work in these processes does not get into inspector.Session profile
     !process.env.TRAMVAI_CPU_PROFILE &&
     // TODO: check that there is still issue with windows systems and thread-loader
     process.platform !== 'win32' &&

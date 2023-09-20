@@ -10,7 +10,7 @@ import { createServer } from '../utils/createServer';
 import { listenServer } from '../utils/listenServer';
 import { getListeningPort } from '../utils/getListeningPort';
 import { stopServer } from '../utils/stopServer';
-import { DEFAULT_PORT, DEFAULT_STATIC_PORT } from '../../../config/configManager';
+import { PortManager } from '../../../models/port-manager';
 
 const FIXTURES_DIR = resolve(__dirname, '__fixtures__');
 
@@ -290,8 +290,8 @@ describe('@tramvai/cli start command', () => {
       const testServerStub = createServer();
       const testStaticServerStub = createServer();
 
-      await listenServer(testServerStub, '0.0.0.0', DEFAULT_PORT);
-      await listenServer(testStaticServerStub, '0.0.0.0', DEFAULT_STATIC_PORT);
+      await listenServer(testServerStub, '0.0.0.0', PortManager.DEFAULT_PORT);
+      await listenServer(testStaticServerStub, '0.0.0.0', PortManager.DEFAULT_STATIC_PORT);
 
       const { server, staticServer, close } = await start({
         rootDir: FIXTURES_DIR,

@@ -13,6 +13,7 @@ import moduleVersion from '../utils/moduleVersion';
 import { packageVersion } from '../utils/packageVersion';
 import { showConfig } from './showConfig';
 import type { Target } from '../typings/target';
+import { PortManager } from '../models/port-manager';
 
 // @TODO: maybe split settings depending on env?
 export interface Settings<E extends Env> {
@@ -92,10 +93,7 @@ export type ConfigManager<
     assetsPrefix?: string;
   };
 
-export const DEFAULT_PORT = 3000;
 export const DEFAULT_STATIC_HOST = 'localhost';
-export const DEFAULT_STATIC_PORT = 4000;
-export const DEFAULT_STATIC_MODULE_PORT = 4040;
 
 // eslint-disable-next-line max-statements, complexity
 export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E extends Env = Env>(
@@ -153,10 +151,13 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     rootDir,
     buildType,
     debug,
-    port: Number(settings.port ?? DEFAULT_PORT),
+    port: Number(settings.port ?? PortManager.DEFAULT_PORT),
     staticHost: settings.staticHost ?? DEFAULT_STATIC_HOST,
     staticPort: Number(
-      settings.staticPort ?? (type === 'module' ? DEFAULT_STATIC_MODULE_PORT : DEFAULT_STATIC_PORT)
+      settings.staticPort ??
+        (type === 'module'
+          ? PortManager.DEFAULT_MODULE_STATIC_PORT
+          : PortManager.DEFAULT_STATIC_PORT)
     ),
     modern,
     // eslint-disable-next-line no-nested-ternary

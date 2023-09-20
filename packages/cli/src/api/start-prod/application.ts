@@ -1,6 +1,6 @@
 import type { Container } from '@tinkoff/dippy';
 import type { Params, Result } from './index';
-import { COMMAND_PARAMETERS_TOKEN, STATIC_SERVER_TOKEN } from '../../di/tokens';
+import { COMMAND_PARAMETERS_TOKEN, PORT_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../di/tokens';
 import {
   INIT_HANDLER_TOKEN,
   CLOSE_HANDLER_TOKEN,
@@ -15,8 +15,12 @@ import { build } from '..';
 
 export const startProdApplication = async (di: Container): Result => {
   const parameters = di.get(COMMAND_PARAMETERS_TOKEN) as Params;
+  const portManager = di.get(PORT_MANAGER_TOKEN);
+
+  await portManager.computeAvailablePorts();
 
   registerProviders(di, [...sharedProviders, ...applicationsProviders]);
+
   await runHandlers(di.get({ token: INIT_HANDLER_TOKEN, optional: true }));
 
   const { builder, ...buildResult } = await build(parameters);

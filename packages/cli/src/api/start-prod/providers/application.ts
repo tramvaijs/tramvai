@@ -6,39 +6,31 @@ import {
   COMMAND_PARAMETERS_TOKEN,
   CONFIG_ENTRY_TOKEN,
   CONFIG_MANAGER_TOKEN,
+  PORT_MANAGER_TOKEN,
 } from '../../../di/tokens';
-import type { Params } from '../index';
-import type { ConfigEntry } from '../../../typings/configEntry/common';
+import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
 import { CLOSE_HANDLER_TOKEN, SERVER_PROCESS_TOKEN } from '../tokens';
 import { DEBUG_ARGV } from '../../../config/constants';
-import { detectPortSync } from '../../../utils/detectPortSync';
 import { safeRequire } from '../../../utils/safeRequire';
 import type { ConfigManager } from '../../../config/configManager';
-import {
-  createConfigManager,
-  DEFAULT_PORT,
-  DEFAULT_STATIC_PORT,
-} from '../../../config/configManager';
-import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
+import { createConfigManager } from '../../../config/configManager';
 
 export const applicationsProviders: readonly Provider[] = [
   provide({
     provide: CONFIG_MANAGER_TOKEN,
-    useFactory: ({ configEntry, parameters }: { configEntry: ConfigEntry; parameters: Params }) =>
-      createConfigManager(configEntry, {
+    useFactory: ({ configEntry, parameters, portManager }) =>
+      createConfigManager(configEntry as ApplicationConfigEntry, {
         ...parameters,
         appEnv: parameters.env,
         env: 'production',
         buildType: 'client',
-        port: detectPortSync({ request: parameters.port, fallback: DEFAULT_PORT }),
-        staticPort: detectPortSync({
-          request: parameters.staticPort,
-          fallback: DEFAULT_STATIC_PORT,
-        }),
+        port: portManager.port,
+        staticPort: portManager.staticPort,
       }),
     deps: {
       configEntry: CONFIG_ENTRY_TOKEN,
       parameters: COMMAND_PARAMETERS_TOKEN,
+      portManager: PORT_MANAGER_TOKEN,
     },
   }),
   provide({

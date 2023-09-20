@@ -57,7 +57,7 @@ export const configProviders: readonly Provider[] = [
       const { content, isSuccessful } = getTramvaiConfig(rootDir);
 
       if (!isSuccessful) {
-        throw new Error('Config neither passed as parameter or found in file system');
+        throw new Error('Config neither passed as parameter nor found in file system');
       }
 
       const manager = new ConfigManager({ config: content, syncConfigFile: syncJsonFile });

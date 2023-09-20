@@ -1,3 +1,4 @@
+import { provide } from '@tinkoff/dippy';
 import type { Provider } from '@tinkoff/dippy';
 import {
   CONFIG_MANAGER_TOKEN,
@@ -6,19 +7,12 @@ import {
 } from '../../../di/tokens';
 import { createConfigManager } from '../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
-import type { Params } from '../index';
 
 export const sharedProviders: readonly Provider[] = [
-  {
+  provide({
     provide: CONFIG_MANAGER_TOKEN,
-    useFactory: ({
-      configEntry,
-      parameters,
-    }: {
-      configEntry: ApplicationConfigEntry;
-      parameters: Params;
-    }) => {
-      return createConfigManager(configEntry, {
+    useFactory: ({ configEntry, parameters }) => {
+      return createConfigManager(configEntry as ApplicationConfigEntry, {
         ...parameters,
         appEnv: parameters.env,
         env: 'production',
@@ -29,5 +23,5 @@ export const sharedProviders: readonly Provider[] = [
       configEntry: CONFIG_ENTRY_TOKEN,
       parameters: COMMAND_PARAMETERS_TOKEN,
     },
-  },
+  }),
 ];

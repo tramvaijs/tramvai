@@ -5,7 +5,7 @@ import { createCommand } from '../../commands/createCommand';
 import type { WithConfig } from '../shared/types/withConfig';
 import { startApplication } from './application';
 import { startModule } from './module';
-import { CONFIG_ENTRY_TOKEN } from '../../di/tokens';
+import { CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from '../../di/tokens';
 import { startChildApp } from './child-app';
 import type { Builder } from '../../typings/build/Builder';
 
@@ -45,8 +45,11 @@ export type StartCommand = (params: Params, providers?: Provider[]) => Result;
 
 export default createCommand({
   name: 'start',
-  command: (di): Result => {
+  command: async (di): Result => {
     const configEntry = di.get(CONFIG_ENTRY_TOKEN);
+    const portManager = di.get(PORT_MANAGER_TOKEN);
+
+    await portManager.computeAvailablePorts();
 
     switch (configEntry.type) {
       case 'application':

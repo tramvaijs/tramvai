@@ -8,6 +8,7 @@ import {
   configProviders,
   packageManagerProviders,
   stdProviders,
+  networkProviders,
 } from '../di/providers';
 import { COMMAND_MAP_TOKEN, COMMAND_PARAMETERS_TOKEN, COMMAND_RUNNER_TOKEN } from '../di/tokens';
 
@@ -25,6 +26,7 @@ export const createApp = ({
     ...commandsProviders,
     ...packageManagerProviders,
     ...builderProviders,
+    ...networkProviders,
     ...providers,
     {
       provide: COMMAND_PARAMETERS_TOKEN,

@@ -4,7 +4,7 @@ import type { ChildProcess } from 'child_process';
 import type { Provider } from '@tinkoff/dippy';
 import { createCommand } from '../../commands/createCommand';
 import type { WithConfig } from '../shared/types/withConfig';
-import { CONFIG_ENTRY_TOKEN } from '../../di/tokens';
+import { CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from '../../di/tokens';
 import type { Builder } from '../../typings/build/Builder';
 import { startProdApplication } from './application';
 import { startProdChildApp } from './child-app';
@@ -36,8 +36,11 @@ export type StartProdCommand = (params: Params, providers?: Provider[]) => Resul
 
 export default createCommand({
   name: 'start-prod',
-  command: (di): Result => {
+  command: async (di): Result => {
     const configEntry = di.get(CONFIG_ENTRY_TOKEN);
+    const portManager = di.get(PORT_MANAGER_TOKEN);
+
+    await portManager.computeAvailablePorts();
 
     switch (configEntry.type) {
       case 'application':

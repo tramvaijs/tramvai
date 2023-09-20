@@ -7,3 +7,4 @@ export * from './config';
 export * from './packageManager';
 export * from './builder';
 export * from './server';
+export * from './network';

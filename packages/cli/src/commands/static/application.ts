@@ -17,6 +17,7 @@ import { startStaticServer } from './staticServer';
 import { startServer } from './server';
 import { handleServerOutput } from './utils/handle-server-output';
 import { appBundleInfo } from '../../utils/dev-app/request';
+import { PortManager } from '../../models/port-manager';
 
 // eslint-disable-next-line max-statements
 export const staticApp = async (
@@ -24,11 +25,17 @@ export const staticApp = async (
   configEntry: ApplicationConfigEntry,
   options: Params
 ): Promise<CommandResult> => {
+  const network = new PortManager({ configEntry, commandParams: options });
+
+  await network.computeAvailablePorts();
+
   const clientConfigManager = createConfigManager(configEntry, {
     env: 'production',
     ...options,
     buildType: 'client',
     modern: false,
+    port: network.port,
+    staticPort: network.staticPort,
   });
   const serverConfigManager = clientConfigManager.withSettings({ buildType: 'server' });
 

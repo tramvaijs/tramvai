@@ -4,28 +4,27 @@ import {
   COMMAND_PARAMETERS_TOKEN,
   CONFIG_ENTRY_TOKEN,
   CONFIG_MANAGER_TOKEN,
+  PORT_MANAGER_TOKEN,
 } from '../../../di/tokens';
-import { createConfigManager, DEFAULT_STATIC_MODULE_PORT } from '../../../config/configManager';
+import { createConfigManager } from '../../../config/configManager';
 import type { ChildAppConfigEntry } from '../../../typings/configEntry/child-app';
-import { detectPortSync } from '../../../utils/detectPortSync';
 
 export const childAppProviders: readonly Provider[] = [
   provide({
     provide: CONFIG_MANAGER_TOKEN,
-    useFactory: ({ configEntry, parameters }) =>
+    useFactory: ({ configEntry, parameters, portManager }) =>
       createConfigManager(configEntry as ChildAppConfigEntry, {
         ...parameters,
         appEnv: parameters.env,
         env: 'production',
         buildType: 'client',
-        staticPort: detectPortSync({
-          request: parameters.staticPort,
-          fallback: DEFAULT_STATIC_MODULE_PORT,
-        }),
+        port: portManager.port,
+        staticPort: portManager.staticPort,
       }),
     deps: {
       configEntry: CONFIG_ENTRY_TOKEN,
       parameters: COMMAND_PARAMETERS_TOKEN,
+      portManager: PORT_MANAGER_TOKEN,
     },
   }),
 ] as const;

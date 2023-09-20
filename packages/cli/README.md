@@ -67,7 +67,7 @@ Name generation is configured via the options `cssLocalIdentNameDev` and `cssLoc
 ```json
 {
   "postcss": {
-    "cssLocalIdentName": "[hash:base64:5]", // default value (deprecated)
+    "cssLocalIdentName": "[hash:base64:5]" // default value (deprecated)
   }
 }
 ```
@@ -79,7 +79,7 @@ or
   "postcss": {
     "cssLocalIdentName": {
       "development": "[name]__[local]_[minicss]", // available values see in the docs to [css-loader](https://github.com/webpack-contrib/css-loader)
-      "production": "[minicss]", // additionally new tag `minicss` can be used for the generating minimal css names. Based on [article](https://dev.to/denisx/reduce-bundle-size-via-one-letter-css-classname-hash-strategy-10g6)
+      "production": "[minicss]" // additionally new tag `minicss` can be used for the generating minimal css names. Based on [article](https://dev.to/denisx/reduce-bundle-size-via-one-letter-css-classname-hash-strategy-10g6)
     }
   }
 }
@@ -268,7 +268,7 @@ NODE_OPTIONS="--max_semi_space_size=64" tramvai start-prod {appName}
 
 ### How to get CPU profile of @tramvai/cli work?
 
-Run application server or production buid with env variable `TRAMVAI_CPU_PROFILE`:
+Run application server or production build with env variable `TRAMVAI_CPU_PROFILE`:
 
 ```bash
 TRAMVAI_CPU_PROFILE=1 tramvai build {appName}

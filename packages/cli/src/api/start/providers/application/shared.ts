@@ -7,35 +7,29 @@ import {
   CONFIG_ENTRY_TOKEN,
   COMMAND_PARAMETERS_TOKEN,
   STATIC_SERVER_TOKEN,
+  PORT_MANAGER_TOKEN,
 } from '../../../../di/tokens';
 import { stopServer } from '../../utils/stopServer';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
-import {
-  createConfigManager,
-  DEFAULT_PORT,
-  DEFAULT_STATIC_PORT,
-} from '../../../../config/configManager';
+import { createConfigManager } from '../../../../config/configManager';
 import { createServer } from '../../utils/createServer';
 import { listenServer } from '../../utils/listenServer';
-import { detectPortSync } from '../../../../utils/detectPortSync';
 
 export const sharedProviders: readonly Provider[] = [
   provide({
     provide: CONFIG_MANAGER_TOKEN,
-    useFactory: ({ configEntry, parameters }) =>
+    useFactory: ({ configEntry, parameters, portManager }) =>
       createConfigManager(configEntry as ApplicationConfigEntry, {
         ...parameters,
         appEnv: parameters.env,
         env: 'development',
-        port: detectPortSync({ request: parameters.port, fallback: DEFAULT_PORT }),
-        staticPort: detectPortSync({
-          request: parameters.staticPort,
-          fallback: DEFAULT_STATIC_PORT,
-        }),
+        port: portManager.port,
+        staticPort: portManager.staticPort,
       }),
     deps: {
       configEntry: CONFIG_ENTRY_TOKEN,
       parameters: COMMAND_PARAMETERS_TOKEN,
+      portManager: PORT_MANAGER_TOKEN,
     },
   }),
   provide({
