@@ -160,6 +160,7 @@ EventEmitter.defaultMaxListeners = 50;
       useValue: [
         { key: 'DEV_STATIC', optional: true, dehydrate: false },
         { key: 'PORT_STATIC', optional: true, dehydrate: false, value: 4000 },
+        { key: 'HOST_STATIC', optional: true, dehydrate: false, value: 'localhost' },
         { key: 'PORT', optional: true, dehydrate: false, value: 3000 },
         {
           key: 'APP_VERSION',

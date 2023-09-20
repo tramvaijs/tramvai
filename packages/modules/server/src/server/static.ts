@@ -5,10 +5,7 @@ import type { LOGGER_TOKEN, ENV_MANAGER_TOKEN } from '@tramvai/module-common';
 import type { APP_INFO_TOKEN } from '@tramvai/core';
 import os from 'os';
 
-interface StaticAppOptions {
-  port?: number;
-  log: any;
-}
+const DEFAULT_STATIC_HOST = 'localhost';
 
 export const staticAppCommand = ({
   logger,
@@ -20,11 +17,15 @@ export const staticAppCommand = ({
   appInfo: typeof APP_INFO_TOKEN;
 }) => {
   if (!envManager.get('DEV_STATIC')) {
-    return function staticAppNoop() {};
+    return async function staticAppNoop() {};
   }
 
   const log = logger('server:static');
   const port = +envManager.get('PORT_STATIC');
+  const host = (envManager.get('HOST_STATIC') ?? DEFAULT_STATIC_HOST).replace(
+    'localhost',
+    '0.0.0.0'
+  );
   const appVersion = envManager.get('APP_VERSION');
 
   return async function staticApp() {
@@ -43,7 +44,7 @@ export const staticAppCommand = ({
         res.setHeader('X-Host', os.hostname());
       },
     });
-    appStatic.listen({ port }, () => log.info(`Running static server on port: ${port}`));
+    appStatic.listen({ host, port }, () => log.info(`Running static server on ${host}:${port}`));
 
     return appStatic;
   };
