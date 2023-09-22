@@ -33,7 +33,8 @@ export type ProvideDepsIterator<T> = {
       ? any // строковые токены = any
       : T[P] extends { token: infer OptionsToken; optional?: infer OptionsOptional, multi?: infer OptionsMulti  }
         ? OptionsType<OptionsToken, OptionsMulti, OptionsOptional>
-        : T[P]; // Обычный токен
+        // last resort для токенов, значение которых может быть null или undefined
+        : ExtractDependencyType<T[P]>;
 };
 
 // prettier-ignore

@@ -11,7 +11,9 @@ interface BuilderModule<Name extends string> {
   resolveProviders: () => Promise<Provider[]>;
 }
 
-export const BUILDER_MODULE_TOKEN = createToken<BuilderModule<any>>('builder module');
+export const BUILDER_MODULE_TOKEN = createToken<BuilderModule<any>>('builder module', {
+  multi: true,
+});
 
 export const ABSTRACT_BUILDER_FACTORY_TOKEN =
   createToken<AbstractBuilderFactory>('builder abstractFactory');

@@ -59,7 +59,7 @@ next builders are available: "${[...builderMap.keys()]}"`);
     },
     deps: {
       di: DI_TOKEN,
-      builderFactories: BUILDER_MODULE_TOKEN as any as typeof BUILDER_MODULE_TOKEN[],
+      builderFactories: BUILDER_MODULE_TOKEN,
     },
   }),
   {

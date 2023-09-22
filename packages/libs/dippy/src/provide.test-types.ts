@@ -179,9 +179,9 @@ describe('useFactory', () => {
       return `${a}${b}`;
     };
 
-    // @ts-expect-error
     provide({
       provide: STRING_TOKEN,
+      // @ts-expect-error
       useFactory: factory,
     });
 
@@ -357,9 +357,9 @@ describe('useClass', () => {
       }
     }
 
-    // @ts-expect-error
     provide({
       provide: OBJECT_TOKEN,
+      // @ts-expect-error
       useClass: Test,
     });
 
