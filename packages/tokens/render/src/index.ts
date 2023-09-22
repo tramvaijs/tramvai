@@ -48,6 +48,8 @@ export const RENDERER_CALLBACK = createToken<(e?: Error) => void>('RENDERER_CALL
 });
 
 /**
+ * @deprecated you can lost some of tramvai features, for example [streaming render support](https://tramvai.dev/docs/features/rendering/streaming)
+ *
  * @description
  * Used as async function which overrides app render. This function may define render parameters or override render result.
  */
@@ -67,7 +69,7 @@ export const RESOURCES_REGISTRY = createToken<ResourcesRegistry>('resourcesRegis
  * this check will called in order to find out the need of loading polyfills
  * (by default checks for Promise.prototype.finally and implementations for URL and URLSearchParams)
  *
- * [Polyfill documentation](https://tramvai.dev/docs/how-to/how-to-enable-polyfills)
+ * [Polyfill documentation](https://tramvai.dev/docs/references/libs/main-polyfills/#how-polyfills-loading-works)
  */
 export const POLYFILL_CONDITION = createToken<string>('POLYFILL_CONDITION');
 

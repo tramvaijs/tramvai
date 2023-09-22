@@ -117,6 +117,10 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
         cookieManager: COOKIE_MANAGER_TOKEN,
       },
     }),
+    provide({
+      provide: REACT_SERVER_RENDER_MODE,
+      useValue: 'sync',
+    }),
   ],
 })
 export class RenderModule {

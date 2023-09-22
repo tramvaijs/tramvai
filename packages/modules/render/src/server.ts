@@ -328,6 +328,10 @@ Page Error Boundary will be rendered for the client`,
       provide: BACK_FORWARD_CACHE_ENABLED,
       useValue: true,
     }),
+    provide({
+      provide: REACT_SERVER_RENDER_MODE,
+      useValue: 'sync',
+    }),
   ],
 })
 export class RenderModule {
