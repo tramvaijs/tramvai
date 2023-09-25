@@ -214,3 +214,15 @@ const App = () => {
 ### USER_AGENT_TOKEN
 
 Object as a result of parsing user-agent string with [@tinkoff/user-agent](../libs/user-agent.md). Parsing happens only on server-side and parsed info is reused on client-side.
+
+## Env variables
+
+### TRAMVAI_USER_AGENT_CACHE_MAX
+
+Size of User-Agent header parsing cache (in-memory LRU cache), default value is `200`.
+
+You can increase it for better cache hit rate and server performance.
+
+## Metrics
+
+- `user_agent_cache_gets` counter - User-Agent header parsing count, with labels `hit` and `miss` 

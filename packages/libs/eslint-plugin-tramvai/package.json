@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@types/eslint": "^7.2.0",
-    "@typescript-eslint/parser": "^3.7.0",
+    "@typescript-eslint/parser": "^6.7.2",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.5.0"
   },

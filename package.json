@@ -38,7 +38,7 @@
     "@types/node": "^18.13.0",
     "@types/webpack-env": "^1.13.16",
     "expect-type": "^0.13.0",
-    "typescript": "4.9.3",
+    "typescript": "~5.1.0",
     "json": "^9.0.6",
     "wsrun": "^5.2.0"
   },

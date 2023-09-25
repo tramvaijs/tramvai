@@ -20,25 +20,11 @@ import { parseUserAgentWithCache } from './parseUserAgentWithCache';
 
 export const serverUserAgentProviders: Provider[] = [
   provide({
-    provide: 'userAgentCacheType',
-    useFactory: ({ envManager }) => envManager.get('TRAMVAI_USER_AGENT_CACHE_TYPE'),
-    deps: {
-      envManager: ENV_MANAGER_TOKEN,
-    },
-  }),
-  provide({
     provide: ENV_USED_TOKEN,
     useValue: [
       {
-        key: 'TRAMVAI_USER_AGENT_CACHE_TYPE',
-        value: 'memory',
-        optional: true,
-        validator: (value) => value === 'memory' || value === 'memory-lfu',
-        dehydrate: false,
-      },
-      {
         key: 'TRAMVAI_USER_AGENT_CACHE_MAX',
-        value: '50',
+        value: '200',
         optional: true,
         validator: isNumber,
         dehydrate: false,
@@ -48,15 +34,14 @@ export const serverUserAgentProviders: Provider[] = [
   provide({
     provide: 'userAgentMemoryCache',
     scope: Scope.SINGLETON,
-    useFactory: ({ createCache, envManager, cacheType }) => {
-      return createCache(cacheType, {
+    useFactory: ({ createCache, envManager }) => {
+      return createCache('memory', {
         max: Number(envManager.get('TRAMVAI_USER_AGENT_CACHE_MAX')),
       });
     },
     deps: {
       createCache: CREATE_CACHE_TOKEN,
       envManager: ENV_MANAGER_TOKEN,
-      cacheType: 'userAgentCacheType',
     },
   }),
   provide({

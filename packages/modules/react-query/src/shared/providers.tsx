@@ -34,7 +34,7 @@ export const sharedQueryProviders: Provider[] = [
                       return false;
                     }
 
-                    return count < (queries.retry ?? 3);
+                    return count < ((queries.retry as number) ?? 3);
                   },
           },
         },

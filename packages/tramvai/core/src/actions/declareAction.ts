@@ -44,7 +44,7 @@ export function declareAction<Params extends any[], Result, Deps = {}>(
   });
 }
 
-export function isTramvaiAction<Params extends any[], Result, Deps>(
+export function isTramvaiAction<Params extends any[], Result = any, Deps = any>(
   action: any
 ): action is TramvaiAction<Params, Result, Deps> {
   return 'tramvaiActionVersion' in action && action.tramvaiActionVersion === 2;

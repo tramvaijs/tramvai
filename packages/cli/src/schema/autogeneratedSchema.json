@@ -16,9 +16,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "application"
-          ]
+          "const": "application"
         },
         "polyfill": {
           "title": "Path to polyfill file. By default, looks for the `src/polyfill`",
@@ -72,9 +70,7 @@
               "default": "routes",
               "anyOf": [
                 {
-                  "enum": [
-                    false
-                  ],
+                  "const": false,
                   "type": "boolean"
                 },
                 {
@@ -87,9 +83,7 @@
               "default": "pages",
               "anyOf": [
                 {
-                  "enum": [
-                    false
-                  ],
+                  "const": false,
                   "type": "boolean"
                 },
                 {
@@ -258,9 +252,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "basic"
-                              ]
+                              "const": "basic"
                             },
                             "pathType": {
                               "enum": [
@@ -277,9 +269,7 @@
                           "properties": {
                             "type": {
                               "type": "string",
-                              "enum": [
-                                "codeframe"
-                              ]
+                              "const": "codeframe"
                             },
                             "pathType": {
                               "enum": [
@@ -463,9 +453,7 @@
                           "additionalProperties": false
                         },
                         {
-                          "enum": [
-                            "webpack-infrastructure"
-                          ],
+                          "const": "webpack-infrastructure",
                           "type": "string"
                         }
                       ]
@@ -1141,23 +1129,26 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@6176": {
+                        "hasIndices": {
+                          "type": "boolean"
+                        },
+                        "__@match@6354": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6178": {
+                        "__@replace@6356": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6181": {
+                        "__@search@6359": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6183": {
+                        "__@split@6361": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6185": {
+                        "__@matchAll@6363": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1424,9 +1415,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "module"
-          ]
+          "const": "module"
         },
         "output": {
           "title": "Path to build module assets",
@@ -1802,23 +1791,26 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@6176": {
+                        "hasIndices": {
+                          "type": "boolean"
+                        },
+                        "__@match@6354": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6178": {
+                        "__@replace@6356": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6181": {
+                        "__@search@6359": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6183": {
+                        "__@split@6361": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6185": {
+                        "__@matchAll@6363": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2085,9 +2077,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "child-app"
-          ]
+          "const": "child-app"
         },
         "output": {
           "title": "Path to build module assets",
@@ -2463,23 +2453,26 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@6176": {
+                        "hasIndices": {
+                          "type": "boolean"
+                        },
+                        "__@match@6354": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6178": {
+                        "__@replace@6356": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6181": {
+                        "__@search@6359": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6183": {
+                        "__@split@6361": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6185": {
+                        "__@matchAll@6363": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2746,9 +2739,7 @@
         },
         "type": {
           "type": "string",
-          "enum": [
-            "package"
-          ]
+          "const": "package"
         }
       },
       "required": [

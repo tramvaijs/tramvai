@@ -46,8 +46,8 @@ export const webpackServerConfig = ({
   } else {
     config.watchOptions(
       configManager.webpack.watchOptions ?? {
-        aggregateTimeout: 5,
-        ignored: ['**/node_modules/**', '**/.git/**'],
+        aggregateTimeout: 20,
+        ignored: configManager.debug ? ['**/.git/**'] : ['**/node_modules/**', '**/.git/**'],
       }
     );
   }

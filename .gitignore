@@ -39,6 +39,7 @@ test-results
 # Compiled sources
 lib
 tests.d.ts
+tests.d.ts.map
 tests.js
 __migrations__
 **/dist
