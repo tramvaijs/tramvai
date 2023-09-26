@@ -6,7 +6,8 @@
     "build-publish": {
       "outputs": [
         "packages/tramvai/react-query/package.json",
-        "packages/tramvai/react-query/lib"
+        "packages/tramvai/react-query/lib",
+        "packages/tramvai/react-query/__migrations__"
       ],
       "executor": "@tramvai/nx-plugin:build"
     }

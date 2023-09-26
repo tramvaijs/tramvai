@@ -3,8 +3,10 @@ import type { UseQueryOptions } from '@tanstack/react-query';
 import type { TramvaiAction } from '@tramvai/core';
 import type { BaseCreateQueryOptions, BaseQuery, ReactQueryContext } from '../baseQuery/types';
 
-export interface CreateQueryOptions<Options, Result, Deps extends ProviderDeps>
-  extends BaseCreateQueryOptions<Options, Deps> {
+export type CreateQueryOptions<Options, Result, Deps extends ProviderDeps> = BaseCreateQueryOptions<
+  Options,
+  Deps
+> & {
   queryOptions?: UseQueryOptions<Result, Error>;
 
   fn: (
@@ -15,7 +17,7 @@ export interface CreateQueryOptions<Options, Result, Deps extends ProviderDeps>
      */
     deps: ProvideDepsIterator<Deps>
   ) => Promise<Result>;
-}
+};
 
 export type Query<Options, Result, Deps extends ProviderDeps> = BaseQuery<
   Options,

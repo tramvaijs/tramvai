@@ -3,8 +3,12 @@ import type { UseInfiniteQueryOptions, InfiniteData } from '@tanstack/react-quer
 import type { TramvaiAction } from '@tramvai/core';
 import type { BaseCreateQueryOptions, BaseQuery, ReactQueryContext } from '../baseQuery/types';
 
-export interface CreateInfiniteQueryOptions<Options, PageParam, Result, Deps extends ProviderDeps>
-  extends BaseCreateQueryOptions<Options, Deps> {
+export type CreateInfiniteQueryOptions<
+  Options,
+  PageParam,
+  Result,
+  Deps extends ProviderDeps
+> = BaseCreateQueryOptions<Options, Deps> & {
   infiniteQueryOptions?: UseInfiniteQueryOptions<Result, Error>;
 
   fn: (
@@ -19,7 +23,7 @@ export interface CreateInfiniteQueryOptions<Options, PageParam, Result, Deps ext
 
   getNextPageParam?: (lastPage: Result, allPages: Result[]) => PageParam;
   getPreviousPageParam?: (firstPage: Result, allPages: Result[]) => PageParam;
-}
+};
 
 export type InfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps> = BaseQuery<
   Options,

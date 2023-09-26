@@ -16,8 +16,8 @@ export type QueryKey<Options, Deps extends ProviderDeps> =
   | ((this: ReactQueryContext<Deps>, options: Options) => ReactQueryKeyOrString)
   | ReactQueryKeyOrString;
 
-export interface BaseCreateQueryOptions<Options, Deps extends ProviderDeps> {
-  key: QueryKey<Options, Deps>;
+export type CreateQueryOptionsWithSerializableKey<Options, Deps extends ProviderDeps> = {
+  key: ReactQueryKeyOrString;
 
   actionNamePostfix?: string;
 
@@ -26,7 +26,23 @@ export interface BaseCreateQueryOptions<Options, Deps extends ProviderDeps> {
   deps?: Deps;
 
   conditions?: ActionConditionsParameters;
-}
+};
+
+export type CreateQueryOptionsWithNonSerializableKey<Options, Deps extends ProviderDeps> = {
+  key: (this: ReactQueryContext<Deps>, options: Options) => ReactQueryKeyOrString;
+
+  actionNamePostfix: string;
+
+  fn: Function;
+
+  deps?: Deps;
+
+  conditions?: ActionConditionsParameters;
+};
+
+export type BaseCreateQueryOptions<Options, Deps extends ProviderDeps> =
+  | CreateQueryOptionsWithSerializableKey<Options, Deps>
+  | CreateQueryOptionsWithNonSerializableKey<Options, Deps>;
 
 export interface BaseQuery<Options, TCreateQuery, TQuery, TUseQuery> {
   [QUERY_PARAMETERS]: TCreateQuery;
