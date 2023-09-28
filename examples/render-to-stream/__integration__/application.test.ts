@@ -128,6 +128,7 @@ describe('render-to-stream', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -154,6 +155,7 @@ describe('render-to-stream', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -180,6 +182,7 @@ describe('render-to-stream', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -205,6 +208,7 @@ describe('render-to-stream', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -222,6 +226,7 @@ describe('render-to-stream', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar

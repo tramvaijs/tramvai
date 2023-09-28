@@ -1,4 +1,4 @@
-import { useRoute, useUrl } from '@tinkoff/router';
+import { useRoute } from '@tinkoff/router';
 import { declareAction } from '@tramvai/core';
 import { Await } from '@tramvai/module-common';
 import type { PageComponent } from '@tramvai/react';

@@ -53,6 +53,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -79,6 +80,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -104,6 +106,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar
@@ -121,6 +124,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Main
         Second
         Deferred
+        Deferred State
         Non-deferred
         Deferred Foo
         Deferred Bar

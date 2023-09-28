@@ -19,6 +19,9 @@ export const Header = () => (
         <Link url="/deferred/">Deferred</Link>
       </li>
       <li>
+        <Link url="/deferred-state/">Deferred State</Link>
+      </li>
+      <li>
         <Link url="/non-deferred/">Non-deferred</Link>
       </li>
       <li>
