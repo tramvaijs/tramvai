@@ -13,6 +13,7 @@ export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all' | 'none';
   onlyModern?: boolean;
   debug?: boolean;
+  verboseWebpack?: boolean;
   profile?: boolean;
   modern?: boolean;
   sourceMap?: boolean;

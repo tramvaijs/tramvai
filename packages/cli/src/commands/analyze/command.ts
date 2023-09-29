@@ -35,6 +35,11 @@ class AnalyzeCommand extends CLICommand<Params> {
       transformer: (value: string) => value !== 'false',
       description: 'Enable/disable persistent file cache for used cli builder',
     },
+    {
+      name: '--verboseWebpack',
+      value: '[verboseWebpack]',
+      description: 'verbose output for webpack',
+    },
   ];
 
   alias = 'a';

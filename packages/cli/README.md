@@ -143,6 +143,15 @@ While developing sometimes it is needed to debug nodejs app directly so see CPU,
 
 After that you can open debugger in the chrome devtools - `chrome://inspect`
 
+#### Webpack Logs
+
+It is possible to get verbose output almost on every cli command where it is using webpack.
+
+To do this, you should pass `--verboseWebpack` option to command. Check availability of option with help command.
+
+It will pass `{ logging: 'verbose', loggingDebug: true }` to webpack stats config.  
+Also, it will turn on [infrastructureLogging](https://webpack.js.org/configuration/other-options/#infrastructurelogging) for webpack with options `{ level: 'verbose', debug: /webpack/ }`.
+
 #### Source Maps
 
 `webpack` offers several kind of [sourcemap qualities](https://webpack.js.org/configuration/devtool/#qualities). Some of the examples are:

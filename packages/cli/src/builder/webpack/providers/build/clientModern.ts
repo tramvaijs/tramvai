@@ -39,13 +39,14 @@ export const buildClientModernProviders: Provider[] = [
   provide({
     provide: PROCESS_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ webpackCompiler }) => {
+    useFactory: ({ webpackCompiler, configManager }) => {
       return function webpackBuild() {
-        return runWebpack(webpackCompiler);
+        return runWebpack(webpackCompiler, { verboseWebpack: configManager.verboseWebpack });
       };
     },
     deps: {
       webpackCompiler: WEBPACK_CLIENT_MODERN_COMPILER_TOKEN,
+      configManager: CONFIG_MANAGER_TOKEN,
     },
   }),
   provide({

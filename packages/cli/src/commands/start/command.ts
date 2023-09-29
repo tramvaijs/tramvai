@@ -50,6 +50,11 @@ export class StartCommand extends CLICommand<Params> {
         'start in trace mode (allow trace for warnings, server starts with --trace-deprecation)',
     },
     {
+      name: '--verboseWebpack',
+      value: '[verboseWebpack]',
+      description: 'verbose output for webpack',
+    },
+    {
       name: '--profile',
       value: '[profile]',
       description: 'report statistic how much time execute loaders and plugins',

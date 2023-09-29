@@ -1,6 +1,6 @@
 import type { Provider } from '@tinkoff/dippy';
 import { DI_TOKEN, provide } from '@tinkoff/dippy';
-import { CONFIG_MANAGER_TOKEN } from '../../../../di/tokens';
+import { COMMAND_PARAMETERS_TOKEN, CONFIG_MANAGER_TOKEN } from '../../../../di/tokens';
 import { toWebpackConfig } from '../../../../library/webpack/utils/toWebpackConfig';
 import {
   CLIENT_CONFIG_MANAGER_TOKEN,
@@ -39,13 +39,14 @@ export const buildClientProviders: Provider[] = [
   provide({
     provide: PROCESS_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ webpackCompiler }) => {
+    useFactory: ({ webpackCompiler, configManager }) => {
       return function webpackBuild() {
-        return runWebpack(webpackCompiler);
+        return runWebpack(webpackCompiler, { verboseWebpack: configManager.verboseWebpack });
       };
     },
     deps: {
       webpackCompiler: WEBPACK_CLIENT_COMPILER_TOKEN,
+      configManager: COMMAND_PARAMETERS_TOKEN,
     },
   }),
   provide({

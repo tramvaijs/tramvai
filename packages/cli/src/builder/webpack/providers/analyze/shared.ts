@@ -3,7 +3,6 @@ import { provide } from '@tinkoff/dippy';
 import chalk from 'chalk';
 import rimraf from 'rimraf';
 import webpack from 'webpack';
-import type { ConfigManager } from '../../../../api';
 import {
   CLI_PACKAGE_MANAGER,
   CLI_ROOT_DIR_TOKEN,
@@ -133,14 +132,15 @@ export const analyzeSharedProviders: Provider[] = [
   provide({
     provide: PROCESS_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ webpackCompiler }) => {
+    useFactory: ({ webpackCompiler, configManager }) => {
       return function webpackBuild() {
         console.log(chalk.green('Starting build with analyze tool'));
-        return runWebpack(webpackCompiler);
+        return runWebpack(webpackCompiler, { verboseWebpack: configManager.verboseWebpack });
       };
     },
     deps: {
       webpackCompiler: WEBPACK_CLIENT_COMPILER_TOKEN,
+      configManager: CONFIG_MANAGER_TOKEN,
     },
   }),
   provide({

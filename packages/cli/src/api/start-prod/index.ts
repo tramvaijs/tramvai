@@ -16,6 +16,7 @@ export type Params = WithConfig<{
   staticPort?: number;
   staticHost?: string;
   debug?: boolean;
+  verboseWebpack?: boolean;
   sourceMap?: boolean;
   resolveSymlinks?: boolean;
   showConfig?: boolean;

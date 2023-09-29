@@ -1,6 +1,6 @@
-import type { Configuration } from 'webpack';
+import type { StatsOptions } from 'webpack';
 
-export const DEFAULT_STATS_OPTIONS: Configuration['stats'] = {
+export const DEFAULT_STATS_OPTIONS: StatsOptions = {
   all: false, // отключаем большинство ненужной информации
 
   publicPath: true,
@@ -19,9 +19,15 @@ export const DEFAULT_STATS_FIELDS: string[] = [
   'entrypoints',
 ];
 
-export const DEV_STATS_OPTIONS = {
+export const DEV_STATS_OPTIONS: StatsOptions = {
   ...DEFAULT_STATS_OPTIONS,
   chunks: true, // нужно, чтобы получить название файлов для shared чанков в development режиме
 };
 
 export const DEV_STATS_FIELDS = [...DEFAULT_STATS_FIELDS, 'chunks'];
+
+export const WEBPACK_DEBUG_STATS_OPTIONS: StatsOptions = {
+  logging: 'verbose',
+};
+
+export const WEBPACK_DEBUG_STATS_FIELDS = Object.keys(WEBPACK_DEBUG_STATS_OPTIONS);

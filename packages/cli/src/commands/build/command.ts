@@ -68,6 +68,11 @@ class BuildCommand extends CLICommand<Params> {
       transformer: (value: string) => value !== 'false',
       description: 'Emit only modern build from client compilation',
     },
+    {
+      name: '--verboseWebpack',
+      value: '[verboseWebpack]',
+      description: 'verbose output for webpack',
+    },
   ];
 
   alias = 'b';

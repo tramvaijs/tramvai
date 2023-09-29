@@ -2,6 +2,7 @@ import type { Provider } from '@tinkoff/dippy';
 import { DI_TOKEN, provide } from '@tinkoff/dippy';
 import rimraf from 'rimraf';
 import { toWebpackConfig } from '../../../../library/webpack/utils/toWebpackConfig';
+import { CONFIG_MANAGER_TOKEN } from '../../../../di/tokens';
 import {
   CLOSE_HANDLER_TOKEN,
   INIT_HANDLER_TOKEN,
@@ -40,13 +41,14 @@ export const buildServerProviders: Provider[] = [
   provide({
     provide: PROCESS_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ webpackCompiler }) => {
+    useFactory: ({ webpackCompiler, configManager }) => {
       return function webpackBuild() {
-        return runWebpack(webpackCompiler);
+        return runWebpack(webpackCompiler, { verboseWebpack: configManager.verboseWebpack });
       };
     },
     deps: {
       webpackCompiler: WEBPACK_SERVER_COMPILER_TOKEN,
+      configManager: CONFIG_MANAGER_TOKEN,
     },
   }),
   provide({

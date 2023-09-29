@@ -628,6 +628,11 @@ describe('Cookies mocked environment', () => {
       document.cookie = 'c=2';
       expect(cookies.get('c')).toBe('2');
     });
+
+    it('cookie.get resolves first matching cookie in string', () => {
+      document.cookie = 'psid=123; psid=345';
+      expect(cookies.get('psid')).toBe('123');
+    });
   });
 });
 /* eslint-enable max-statements */

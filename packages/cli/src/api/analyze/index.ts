@@ -10,6 +10,7 @@ export interface Params {
   modern?: boolean;
   showConfig?: boolean;
   fileCache?: boolean;
+  verboseWebpack?: boolean;
 }
 
 export type AnalyzeCommand = (params: Params, providers?: Provider[]) => Promise<void>;

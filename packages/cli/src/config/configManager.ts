@@ -25,6 +25,7 @@ export interface Settings<E extends Env> {
   version?: string;
   buildType?: BuildType;
   debug?: boolean;
+  verboseWebpack?: boolean;
   trace?: boolean;
   sourceMap?: boolean;
   host?: string;
@@ -106,6 +107,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
   const { type } = configEntry;
   const rootDir = settings.rootDir ?? process.cwd();
   const debug = settings.debug ?? false;
+  const verboseWebpack = settings.verboseWebpack ?? false;
   const appEnv = settings.appEnv ?? {};
   // First problem, modern build is not supported for CSR mode.
   // Second, in development mode with enabled modern, only modern JS chunks will be generated.
@@ -151,6 +153,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     rootDir,
     buildType,
     debug,
+    verboseWebpack,
     port: Number(settings.port ?? PortManager.DEFAULT_PORT),
     staticHost: settings.staticHost ?? DEFAULT_STATIC_HOST,
     staticPort: Number(

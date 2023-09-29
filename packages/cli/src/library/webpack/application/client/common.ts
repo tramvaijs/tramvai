@@ -21,8 +21,10 @@ import { configToEnv } from '../../blocks/configToEnv';
 import {
   DEFAULT_STATS_OPTIONS,
   DEFAULT_STATS_FIELDS,
-  DEV_STATS_OPTIONS,
   DEV_STATS_FIELDS,
+  DEV_STATS_OPTIONS,
+  WEBPACK_DEBUG_STATS_OPTIONS,
+  WEBPACK_DEBUG_STATS_FIELDS,
 } from '../../constants/stats';
 import { pwaBlock } from '../../blocks/pwa/client';
 import type { ModuleFederationFixRangeOptions } from '../../plugins/ModuleFederationFixRange';
@@ -70,8 +72,14 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .use(StatsWriterPlugin, [
       {
         filename: configManager.modern ? 'stats.modern.json' : 'stats.json',
-        stats: env === 'development' ? DEV_STATS_OPTIONS : DEFAULT_STATS_OPTIONS,
-        fields: env === 'development' ? DEV_STATS_FIELDS : DEFAULT_STATS_FIELDS,
+        stats: {
+          ...(env === 'development' ? DEV_STATS_OPTIONS : DEFAULT_STATS_OPTIONS),
+          ...(configManager.verboseWebpack ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+        },
+        fields: [
+          ...(env === 'development' ? DEV_STATS_FIELDS : DEFAULT_STATS_FIELDS),
+          ...(configManager.verboseWebpack ? WEBPACK_DEBUG_STATS_FIELDS : []),
+        ],
       },
     ])
     .end()

@@ -64,6 +64,11 @@ export class StartProdCommand extends CLICommand<Params> {
       description: 'start in debug mode (enable source map, server starting with --inspect)',
     },
     {
+      name: '--verboseWebpack',
+      value: '[verboseWebpack]',
+      description: 'verbose output for webpack',
+    },
+    {
       name: '--sm, --sourceMap',
       value: '[sourceMap]',
       description: 'enable source map generation',

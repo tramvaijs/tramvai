@@ -1,6 +1,10 @@
 import type { Compiler, MultiCompiler } from 'webpack';
+import { WEBPACK_DEBUG_STATS_OPTIONS } from '../../../library/webpack/constants/stats';
 
-export const runWebpack = (compiler: Compiler | MultiCompiler) => {
+export const runWebpack = (
+  compiler: Compiler | MultiCompiler,
+  options?: { verboseWebpack?: boolean }
+) => {
   return new Promise<void>((resolve, reject) => {
     compiler.run((err, stats) => {
       // stats can be undefined when error exists
@@ -9,6 +13,7 @@ export const runWebpack = (compiler: Compiler | MultiCompiler) => {
         colors: true,
         warnings: true,
         errors: true,
+        ...(options?.verboseWebpack ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
       });
 
       if (warnings) {
