@@ -9,8 +9,8 @@ export class Cookies implements ICookies {
     const cookies = document.cookie.split(';');
 
     // Iterate all cookies
-    while (cookies.length) {
-      const cookie = cookies.pop();
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
 
       if (!cookie) {
         break;
