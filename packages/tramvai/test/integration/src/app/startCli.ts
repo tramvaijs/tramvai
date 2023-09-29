@@ -1,5 +1,6 @@
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import { Writable } from 'stream';
+import { setDefaultResultOrder } from 'dns';
 import envCi from 'env-ci';
 import { start } from '@tramvai/cli';
 import type { PromiseType } from 'utility-types';
@@ -11,6 +12,10 @@ import { wrapPapi } from './papi';
 import { wrapMocker } from './mocker';
 
 export * from './utils';
+
+if (typeof setDefaultResultOrder === 'function') {
+  setDefaultResultOrder('ipv4first');
+}
 
 const ciInfo = envCi();
 
