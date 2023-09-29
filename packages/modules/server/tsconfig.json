@@ -71,6 +71,9 @@
         },
         {
             "path": "../../libs/safe-strings"
+        },
+        {
+            "path": "../../tokens/router"
         }
     ]
 }

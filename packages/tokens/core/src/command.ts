@@ -12,7 +12,8 @@ export interface CommandLineRunner {
     type: keyof CommandLines,
     status: keyof CommandLineDescription,
     providers?: Provider[],
-    customDi?: Container
+    customDi?: Container,
+    key?: string | number
   ): Promise<Container>;
 }
 

@@ -21,7 +21,8 @@ export type CommandLineExecutionEndHandler = (
   di: Container,
   type: keyof CommandLines,
   status: keyof CommandLineDescription,
-  timingInfo: CommandLineTimingInfo
+  timingInfo: CommandLineTimingInfo,
+  key?: string | number
 ) => void;
 
 export const COMMAND_LINE_TIMING_INFO_TOKEN = createToken<CommandLineTimingInfo>(

@@ -8,8 +8,8 @@ export const runCommandsSpa = ({
   di: typeof DI_TOKEN;
   commandLineRunner: typeof COMMAND_LINE_RUNNER_TOKEN;
 }): NavigationHook => {
-  return async () => {
-    await commandLineRunner.run('client', 'spa', [], di);
+  return async ({ key }) => {
+    await commandLineRunner.run('client', 'spa', [], di, key);
   };
 };
 
@@ -20,7 +20,7 @@ export const runCommandsAfterSpa = ({
   di: typeof DI_TOKEN;
   commandLineRunner: typeof COMMAND_LINE_RUNNER_TOKEN;
 }): NavigationHook => {
-  return async () => {
-    await commandLineRunner.run('client', 'afterSpa', [], di);
+  return async ({ key }) => {
+    await commandLineRunner.run('client', 'afterSpa', [], di, key);
   };
 };

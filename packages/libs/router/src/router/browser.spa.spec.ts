@@ -65,11 +65,15 @@ Object.defineProperty(window.location, 'replace', {
   },
 });
 
+let currentNavigationObjectUuid = 0;
+
 describe('router/browser-spa', () => {
   let router: Router;
 
   describe('default trailingSlash treatment', () => {
     beforeEach(() => {
+      currentNavigationObjectUuid = 0;
+
       router = new Router({
         routes,
       });
@@ -478,6 +482,7 @@ describe('router/browser-spa', () => {
           to: { name: 'child1', path: '/child1/', actualPath: '/child1', params: {} },
           url: expect.objectContaining({ path: '/child1?a=1' }),
           fromUrl: expect.objectContaining({ path: '/' }),
+          key: currentNavigationObjectUuid++,
         };
         expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
@@ -539,6 +544,7 @@ describe('router/browser-spa', () => {
           from: expect.objectContaining({ name: 'root' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1' }),
+          key: currentNavigationObjectUuid++,
         });
         expect(router.getCurrentRoute()).toMatchObject({ name: 'child1' });
         expect(router.getCurrentUrl()).toMatchObject({ path: '/child1' });
@@ -559,6 +565,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1/' }),
+          key: currentNavigationObjectUuid++,
         });
         expect(router.getCurrentRoute()).toMatchObject({ name: 'root' });
         expect(router.getCurrentUrl()).toMatchObject({ path: '/' });
@@ -580,6 +587,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1/' }),
+          key: currentNavigationObjectUuid++,
         });
 
         expect(router.getCurrentRoute()).toMatchObject({ name: 'child2' });
@@ -791,6 +799,8 @@ describe('router/browser-spa', () => {
 
   describe('trailingSlash force enabled', () => {
     beforeEach(() => {
+      currentNavigationObjectUuid = 0;
+
       router = new Router({
         trailingSlash: true,
         routes,
@@ -1034,6 +1044,7 @@ describe('router/browser-spa', () => {
           to: { name: 'child1', path: '/child1/', actualPath: '/child1/', params: {} },
           url: expect.objectContaining({ path: '/child1/?a=1' }),
           fromUrl: expect.objectContaining({ path: '/' }),
+          key: currentNavigationObjectUuid++,
         };
         expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
@@ -1072,6 +1083,8 @@ describe('router/browser-spa', () => {
 
     describe('guards', () => {
       beforeEach(async () => {
+        currentNavigationObjectUuid = 0;
+
         window.location.href = 'http://localhost/';
 
         await router.rehydrate({
@@ -1096,6 +1109,7 @@ describe('router/browser-spa', () => {
           from: expect.objectContaining({ name: 'root' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1/' }),
+          key: currentNavigationObjectUuid++,
         });
         expect(router.getCurrentRoute()).toMatchObject({ name: 'child1' });
         expect(router.getCurrentUrl()).toMatchObject({ path: '/child1/' });
@@ -1137,6 +1151,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1/' }),
+          key: currentNavigationObjectUuid++,
         });
 
         expect(router.getCurrentRoute()).toMatchObject({ name: 'child2' });
@@ -1148,6 +1163,8 @@ describe('router/browser-spa', () => {
 
   describe('trailingSlash force disabled', () => {
     beforeEach(() => {
+      currentNavigationObjectUuid = 0;
+
       router = new Router({
         trailingSlash: false,
         routes,
@@ -1362,6 +1379,8 @@ describe('router/browser-spa', () => {
 
     describe('hooks', () => {
       beforeEach(async () => {
+        currentNavigationObjectUuid = 0;
+
         window.location.href = 'http://localhost/';
         await router.rehydrate({
           type: 'navigate',
@@ -1389,6 +1408,7 @@ describe('router/browser-spa', () => {
           to: { name: 'child1', path: '/child1/', actualPath: '/child1', params: {} },
           url: expect.objectContaining({ path: '/child1?a=1' }),
           fromUrl: expect.objectContaining({ path: '/' }),
+          key: currentNavigationObjectUuid++,
         };
         expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
@@ -1427,6 +1447,8 @@ describe('router/browser-spa', () => {
 
     describe('guards', () => {
       beforeEach(async () => {
+        currentNavigationObjectUuid = 0;
+
         window.location.href = 'http://localhost/';
         await router.rehydrate({
           type: 'navigate',
@@ -1450,6 +1472,7 @@ describe('router/browser-spa', () => {
           from: expect.objectContaining({ name: 'root' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1' }),
+          key: currentNavigationObjectUuid++,
         });
         expect(router.getCurrentRoute()).toMatchObject({ name: 'child1' });
         expect(router.getCurrentUrl()).toMatchObject({ path: '/child1' });
@@ -1491,6 +1514,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),
           url: expect.objectContaining({ path: '/child1' }),
+          key: currentNavigationObjectUuid++,
         });
 
         expect(router.getCurrentRoute()).toMatchObject({ name: 'child2' });

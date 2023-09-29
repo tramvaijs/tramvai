@@ -72,6 +72,9 @@ export abstract class AbstractRouter {
   protected guards: Set<NavigationGuard>;
   protected hooks: Map<HookName, Set<NavigationHook>>;
   protected syncHooks: Map<SyncHookName, Set<NavigationSyncHook>>;
+
+  private currentUuid: number;
+
   constructor({
     trailingSlash,
     mergeSlashes,
@@ -104,6 +107,8 @@ export abstract class AbstractRouter {
     this.onRedirect = onRedirect;
     this.onNotFound = onNotFound;
     this.onBlock = onBlock;
+
+    this.currentUuid = 0;
   }
 
   protected onRedirect?: NavigationHook;
@@ -185,6 +190,7 @@ export abstract class AbstractRouter {
       history,
       navigateState,
       code: updateRouteOptions.code,
+      key: this.uuid(),
     };
 
     logger.debug({
@@ -238,6 +244,7 @@ export abstract class AbstractRouter {
       code,
       redirect,
       redirectFrom,
+      key: this.uuid(),
     };
 
     await this.runHooks('beforeResolve', navigation);
@@ -576,5 +583,9 @@ export abstract class AbstractRouter {
 
   registerHook(hookName: HookName, hook: NavigationHook) {
     return registerHook(this.hooks.get(hookName), hook);
+  }
+
+  private uuid() {
+    return this.currentUuid++;
   }
 }

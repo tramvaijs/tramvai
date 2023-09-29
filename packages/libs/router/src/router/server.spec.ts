@@ -23,6 +23,8 @@ const routes = [
   },
 ];
 
+let currentNavigationObjectUuid = 0;
+
 describe('router/server', () => {
   let router: Router;
   const mockRedirect = jest.fn();
@@ -31,6 +33,8 @@ describe('router/server', () => {
 
   describe('default trailingSlash treatment', () => {
     beforeEach(() => {
+      currentNavigationObjectUuid = 0;
+
       router = new Router({
         routes,
         onRedirect: mockRedirect,
@@ -226,6 +230,7 @@ describe('router/server', () => {
           replace: true,
           to: { name: 'child1', path: '/child1/', actualPath: '/child1', params: {} },
           url: expect.objectContaining({ path: '/child1?a=1' }),
+          key: currentNavigationObjectUuid++,
         };
         expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
@@ -312,6 +317,8 @@ describe('router/server', () => {
 
   describe('trailingSlash force enabled', () => {
     beforeEach(() => {
+      currentNavigationObjectUuid = 0;
+
       router = new Router({
         trailingSlash: true,
         routes,
@@ -432,6 +439,7 @@ describe('router/server', () => {
           replace: true,
           to: { name: 'child1', path: '/child1/', actualPath: '/child1/', params: {} },
           url: expect.objectContaining({ path: '/child1/?a=1' }),
+          key: currentNavigationObjectUuid++,
         };
 
         expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
@@ -519,6 +527,8 @@ describe('router/server', () => {
 
   describe('trailingSlash force disabled', () => {
     beforeEach(() => {
+      currentNavigationObjectUuid = 0;
+
       router = new Router({
         trailingSlash: false,
         routes,
@@ -628,6 +638,7 @@ describe('router/server', () => {
           replace: true,
           to: { name: 'child1', path: '/child1/', actualPath: '/child1', params: {} },
           url: expect.objectContaining({ path: '/child1?a=1' }),
+          key: currentNavigationObjectUuid++,
         };
         expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);

@@ -60,6 +60,12 @@ export interface Navigation {
   redirect?: boolean;
 
   redirectFrom?: NavigationRoute;
+
+  /**
+   * Helps to separate commandLineRunner launches on navigation processes.
+   * Defines internally within the router
+   */
+  key?: number;
 }
 
 export type NavigationGuard = (

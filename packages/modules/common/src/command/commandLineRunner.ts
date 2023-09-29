@@ -74,7 +74,8 @@ export class CommandLineRunner implements Interface {
     type: keyof CommandLines,
     status: keyof CommandLineDescription,
     providers?: Provider[],
-    customDi?: Container
+    customDi?: Container,
+    key?: string | number
   ) {
     const di = customDi ?? resolveDi(type, status, this.rootDi, providers);
     const rootExecutionContext = di.get({ token: ROOT_EXECUTION_CONTEXT_TOKEN, optional: true });
@@ -122,7 +123,7 @@ export class CommandLineRunner implements Interface {
 
           if (this.executionEndHandlers) {
             for (const executionEndHandler of this.executionEndHandlers) {
-              executionEndHandler(di, type, status, timingInfo);
+              executionEndHandler(di, type, status, timingInfo, key);
             }
           }
         })
