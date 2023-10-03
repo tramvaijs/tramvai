@@ -1,4 +1,4 @@
-import type { Url } from '@tinkoff/url';
+import type { Query, Url } from '@tinkoff/url';
 import { format, parse } from '@tinkoff/url';
 import type { REQUEST_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import type { FASTIFY_REQUEST } from '@tramvai/tokens-server-private';
@@ -20,6 +20,7 @@ export class RequestManager implements Interface {
         protocol: (this.getHeader('x-forwarded-proto') as string) || this.request.protocol,
         host: this.getHost(),
         path: this.request.url,
+        query: this.request.query as Query,
       });
     } else {
       this.url = window.location.href;

@@ -2,7 +2,7 @@ import type { IncomingHttpHeaders } from 'http';
 
 import type { ProvideDepsIterator } from '@tinkoff/dippy';
 import type { Url } from '@tinkoff/url';
-import type { REQUEST_MANAGER_TOKEN, RESPONSE_MANAGER_TOKEN, Logger } from '@tramvai/tokens-common';
+import type { Logger, REQUEST_MANAGER_TOKEN, RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import type { PAPI_PARAMETERS } from './createPapiMethod';
 
 export type Method = 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';

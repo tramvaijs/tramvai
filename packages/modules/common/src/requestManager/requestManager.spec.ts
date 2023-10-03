@@ -68,6 +68,16 @@ describe('requestManager', () => {
     expect(requestManager.getUrl()).toBe('https://www.test.test/abc/');
   });
 
+  it('get parsed Url with query params', () => {
+    const requestManager = createRequestManager({
+      query: { abc: '123', efg: '456' },
+    });
+
+    expect(requestManager.getParsedUrl()).toEqual(
+      expect.objectContaining({ query: { abc: '123', efg: '456' } })
+    );
+  });
+
   it('getUrl with x-original-host', () => {
     const requestManager = createRequestManager({
       protocol: 'https://',
