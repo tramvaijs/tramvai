@@ -1,18 +1,14 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import type { Provider } from '@tramvai/core';
+import { provide } from '@tramvai/core';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { CONTEXT_TOKEN } from '@tramvai/module-common';
 import { MetaWalk } from '@tinkoff/meta-tags-generate';
+import type { PageComponent } from '@tramvai/react';
 import { metaDefaultPack, defaultPack } from './metaDefaultPack';
 import { META_PRIORITY_ROUTE } from './constants';
 import { META_DEFAULT_TOKEN, META_WALK_TOKEN, META_UPDATER_TOKEN } from './tokens';
-
-export type PageSeoProperty = {
-  metaTags?: Record<string, string>;
-  openGraph?: Record<string, string>;
-  twitterCard?: Record<string, string>;
-};
 
 const capitalize = (str) => {
   return `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
@@ -46,7 +42,7 @@ export const sharedProviders: Provider[] = [
       defaultMeta: META_DEFAULT_TOKEN,
     },
   },
-  {
+  provide({
     // получение из админки мета тегов
     provide: META_UPDATER_TOKEN,
     useFactory: ({ pageService }) => {
@@ -55,8 +51,8 @@ export const sharedProviders: Provider[] = [
 
         // @todo: only for file-system routes?
         const { pageComponent } = pageService.getConfig() || {};
-        const PageComponent = pageService.getComponent(pageComponent) || {};
-        const pageComponentSeo = PageComponent.seo || {};
+        const PageComponent = pageService.getComponent(pageComponent) as PageComponent;
+        const pageComponentSeo = (PageComponent && PageComponent.seo) || {};
 
         const seo = mergeDeep({}, routeSeo, pageComponentSeo);
 
@@ -75,7 +71,7 @@ export const sharedProviders: Provider[] = [
     deps: {
       pageService: PAGE_SERVICE_TOKEN,
     },
-  },
+  }),
   {
     // преобразовыет логику старого токена metaList к новому META_UPDATER_TOKEN
     // TODO: убрать, легаси

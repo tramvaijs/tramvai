@@ -31,16 +31,6 @@ import { commonHooks } from './hooks/common';
 import { commonTokens } from './tokens/common';
 import { providers as fsPagesProviders } from './fileSystemPages';
 
-declare module '@tinkoff/router' {
-  export interface RouteConfig {
-    bundle?: string;
-    pageComponent?: string;
-    layoutComponent?: string;
-    nestedLayoutComponent?: string;
-    forceRouteResolve?: boolean;
-  }
-}
-
 export const providers: Provider[] = [
   ...commonGuards,
   ...commonHooks,

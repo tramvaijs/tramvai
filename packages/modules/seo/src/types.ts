@@ -7,3 +7,20 @@ export type SeoModuleOptions =
       metaDefault?: typeof META_DEFAULT_TOKEN;
     }
   | any[]; // any[] - легаси типы для старого формата; TODO: убрать
+
+export type MetaRouteConfig = {
+  seo?: {
+    metaTags?: Record<string, any>;
+    shareSchema?: {
+      openGraph?: Record<string, string>;
+      twitterCard?: Record<string, string>;
+    };
+    structuredData?: {
+      jsonLd?: Record<string, any>;
+      microdata?: Record<string, any>;
+    };
+  };
+  analytics?: Record<string, any>;
+};
+
+export type PageSeoProperty = MetaRouteConfig['seo'];

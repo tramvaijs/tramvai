@@ -4,11 +4,10 @@ import { Module, provide } from '@tramvai/core';
 import { Meta, Update } from '@tinkoff/meta-tags-generate';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { transformValue } from './transformValue';
-import type { PageSeoProperty } from './shared';
 import { sharedProviders } from './shared';
 import { converters } from './converters/converters';
 import { META_UPDATER_TOKEN, META_DEFAULT_TOKEN, META_WALK_TOKEN } from './tokens';
-import type { SeoModuleOptions } from './types';
+import type { MetaRouteConfig, SeoModuleOptions, PageSeoProperty } from './types';
 
 export * from './constants';
 export * from './tokens';
@@ -16,6 +15,12 @@ export * from './tokens';
 declare module '@tramvai/react' {
   export interface PageComponentOptions {
     seo?: PageSeoProperty;
+  }
+}
+
+declare module '@tinkoff/router' {
+  export interface RouteConfig {
+    meta?: MetaRouteConfig;
   }
 }
 

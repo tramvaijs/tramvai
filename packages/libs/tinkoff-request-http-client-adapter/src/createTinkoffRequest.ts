@@ -142,7 +142,12 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     })
   );
 
-  plugins.push(deduplicateCache(getCacheKey ? { getCacheKey } : undefined));
+  plugins.push(
+    deduplicateCache({
+      shouldExecute: !disableCache,
+      getCacheKey,
+    })
+  );
 
   if (enableCircuitBreaker) {
     plugins.push(

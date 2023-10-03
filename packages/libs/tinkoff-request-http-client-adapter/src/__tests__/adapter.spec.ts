@@ -1,4 +1,6 @@
-import type { Express } from 'express';
+import type { Express, Handler } from 'express';
+import type { HttpClientError, HttpClientBaseOptions } from '@tramvai/http-client';
+
 import { createAdapter } from '../createAdapter';
 import {
   startMockServer,
@@ -28,7 +30,7 @@ const applySlowResponseHandler = (app: Express) => {
   });
 };
 
-const successHandler = async (req, res) => {
+const successHandler: Handler = async (req, res) => {
   res.send('ok');
 };
 
@@ -58,16 +60,17 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       const { port, terminate } = await startMockServer(applySlowResponseHandler);
       const httpClient = createAdapter({ logger: loggerFactoryMock, defaultTimeout: 100 });
 
-      let error;
+      let error: HttpClientError | null = null;
+
       try {
         await httpClient.request({ url: `http://localhost:${port}/fake` });
       } catch (e) {
-        error = e;
+        error = e as HttpClientError;
       }
 
-      expect(error.message).toBe('Request timed out');
-      expect(error.status).toBe(undefined);
-      expect(error.headers).toEqual({});
+      expect(error?.message).toBe('Request timed out');
+      expect(error?.status).toBe(undefined);
+      expect(error?.headers).toEqual({});
 
       await terminate();
     });
@@ -90,16 +93,16 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       const { port, terminate } = await startMockServer(applySlowResponseHandler);
       const httpClient = createAdapter({ logger: loggerFactoryMock, defaultTimeout: 2000 });
 
-      let error;
+      let error: HttpClientError | null = null;
       try {
         await httpClient.request({ url: `http://localhost:${port}/fake`, timeout: 100 });
       } catch (e) {
-        error = e;
+        error = e as HttpClientError;
       }
 
-      expect(error.message).toBe('Request timed out');
-      expect(error.status).toBe(undefined);
-      expect(error.headers).toEqual({});
+      expect(error?.message).toBe('Request timed out');
+      expect(error?.status).toBe(undefined);
+      expect(error?.headers).toEqual({});
 
       await terminate();
     });
@@ -319,6 +322,50 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await terminate();
     });
 
+    it('disableCache disables deduplication', async () => {
+      const firstHandler = jest.fn(successHandler);
+
+      const applyMockHandlers = (app: Express) => {
+        app.get('/first', firstHandler);
+      };
+
+      const { port, terminate } = await startMockServer(applyMockHandlers);
+      const httpClient = createAdapter({
+        logger: loggerFactoryMock,
+        baseUrl: `http://localhost:${port}/`,
+        disableCache: true,
+      });
+
+      await httpClient.request({ path: 'first' });
+      await httpClient.request({ path: 'first' });
+
+      expect(firstHandler).toBeCalledTimes(2);
+
+      await terminate();
+    });
+
+    it('disableCache allows deduplication by demand', async () => {
+      const firstHandler = jest.fn(successHandler);
+
+      const applyMockHandlers = (app: Express) => {
+        app.get('/first', firstHandler);
+      };
+
+      const { port, terminate } = await startMockServer(applyMockHandlers);
+      const httpClient = createAdapter({
+        logger: loggerFactoryMock,
+        baseUrl: `http://localhost:${port}/`,
+        disableCache: true,
+      });
+
+      await httpClient.request({ path: 'first', cache: true });
+      await httpClient.request({ path: 'first', cache: true });
+
+      expect(firstHandler).toBeCalledTimes(1);
+
+      await terminate();
+    });
+
     it('cache, disabled', async () => {
       const firstHandler = jest.fn(successHandler);
       const secondHandler = jest.fn(successHandler);
@@ -360,26 +407,26 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       });
 
       const startedReqCount = 10;
-      const sendedReqCount = 6;
-      let error;
+      const sentReqCount = 6;
+      let error: HttpClientError | null = null;
 
       for (let i = 1; i <= startedReqCount; i++) {
         try {
           await httpClient.get('fake');
         } catch (e) {
-          error = e;
+          error = e as HttpClientError;
         }
       }
 
-      expect(errorHandlerMock).toBeCalledTimes(sendedReqCount);
+      expect(errorHandlerMock).toBeCalledTimes(sentReqCount);
 
-      expect(error.__meta).toMatchObject({
+      expect(error?.__meta).toMatchObject({
         CIRCUIT_BREAKER: {
           open: true,
         },
       });
-      expect(error.status).toBe(undefined);
-      expect(error.headers).toEqual({});
+      expect(error?.status).toBe(undefined);
+      expect(error?.headers).toEqual({});
 
       await terminate();
     });
@@ -405,18 +452,19 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         },
       });
 
-      let error;
+      let error: HttpClientError | null = null;
+
       try {
         await httpClient.get('fake');
       } catch (e) {
-        error = e;
+        error = e as HttpClientError;
       }
 
-      expect(error.url).toBe(`http://localhost:${port}/fake`);
-      expect(error.status).toBe(500);
-      expect(error.body).toEqual(response);
-      expect(error.errorId).toBe('FAKE_API');
-      expect(error.headers).toMatchObject({ 'content-type': 'application/json; charset=utf-8' });
+      expect(error?.url).toBe(`http://localhost:${port}/fake`);
+      expect(error?.status).toBe(500);
+      expect(error?.body).toEqual(response);
+      expect(error?.errorId).toBe('FAKE_API');
+      expect(error?.headers).toMatchObject({ 'content-type': 'application/json; charset=utf-8' });
 
       await terminate();
     });
@@ -452,15 +500,16 @@ describe('@tinkoff/request to HttpClient adapter', () => {
 
       const { payload } = await httpClient.get('success');
 
-      let error;
+      let error: HttpClientError | null = null;
+
       try {
         await httpClient.get('error');
       } catch (e) {
-        error = e;
+        error = e as HttpClientError;
       }
 
       expect(payload).toEqual({ result: 'ok' });
-      expect(error.message).toBe('Not Found');
+      expect(error?.message).toBe('Not Found');
 
       await terminate();
     });
@@ -819,16 +868,17 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         },
       });
 
-      let error;
+      let error: HttpClientError | null = null;
+
       try {
         await httpClient.get('fake');
       } catch (e) {
-        error = e;
+        error = e as HttpClientError;
       }
 
-      expect(error.meta).toBe('some meta info');
-      expect(error.status).toBe(500);
-      expect(error.headers).toMatchObject({ 'content-type': 'application/json; charset=utf-8' });
+      expect(error?.meta).toBe('some meta info');
+      expect(error?.status).toBe(500);
+      expect(error?.headers).toMatchObject({ 'content-type': 'application/json; charset=utf-8' });
 
       await terminate();
     });
@@ -851,14 +901,15 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         baseUrl: `http://localhost:${port}/`,
       });
 
-      let error;
+      let error: HttpClientError | null = null;
+
       try {
         await httpClient.get('fake');
       } catch (e) {
-        error = e;
+        error = e as HttpClientError;
       }
 
-      expect(error.__meta).toEqual({
+      expect(error?.__meta).toEqual({
         cache: {
           deduplicateEnabled: true,
           deduplicateForce: false,
@@ -930,7 +981,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         },
       });
 
-      const request = {
+      const request: HttpClientBaseOptions = {
         path: 'fake',
         query: {
           req_query: 'fake_query',

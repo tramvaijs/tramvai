@@ -16,25 +16,13 @@ export {
   afterUpdateCurrentHooksToken,
 } from './modules/tokens';
 
-type RouteConfig = {
-  [key: string]: any;
-
-  bundle?: string;
-  pageComponent?: string;
-  layoutComponent?: string;
-  nestedLayoutComponent?: string;
-  errorBoundaryComponent?: string;
-
-  meta?: {
-    seo?: {
-      metaTags?: Record<string, any>;
-      shareSchema?: Record<string, any>;
-    };
-  };
-};
-
-declare module '@tramvai/react' {
-  export interface PageComponentOptions {
-    routeConfig?: RouteConfig;
+declare module '@tinkoff/router' {
+  export interface RouteConfig {
+    bundle?: string;
+    pageComponent?: string;
+    layoutComponent?: string;
+    nestedLayoutComponent?: string;
+    errorBoundaryComponent?: string;
+    forceRouteResolve?: boolean;
   }
 }

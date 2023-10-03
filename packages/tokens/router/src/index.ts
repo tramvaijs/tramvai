@@ -8,6 +8,7 @@ import type {
   NavigateOptions,
   UpdateCurrentRouteOptions,
   HistoryOptions,
+  RouteConfig,
 } from '@tinkoff/router';
 import type { TramvaiComponent } from '@tramvai/react';
 
@@ -83,9 +84,9 @@ export type PageServiceComponentType =
 export interface PageService {
   getCurrentRoute(): NavigationRoute;
   getCurrentUrl(): ReturnType<AbstractRouter['getCurrentUrl']>;
-  getConfig(route?: Route): Route['config'];
+  getConfig(route?: Route): RouteConfig;
   getContent(route?: Route): Record<string, any>;
-  getMeta(route?: Route): { seo: Record<string, string>; analytics: Record<string, string> };
+  getMeta(route?: Route): RouteConfig['meta'];
 
   navigate(options: string | NavigateOptions): Promise<void>;
   updateCurrentRoute(options: UpdateCurrentRouteOptions): Promise<void>;

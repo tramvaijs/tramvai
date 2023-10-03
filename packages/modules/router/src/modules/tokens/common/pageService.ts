@@ -31,7 +31,7 @@ export class PageService implements PageServiceInterface {
     return this.router.getCurrentUrl();
   }
 
-  getConfig(route: Route = this.getCurrentRoute()): Record<string, any> {
+  getConfig(route: Route = this.getCurrentRoute()) {
     return route?.config ?? {};
   }
 
