@@ -1566,4 +1566,44 @@ describe('router/browser-spa', () => {
       });
     });
   });
+
+  describe('history', () => {
+    beforeEach(() => {
+      router = new Router({
+        routes,
+      });
+
+      mockPush.mockClear();
+      mockReplace.mockClear();
+    });
+
+    describe('init history', () => {
+      beforeEach(async () => {
+        window.location.href = 'http://localhost/';
+
+        await router.rehydrate({
+          type: 'navigate',
+          to: { name: 'root', path: '/', actualPath: '/', params: {} },
+          url: parse('http://localhost/'),
+        });
+
+        await router.start();
+      });
+
+      it('should store previousRoute, previousUrl in navigateState on navigation', async () => {
+        await router.navigate('/');
+
+        expect(mockPush).toHaveBeenCalledWith(
+          expect.objectContaining({
+            navigateState: expect.objectContaining({
+              previousUrl: parse('http://localhost/'),
+              previousRoute: { actualPath: '/', name: 'root', params: {}, path: '/' },
+            }),
+          }),
+          '',
+          '/'
+        );
+      });
+    });
+  });
 });

@@ -375,4 +375,44 @@ describe('router/noSpa', () => {
       });
     });
   });
+
+  describe('history', () => {
+    beforeEach(() => {
+      router = new NoSpaRouter({
+        routes,
+      });
+
+      mockPush.mockClear();
+      mockReplace.mockClear();
+    });
+
+    describe('init history', () => {
+      beforeEach(async () => {
+        window.location.href = 'http://localhost:3000/';
+
+        await router.rehydrate({
+          type: 'navigate',
+          to: { name: 'root', path: '/', actualPath: '/', params: {} },
+          url: parse('http://localhost:3000/'),
+        });
+
+        await router.start();
+      });
+
+      it('should store previousRoute, previousUrl in navigateState on navigation', async () => {
+        await wrapNotResolved(router.updateCurrentRoute({}));
+
+        expect(mockPush).toHaveBeenCalledWith(
+          expect.objectContaining({
+            navigateState: expect.objectContaining({
+              previousRoute: { actualPath: '/', name: 'root', params: {}, path: '/' },
+              previousUrl: parse('http://localhost:3000/'),
+            }),
+          }),
+          '',
+          '/'
+        );
+      });
+    });
+  });
 });

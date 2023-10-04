@@ -1,5 +1,6 @@
+import type { Url } from '@tinkoff/url';
 import { History } from './base';
-import type { Navigation, NavigationType, HistoryOptions } from '../types';
+import type { Navigation, NavigationType, HistoryOptions, Route } from '../types';
 import type { Wrapper } from './wrapper';
 import { wrapHistory } from './wrapper';
 
@@ -21,18 +22,43 @@ const generateKey = (navigation: Navigation) => {
   }
 };
 
+interface PreviousNavigateState {
+  previousRoute?: Route;
+  previousUrl?: Url;
+}
+
+const generatePreviousNavigateState = (navigation: Navigation): PreviousNavigateState => {
+  const state: PreviousNavigateState = {};
+
+  if (navigation.from) {
+    state.previousRoute = navigation.from;
+  }
+
+  if (navigation.fromUrl) {
+    state.previousUrl = navigation.fromUrl;
+  }
+
+  return state;
+};
+
 const generateState = (navigation: Navigation, currentState?: HistoryState): HistoryState => {
   const key = generateKey(navigation);
+  const previousNavigateState = generatePreviousNavigateState(navigation);
   let { type } = navigation;
 
   if (navigation.replace && currentState) {
     type = currentState.type === type ? type : 'navigate';
   }
 
+  const navigateState = {
+    ...previousNavigateState,
+    ...navigation.navigateState,
+  };
+
   return {
     key,
     type,
-    navigateState: navigation.navigateState,
+    navigateState,
   };
 };
 
