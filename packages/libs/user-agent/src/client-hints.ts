@@ -108,6 +108,22 @@ const getBackwardCompatibleOsName = (payload: string | undefined): string | unde
 };
 
 /**
+ * Method to convert arch + bitness to `ua-parser-js` compatible format.
+ *
+ * @see ICPU
+ */
+const getArchitecture = (
+  arch: string | undefined,
+  bitness: string | undefined
+): string | undefined => {
+  if (arch === undefined) {
+    return undefined;
+  }
+
+  return `${arch}${bitness ?? ''}`;
+};
+
+/**
  *
  * @description
  *
@@ -140,7 +156,10 @@ export const parseClientHintsHeaders = (
       version: parseQuotedString(headers['sec-ch-ua-platform-version'] as string),
     },
     cpu: {
-      architecture: parseQuotedString(headers['sec-ch-ua-arch'] as string),
+      architecture: getArchitecture(
+        parseQuotedString(headers['sec-ch-ua-arch'] as string),
+        parseQuotedString(headers['sec-ch-ua-bitness'] as string)
+      ),
     },
     mobileOS,
     device: {
@@ -161,7 +180,7 @@ export const parseClientHintsHeaders = (
  * `getHighEntropyValues` async method, but it's not suitable for all cases.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/User-Agent_Client_Hints_API
- * @see https://wicg.github.io/ua-client-hints/#user-agent-model
+ * @see https://wicg.github.io/ua-client-hints/#http-ua-hints
  *
  * @param payload
  *
@@ -181,7 +200,7 @@ export const parseClientHintsUserAgentData = (payload: UADataValues): UserAgent 
       version: payload.platformVersion,
     },
     cpu: {
-      architecture: payload.architecture,
+      architecture: getArchitecture(payload.architecture, payload.bitness),
     },
     mobileOS: getMobileOs(payload.platform),
     device: {

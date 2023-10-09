@@ -17,6 +17,10 @@ export interface Engine {
 }
 
 export interface Device {
+  /**
+   * Device type may be undefined in various cases.
+   * @see https://github.com/faisalman/ua-parser-js/issues/182
+   */
   type: string | undefined;
   model: string | undefined;
   /**
@@ -31,9 +35,6 @@ export interface OS {
 }
 
 export interface Cpu {
-  /**
-   * @deprecated This is not provided by default with client-hints
-   */
   architecture: string | undefined;
 }
 
@@ -42,9 +43,6 @@ export interface UserAgent {
   engine: Engine;
   device: Device;
   os: OS;
-  /**
-   * @deprecated This is not provided by default with client-hints
-   */
   cpu: Cpu;
   mobileOS?: string;
   sameSiteNoneCompatible: boolean;

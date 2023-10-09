@@ -3,12 +3,13 @@ import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import type { Provider } from '@tramvai/core';
 import { provide } from '@tramvai/core';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
-import { CONTEXT_TOKEN } from '@tramvai/module-common';
+import { COMBINE_REDUCERS, CONTEXT_TOKEN } from '@tramvai/module-common';
 import { MetaWalk } from '@tinkoff/meta-tags-generate';
 import type { PageComponent } from '@tramvai/react';
 import { metaDefaultPack, defaultPack } from './metaDefaultPack';
 import { META_PRIORITY_ROUTE } from './constants';
 import { META_DEFAULT_TOKEN, META_WALK_TOKEN, META_UPDATER_TOKEN } from './tokens';
+import { metaStore } from './store/metaStore';
 
 const capitalize = (str) => {
   return `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
@@ -89,4 +90,9 @@ export const sharedProviders: Provider[] = [
       metaList: { token: 'metaList', optional: true },
     },
   },
+  provide({
+    provide: COMBINE_REDUCERS,
+    multi: true,
+    useValue: metaStore,
+  }),
 ];

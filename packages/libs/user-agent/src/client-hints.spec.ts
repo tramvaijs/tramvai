@@ -430,6 +430,7 @@ describe('high entropy UADataValues only', () => {
   it('desktop chrome', () => {
     const result = parseClientHintsUserAgentData({
       architecture: 'arm',
+      bitness: '64',
       brands: [
         {
           brand: 'Not.A/Brand',
@@ -473,7 +474,7 @@ describe('high entropy UADataValues only', () => {
           "version": "114.0.5735.198",
         },
         "cpu": {
-          "architecture": "arm",
+          "architecture": "arm64",
         },
         "device": {
           "model": "",

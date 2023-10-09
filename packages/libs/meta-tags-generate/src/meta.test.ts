@@ -89,4 +89,20 @@ describe('meta - integrate tests', () => {
     const render = new Render(meta);
     expect(render.render()).toMatchSnapshot();
   });
+
+  it('Сериализация и десериализация стейта в metaWalk', () => {
+    const meta = generateMeta();
+
+    meta.metaWalk.updateMeta(20, { title: 'hello' });
+    const serializableState = meta.metaWalk.getSerializableState();
+
+    expect(serializableState).toEqual([['title', { value: 'hello', priority: 20 }]]);
+
+    const newMeta = generateMeta();
+
+    expect(newMeta.metaWalk.get('title')).toBeUndefined();
+
+    newMeta.metaWalk.mergeValuesFromSerializableState(serializableState);
+    expect(newMeta.metaWalk.get('title')).toEqual({ value: 'hello', priority: 20 });
+  });
 });

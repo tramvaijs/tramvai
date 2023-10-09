@@ -1,5 +1,5 @@
 import eachObj from '@tinkoff/utils/object/each';
-import type { TagRecord } from './Meta.h';
+import type { SerializableMetaWalkState, TagRecord } from './Meta.h';
 
 export type WalkItem = { value: string | TagRecord | null; priority: number };
 
@@ -14,17 +14,20 @@ export class MetaWalk {
     this.state.forEach((value, key) => func(value, key));
   }
 
+  private updateStateByPriority(name: string, walkItem: WalkItem) {
+    const currentMetaStateByName = this.state.get(name);
+
+    if (!currentMetaStateByName || walkItem.priority >= currentMetaStateByName.priority) {
+      this.state.set(name, walkItem);
+    }
+  }
+
   updateMeta(priority: number, metaObj: Record<string, string | TagRecord | null>) {
     eachObj((value, name) => {
       if (!value && value !== null) {
         return;
       }
-
-      const stateMeta = this.state.get(name);
-
-      if (!stateMeta || priority >= stateMeta.priority) {
-        this.state.set(name, { value, priority });
-      }
+      this.updateStateByPriority(name, { value, priority });
     }, metaObj);
 
     return this;
@@ -36,5 +39,15 @@ export class MetaWalk {
 
   reset() {
     this.state.clear();
+  }
+
+  getSerializableState(): SerializableMetaWalkState {
+    return Array.from(this.state.entries());
+  }
+
+  mergeValuesFromSerializableState(serializableState: SerializableMetaWalkState) {
+    serializableState.forEach(([name, walkItem]) => {
+      this.updateStateByPriority(name, walkItem);
+    });
   }
 }

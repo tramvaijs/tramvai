@@ -76,5 +76,21 @@ describe('seo', () => {
       await sleep(300);
       expect(await page.title()).toBe('WoW, such dynamic!');
     });
+
+    it('should have title which is came from the server action', async () => {
+      const { page, router } = await getPageWrapper('/seo/dynamic-server/');
+
+      expect(await page.title()).toBe('Hello, this is Tramvai!');
+    });
+
+    it('should have title which is came from the server action and then be changed by the action on client', async () => {
+      const { page, router } = await getPageWrapper('/seo/dynamic-server-dynamic-client');
+
+      expect(await page.title()).toBe('Hello, this is Tramvai!');
+
+      await sleep(300);
+
+      expect(await page.title()).toBe('WoW, such dynamic!');
+    });
   });
 });

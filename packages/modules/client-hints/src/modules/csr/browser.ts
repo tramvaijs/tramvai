@@ -6,6 +6,12 @@ import { setUserAgent, UserAgentStore } from '../../shared/stores/userAgent';
 import { loadUserAgent } from '../../browser/loadUserAgent';
 import { USER_AGENT_TOKEN } from '../../tokens';
 
+declare global {
+  interface Window {
+    __TRAMVAI_USER_AGENT_DATA?: UADataValues;
+  }
+}
+
 export const ClientHintsCSRModule = /* @__PURE__ */ declareModule({
   name: 'ClientHintsCSRModule',
   providers: [

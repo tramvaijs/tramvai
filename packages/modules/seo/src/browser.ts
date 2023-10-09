@@ -3,6 +3,7 @@ import isArray from '@tinkoff/utils/is/array';
 import { Module, provide } from '@tramvai/core';
 import { Meta, Update } from '@tinkoff/meta-tags-generate';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
+import { INITIAL_APP_STATE_TOKEN } from '@tramvai/module-common';
 import { transformValue } from './transformValue';
 import { sharedProviders } from './shared';
 import { converters } from './converters/converters';
@@ -34,13 +35,25 @@ declare module '@tinkoff/router' {
       useFactory: () => {
         return function updateMeta(di, type, status) {
           if (type === 'client' && (status === 'afterSpa' || status === 'customer')) {
+            const metaWalk = di.get(META_WALK_TOKEN);
+
+            // Be careful: because it executes on customer start
+            // it can override some metadata that was received(executed) on the client before.
+            // We can easily control it by priority value and give the server meta-updates lower priority in these scenarios.
+            if (status === 'customer') {
+              const initialState = di.get({ token: INITIAL_APP_STATE_TOKEN, optional: true });
+              metaWalk.mergeValuesFromSerializableState(
+                initialState.stores.appMeta.serverMetaWalkState
+              );
+            }
+
             // We can't use dependencies below as factory provider dependencies
             // due to dependency cycle when using `@tramvai-tinkoff/module-router`.
             const meta = new Meta({
               list: flatten(
                 di.get({ token: META_UPDATER_TOKEN, optional: true, multi: true }) || []
               ),
-              metaWalk: di.get(META_WALK_TOKEN),
+              metaWalk,
               transformValue,
               converters,
             });

@@ -27,6 +27,7 @@
     "@tramvai/tokens-child-app": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-cookie": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
     "user-agent-data-types": "^0.3.1"
   },
   "peerDependencies": {

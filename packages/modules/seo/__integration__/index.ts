@@ -51,6 +51,18 @@ const dynamicClientAction = declareAction({
   },
 });
 
+const dynamicServerAction = declareAction({
+  name: 'dynamicMetaSucceedOnServer',
+  async fn() {
+    this.deps.meta.updateMeta(10, {
+      title: 'Hello, this is Tramvai!',
+    });
+  },
+  deps: {
+    meta: META_WALK_TOKEN,
+  },
+});
+
 const dynamicBundle = createBundle({
   name: 'dynamic',
   components: {
@@ -69,6 +81,24 @@ const dynamicClientBundle = createBundle({
   actions: [dynamicClientAction],
 });
 
+const dynamicServerBundle = createBundle({
+  name: 'dynamic-server',
+  components: {
+    page: () => 'dynamic server page',
+    layout: ({ children }) => children,
+  },
+  actions: [dynamicServerAction],
+});
+
+const dynamicServerAndClientBundle = createBundle({
+  name: 'dynamic-server-and-dynamic-client',
+  components: {
+    page: () => 'dynamic server page',
+    layout: ({ children }) => children,
+  },
+  actions: [dynamicServerAction, dynamicClientAction],
+});
+
 createApp({
   name: 'seo',
   modules: [...modules, SeoModule.forRoot([metaSpecial] as any)],
@@ -76,6 +106,9 @@ createApp({
     ...bundles,
     dynamic: () => Promise.resolve({ default: dynamicBundle }),
     'dynamic-client': () => Promise.resolve({ default: dynamicClientBundle }),
+    'dynamic-server': () => Promise.resolve({ default: dynamicServerBundle }),
+    'dynamic-server-and-dynamic-client': () =>
+      Promise.resolve({ default: dynamicServerAndClientBundle }),
   },
   providers: [
     {
@@ -186,6 +219,24 @@ createApp({
           path: '/seo/dynamic-client/',
           config: {
             bundle: 'dynamic-client',
+            pageComponent: 'page',
+            layoutComponent: 'layout',
+          },
+        },
+        {
+          name: 'seo-dynamic-server',
+          path: '/seo/dynamic-server',
+          config: {
+            bundle: 'dynamic-server',
+            pageComponent: 'page',
+            layoutComponent: 'layout',
+          },
+        },
+        {
+          name: 'seo-dynamic-server-and-dynamic-client',
+          path: '/seo/dynamic-server-dynamic-client',
+          config: {
+            bundle: 'dynamic-server-and-dynamic-client',
             pageComponent: 'page',
             layoutComponent: 'layout',
           },

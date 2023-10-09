@@ -1,4 +1,5 @@
 import { Module } from '@tramvai/core';
+import { CONTEXT_TOKEN } from '@tramvai/module-common';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 import flatten from '@tinkoff/utils/array/flatten';
@@ -10,6 +11,7 @@ import { transformValue } from './transformValue';
 import { sharedProviders } from './shared';
 import { converters } from './converters/converters';
 import type { MetaRouteConfig, SeoModuleOptions, PageSeoProperty } from './types';
+import { setServerMetaWalkState } from './store/metaStore';
 
 export * from './constants';
 export * from './tokens';
@@ -31,13 +33,17 @@ declare module '@tinkoff/router' {
     ...sharedProviders,
     {
       provide: RENDER_SLOTS,
-      useFactory: ({ metaWalk, metaUpdaters }) => {
+      useFactory: ({ metaWalk, metaUpdaters, context }) => {
         const meta = new Meta({
           list: flatten(metaUpdaters || []),
           transformValue,
           converters,
           metaWalk,
         });
+
+        // We should do this before rendering because rendering resets the state of MetaWalk
+        context.dispatch(setServerMetaWalkState(metaWalk.getSerializableState()));
+
         const result = new Render(meta).render();
 
         return {
@@ -50,6 +56,7 @@ declare module '@tinkoff/router' {
       deps: {
         metaWalk: META_WALK_TOKEN,
         metaUpdaters: { token: META_UPDATER_TOKEN, optional: true },
+        context: CONTEXT_TOKEN,
       },
     },
     {
