@@ -33,8 +33,8 @@ export const SpaTransitionPerformanceMetrics = declareModule({
           });
 
           // If you want to include page actions in spa transition,
-          // you should use 'afterNavigate' hook
-          router.registerHook('beforeNavigate', async ({ key }) => {
+          // you should use second recipe
+          router.registerHook('afterNavigate', async ({ key }) => {
             const startKey = `router:spa-transition:start:${key}`;
             const endKey = `router:spa-transition:end:${key}`;
             const measureKey = `router:spa-transition:${key}`;

@@ -52,8 +52,7 @@ The behaviour of routing depends on the result of executing guards functions and
 
 :::info
 
-Hooks are not recommended to usage because you can easy slow down application response time.
-Always prefer commandLineRunner, Actions or Guards if it is possible.
+Hooks are not recommended to usage because you can easy slow down application response time. Always prefer commandLineRunner, Actions or Guards if it is possible.
 
 :::
 
@@ -69,12 +68,16 @@ Example:
 
 ```ts
 import { provide, commandLineListTokens } from '@tramvai/core';
-import { beforeNavigateHooksToken } from '@tramvai/module-router';
+import { ROUTER_TOKEN } from '@tramvai/tokens-router';
 
 const provider = provide({
-  provide: beforeNavigateHooksToken,
-  useValue: async ({ from, to, url, fromUrl }) => {
-    console.log(`navigating from ${from} to route ${to}`);
+  provide: commandLineListTokens.customerStart,
+  useFactory: ({ router }) => {
+    return () => {
+      router.registerHook('beforeNavigate', async ({ from, to, url, fromUrl }) => {
+        console.log(`navigating from ${from} to route ${to}`);
+      });
+    };
   },
 });
 ```
