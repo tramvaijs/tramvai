@@ -36,6 +36,9 @@
         },
         {
             "path": "../../tokens/core-private"
+        },
+        {
+            "path": "../../tramvai/test/mocks"
         }
     ]
 }

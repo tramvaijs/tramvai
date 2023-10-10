@@ -6,6 +6,7 @@ import flatten from '@tinkoff/utils/array/flatten';
 import path from '@tinkoff/utils/object/path';
 import { Meta, Render } from '@tinkoff/meta-tags-generate';
 import isArray from '@tinkoff/utils/is/array';
+import isEmpty from '@tinkoff/utils/is/empty';
 import { META_WALK_TOKEN, META_UPDATER_TOKEN, META_DEFAULT_TOKEN } from './tokens';
 import { transformValue } from './transformValue';
 import { sharedProviders } from './shared';
@@ -66,7 +67,7 @@ declare module '@tinkoff/router' {
       useFactory: ({ pageService }) => {
         const jsonLd = path(['seo', 'structuredData', 'jsonLd'], pageService.getMeta());
 
-        if (!jsonLd) {
+        if (isEmpty(jsonLd)) {
           return {};
         }
 
