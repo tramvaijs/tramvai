@@ -60,6 +60,12 @@ const args = buildResultCliWithCollectorOpts(collector)
     default: false,
     description: 'Disable checks in bin files for project',
   })
+  .option('depcheck-ignore-path', {
+    group: 'depcheck',
+    type: 'string',
+    default: 'dummy', // disabled that way
+    description: 'Path to a file with patterns describing files to ignore. Disabled by default',
+  })
   .help('h').argv;
 
 export async function run() {
