@@ -12,7 +12,11 @@ export const clientTokens = [
     useFactory: ({ store }) => {
       return {
         onBlock: async (navigation: Navigation) => {
-          let error = new BlockError({ message: `Url ${navigation.to?.actualPath} is blocked` });
+          let error = new BlockError({
+            message: `Url ${navigation.to?.actualPath} is blocked`,
+            prevUrl: navigation.fromUrl?.href ?? window.location.href,
+            nextUrl: navigation.url.href,
+          });
           error = makeErrorSilent(error);
           store.dispatch(setPageErrorEvent(error));
         },
