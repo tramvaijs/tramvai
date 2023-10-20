@@ -257,3 +257,43 @@ const provider = {
   },
 };
 ```
+
+## Known Issues
+
+### React Hydration Mismatch Due to User Browser Extensions
+
+When rendering a Root Error Boundary:
+
+- The server renders the boundary, which includes the HTML, head, and body.
+- The server injects the necessary assets for the page to function into the head.
+- On the client-side, the page gets hydrated.
+
+At first glance, everything seems to be functioning as expected. However, if a user has a browser extension that also writes something to the head, React sees this as a mismatch during hydration. React then re-renders the boundary without the assets, which were only inserted during server-side rendering. This leads to the page breaking since the links to the assets are removed, causing the CSS (also maybe JS) to stop working.
+
+[This GitHub Issue](https://github.com/facebook/react/issues/24430) has a list of workarounds.
+
+#### Workarounds
+
+1. Implement a HEAD Wrapper which renders your head content during server-side rendering, but during browser-side rendering it uses the current head content, ensuring that any modifications made by extensions are preserved during React hydration.
+
+```jsx
+if (process.env.BROWSER) {
+  return <head dangerouslySetInnerHTML={{ __html: document.head.innerHTML }} />;
+}
+
+return <head>{/* YOUR CODE HERE */}</head>;
+```
+
+2. Remove Scripts and Links Outside of HEAD and Extension Scripts. This solution targets and removes certain scripts and links, including those added by extensions, to mitigate the issue:
+
+```jsx
+if (process.env.BROWSER) {
+  document
+    .querySelectorAll(
+      'html > _:not(body, head), script[src_="extension://"], link[href*="extension://"], script[src*="scr.kaspersky-labs.com"], link[href*="scr.kaspersky-labs.com"]'
+    )
+    .forEach((s) => {
+      s?.parentNode?.removeChild(s);
+    });
+}
+```
