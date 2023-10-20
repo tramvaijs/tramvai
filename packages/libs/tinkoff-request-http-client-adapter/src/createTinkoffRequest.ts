@@ -38,6 +38,7 @@ export interface TinkoffRequestOptions extends HttpClientBaseOptions {
   circuitBreakerOptions?: CircuitBreakerOptions;
   getCacheKey?: (request: Request) => string;
   lruOptions?: { maxAge: number; max: number };
+  allowStale?: boolean;
   retryOptions?: {
     retry?: number;
     retryDelay?: number | ((attempt: number) => number);
@@ -65,6 +66,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     circuitBreakerOptions = {},
     getCacheKey,
     lruOptions = { max: 1000, maxAge: cacheTime },
+    allowStale = true,
     agent,
     querySerializer,
     retryOptions,
@@ -136,7 +138,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     memoryCache({
       shouldExecute: !disableCache,
       lruOptions,
-      allowStale: true,
+      allowStale,
       getCacheKey,
       memoryConstructor: createCache,
     })
