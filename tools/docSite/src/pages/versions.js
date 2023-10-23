@@ -9,7 +9,8 @@ export default function Versions() {
       <div className="container container-fluid">
         <h2>Tramvai Versions</h2>
         <ul>
-          <li><a href={baseUrl}>v2.x.x</a></li>
+          <li><a href={baseUrl}>v3.x.x</a></li>
+          <li><a href={`${baseUrl}2.x.x`}>v2.x.x</a></li>
           <li><a href={`${baseUrl}1.x.x`}>v1.x.x</a></li>
         </ul>
       </div>
