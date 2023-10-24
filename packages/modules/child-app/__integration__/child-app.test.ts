@@ -15,7 +15,7 @@ jest.setTimeout(3 * 60 * 1000);
 type TestVersion =
   | 'latest' // latest dev version from the current tramvai repo state
   | 'v2.0.0' // for checking compatibility with the most outdated version
-  | 'v2.111.1'; // version that introduced more flexible tramvai versions for module federation sharing
+  | 'v3.0.1'; // first new major version after one where introduced more flexible tramvai versions for module federation sharing
 type TestCase = {
   rootAppVersion: TestVersion;
   childAppsVersion: TestVersion;
@@ -61,7 +61,7 @@ const TEST_CASES: TestCase[] = [
         },
         {
           rootAppVersion: 'latest',
-          childAppsVersion: 'v2.111.1',
+          childAppsVersion: 'v3.0.1',
           router: {
             prefetchScriptsCount: 2, // versions that has support for prefetch in routing
             nonBlockingSpa: true, // latest root-app has updated code to support non-blocking loading on spa navigations
