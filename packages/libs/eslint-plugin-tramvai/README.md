@@ -72,3 +72,32 @@ createApp({
 Options:
 
 - `propertyNames`: defines array of object properties which will be analyzed. By default it equals to `["bundles"]`.
+
+### no-lambda-fn-in-actions
+
+In order to save context of executable actions, action function itself should be a declered by function declaration.
+
+The rule bans arrow function in `fn` prop of `declareAction` argument and provides autofix.
+
+
+Example of the wrong code:
+
+```ts
+export const yourAction = declareAction({
+  name: 'yourAction',
+  fn: () => {
+    /// your code
+  }
+})
+```
+
+Example of the right code after autofix for the code above:
+
+```ts
+export const yourAction = declareAction({
+  name: 'yourAction',
+  fn () {
+    /// your code
+  }
+})
+```

@@ -37,7 +37,12 @@ describe('actionPageRunnerBrowser', () => {
     await actionRunner.runActions([
       createAction({ name: 'test1', fn: () => result.push(1) }),
       createAction({ name: 'test2', fn: () => result.push(2) }),
-      declareAction({ name: 'test1', fn: () => result.push(3) }),
+      declareAction({
+        name: 'test1',
+        fn() {
+          return result.push(3);
+        },
+      }),
     ]);
 
     expect(result).toEqual([1, 2, 3]);

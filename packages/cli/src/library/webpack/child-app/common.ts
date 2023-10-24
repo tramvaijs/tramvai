@@ -91,9 +91,12 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
         // Way to reproduce: build and compare stats file for child-app with absolute and relative paths
         // -----
         // 2) path.relative should use the posix separator because
-        // @module-federation/node library (https://github.com/module-federation/universe/blob/2dd44826954e5136bac08b0d9a0e7e01dbb8b79c/packages/typescript/src/lib/TypescriptCompiler.ts#L110)
-        // is splitting path strings with regexp, which only works correctly for posix paths.
-        entry: path.posix.relative(config.get('context'), entry),
+        // @module-federation/node is parsing relative path incorrectly
+        // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
+        entry: path
+          .relative(config.get('context'), entry)
+          .split(path.win32.sep)
+          .join(path.posix.sep),
       },
       shared: getSharedModules(configManager),
     } as UniversalFederationPluginOptions,

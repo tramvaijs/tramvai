@@ -51,7 +51,7 @@ describe('execution', () => {
       name: 'action1',
     });
     const action2 = declareAction({
-      fn: async (payload) => {
+      async fn(payload) {
         result.push(['action2', payload]);
 
         await instanceExecution.run(action1, 1);
@@ -104,7 +104,12 @@ describe('errors', () => {
     const result: number[] = [];
     await instance.runActions([
       createAction({ fn: () => Promise.reject(new Error('Error')), name: 'action1' }),
-      declareAction({ fn: () => result.push(2), name: 'action2' }),
+      declareAction({
+        fn() {
+          return result.push(2);
+        },
+        name: 'action2',
+      }),
     ]);
 
     expect(result).toEqual([2]);
@@ -251,7 +256,9 @@ describe('limits', () => {
         name: 'action time 2',
       }),
       declareAction({
-        fn: () => result.push(3),
+        fn() {
+          return result.push(3);
+        },
         name: 'action time 3',
       }),
     ]);
@@ -312,7 +319,9 @@ describe('limits', () => {
       name: 'action 1',
     });
     const innerAction2 = declareAction({
-      fn: () => delay(200).then(() => result.push(2)),
+      fn() {
+        return delay(200).then(() => result.push(2));
+      },
       name: 'action 2',
     });
     const innerAction3 = createAction({
@@ -320,7 +329,9 @@ describe('limits', () => {
       name: 'action 3',
     });
     const innerAction4 = declareAction({
-      fn: () => delay(200).then(() => result.push(4)),
+      fn() {
+        return delay(200).then(() => result.push(4));
+      },
       name: 'action 4',
     });
 

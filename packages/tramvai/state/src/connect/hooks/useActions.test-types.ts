@@ -6,7 +6,12 @@ import { createEvent } from '../../createEvent/createEvent';
 describe('useActions.test-types', () => {
   describe('modern actions', () => {
     it('single action', async () => {
-      const action = declareAction({ name: 'test', fn: (arg1: string, arg2: number) => 5 });
+      const action = declareAction({
+        name: 'test',
+        fn(arg1: string, arg2: number) {
+          return 5;
+        },
+      });
 
       const hookAction = useActions(action);
 
@@ -15,8 +20,13 @@ describe('useActions.test-types', () => {
     });
 
     it('multiple actions', async () => {
-      const action1 = declareAction({ name: 'test', fn: (arg: string) => 5 });
-      const action2 = declareAction({ name: 'test2', fn: (arg: { a: number }) => {} });
+      const action1 = declareAction({
+        name: 'test',
+        fn(arg: string) {
+          return 5;
+        },
+      });
+      const action2 = declareAction({ name: 'test2', fn(arg: { a: number }) {} });
 
       const [hookAction1, hookAction2] = useActions([action1, action2]);
 
@@ -28,9 +38,19 @@ describe('useActions.test-types', () => {
     });
 
     it('multiple actions as const', async () => {
-      const action1 = declareAction({ name: 'test', fn: (arg1: string, arg2: number) => 5 });
-      const action2 = declareAction({ name: 'test2', fn: () => 'test' });
-      const action3 = declareAction({ name: 'test3', fn: (arg: { a: number }) => {} });
+      const action1 = declareAction({
+        name: 'test',
+        fn(arg1: string, arg2: number) {
+          return 5;
+        },
+      });
+      const action2 = declareAction({
+        name: 'test2',
+        fn() {
+          return 'test';
+        },
+      });
+      const action3 = declareAction({ name: 'test3', fn(arg: { a: number }) {} });
 
       const [hookAction1, hookAction2, hookAction3] = useActions([
         action1,

@@ -22,7 +22,9 @@ const actionNameFactory = (
   options: Partial<TramvaiActionDefinition<any, any, any>> = {}
 ) =>
   declareAction({
-    fn: (c, payload) => result.push(`action: ${name} with: ${payload}`),
+    fn(c, payload) {
+      return result.push(`action: ${name} with: ${payload}`);
+    },
     name,
     ...options,
   });
