@@ -21,7 +21,7 @@ export default async (
     message: `Tramvai version resolved to ${versionNumber}`,
   });
 
-  await updatePackageJson(versionNumber);
+  await updatePackageJson(versionNumber, version === 'prerelease');
 
   context.logger.event({
     type: 'info',

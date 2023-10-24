@@ -19,6 +19,21 @@ import commonProd from '../../common/client/prod';
 import { extractCssPluginFactory } from '../../blocks/extractCssPlugin';
 import { splitChunksConfig } from './prod/optimization/splitChunks';
 
+const generateFilename = (
+  extension: string,
+  isChunk: boolean,
+  configManager: ConfigManager<ApplicationConfigEntry>
+) =>
+  [
+    '[name]',
+    !configManager.disableProdOptimization && '[contenthash]',
+    configManager.disableProdOptimization && configManager.modern && 'modern',
+    isChunk && 'chunk',
+    extension,
+  ]
+    .filter(Boolean)
+    .join('.');
+
 // eslint-disable-next-line max-statements
 export const webpackClientConfig = ({
   configManager,
@@ -35,8 +50,8 @@ export const webpackClientConfig = ({
   config.output
     .path(configManager.buildPath)
     .publicPath('')
-    .filename('[name].[contenthash].js')
-    .chunkFilename('[name].[contenthash].chunk.js')
+    .filename(generateFilename('js', false, configManager))
+    .chunkFilename(generateFilename('js', true, configManager))
     .crossOriginLoading('anonymous')
     .chunkLoadTimeout(240000);
 
@@ -48,8 +63,8 @@ export const webpackClientConfig = ({
 
   config.batch(
     extractCssPluginFactory(configManager, {
-      filename: '[name].[contenthash].css',
-      chunkFilename: '[name].[contenthash].chunk.css',
+      filename: generateFilename('css', false, configManager),
+      chunkFilename: generateFilename('css', true, configManager),
     })
   );
 

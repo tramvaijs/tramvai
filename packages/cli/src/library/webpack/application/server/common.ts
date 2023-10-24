@@ -21,7 +21,7 @@ import { pwaBlock } from '../../blocks/pwa/server';
 
 // eslint-disable-next-line import/no-default-export
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
-  const { output, fileSystemPages } = configManager;
+  const { output, fileSystemPages, disableProdOptimization } = configManager;
 
   config
     .name('server')
@@ -41,7 +41,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .batch(browserslistConfigResolve(configManager))
     .batch(
       extractCssPluginFactory(configManager, {
-        filename: 'server.[contenthash].css',
+        filename: disableProdOptimization ? 'server.css' : 'server.[contenthash].css',
         chunkFilename: null,
       })
     )

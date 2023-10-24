@@ -4,12 +4,13 @@ import { DEPENDANT_LIBS_MAP } from '../../utils/tramvaiVersions';
 
 export const getLibPackageVersion = async (
   name: string,
-  unifiedVersion: string
+  unifiedVersion: string,
+  prerelease: boolean
 ): Promise<string | undefined> => {
   const unifiedModule = DEPENDANT_LIBS_MAP.get(name);
 
   if (!unifiedModule) {
-    return getLatestPackageVersion(name);
+    return getLatestPackageVersion(name, { version: prerelease ? 'prerelease' : 'latest' });
   }
 
   const { dependencies } = await getPackageInfo(unifiedModule, { version: unifiedVersion });

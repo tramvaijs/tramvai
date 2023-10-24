@@ -16,6 +16,7 @@ const getVersionFromDep = (dep?: string) => {
 const updateDependencies = (
   dependencies: Record<string, string> = {},
   targetVersion: string,
+  prerelease: boolean,
   currentVersion: string,
   spinner: Ora
 ) => {
@@ -27,7 +28,7 @@ const updateDependencies = (
       if (isUnifiedVersion(dep) && getVersionFromDep(dependencies[dep]) === currentVersion) {
         nextVersion = targetVersion;
       } else if (isDependantLib(dep)) {
-        const libVersion = await getLibPackageVersion(dep, targetVersion);
+        const libVersion = await getLibPackageVersion(dep, targetVersion, prerelease);
         nextVersion = libVersion;
       }
 
@@ -60,7 +61,7 @@ const updateDependencies = (
   );
 };
 
-export const updatePackageJson = async (version: string) => {
+export const updatePackageJson = async (version: string, prerelease?: boolean) => {
   const file = fs.readFileSync('package.json');
   const content = JSON.parse(file.toString());
   const currentVersion = getVersionFromDep(content.dependencies['@tramvai/core']);
@@ -79,9 +80,15 @@ export const updatePackageJson = async (version: string) => {
   const spinner = ora(`Updating package.json versions`).start();
 
   try {
-    await updateDependencies(content.dependencies, version, currentVersion, spinner);
-    await updateDependencies(content.devDependencies, version, currentVersion, spinner);
-    await updateDependencies(content.peerDependencies, version, currentVersion, spinner);
+    await updateDependencies(content.dependencies, version, prerelease, currentVersion, spinner);
+    await updateDependencies(content.devDependencies, version, prerelease, currentVersion, spinner);
+    await updateDependencies(
+      content.peerDependencies,
+      version,
+      prerelease,
+      currentVersion,
+      spinner
+    );
 
     fs.writeFileSync('package.json', JSON.stringify(content, null, 2));
   } finally {
