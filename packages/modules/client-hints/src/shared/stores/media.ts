@@ -14,6 +14,7 @@ const initialState: Media = {
   isTouch: false,
   retina: false,
   synchronized: false,
+  displayMode: 'unknown',
 };
 
 export const MediaStore = createReducer('media', initialState).on(setMedia, (state, media) => {

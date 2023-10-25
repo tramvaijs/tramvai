@@ -92,6 +92,7 @@ const state = {
   // desktop - false, tablet - true, mobile - true
   isTouch: false,
   retina: false,
+  displayMode: 'browser',
   supposed: true,
   synchronized: false,
 };
@@ -105,6 +106,7 @@ const state = {
   height: 1080,
   isTouch: false,
   retina: true,
+  displayMode: 'browser',
   supposed: false,
   synchronized: false,
 };
@@ -122,6 +124,7 @@ const state = {
   height: 1080,
   isTouch: false,
   retina: true,
+  displayMode: 'browser',
   supposed: false,
   synchronized: true,
 };
@@ -157,6 +160,7 @@ type Media = {
   height: number;
   isTouch: boolean;
   retina: boolean;
+  displayMode: 'browser' | 'standalone' | 'unknown';
   supposed?: boolean;
   synchronized?: boolean;
 };
@@ -175,6 +179,12 @@ type Media = {
 `useIsSupposed(): boolean` - calculates isSupposed
 
 `useIsRetina(): boolean` - calculates isRetina
+
+`useDisplayMode(): boolean` - calculates displayMode. It indicates the mode in which the application is opened. The possible values are:
+
+- browser: The application is opened in a browser
+- standalone: The application is opened as a Progressive Web App (PWA)
+- unknown: The application mode could not be determined
 
 ## How to
 
@@ -225,4 +235,4 @@ You can increase it for better cache hit rate and server performance.
 
 ## Metrics
 
-- `user_agent_cache_gets` counter - User-Agent header parsing count, with labels `hit` and `miss` 
+- `user_agent_cache_gets` counter - User-Agent header parsing count, with labels `hit` and `miss`

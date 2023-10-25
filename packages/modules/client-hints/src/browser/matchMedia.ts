@@ -5,6 +5,7 @@ import type { MediaInfo } from '../types';
 import { setMedia } from '../shared/stores/media';
 import { COOKIE_NAME_MEDIA_INFO } from '../shared/constants';
 import { mediaBreakpoints } from '../shared/mediaBreakpoints';
+import { getDisplayMode } from './getDisplayMode';
 
 declare global {
   interface Window {
@@ -17,10 +18,13 @@ const isTouch = !!(
   (window.DocumentTouch && document instanceof window.DocumentTouch)
 );
 
+const displayMode = getDisplayMode();
+
 const getMediaInfo = (): MediaInfo => ({
   width: window.innerWidth,
   height: window.innerHeight,
   isTouch,
+  displayMode,
   retina: window.matchMedia(mediaBreakpoints.retina).matches,
 });
 

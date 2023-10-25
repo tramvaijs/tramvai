@@ -23,12 +23,24 @@ export class ClientHintsComponentObject {
     });
   }
 
+  async mockDisplayMode(displayMode: string) {
+    await this.context.addInitScript((displayMode) => {
+      window.matchMedia = (query: string) => {
+        return query.includes(displayMode) ? ({ matches: [] } as any) : {};
+      };
+    }, displayMode);
+  }
+
   async globalClientHints(page: Page): Promise<string | undefined> {
     return page.evaluate('window.__TRAMVAI_USER_AGENT_DATA');
   }
 
   async userAgentFromDI(page: Page): Promise<UserAgent | null> {
     return page.evaluate('contextExternal.di.get("userAgent")');
+  }
+
+  async mediaStore(page: Page): Promise<Record<string, number | string>> {
+    return page.evaluate("contextExternal.getStore('media').state");
   }
 }
 

@@ -1154,23 +1154,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6354": {
+                              "__@match@6355": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6356": {
+                              "__@replace@6357": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6359": {
+                              "__@search@6360": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6361": {
+                              "__@split@6362": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6363": {
+                              "__@matchAll@6364": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1195,6 +1195,17 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "devtool": {
+                    "title": "Use the specified type of source maps for building in development mode",
+                    "default": "eval",
+                    "enum": [
+                      "eval",
+                      "eval-cheap-module-source-map",
+                      "eval-cheap-source-map",
+                      "eval-source-map"
+                    ],
+                    "type": "string"
                   }
                 },
                 "additionalProperties": false
@@ -1825,23 +1836,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6354": {
+                                "__@match@6355": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6356": {
+                                "__@replace@6357": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6359": {
+                                "__@search@6360": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6361": {
+                                "__@split@6362": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6363": {
+                                "__@matchAll@6364": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -1866,6 +1877,17 @@
                         }
                       },
                       "additionalProperties": false
+                    },
+                    "devtool": {
+                      "title": "Use the specified type of source maps for building in development mode",
+                      "default": "eval",
+                      "enum": [
+                        "eval",
+                        "eval-cheap-module-source-map",
+                        "eval-cheap-source-map",
+                        "eval-source-map"
+                      ],
+                      "type": "string"
                     }
                   },
                   "additionalProperties": false
@@ -2496,23 +2518,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6354": {
+                                  "__@match@6355": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6356": {
+                                  "__@replace@6357": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6359": {
+                                  "__@search@6360": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6361": {
+                                  "__@split@6362": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6363": {
+                                  "__@matchAll@6364": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
@@ -2537,6 +2559,17 @@
                           }
                         },
                         "additionalProperties": false
+                      },
+                      "devtool": {
+                        "title": "Use the specified type of source maps for building in development mode",
+                        "default": "eval",
+                        "enum": [
+                          "eval",
+                          "eval-cheap-module-source-map",
+                          "eval-cheap-source-map",
+                          "eval-source-map"
+                        ],
+                        "type": "string"
                       }
                     },
                     "additionalProperties": false

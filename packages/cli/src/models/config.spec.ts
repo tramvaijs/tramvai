@@ -118,7 +118,9 @@ it('should populate defaults for config', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "application",
-          "webpack": {},
+          "webpack": {
+            "devtool": "eval",
+          },
         },
         "child-app": {
           "cssMinimize": "css-minimizer",
@@ -170,7 +172,9 @@ it('should populate defaults for config', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "child-app",
-          "webpack": {},
+          "webpack": {
+            "devtool": "eval",
+          },
         },
       },
     }
@@ -362,7 +366,9 @@ it('should populate defaults for overridable options', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "application",
-          "webpack": {},
+          "webpack": {
+            "devtool": "eval",
+          },
         },
         "child-app": {
           "cssMinimize": "css-minimizer",
@@ -425,6 +431,7 @@ it('should populate defaults for overridable options', () => {
           "transpileOnlyModernLibs": true,
           "type": "child-app",
           "webpack": {
+            "devtool": "eval",
             "provide": {
               "Buffer": [
                 "buffer",

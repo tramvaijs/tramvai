@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 import { testChrome, testSafari } from './test.fixture';
 import {
   chromeClientHints,
@@ -33,6 +35,47 @@ testChrome.describe('CSR Client Hints Module in Chrome', async () => {
       testChrome.expect(await ClientHints.userAgentFromDI(page)).toEqual(chromeUserAgent);
     }
   );
+
+  testChrome(
+    'Provides info about user screen in media store',
+    async ({ app, context, ClientHints }) => {
+      const page = await context.newPage();
+
+      await page.goto(app.serverUrl);
+
+      testChrome.expect(await ClientHints.mediaStore(page)).toEqual({
+        height: expect.anything(),
+        width: expect.anything(),
+        isTouch: false,
+        retina: false,
+        synchronized: false,
+        supposed: false,
+        displayMode: 'browser',
+      });
+    }
+  );
+
+  testChrome('Correctly determines PWA display mode', async ({ app, context, ClientHints }) => {
+    await ClientHints.mockDisplayMode('standalone');
+    const page = await context.newPage();
+
+    await page.goto(app.serverUrl);
+
+    testChrome
+      .expect(await ClientHints.mediaStore(page))
+      .toEqual(expect.objectContaining({ displayMode: 'standalone' }));
+  });
+
+  testChrome('Correctly determines unknown display mode', async ({ app, context, ClientHints }) => {
+    await ClientHints.mockDisplayMode('random');
+    const page = await context.newPage();
+
+    await page.goto(app.serverUrl);
+
+    testChrome
+      .expect(await ClientHints.mediaStore(page))
+      .toEqual(expect.objectContaining({ displayMode: 'unknown' }));
+  });
 });
 
 testSafari.describe('CSR Client Hints Module', async () => {

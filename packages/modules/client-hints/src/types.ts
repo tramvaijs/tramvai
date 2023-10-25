@@ -3,4 +3,7 @@ export interface MediaInfo {
   height: number;
   isTouch: boolean;
   retina: boolean;
+  displayMode: DisplayMode;
 }
+
+export type DisplayMode = 'browser' | 'standalone' | 'unknown';

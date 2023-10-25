@@ -66,6 +66,14 @@ In `tramvai.json`
 
 It is equivalent to `devtool: 'source-map'` in webpack config with `source-map-loader`.
 
+In addition, it is possible to set one of the following values for the `devtool` option in webpack config: `eval-cheap-module-source-map`, `eval-cheap-source-map`, `eval-source-map`. For example, to set the option value to `eval-cheap-module-source-map`, add next lines to the `tramvai.json`:
+
+```json
+"webpack": {
+  "devtool": "eval-cheap-module-source-map"
+}
+```
+
 ## Modern build and dev-mode
 
 In dev-mode may work only single build mode: either `modern` or `legacy`. By default `modern` is used. If you want to use legacy build in dev mode, add next lines to the `tramvai.json`:

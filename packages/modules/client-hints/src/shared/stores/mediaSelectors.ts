@@ -1,6 +1,7 @@
 import { useSelector } from '@tramvai/state';
 import type { Media } from './media';
-import { fromClientHints, isSupposed, isRetina } from './mediaCheckers';
+import { fromClientHints, isSupposed, isRetina, displayMode } from './mediaCheckers';
+import type { DisplayMode } from '../../types';
 
 export function useMedia(): Media {
   return useSelector('media', ({ media }) => media);
@@ -16,4 +17,8 @@ export function useIsSupposed(): boolean {
 
 export function useIsRetina(): boolean {
   return isRetina(useMedia());
+}
+
+export function useDisplayMode(): DisplayMode {
+  return displayMode(useMedia());
 }

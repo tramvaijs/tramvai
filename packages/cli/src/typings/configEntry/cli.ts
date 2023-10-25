@@ -208,6 +208,11 @@ export interface CliConfigEntry extends ConfigEntry {
      * @description For OSX users and big projects it's recommended to enable watch polling, e.g. `{ poll: 1000 }`, more info - https://github.com/webpack/watchpack/issues/222
      */
     watchOptions?: Configuration['watchOptions'];
+    /**
+     * @title Use the specified type of source maps for building in development mode
+     * @default "eval"
+     */
+    devtool: 'eval' | 'eval-cheap-source-map' | 'eval-cheap-module-source-map' | 'eval-source-map';
   };
 
   // options that affect only production builds

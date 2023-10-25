@@ -172,6 +172,8 @@ Flag `--debug` enables sourcemap generation for the client and server code.
 
 Also, `tramvai.json` option [`sourceMap`](references/cli/start.md#enable-sourcemaps-in-dev-mode) enables sourcemap generation both for browser and server code.
 
+Also, `tramvai.json` option [`webpack`](references/cli/start.md#enable-sourcemaps-in-dev-mode) allows set one of the following values for the `devtool` option in webpack config: `eval-cheap-module-source-map`, `eval-cheap-source-map`, `eval-source-map` - both for browser and server code.
+
 ##### Production
 
 By default, sourcemaps are disabled both for the client and server code in production mode.

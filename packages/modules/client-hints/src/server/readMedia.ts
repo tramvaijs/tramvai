@@ -13,18 +13,21 @@ const SUPPOSED_MEDIA: Record<string, MediaInfo> = {
     height: 500,
     isTouch: true,
     retina: false,
+    displayMode: 'browser',
   },
   tablet: {
     width: 600,
     height: 800,
     isTouch: true,
     retina: false,
+    displayMode: 'browser',
   },
   desktop: {
     width: 1024,
     height: 768,
     isTouch: false,
     retina: false,
+    displayMode: 'browser',
   },
 };
 
