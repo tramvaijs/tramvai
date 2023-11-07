@@ -8,6 +8,12 @@ import type { CliConfigEntry } from '../../../typings/configEntry/cli';
 export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config) => {
   const { modern, debug, disableProdOptimization } = configManager;
 
+  const isProductionProfilingEnabled = !!process.env.TRAMVAI_REACT_PROFILE;
+  const tramvaiReactProfileTerserOptions = {
+    keep_fnames: isProductionProfilingEnabled,
+    keep_classnames: isProductionProfilingEnabled,
+  };
+
   if (disableProdOptimization) {
     // with this option for id of module path to file will be used
     config.optimization.set('moduleIds', 'named');
@@ -18,6 +24,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
       {
         extractComments: false,
         terserOptions: {
+          ...tramvaiReactProfileTerserOptions,
           ecma: 6,
           mangle: false,
           output: {
@@ -45,6 +52,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
       extractComments: false,
       parallel: terser.parallel,
       terserOptions: {
+        ...tramvaiReactProfileTerserOptions,
         ecma: modern ? 6 : 5,
         mangle: {
           // https://github.com/node-fetch/node-fetch/issues/667

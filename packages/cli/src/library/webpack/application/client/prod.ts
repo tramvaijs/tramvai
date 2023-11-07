@@ -109,5 +109,9 @@ export const webpackClientConfig = ({
     config.batch(sourcemaps(configManager));
   }
 
+  if (process.env.TRAMVAI_REACT_PROFILE) {
+    config.resolve.alias.set('react-dom$', 'react-dom/profiling');
+  }
+
   return config;
 };

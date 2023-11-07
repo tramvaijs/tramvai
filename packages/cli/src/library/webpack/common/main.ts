@@ -17,6 +17,16 @@ const filterNonExisted = (filePaths: string[]) => {
   });
 };
 
+const getConfigCacheNameAdditionalFlags = (configManager: ConfigManager<CliConfigEntry>) => {
+  return [
+    configManager.buildType === 'client' && configManager.modern ? 'modern' : '',
+    configManager.debug ? 'debug' : '',
+    process.env.TRAMVAI_REACT_PROFILE ? 'tramvai_react_profile' : '',
+  ]
+    .filter(Boolean)
+    .join('-');
+};
+
 // eslint-disable-next-line import/no-default-export
 export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config) => {
   const env = configManager.env === 'development' ? 'dev' : 'prod';
@@ -66,9 +76,9 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
   if (configManager.fileCache) {
     config.cache({
       type: 'filesystem',
-      name: `${env}-${configManager.type}-${configManager.buildType}-${configManager.name}${
-        configManager.buildType === 'client' && configManager.modern ? '-modern' : ''
-      }`,
+      name: `${env}-${configManager.type}-${configManager.buildType}-${
+        configManager.name
+      }-${getConfigCacheNameAdditionalFlags(configManager)}`,
       cacheDirectory: findCacheDir({ cwd: configManager.rootDir, name: 'webpack' }),
       buildDependencies: {
         cli: ['@tramvai/cli'],

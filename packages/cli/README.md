@@ -288,3 +288,20 @@ TRAMVAI_CPU_PROFILE=1 tramvai build {appName}
 Then, file with `tramvai-cli.${Date.now()}.cpuprofile` name will be generated in current working directory.
 
 You can open this trace in Chrome DevTools - `chrome://inspect`, "Open dedicated DevTools for Node", `Performance` tab.
+
+### How to enable production profiling for React
+
+```bash
+TRAMVAI_REACT_PROFILE=1 tramvai build {appName}
+# or
+TRAMVAI_REACT_PROFILE=1 tramvai start-prod {appName}
+```
+
+After that, you can use the React DevTools Profiler in the same way as you would in development.
+
+WARNING: The size of the bundle will be larger, because mangling is disabled for such builds. Do not use this env variable for production environment.
+
+Documentation:
+
+- [How to use React Profiler](https://legacy.reactjs.org/blog/2018/09/10/introducing-the-react-profiler.html)
+- [Introducing a new React profiler (React 18)](https://github.com/reactwg/react-18/discussions/76)
