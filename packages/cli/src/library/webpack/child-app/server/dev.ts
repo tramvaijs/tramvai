@@ -5,6 +5,7 @@ import common from './common';
 import commonDev from '../../common/dev';
 import type { UI_SHOW_PROGRESS_TOKEN } from '../../../../di/tokens';
 import type { ChildAppConfigEntry } from '../../../../typings/configEntry/child-app';
+import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
 
 export const webpackServerConfig = ({
   configManager,
@@ -24,6 +25,8 @@ export const webpackServerConfig = ({
     config.plugin('progress').use(WebpackBar, [
       {
         name: 'child-app-server',
+        color: 'orange',
+        reporters: [new FancyReporter()],
       },
     ]);
   }
