@@ -10,10 +10,19 @@ import type {
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
 } from '@tramvai/tokens-child-app';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
-import type { PageResource } from '@tramvai/tokens-render';
+import type { PageResource, REACT_SERVER_RENDER_MODE } from '@tramvai/tokens-render';
 import { RENDER_SLOTS, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import type { ServerLoader } from './loader';
 import { getSharedScope } from '../shared/webpack/moduleFederation';
+
+const asyncScriptAttrs = {
+  defer: null,
+  async: 'async',
+};
+const deferScriptAttrs = {
+  defer: 'defer',
+  async: null,
+};
 
 export const registerChildAppRenderSlots = ({
   logger,
@@ -21,15 +30,20 @@ export const registerChildAppRenderSlots = ({
   resolveFullConfig,
   preloadManager,
   loader,
+  renderMode,
 }: {
   logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
   diManager: ChildAppDiManager;
   resolveFullConfig: ExtractDependencyType<typeof CHILD_APP_RESOLVE_CONFIG_TOKEN>;
   preloadManager: ChildAppPreloadManager;
   loader: ChildAppLoader | ServerLoader;
+  renderMode: typeof REACT_SERVER_RENDER_MODE | null;
 }) => {
   const log = logger('child-app:render:slots');
   const result: ExtractTokenType<typeof RENDER_SLOTS> = [];
+  // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible
+  // https://github.com/reactwg/react-18/discussions/114
+  const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
 
   const addChunk = (entry?: string) => {
     if (!entry) {
@@ -39,7 +53,6 @@ export const registerChildAppRenderSlots = ({
     const extension = extname(entry);
 
     switch (extension) {
-      // @todo async scripts for streaming
       case '.js':
         result.push({
           type: ResourceType.script,
@@ -47,6 +60,7 @@ export const registerChildAppRenderSlots = ({
           payload: entry,
           attrs: {
             'data-critical': 'true',
+            ...scriptTypeAttr,
           },
         });
         break;

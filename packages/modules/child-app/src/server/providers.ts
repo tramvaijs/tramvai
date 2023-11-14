@@ -1,6 +1,6 @@
 import type { Provider } from '@tinkoff/dippy';
 import { isUrl, endsWith, combineValidators } from '@tinkoff/env-validators';
-import { Scope } from '@tinkoff/dippy';
+import { Scope, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import {
   CREATE_CACHE_TOKEN,
@@ -14,6 +14,7 @@ import {
   ResourceSlot,
   RESOURCES_REGISTRY,
   ResourceType,
+  REACT_SERVER_RENDER_MODE,
 } from '@tramvai/tokens-render';
 import {
   CHILD_APP_RENDER_MANAGER_TOKEN,
@@ -107,6 +108,7 @@ export const serverProviders: Provider[] = [
       resolveFullConfig: CHILD_APP_RESOLVE_CONFIG_TOKEN,
       loader: CHILD_APP_LOADER_TOKEN,
       preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+      renderMode: optional(REACT_SERVER_RENDER_MODE),
     },
   }),
   provide({
