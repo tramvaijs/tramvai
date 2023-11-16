@@ -2,6 +2,7 @@ import { commandLineListTokens, declareModule, provide } from '@tramvai/core';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { ROUTER_TOKEN } from '@tramvai/tokens-router';
 import isNil from '@tinkoff/utils/is/nil';
+import afterFrame from 'afterframe';
 
 export const BrowserTimingModule = declareModule({
   name: 'BrowserTiming',
@@ -28,6 +29,33 @@ export const BrowserTimingModule = declareModule({
             performance.clearMeasures(measureKey);
             [startKey, endKey].forEach((name) => performance.clearMarks(name));
           });
+
+          // Inaccurate measurements
+          router.registerSyncHook('change', ({ key }) => {
+            const startKey = `router:spa-render:start:${key}`;
+            const endKey = `router:spa-render:end:${key}`;
+            const measureKey = `router:spa-render:${key}`;
+
+            performance.mark(startKey);
+
+            afterFrame(() => {
+              if (process.env.__TRAMVAI_CONCURRENT_FEATURES) {
+                afterFrame(() => {
+                  performance.mark(endKey);
+
+                  performance.measure(measureKey, startKey, endKey);
+                  performance.clearMeasures();
+                  [startKey, endKey].forEach((name) => performance.clearMarks(name));
+                });
+              } else {
+                performance.mark(endKey);
+
+                performance.measure(measureKey, startKey, endKey);
+                performance.clearMeasures();
+                [startKey, endKey].forEach((name) => performance.clearMarks(name));
+              }
+            });
+          });
         };
       },
       deps: {
@@ -52,26 +80,6 @@ export const BrowserTimingModule = declareModule({
 
           [startName, endName].forEach((name) => performance.clearMarks(name));
           performance.clearMeasures(name);
-
-          // special wark between `spa_transition` end and `after_spa_transition` start - in most ways it will be React rerender time
-          if (line === 'spa_transition' || line === 'after_spa_transition') {
-            const spaRenderStartMark = `spa-render-start:${keyPostfix}`;
-            const spaRenderEndMark = `spa-render-end:${keyPostfix}`;
-
-            if (line === 'spa_transition') {
-              performance.mark(spaRenderStartMark, { startTime: end });
-            } else if (line === 'after_spa_transition') {
-              performance.mark(spaRenderEndMark, { startTime: start });
-
-              const spaRenderMeasureName = `tramvai:spa-render:${keyPostfix}`;
-              performance.measure(spaRenderMeasureName, spaRenderStartMark, spaRenderEndMark);
-
-              [spaRenderStartMark, spaRenderEndMark].forEach((name) =>
-                performance.clearMarks(name)
-              );
-              performance.clearMeasures(spaRenderMeasureName);
-            }
-          }
         });
       },
     }),

@@ -21,6 +21,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "afterframe": "^1.0.2",
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/monkeypatch": "0.0.0-stub",
     "@tinkoff/terminus": "0.0.0-stub",
