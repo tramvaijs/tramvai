@@ -40,6 +40,9 @@ type Options = PWOptions & {
   enableLogging?: boolean;
 };
 
+/**
+ * @deprecated - use Playwright directly or with `startAppFixture`
+ */
 export const initPlaywright = async (
   serverUrl: string,
   { enableLogging = true, ...options }: Options = {}

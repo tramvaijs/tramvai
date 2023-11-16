@@ -26,6 +26,9 @@ declare global {
 }
 const { nativeConsole } = global;
 
+/**
+ * @deprecated - use Playwright and @tramvai/test-pw instead
+ */
 export const wrapPuppeteerPage = (page: Page) => {
   if (page.url() && page.url() !== 'about:blank') {
     throw new Error(

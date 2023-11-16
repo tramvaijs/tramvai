@@ -9,7 +9,7 @@ This utilities based on main `tramvai` concepts and features, and built on top o
 
 - [Jest](https://jestjs.io/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- [Puppeteer](https://pptr.dev/)
+- [Playwright](https://playwright.dev/)
 
 ## Setup environment
 
@@ -668,9 +668,15 @@ it('hook', async () => {
 
 ## Integration tests
 
+:::caution
+
+Deprecated setup and examples for integration tests, this section will be rewritten in favour to direct Playwright usage (without Jest)
+
+:::
+
 For any web applications, comprehensive testing requires running that application in a browser. For SSR applications, another main requirement is to build and start server code of the application.
 
-We will use `jest` and `puppeteer` in examples below.
+We will use `jest` and `playwright` in examples below.
 
 `tramvai` provides few packages for integration testing:
 
@@ -836,16 +842,16 @@ it('papi', async () => {
 });
 ```
 
-### Puppeteer
+### Playwright
 
 #### Setup
 
-`puppeteer` instance need to be initialized in the start of the test suite, and closed in the end:
+`playwright` instance need to be initialized in the start of the test suite, and closed in the end:
 
 ```ts
 import { initPlaywright } from '@tramvai/test-pw';
 
-it('puppeteer', async () => {
+it('playwright', async () => {
   // pass application url, usually http://localhost:3000
   const { browser } = await initPlaywright(app.serverUrl);
 
@@ -866,7 +872,7 @@ import {
   wrapPlaywrightPage,
 } from '@tramvai/test-pw';
 
-it('puppeteer', async () => {
+it('playwright', async () => {
   const { browser } = await initPlaywright(app.serverUrl);
 
   // highlight-start
@@ -886,7 +892,7 @@ it('puppeteer', async () => {
 The same, but simplified example:
 
 ```ts
-it('puppeteer', async () => {
+it('playwright', async () => {
   const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
 
   // highlight-next-line
@@ -901,7 +907,7 @@ it('puppeteer', async () => {
 Page wrapper return special `router` object, which works directly with `tramvai` router on the page:
 
 ```ts
-it('puppeteer', async () => {
+it('playwright', async () => {
   const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
 
   // highlight-start
@@ -922,15 +928,15 @@ it('puppeteer', async () => {
 
 #### Page interaction
 
-`puppeteer` provides a lot of different API's, here is some useful for testing:
+`playwright` provides a lot of different API's, here is some useful for testing:
 
-- [page.evaluate](https://pptr.dev/api/puppeteer.page.evaluate) is main method for execute code in the page context.
-- [page.$eval](https://pptr.dev/api/puppeteer.page._eval) is alias over page `document.querySelector`.
+- [page.evaluate](https://playwright.dev/docs/evaluating) is main method for execute code in the page context.
+- [page.$eval](https://playwright.dev/docs/api/class-page#page-eval-on-selector) is alias over page `document.querySelector`.
 
 In example below we will check `.application` element content with both methods:
 
 ```ts
-it('puppeteer', async () => {
+it('playwright', async () => {
   const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
 
   const { page } = await getPageWrapper(app.serverUrl);
@@ -952,31 +958,22 @@ it('puppeteer', async () => {
 For example, we want to block any requests to `https://www.test.api.example`:
 
 ```ts
-it('puppeteer', async () => {
+it('playwright', async () => {
   const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
 
   const { page } = await getPageWrapper(app.serverUrl);
 
   // highlight-start
-  // enable requests interception
-  page.setRequestInterception(true);
-
-  // listen for all requests
-  page.on('request', (req) => {
-    // check request url
-    if (req.url() === 'https://www.test.api.example/') {
-      // send 500 response
-      req.respond({
+  page.route('**/*', (route) => {
+    if (route.request().url() === 'https://www.test.api.example/') {
+      route.fulfill({
         status: 500,
         contentType: 'text/plain',
         body: 'Blocked',
       });
-
-      return;
+    } else {
+      route.continue();
     }
-
-    // allow all other requests
-    return req.continue();
   });
   // highlight-end
 

@@ -26,6 +26,9 @@ declare global {
 }
 const { nativeConsole } = global;
 
+/**
+ * @deprecated - use Playwright directly or with `startAppFixture`
+ */
 export const wrapPlaywrightPage = (page: Page) => {
   if (page.url() && page.url() !== 'about:blank') {
     throw new Error(

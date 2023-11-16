@@ -41,6 +41,9 @@ type Options = PuppeteerOptions & {
   enableLogging?: boolean;
 };
 
+/**
+ * @deprecated - use Playwright and @tramvai/test-pw instead
+ */
 export const initPuppeteer = async (
   serverUrl: string,
   { enableLogging = true, ...options }: Options = {}
