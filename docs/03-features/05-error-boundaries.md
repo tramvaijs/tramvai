@@ -64,6 +64,8 @@ const provider = {
 };
 ```
 
+This error boundary is also used by client render/hydration in cases where an error happens before the page is being rehydrated or rendered. The boundary wouldn't work if you're providing `CUSTOM_RENDER` token for your client rendering process; you should handle it yourself.
+
 ### Specific fallback
 
 There are two ways to add a specific error boundary to the page.

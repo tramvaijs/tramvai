@@ -55,6 +55,19 @@ const ErrorNestedLayoutComponent = ({ children }) => {
   );
 };
 
+const ErrorNestedLayoutComponentForClient = ({ children }) => {
+  if (typeof window !== 'undefined') {
+    throw new Error('Error Nested Layout SSR');
+  }
+
+  return (
+    <>
+      <nav>Error in Layout on Client</nav>
+      {children}
+    </>
+  );
+};
+
 const errorAction = declareAction({
   name: 'errorAction',
   fn() {
@@ -87,5 +100,6 @@ export default createBundle({
     pageGuardErrorComponent: PageGuardErrorComponent,
     nestedLayoutComponent: NestedLayoutComponent,
     errorNestedLayoutComponent: ErrorNestedLayoutComponent,
+    errorNestedLayoutComponentForClient: ErrorNestedLayoutComponentForClient,
   },
 });

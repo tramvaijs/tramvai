@@ -9,6 +9,7 @@ import {
   USE_REACT_STRICT_MODE,
   MODERN_SATISFIES_TOKEN,
   REACT_SERVER_RENDER_MODE,
+  DEFAULT_ERROR_BOUNDARY_COMPONENT,
 } from '@tramvai/tokens-render';
 import { PageErrorStore, setPageErrorEvent, beforeResolveHooksToken } from '@tramvai/module-router';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
@@ -76,6 +77,7 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
         di: DI_TOKEN,
         useStrictMode: USE_REACT_STRICT_MODE,
         renderMode: optional(REACT_SERVER_RENDER_MODE),
+        defaultErrorBoundary: optional(DEFAULT_ERROR_BOUNDARY_COMPONENT),
       },
       multi: true,
     }),

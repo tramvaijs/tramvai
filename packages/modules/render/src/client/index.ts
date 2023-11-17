@@ -1,14 +1,14 @@
-import each from '@tinkoff/utils/array/each';
-import { createElement, StrictMode } from 'react';
 import type {
   EXTEND_RENDER,
   REACT_SERVER_RENDER_MODE,
   RENDERER_CALLBACK,
   USE_REACT_STRICT_MODE,
+  DEFAULT_ERROR_BOUNDARY_COMPONENT,
 } from '@tramvai/tokens-render';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
-import { renderReact } from '../react';
+import { createElement } from 'react';
 import { renderer } from './renderer';
+import RootClientComponent, { createRootElement } from './RootClientComponent';
 
 export function rendering({
   logger,
@@ -19,6 +19,7 @@ export function rendering({
   useStrictMode,
   rendererCallback,
   renderMode,
+  defaultErrorBoundary,
 }: {
   logger: any;
   consumerContext: any;
@@ -28,25 +29,25 @@ export function rendering({
   useStrictMode: ExtractDependencyType<typeof USE_REACT_STRICT_MODE>;
   rendererCallback?: ExtractDependencyType<typeof RENDERER_CALLBACK>;
   renderMode?: ExtractDependencyType<typeof REACT_SERVER_RENDER_MODE>;
+  defaultErrorBoundary?: ExtractDependencyType<typeof DEFAULT_ERROR_BOUNDARY_COMPONENT>;
 }) {
   const log = logger('module-render');
 
   return new Promise<void>((resolve, reject) => {
-    let renderResult = renderReact({ di }, consumerContext);
-
-    if (extendRender) {
-      each((render) => {
-        renderResult = render(renderResult);
-      }, extendRender);
-    }
-
     if (customRender) {
-      return customRender(renderResult);
+      // Provide possibility of customRender for root JSX.Element
+      // Can be useful in case of custom render function on client or to replace hydration
+      return customRender(createRootElement({ extendRender, di, consumerContext }));
     }
 
-    if (useStrictMode) {
-      renderResult = createElement(StrictMode, null, renderResult);
-    }
+    const renderResult = createElement(RootClientComponent, {
+      defaultErrorBoundary,
+      extendRender,
+      customRender,
+      useStrictMode,
+      consumerContext,
+      di,
+    });
 
     const container = document.querySelector('.application');
     const executeRendererCallbacks = (renderErr?: Error) =>

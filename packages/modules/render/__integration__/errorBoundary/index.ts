@@ -1,15 +1,27 @@
-import React from 'react';
+import type { ReactElement } from 'react';
+import React, { createElement } from 'react';
 import { commandLineListTokens, createApp, provide } from '@tramvai/core';
 import { CommonModule, REQUEST_MANAGER_TOKEN, STORE_TOKEN } from '@tramvai/module-common';
-import { SpaRouterModule, ROUTER_GUARD_TOKEN, setPageErrorEvent } from '@tramvai/module-router';
-import { RenderModule } from '@tramvai/module-render';
+import {
+  SpaRouterModule,
+  ROUTER_GUARD_TOKEN,
+  setPageErrorEvent,
+  PAGE_SERVICE_TOKEN,
+} from '@tramvai/module-router';
+import { EXTEND_RENDER, RenderModule } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
 import { ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN } from '@tramvai/react';
 import { HttpError, throwHttpError } from '@tinkoff/errors';
 import { parse } from '@tinkoff/url';
 import { DEFAULT_ERROR_BOUNDARY_COMPONENT } from '@tramvai/tokens-render';
+import {
+  PAGE_RENDER_DEFAULT_FALLBACK_COMPONENT,
+  PageRenderModeModule,
+} from '@tramvai/module-page-render-mode';
+import Fallback from './components/Fallback';
 import { LegacyErrorBoundary } from './components/LegacyErrorBoundary';
 import { TokenDefaultErrorBoundary } from './components/TokenDefaultErrorBoundary';
+import ExtendRenderHocWithError from './components/ExtendRenderHOCWithError';
 
 createApp({
   name: 'render-error-boundary',
@@ -104,9 +116,39 @@ createApp({
           errorBoundaryComponent: 'pageErrorBoundaryComponent',
         },
       },
+      {
+        name: 'extend-render-error',
+        path: '/extend-render-error/',
+        config: {
+          pageComponent: 'pageComponent',
+        },
+      },
+      {
+        name: 'csr-extend-render-error',
+        path: '/csr-extend-render-error/',
+        config: {
+          pageComponent: 'pageComponent',
+        },
+      },
+      {
+        name: 'csr-extend-render-use-effect-error',
+        path: '/csr-extend-render-use-effect-error/',
+        config: {
+          pageComponent: 'pageComponent',
+        },
+      },
+      {
+        name: 'error-on-client-in-layout',
+        path: '/error-on-client-in-layout/',
+        config: {
+          pageComponent: 'pageComponent',
+          nestedLayoutComponent: 'errorNestedLayoutComponentForClient',
+        },
+      },
     ]),
     RenderModule,
     ServerModule,
+    PageRenderModeModule,
   ],
   bundles: {
     mainDefault: () => import(/* webpackChunkName: 'mainDefault' */ './bundles/mainDefault'),
@@ -157,6 +199,37 @@ createApp({
       deps: {
         requestManager: REQUEST_MANAGER_TOKEN,
       },
+    }),
+    provide({
+      provide: EXTEND_RENDER,
+      multi: true,
+      useFactory: ({ pageService }) => {
+        return (render: ReactElement) => {
+          if (pageService.getCurrentRoute().path === '/extend-render-error/') {
+            throw new Error('EXTEND_RENDER error');
+          }
+
+          if (
+            pageService.getCurrentRoute().path === '/csr-extend-render-error/' &&
+            typeof window !== 'undefined'
+          ) {
+            throw new Error('EXTEND_RENDER CSR error');
+          }
+
+          if (pageService.getCurrentRoute().path === '/csr-extend-render-use-effect-error/') {
+            return createElement(ExtendRenderHocWithError, null, render);
+          }
+
+          return render;
+        };
+      },
+      deps: {
+        pageService: PAGE_SERVICE_TOKEN,
+      },
+    }),
+    provide({
+      provide: PAGE_RENDER_DEFAULT_FALLBACK_COMPONENT,
+      useValue: Fallback,
     }),
   ],
 });
