@@ -7,6 +7,15 @@ const KNOWN_ENGINES = new Set(['Chromium']);
 
 const BACKWARD_COMPATIBILITY_BROWSER_NAME: Record<string, string> = {
   'Google Chrome': 'chrome',
+  'Microsoft Edge': 'edge',
+};
+
+const BACKWARD_COMPATIBILITY_ENGINE_NAME: Record<string, string> = {
+  Chromium: 'Blink',
+};
+
+const BACKWARD_COMPATIBILITY_ARCH: Record<string, string> = {
+  x86: 'amd64',
 };
 
 const BACKWARD_COMPATIBILITY_OS_NAME: Record<string, string> = {
@@ -47,7 +56,7 @@ const parseBrowserFromString = (brandsList: string): { browser: Browser; engine:
     }
 
     if (name && KNOWN_ENGINES.has(name)) {
-      engine.name = name.toLowerCase();
+      engine.name = BACKWARD_COMPATIBILITY_ENGINE_NAME[name] ?? name.toLowerCase();
       engine.version = version;
     }
   });
@@ -57,7 +66,7 @@ const parseBrowserFromString = (brandsList: string): { browser: Browser; engine:
     browser.version = engine.version;
   }
 
-  browser.browserEngine = getBrowserEngine(browser.name, engine.name);
+  browser.browserEngine = getBrowserEngine(browser.name?.toLowerCase(), engine.name?.toLowerCase());
 
   return { browser, engine };
 };
@@ -84,7 +93,7 @@ const parseBrowserFromUserAgentData = (
     }
 
     if (KNOWN_ENGINES.has(brand)) {
-      engine.name = brand.toLowerCase();
+      engine.name = BACKWARD_COMPATIBILITY_ENGINE_NAME[brand] ?? brand.toLowerCase();
       engine.version = version;
     }
   });
@@ -94,7 +103,7 @@ const parseBrowserFromUserAgentData = (
     browser.version = engine.version;
   }
 
-  browser.browserEngine = getBrowserEngine(browser.name, engine.name);
+  browser.browserEngine = getBrowserEngine(browser.name?.toLowerCase(), engine.name?.toLowerCase());
 
   return { browser, engine };
 };
@@ -105,22 +114,6 @@ const getBackwardCompatibleOsName = (payload: string | undefined): string | unde
   }
 
   return BACKWARD_COMPATIBILITY_OS_NAME[payload] ?? payload;
-};
-
-/**
- * Method to convert arch + bitness to `ua-parser-js` compatible format.
- *
- * @see ICPU
- */
-const getArchitecture = (
-  arch: string | undefined,
-  bitness: string | undefined
-): string | undefined => {
-  if (arch === undefined) {
-    return undefined;
-  }
-
-  return `${arch}${bitness ?? ''}`;
 };
 
 /**
@@ -147,6 +140,7 @@ export const parseClientHintsHeaders = (
   const osName = parseQuotedString(headers['sec-ch-ua-platform'] as string);
 
   const mobileOS = getMobileOs(osName);
+  const architecture = parseQuotedString(headers['sec-ch-ua-arch'] as string);
 
   return {
     browser,
@@ -156,10 +150,9 @@ export const parseClientHintsHeaders = (
       version: parseQuotedString(headers['sec-ch-ua-platform-version'] as string),
     },
     cpu: {
-      architecture: getArchitecture(
-        parseQuotedString(headers['sec-ch-ua-arch'] as string),
-        parseQuotedString(headers['sec-ch-ua-bitness'] as string)
-      ),
+      architecture: architecture
+        ? BACKWARD_COMPATIBILITY_ARCH[architecture] ?? architecture
+        : architecture,
     },
     mobileOS,
     device: {
@@ -200,7 +193,9 @@ export const parseClientHintsUserAgentData = (payload: UADataValues): UserAgent 
       version: payload.platformVersion,
     },
     cpu: {
-      architecture: getArchitecture(payload.architecture, payload.bitness),
+      architecture: payload.architecture
+        ? BACKWARD_COMPATIBILITY_ARCH[payload.architecture] ?? payload.architecture
+        : payload.architecture,
     },
     mobileOS: getMobileOs(payload.platform),
     device: {

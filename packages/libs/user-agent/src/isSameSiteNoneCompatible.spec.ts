@@ -112,7 +112,7 @@ describe('isSameSiteNoneCompatible with user agent', () => {
 // will be correct for `isSameSiteNoneCompatible(result)`
 describe('isSameSiteNoneCompatible with client hints', () => {
   it('unsupported version of chrome', () => {
-    const result = parseClientHintsUserAgentData({
+    const userAgent = parseClientHintsUserAgentData({
       brands: [
         {
           brand: 'Not.A/Brand',
@@ -131,6 +131,29 @@ describe('isSameSiteNoneCompatible with client hints', () => {
       platform: 'macOS',
     });
 
-    expect(isSameSiteNoneCompatible(result)).toBe(false);
+    expect(isSameSiteNoneCompatible(userAgent)).toBe(false);
+  });
+
+  it('unsupported version of engine', () => {
+    const userAgent = parseClientHintsUserAgentData({
+      brands: [
+        {
+          brand: 'Not.A/Brand',
+          version: '8',
+        },
+        {
+          brand: 'Chromium',
+          version: '62',
+        },
+        {
+          brand: 'Microsoft Edge',
+          version: '62',
+        },
+      ],
+      mobile: false,
+      platform: 'Windows',
+    });
+
+    expect(isSameSiteNoneCompatible(userAgent)).toBe(false);
   });
 });

@@ -47,7 +47,7 @@ export const isSameSiteNoneCompatible = (userAgent: Omit<UAParser.IResult, 'ua'>
       return browserMajor < 51 || browserMajor > 66;
     }
 
-    if (engineName === 'blink') {
+    if (engineName === 'blink' || engineName === 'chromium') {
       return engineMajor < 51 || engineMajor > 66;
     }
 

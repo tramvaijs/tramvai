@@ -1,4 +1,5 @@
 import { parseClientHintsHeaders, parseClientHintsUserAgentData } from './client-hints';
+import { parseUserAgentHeader } from './userAgent';
 
 describe('low entropy headers only', () => {
   it('desktop chrome', () => {
@@ -25,7 +26,7 @@ describe('low entropy headers only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "106",
         },
         "mobileOS": undefined,
@@ -62,7 +63,7 @@ describe('low entropy headers only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "106",
         },
         "mobileOS": "android",
@@ -87,7 +88,7 @@ describe('low entropy headers only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": undefined,
-          "name": "chromium",
+          "name": "Blink",
           "version": "104",
         },
         "cpu": {
@@ -99,7 +100,7 @@ describe('low entropy headers only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "104",
         },
         "mobileOS": undefined,
@@ -124,7 +125,7 @@ describe('low entropy headers only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": undefined,
-          "name": "chromium",
+          "name": "Blink",
           "version": "104",
         },
         "cpu": {
@@ -136,7 +137,7 @@ describe('low entropy headers only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "104",
         },
         "mobileOS": "android",
@@ -161,7 +162,7 @@ describe('low entropy headers only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "105",
-          "name": "microsoft edge",
+          "name": "edge",
           "version": "105",
         },
         "cpu": {
@@ -173,7 +174,7 @@ describe('low entropy headers only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "105",
         },
         "mobileOS": undefined,
@@ -198,7 +199,7 @@ describe('low entropy headers only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "105",
-          "name": "microsoft edge",
+          "name": "edge",
           "version": "105",
         },
         "cpu": {
@@ -210,7 +211,7 @@ describe('low entropy headers only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "105",
         },
         "mobileOS": "android",
@@ -262,7 +263,7 @@ describe('low entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114",
         },
         "mobileOS": undefined,
@@ -312,7 +313,7 @@ describe('low entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114",
         },
         "mobileOS": "android",
@@ -350,7 +351,7 @@ describe('low entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "microsoft edge",
+          "name": "edge",
           "version": "114",
         },
         "cpu": {
@@ -362,7 +363,7 @@ describe('low entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114",
         },
         "mobileOS": undefined,
@@ -400,7 +401,7 @@ describe('low entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "microsoft edge",
+          "name": "edge",
           "version": "114",
         },
         "cpu": {
@@ -412,7 +413,7 @@ describe('low entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114",
         },
         "mobileOS": "android",
@@ -474,7 +475,7 @@ describe('high entropy UADataValues only', () => {
           "version": "114.0.5735.198",
         },
         "cpu": {
-          "architecture": "arm64",
+          "architecture": "arm",
         },
         "device": {
           "model": "",
@@ -482,7 +483,7 @@ describe('high entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114.0.5735.198",
         },
         "mobileOS": undefined,
@@ -549,7 +550,7 @@ describe('high entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114.0.5735.198",
         },
         "mobileOS": "android",
@@ -604,11 +605,11 @@ describe('high entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "microsoft edge",
+          "name": "edge",
           "version": "114.0.1823.58",
         },
         "cpu": {
-          "architecture": "x86",
+          "architecture": "amd64",
         },
         "device": {
           "model": "",
@@ -616,7 +617,7 @@ describe('high entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114.0.5735.134",
         },
         "mobileOS": undefined,
@@ -671,7 +672,7 @@ describe('high entropy UADataValues only', () => {
         "browser": {
           "browserEngine": "chrome",
           "major": "114",
-          "name": "microsoft edge",
+          "name": "edge",
           "version": "114.0.1823.58",
         },
         "cpu": {
@@ -683,7 +684,7 @@ describe('high entropy UADataValues only', () => {
           "vendor": undefined,
         },
         "engine": {
-          "name": "chromium",
+          "name": "Blink",
           "version": "114.0.5735.134",
         },
         "mobileOS": "android",
@@ -694,5 +695,163 @@ describe('high entropy UADataValues only', () => {
         "sameSiteNoneCompatible": true,
       }
     `);
+  });
+});
+
+describe('difference between ua-string and ua-data', () => {
+  it('should not have difference in Microsoft Edge (Windows)', () => {
+    const uaString = parseUserAgentHeader(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0'
+    );
+    const uaData = parseClientHintsUserAgentData({
+      architecture: 'x86',
+      bitness: '64',
+      brands: [
+        {
+          brand: 'Microsoft Edge',
+          version: '119',
+        },
+        {
+          brand: 'Chromium',
+          version: '119',
+        },
+        {
+          brand: 'Not?A_Brand',
+          version: '24',
+        },
+      ],
+      fullVersionList: [
+        {
+          brand: 'Microsoft Edge',
+          version: '119.0.2151.58',
+        },
+        {
+          brand: 'Chromium',
+          version: '119.0.6045.123',
+        },
+        {
+          brand: 'Not?A_Brand',
+          version: '24.0.0.0',
+        },
+      ],
+      mobile: false,
+      model: '',
+      platform: 'Windows',
+      platformVersion: '10.0.0',
+    });
+
+    expect(uaString.cpu).toEqual(uaData.cpu);
+    expect(uaString.browser.name).toEqual(uaData.browser.name);
+    expect(uaString.browser.browserEngine).toEqual(uaData.browser.browserEngine);
+    expect(uaString.engine.name).toEqual(uaData.engine.name);
+    expect(uaString.mobileOS).toEqual(uaData.mobileOS);
+    expect(uaString.os.name).toEqual(uaData.os.name);
+    expect(uaString.sameSiteNoneCompatible).toEqual(uaData.sameSiteNoneCompatible);
+  });
+
+  it('should not have difference in Chrome (macOS)', () => {
+    const uaString = parseUserAgentHeader(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'
+    );
+    const uaData = parseClientHintsUserAgentData({
+      architecture: 'arm',
+      bitness: '64',
+      brands: [
+        {
+          brand: 'Chromium',
+          version: '118',
+        },
+        {
+          brand: 'Google Chrome',
+          version: '118',
+        },
+        {
+          brand: 'Not=A?Brand',
+          version: '99',
+        },
+      ],
+      fullVersionList: [
+        {
+          brand: 'Chromium',
+          version: '118.0.5993.117',
+        },
+        {
+          brand: 'Google Chrome',
+          version: '118.0.5993.117',
+        },
+        {
+          brand: 'Not=A?Brand',
+          version: '99.0.0.0',
+        },
+      ],
+      mobile: false,
+      model: '',
+      platform: 'macOS',
+      platformVersion: '13.5.1',
+    });
+
+    // This different is correct, due to provide arch is better than not
+    expect(uaString.cpu.architecture).toEqual(undefined);
+    expect(uaData.cpu.architecture).toEqual('arm');
+
+    expect(uaString.browser.name).toEqual(uaData.browser.name);
+    expect(uaString.browser.browserEngine).toEqual(uaData.browser.browserEngine);
+    expect(uaString.engine.name).toEqual(uaData.engine.name);
+    expect(uaString.mobileOS).toEqual(uaData.mobileOS);
+    expect(uaString.os.name).toEqual(uaData.os.name);
+    expect(uaString.sameSiteNoneCompatible).toEqual(uaData.sameSiteNoneCompatible);
+  });
+
+  it('should not have difference in Opera (macOS)', () => {
+    const uaString = parseUserAgentHeader(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 OPR/105.0.0.0 (Edition Yx 05)'
+    );
+    const uaData = parseClientHintsUserAgentData({
+      architecture: 'arm',
+      bitness: '64',
+      brands: [
+        {
+          brand: 'Opera',
+          version: '105',
+        },
+        {
+          brand: 'Chromium',
+          version: '119',
+        },
+        {
+          brand: 'Not?A_Brand',
+          version: '24',
+        },
+      ],
+      fullVersionList: [
+        {
+          brand: 'Opera',
+          version: '105.0.4970.13',
+        },
+        {
+          brand: 'Chromium',
+          version: '119.0.6045.124',
+        },
+        {
+          brand: 'Not?A_Brand',
+          version: '24.0.0.0',
+        },
+      ],
+      mobile: false,
+      model: '',
+      platform: 'macOS',
+      platformVersion: '13.5.1',
+    });
+
+    // This different is correct, due to provide arch is better than not
+    expect(uaString.cpu.architecture).toEqual(undefined);
+    expect(uaData.cpu.architecture).toEqual('arm');
+
+    expect(uaString.browser.name).toEqual(uaData.browser.name);
+    expect(uaString.browser.browserEngine).toEqual(uaData.browser.browserEngine);
+    expect(uaString.engine.name).toEqual(uaData.engine.name);
+    expect(uaString.mobileOS).toEqual(uaData.mobileOS);
+    expect(uaString.os.name).toEqual(uaData.os.name);
+    expect(uaString.sameSiteNoneCompatible).toEqual(uaData.sameSiteNoneCompatible);
   });
 });
