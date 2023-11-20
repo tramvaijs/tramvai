@@ -38,7 +38,7 @@ describe('modernLibsFilter', () => {
   it('skip library with module field', () => {
     const pkgPath = getPkgPath('lib-with-module');
 
-    expect(modernLibsFilter(pkgPath)).toBe(false);
+    expect(modernLibsFilter(pkgPath)).toBe(true);
   });
 
   it('skip library with browser field', () => {

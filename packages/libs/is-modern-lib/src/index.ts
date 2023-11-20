@@ -80,6 +80,8 @@ const cache = Object.create(null);
  *
  * - из https://npm.im/webpack-plugin-modern-npm используется идея проверять на наличие полей "exports" и "modern"
  * - из https://github.com/SamVerschueren/babel-engine-plugin используется идея проверки поля "engines.node"
+ * - для большей надежности проверяем на наличие поля "module" - там как минимум всегда ES модули,
+ *   если сборка была через @tramva/build то это 100% индикатор что пакет содержит modern код
  *
  * Потенцильно, более надежный, но медленный вариант, это искать все modern библиотеки заранее,
  * через парсинг исходного кода, как в https://github.com/obahareth/are-you-es5.
@@ -121,6 +123,7 @@ export const modernLibsFilter = (filePath: string): boolean => {
   const packageJsonLooksLikeModern = !!(
     packageJson.exports ||
     packageJson.modern ||
+    packageJson.module ||
     packageJson.type === 'module'
   );
 
