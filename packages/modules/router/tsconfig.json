@@ -47,9 +47,6 @@
             "path": "../../tokens/server"
         },
         {
-            "path": "../../tokens/render"
-        },
-        {
             "path": "../../tramvai/test/helpers"
         },
         {
@@ -69,6 +66,9 @@
         },
         {
             "path": "../../libs/safe-strings"
+        },
+        {
+            "path": "../../tokens/render"
         }
     ]
 }

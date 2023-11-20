@@ -1,0 +1,38 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "view-transitions": {
+      "name": "view-transitions",
+      "root": "src",
+      "type": "application",
+      "modern": true,
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "splitChunks": {
+        "mode": "granularChunks"
+      },
+      "postcss": {
+        "config": "./postcss.js",
+        "cssModulePattern": "^(?!.*global\\.css$).*$"
+      },
+      "hotRefresh": {
+        "enabled": true
+      },
+      "sourceMap": {
+        "development": true,
+        "production": true
+      },
+      "experiments": {
+        "viewTransitions": true,
+        "transpilation": {
+          "loader": {
+            "development": "swc",
+            "production": "babel"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,21 +1,24 @@
 {
-  "extends": "../../../tsconfig.lib.json",
-  "include": [
-    "./src"
-  ],
-  "compilerOptions": {
-    "declarationDir": "./lib",
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "strict": false,
-    "downlevelIteration": true
-  },
-  "references": [
-    {
-      "path": "../../libs/url"
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": false,
+        "downlevelIteration": true
     },
-    {
-      "path": "../react-hooks"
-    }
-  ]
+    "references": [
+        {
+            "path": "../../libs/url"
+        },
+        {
+            "path": "../react-hooks"
+        },
+        {
+            "path": "../../tramvai/core"
+        }
+    ]
 }

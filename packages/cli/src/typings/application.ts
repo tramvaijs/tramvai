@@ -31,6 +31,10 @@ declare module '*.jpeg' {
   export default ImageString;
   export const image: ImageObject;
 }
+declare module '*.webp' {
+  export default ImageString;
+  export const image: ImageObject;
+}
 
 declare module '*.svg' {
   const image: ImageString;

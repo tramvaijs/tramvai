@@ -83,4 +83,4 @@ const provider = provide({
 Router doesn't support proxy setup directly. But proxy still can be used with some limitations:
 
 - setup proxy server to pass requests to app with rewriting request and response paths. (E.g. for [nginx](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_redirect))
-- it wont work as expected on spa navigation on client, so only option in this case is use the `NoSpaRouter`
+- it won't work as expected on spa navigation on client, so only option in this case is use the `NoSpaRouter`

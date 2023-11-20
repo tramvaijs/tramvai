@@ -273,7 +273,7 @@ exports[`render-to-stream server-side rendering main page 1`] = `
     at LayoutRenderComponent (webpack://@tramvai/cli/../modules/render/lib/react/root.js?:[LINE]:[SYMBOL])
     at Root (webpack://@tramvai/cli/../modules/render/lib/react/root.js?:[LINE]:[SYMBOL])
     at Provider (webpack://@tramvai/cli/../tramvai/state/lib/connect/Provider.js?:[LINE]:[SYMBOL])
-    at Provider (webpack://@tramvai/cli/../libs/router/lib/components/react/provider.js?:[LINE]:[SYMBOL])
+    at DefaultProvider (webpack://@tramvai/cli/../libs/router/lib/components/react/providers/default.js?:[LINE]:[SYMBOL])
     at ChunkExtractorManager (webpack://@tramvai/cli/../../node_modules/@loadable/server/lib/ChunkExtractorManager.js?:[LINE]:[SYMBOL])"
         ></template>Error fallback
       </div>

@@ -97,10 +97,12 @@ describe('JSON schema для tramvai.json', () => {
                   "enabled": false,
                 },
               },
+              "reactTransitions": false,
               "serverRunner": "thread",
               "transpilation": {
                 "loader": "babel",
               },
+              "viewTransitions": false,
               "webpack": {
                 "backCompat": false,
                 "cacheUnaffected": true,

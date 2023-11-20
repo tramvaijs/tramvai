@@ -68,10 +68,12 @@ it('should populate defaults for config', () => {
                 "enabled": false,
               },
             },
+            "reactTransitions": false,
             "serverRunner": "thread",
             "transpilation": {
               "loader": "babel",
             },
+            "viewTransitions": false,
             "webpack": {
               "backCompat": false,
               "cacheUnaffected": true,
@@ -304,6 +306,7 @@ it('should populate defaults for overridable options', () => {
                 "enabled": false,
               },
             },
+            "reactTransitions": false,
             "serverRunner": "thread",
             "transpilation": {
               "loader": {
@@ -311,6 +314,7 @@ it('should populate defaults for overridable options', () => {
                 "production": "babel",
               },
             },
+            "viewTransitions": false,
             "webpack": {
               "backCompat": true,
               "cacheUnaffected": true,

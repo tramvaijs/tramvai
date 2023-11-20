@@ -98,6 +98,18 @@ export interface ApplicationExperiments extends Experiments {
      */
     meta?: PwaMetaOptions;
   };
+
+  /**
+   * @title Enable View Transitions API for SPA navigations
+   * @default false
+   */
+  viewTransitions?: boolean;
+
+  /**
+   * @title Enable React Transitions for SPA navigations
+   * @default false
+   */
+  reactTransitions?: boolean;
 }
 
 export interface ApplicationConfigEntry extends CliConfigEntry {

@@ -13,6 +13,7 @@ import {
   ROUTE_RESOLVE_TOKEN,
   ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
 } from '@tramvai/tokens-router';
+import { RENDER_SLOTS, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import {
   routerClassToken,
   onChangeHooksToken,
@@ -43,6 +44,7 @@ export const providers: Provider[] = [
         ...additionalParameters,
         trailingSlash: true,
         mergeSlashes: true,
+        enableViewTransitions: process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true',
         routes: flatten(routes ?? []).map(routeTransform),
       });
 
@@ -172,4 +174,19 @@ export const providers: Provider[] = [
     multi: true,
     useValue: RouterStore,
   }),
+  ...(process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true'
+    ? [
+        provide({
+          provide: RENDER_SLOTS,
+          useValue: [
+            {
+              type: ResourceType.inlineStyle,
+              slot: ResourceSlot.HEAD_CORE_STYLES,
+              payload:
+                '@media (prefers-reduced-motion) { ::view-transition-group(*),::view-transition-old(*),::view-transition-new(*) { animation: none !important; } }',
+            },
+          ],
+        }),
+      ]
+    : []),
 ];

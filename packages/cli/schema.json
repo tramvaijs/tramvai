@@ -788,6 +788,16 @@
                     },
                     "additionalProperties": false
                   },
+                  "viewTransitions": {
+                    "title": "Enable View Transitions API for SPA navigations",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "reactTransitions": {
+                    "title": "Enable React Transitions for SPA navigations",
+                    "default": false,
+                    "type": "boolean"
+                  },
                   "webpack": {
                     "title": "experiments configuration for [webpack](https://webpack.js.org/configuration/experiments/)",
                     "default": {},
@@ -1154,23 +1164,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6355": {
+                              "__@match@6357": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6357": {
+                              "__@replace@6359": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6360": {
+                              "__@search@6362": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6362": {
+                              "__@split@6364": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6364": {
+                              "__@matchAll@6366": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1836,23 +1846,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6355": {
+                                "__@match@6357": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6357": {
+                                "__@replace@6359": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6360": {
+                                "__@search@6362": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6362": {
+                                "__@split@6364": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6364": {
+                                "__@matchAll@6366": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2518,23 +2528,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6355": {
+                                  "__@match@6357": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6357": {
+                                  "__@replace@6359": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6360": {
+                                  "__@search@6362": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6362": {
+                                  "__@split@6364": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6364": {
+                                  "__@matchAll@6366": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }

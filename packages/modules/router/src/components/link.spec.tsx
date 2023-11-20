@@ -28,7 +28,12 @@ describe('react/link', () => {
 
     fireEvent.click(getByTestId('link'));
 
-    expect(router.navigate).toHaveBeenCalledWith({ url: '/test/' });
+    expect(router.navigate).toHaveBeenCalledWith({
+      query: undefined,
+      replace: undefined,
+      url: '/test/',
+      viewTransition: false,
+    });
   });
 
   it('click on link should call router.navigate 2', () => {
@@ -49,6 +54,7 @@ describe('react/link', () => {
       url: '/abc/',
       query: { a: '1' },
       replace: true,
+      viewTransition: false,
     });
   });
 

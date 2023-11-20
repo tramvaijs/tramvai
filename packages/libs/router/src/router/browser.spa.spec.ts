@@ -1035,7 +1035,11 @@ describe('router/browser-spa', () => {
         router.registerHook('beforeNavigate', mockBefore);
         router.registerHook('afterNavigate', mockAfter);
 
-        await router.navigate({ url: '/child1', query: { a: '1' }, replace: true });
+        await router.navigate({
+          url: '/child1',
+          query: { a: '1' },
+          replace: true,
+        });
 
         const navigation = {
           type: 'navigate',
@@ -1399,7 +1403,11 @@ describe('router/browser-spa', () => {
         router.registerHook('beforeNavigate', mockBefore);
         router.registerHook('afterNavigate', mockAfter);
 
-        await router.navigate({ url: '/child1', query: { a: '1' }, replace: true });
+        await router.navigate({
+          url: '/child1',
+          query: { a: '1' },
+          replace: true,
+        });
 
         const navigation = {
           type: 'navigate',
@@ -1604,6 +1612,75 @@ describe('router/browser-spa', () => {
           '/'
         );
       });
+    });
+  });
+
+  describe('view-transitions', () => {
+    beforeEach(async () => {
+      router = new Router({
+        routes,
+        enableViewTransitions: true,
+      });
+
+      window.location.href = 'http://localhost/';
+
+      await router.rehydrate({
+        type: 'navigate',
+        to: { name: 'root', path: '/', actualPath: '/', params: {} },
+        url: parse('http://localhost/'),
+      });
+
+      await router.start();
+    });
+
+    it('should enable view transition if it was passed in options', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+
+      expect(mockChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
+          viewTransition: true,
+        })
+      );
+    });
+
+    it('should enable view transition on backward navigation to the enabled route', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+      await router.back();
+
+      expect(mockChange).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+        })
+      );
+    });
+
+    it('should enable view transition on subsequent navigation if it was previously enabled', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+      await router.navigate({ url: '/child2/' });
+      await router.navigate({ url: '/' });
+
+      expect(mockChange).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+        })
+      );
     });
   });
 });

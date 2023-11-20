@@ -23,3 +23,5 @@ export {
   ExtendedModule,
   declareModule,
 } from '@tinkoff/dippy';
+
+export { Deferred } from './utils/deferred';

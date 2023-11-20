@@ -28,6 +28,12 @@ export const DefaultLink = () => {
 };
 ```
 
+:::tip
+
+Consider to use [View Transitions API](03-features/07-routing/11-view-transitions.md) to animate your navigations
+
+:::
+
 ### Page resources prefetch
 
 `Link` component will try to prefetch resources for passed `url`, if this `url` is handled by the application router.
@@ -53,7 +59,11 @@ If you want to disable this behaviour, pass `prefetch={false}` property.
 
 ```tsx
 export const WrapLink = () => {
-  return <Link url="/test/" prefetch={false}>Click me</Link>;
+  return (
+    <Link url="/test/" prefetch={false}>
+      Click me
+    </Link>
+  );
 };
 ```
 

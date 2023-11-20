@@ -5,17 +5,30 @@ import { logger } from '../logger';
 import { RouteTree } from '../tree/tree';
 
 const DELAY_CHECK_INTERVAL = 50;
+const APPLIED_VIEW_TRANSITIONS_KEY = '_t_view_transitions';
+
 export class Router extends ClientRouter {
   protected delayedNavigation: Navigation;
   protected delayedPromise: Promise<void>;
   protected delayedResolve: () => void;
   protected delayedReject: (error: Error) => void;
 
+  // Store applied view transitions, so we can apply them on back navigations
+  private appliedViewTransitions: Map<string, Set<string>>;
+
   constructor(options: Options) {
     super(options);
     this.tree = new RouteTree(options.routes);
 
     this.history.setTree(this.tree);
+
+    if (this.viewTransitionsEnabled) {
+      this.restoreAppliedViewTransitions();
+
+      window.addEventListener('pagehide', () => {
+        this.saveAppliedViewTransitions();
+      });
+    }
   }
 
   async rehydrate(navigation: Navigation) {
@@ -34,7 +47,13 @@ export class Router extends ClientRouter {
     }
   }
 
-  protected async run(navigation: Navigation) {
+  protected async run(payload: Navigation) {
+    const navigation: Navigation = { ...payload };
+
+    if (this.viewTransitionsEnabled) {
+      navigation.viewTransition = this.shouldApplyViewTransition(payload);
+    }
+
     // if router is not started yet delay current navigation without blocking promise resolving
     if (!this.started) {
       this.delayNavigation(navigation);
@@ -201,5 +220,73 @@ export class Router extends ClientRouter {
         this.delayedResolve = null;
         this.delayedReject = null;
       });
+  }
+
+  private shouldApplyViewTransition(navigation: Navigation) {
+    const from = navigation.from.actualPath;
+    const to =
+      navigation.to.redirect !== undefined
+        ? this.resolve(navigation.to.redirect)?.actualPath
+        : navigation.to?.actualPath;
+
+    // If View Transition enabled to current navigation, save it
+    if (navigation.viewTransition) {
+      const toPaths = this.appliedViewTransitions.get(from);
+
+      if (this.appliedViewTransitions.get(from)) {
+        toPaths.add(to);
+      } else {
+        this.appliedViewTransitions.set(from, new Set([to]));
+      }
+
+      return true;
+    }
+
+    const priorPaths = this.appliedViewTransitions.get(from);
+
+    // If we were on the route with view transition previously,
+    // then there must be back navigation with view transition also
+    if (priorPaths !== undefined && priorPaths.has(to)) {
+      return true;
+    }
+
+    // If we don't have a previous forward navigation, assume we are
+    // going back from the new route and enable view transition if it
+    // was previously enabled
+    return this.appliedViewTransitions.has(to);
+  }
+
+  private restoreAppliedViewTransitions() {
+    try {
+      const valueFromStorage = sessionStorage.getItem(APPLIED_VIEW_TRANSITIONS_KEY);
+
+      if (valueFromStorage !== null) {
+        const parsedValue = JSON.parse(valueFromStorage);
+
+        this.appliedViewTransitions = new Map(
+          Object.entries(parsedValue).map(([key, value]) => [key, new Set(value as Array<string>)])
+        );
+
+        return;
+      }
+
+      this.appliedViewTransitions = new Map();
+    } catch (error) {
+      this.appliedViewTransitions = new Map();
+    }
+  }
+
+  private saveAppliedViewTransitions() {
+    if (this.appliedViewTransitions.size > 0) {
+      try {
+        const valueToSave = {};
+
+        for (const [key, value] of this.appliedViewTransitions) {
+          valueToSave[key] = [...value];
+        }
+
+        sessionStorage.setItem(APPLIED_VIEW_TRANSITIONS_KEY, JSON.stringify(valueToSave));
+      } catch (error) {}
+    }
   }
 }

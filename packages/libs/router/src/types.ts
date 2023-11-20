@@ -35,6 +35,7 @@ export interface BaseNavigateOptions {
 
 export interface NavigateOptions extends BaseNavigateOptions {
   url?: string;
+  viewTransition?: boolean;
 }
 
 export type UpdateCurrentRouteOptions = BaseNavigateOptions;
@@ -66,6 +67,11 @@ export interface Navigation {
    * Defines internally within the router
    */
   key?: number;
+
+  /**
+   * Activates View Transition to this navigation
+   */
+  viewTransition?: boolean;
 }
 
 export type NavigationGuard = (

@@ -6,3 +6,17 @@ import type { NavigationRoute } from '../../types';
 export const RouterContext = createContext<AbstractRouter>(null);
 export const RouteContext = createContext<NavigationRoute>(null);
 export const UrlContext = createContext<Url>(null);
+
+export type ViewTransitionState =
+  | {
+      isTransitioning: false;
+    }
+  | {
+      isTransitioning: true;
+      currentRoute: NavigationRoute;
+      nextRoute: NavigationRoute;
+    };
+
+export const ViewTransitionContext = createContext<ViewTransitionState>({
+  isTransitioning: false,
+});

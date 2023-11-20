@@ -146,12 +146,12 @@ const deferredAction = declareAction({
 
 const Page: PageComponent = () => {
   // highlight-next-line
-  useRoute();
+  const { params } = useRoute();
 
   return (
     <>
       <Header />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div>Loading...</div>} key={params.id}>
         <Await action={deferredAction}>
           {(data) => <div>Result: {JSON.stringify(data)}</div>}
         </Await>

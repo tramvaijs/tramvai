@@ -1,11 +1,16 @@
+import type { ReactNode, AnchorHTMLAttributes } from 'react';
 import { isValidElement, cloneElement, useCallback, useState } from 'react';
 import { useNavigate } from '@tinkoff/router';
+import type { NavigateOptions } from '@tinkoff/router';
+
 import { usePrefetch } from '../hooks/usePrefetch';
 
-interface Props {
-  // если передан react элемент, то он будет использован в качестве компонента для рендера и в него будут переданы агрументы href и onClick
+type AnchorLinkProps = Pick<AnchorHTMLAttributes<HTMLAnchorElement>, 'id' | 'className' | 'style'>;
+
+interface Props extends Partial<AnchorLinkProps> {
+  // если передан react элемент, то он будет использован в качестве компонента для рендера и в него будут переданы аргументы href и onClick
   // иначе будет отрендерен html-элемент <a> с переданной ссылкой и текстом из children
-  children?: any;
+  children?: ReactNode;
   // урл для перехода
   url: string;
   // get-параметры для перехода
@@ -17,12 +22,18 @@ interface Props {
   // калбек, при клике на ссылку
   onClick?: Function;
   // дополнительные опции перехода
-  navigateOptions?: Record<string, any>;
+  navigateOptions?: Partial<NavigateOptions>;
   /**
    * @description enable or disable target page resources prefetching
    * @default true
    */
   prefetch?: boolean;
+
+  /**
+   * @description enable view transition for underlying navigation
+   * @default false
+   */
+  viewTransition?: boolean;
 }
 
 function Link(props: Props) {
@@ -35,9 +46,10 @@ function Link(props: Props) {
     target,
     navigateOptions,
     prefetch = true,
+    viewTransition = false,
     ...otherProps
   } = props;
-  const navigate = useNavigate({ url, query, replace, ...navigateOptions });
+  const navigate = useNavigate({ url, query, replace, viewTransition, ...navigateOptions });
   const [linkElement, setLinkElement] = useState(null);
 
   usePrefetch({
@@ -68,7 +80,11 @@ function Link(props: Props) {
     [navigate, target, onClick]
   );
 
-  const extraProps = { href: url, onClick: handleClick, target };
+  const extraProps = {
+    href: url,
+    onClick: handleClick,
+    target,
+  };
 
   if (isValidElement(children)) {
     return cloneElement(children, {

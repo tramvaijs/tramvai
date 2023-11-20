@@ -11,6 +11,7 @@ title: Overview
 - [Router Guards](03-features/07-routing/05-hooks-and-guards.md) to check the availability of a route under specific conditions
 - Subscriptions to different stages of the transition through [Router Hooks](03-features/07-routing/05-hooks-and-guards.md)
 - React integration by [components and hooks](03-features/07-routing/04-links-and-navigation.md)
+- Support for [View Transitions API](03-features/07-routing/11-view-transitions.md)
 
 ### Client routing with/without SPA transitions
 

@@ -4,8 +4,8 @@ import type { PageComponent } from '@tramvai/react';
 import { lazy } from '@tramvai/react';
 import { Suspense } from 'react';
 
-const LazyTitle = lazy(() => import('../../components/features/Title/Title'));
-const LazyData = lazy(() => import('../../components/features/Data/Data'));
+const LazyTitle = lazy(() => import('../../components/features/Title/Title'), { suspense: true });
+const LazyData = lazy(() => import('../../components/features/Data/Data'), { suspense: true });
 
 const longDeferredAction = declareAction({
   name: 'longDeferred',
