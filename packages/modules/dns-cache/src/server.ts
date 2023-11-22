@@ -2,13 +2,13 @@ import noop from '@tinkoff/utils/function/noop';
 import http from 'http';
 import https from 'https';
 import dns from 'dns';
+import type { CacheInstance } from 'cacheable-lookup';
 import CacheableLookup from 'cacheable-lookup';
 import { declareModule, provide, commandLineListTokens, Scope, createToken } from '@tramvai/core';
-import type { Cache } from '@tramvai/tokens-common';
 import { DEFAULT_HTTP_CLIENT_INTERCEPTORS } from '@tramvai/tokens-http-client';
 import { CREATE_CACHE_TOKEN, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
 
-const DNS_LOOKUP_CACHE_TOKEN = createToken<Cache>('dnsLookupCache');
+const DNS_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsLookupCache');
 
 export const TramvaiDnsCacheModule = declareModule({
   name: 'TramvaiDnsCacheModule',
@@ -113,7 +113,24 @@ export const TramvaiDnsCacheModule = declareModule({
         const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
         const ttl = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
 
-        return createCache('memory', { max, ttl });
+        const cache = createCache('memory', { max, ttl });
+
+        const adapter: CacheInstance = {
+          set: (hostname: string, entries: any[], ttl: number): any => {
+            return cache.set(hostname, entries, { ttl });
+          },
+          get: (hostname: string): any => {
+            return cache.get(hostname);
+          },
+          delete: (hostname: string): boolean => {
+            return cache.delete(hostname);
+          },
+          clear: (): void => {
+            return cache.clear();
+          },
+        };
+
+        return adapter;
       },
       deps: {
         createCache: CREATE_CACHE_TOKEN,

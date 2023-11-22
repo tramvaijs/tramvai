@@ -1,4 +1,5 @@
-import { Provider, provide } from '@tinkoff/dippy';
+import type { Provider } from '@tinkoff/dippy';
+import { provide } from '@tinkoff/dippy';
 import { LAYOUT_OPTIONS, TRAMVAI_RENDER_MODE } from '@tramvai/tokens-render';
 import { pageRenderHOC } from './PageRenderWrapper';
 import {

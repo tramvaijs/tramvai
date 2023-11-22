@@ -31,7 +31,7 @@
   "dependencies": {
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/hook-runner": "0.0.0-stub",
-    "@tinkoff/lru-cache-nano": "^7.8.1",
+    "@tinkoff/lru-cache-nano": "^7.9.0",
     "@akashbabu/lfu-cache": "1.0.2",
     "@tinkoff/pubsub": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",

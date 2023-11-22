@@ -3,8 +3,26 @@ import LFU from '@akashbabu/lfu-cache';
 import type { CacheFactory } from '@tramvai/tokens-common';
 
 class LFUToCacheAdapter extends LFU<any> {
+  set(key: string, value: any, options?: { ttl: number }): any {
+    return this.set(key, value);
+  }
+
   has(key: string) {
     return typeof this.get(key) !== 'undefined';
+  }
+
+  dump(): Array<[string, { value: any }]> {
+    const arr: Array<[string, { value: any }]> = [];
+
+    this.forEach(([key, value]) => arr.push([key, { value }]));
+
+    return arr;
+  }
+
+  load(arr: Array<[string, { value: any }]>) {
+    arr.forEach(([key, { value }]) => {
+      this.set(key, value);
+    });
   }
 }
 

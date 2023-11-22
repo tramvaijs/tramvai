@@ -15,7 +15,7 @@ const defaults = [
   'ios_saf >= 10',
   'OperaMobile >= 48',
   'FirefoxAndroid >= 68',
-  'Samsung >= 2',
+  'Samsung >= 4',
   'Android >= 5',
   'UCAndroid >= 11',
 ];

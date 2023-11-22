@@ -26,10 +26,12 @@ export const CLEAR_CACHE_TOKEN = createToken<(type?: string) => Promise<void>>('
 
 export interface Cache<T = any> {
   get(key: string): T | undefined;
-  set(key: string, value: T): void;
+  set(key: string, value: T, options?: { ttl?: number }): void;
   has(key: string): boolean;
   delete(key: string): boolean;
   clear(): void;
+  dump(): Array<[string, { value: T }]>;
+  load(arr: Array<[string, { value: T }]>): void;
 }
 
 export type CacheType = 'memory' | 'memory-lfu';
