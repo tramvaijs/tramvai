@@ -1,18 +1,17 @@
 import noop from '@tinkoff/utils/function/noop';
 import pathEq from '@tinkoff/utils/object/pathEq';
-import type { Reporter, LogObj } from '../logger.h';
+import type { Reporter, LogObj, EmitLevels } from '../logger.h';
 import type { LEVELS } from '../constants';
 import { formatJson } from './utils/formatJson';
 
-type EmitLevels = Partial<Record<keyof typeof LEVELS, boolean>>;
 type MakeRequest = (logObj: Record<string, any>) => Promise<any>;
 
 export class RemoteReporter implements Reporter {
+  readonly emitLevels: EmitLevels;
+
   private requestCount: number;
 
   private makeRequest: MakeRequest;
-
-  private emitLevels: EmitLevels;
 
   private reqCount = 0;
 

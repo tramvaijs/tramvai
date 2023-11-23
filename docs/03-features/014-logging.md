@@ -19,7 +19,6 @@ Token `LOGGER_TOKEN` provides a [logger factory](#logger) with shared across all
 - [Logs filters](references/libs/logger.md#filter)
 - [Logs extensions](references/libs/logger.md#extension)
 - [Reporters](references/libs/logger.md#reporter)
-- [BeforeReporters](references/libs/logger.md#beforereporter)
 
 ### Available reporters
 
@@ -173,9 +172,20 @@ Works only with [@tinkoff/request](https://tinkoff.github.io/tinkoff-request/)
 
 Plugin automatically generates names for loggers using template `request.${name}` that might be used to setting up [displaying of logs](#display-logs):
 
-```tsx
-const logger = di.get(LOGGER_TOKEN);
-const makeRequest = request([...otherPlugins, logger({ name: 'my-api-name', logger })]);
+```ts
+const provider = provide({
+  provide: MY_HTTP_CLIENT,
+  useFactory: ({ factory, envManager }) => {
+    return factory({
+      name: 'my-api-name',
+      baseUrl: envManager.get('MY_API_URL'),
+    });
+  },
+  deps: {
+    factory: HTTP_CLIENT_FACTORY,
+    envManager: ENV_MANAGER_TOKEN,
+  },
+});
 ```
 
 As name of the logger equals to `my-api-name` to show logs:
@@ -197,11 +207,14 @@ For example, if we want to send logs with levels `error` and `fatal` to url decl
 
 ```ts
 import { createToken, provide, Scope, APP_INFO_TOKEN } from '@tramvai/core';
-import { ENV_USED_TOKEN, ENV_MANAGER_TOKEN, LOGGER_INIT_HOOK } from '@tramvai/tokens-common';
+import {
+  ENV_USED_TOKEN,
+  ENV_MANAGER_TOKEN,
+  LOGGER_INIT_HOOK,
+  LOGGER_REMOTE_REPORTER,
+} from '@tramvai/tokens-common';
 import { RemoteReporter } from '@tinkoff/logger';
 import { isUrl } from '@tinkoff/env-validators';
-
-const REMOTE_REPORTER = createToken<RemoteReporter>('remoteReporter');
 
 const providers = [
   // provide new env variable with logs collector endpoint
@@ -214,7 +227,7 @@ const providers = [
   }),
   // provide new remote reporter
   provide({
-    provide: REMOTE_REPORTER,
+    provide: LOGGER_REMOTE_REPORTER,
     // we need only one instance of reporter
     scope: Scope.SINGLETON,
     useFactory: ({ appInfo, envManager, wuid }) => {
@@ -245,22 +258,63 @@ const providers = [
       envManager: ENV_MANAGER_TOKEN,
     },
   }),
-  // add reporter to logger
-  provide({
-    provide: LOGGER_INIT_HOOK,
-    multi: true,
-    useFactory({ remoteReporter }) {
-      return (loggerInstance) => {
-        loggerInstance.addBeforeReporter(remoteReporter);
-      };
-    },
-    deps: {
-      remoteReporter: REMOTE_REPORTER,
-    },
-  }),
 ];
 ```
 
-### How to properly format logs
+### How to override emit level for remote logs?
+
+When you are using `LOGGER_REMOTE_REPORTER`, all logs with default `remote` property always will be passed to remote reporter (meantime any other logs will be filtered by current emit level configured with `logger.setLevel` or `LOG_LEVEL` variables):
+
+```ts
+// remote has priority over RemoteReporter emitLevels
+const log1 = logger({ name: 'test', defaults: { remote: true } });
+
+// remote.emitLevels has priority over RemoteReporter emitLevels
+const log2 = logger({ name: 'test', defaults: { remote: { emitLevels: { info: true } } } });
+
+// send to API
+log1.info('first');
+log2.info('second');
+
+// not sended to API
+log2.trace('second');
+```
+
+### How to extend logs by user-specific data?
+
+For example, you want to add `User-Agent` to all logs for concrete user.
+
+Logger extensions registered in `LOGGER_INIT_HOOK` provider is not suitable for this case, because registration finishes early, at singletone scope, because of that request-specific providers are not available for this token at server-side.
+
+It is not a problem for client code, but mostly we want to have one consistent way of extending logs.
+
+For that, token `LOGGER_SHARED_CONTEXT` was created. At server-side, [AsyncLocalStorage](https://nodejs.org/api/async_hooks.html#class-asynclocalstorage) is used, and a simple `Map` object at client-side.
+
+```ts
+import { commandLineListTokens, provide } from '@tramvai/core';
+import { LOGGER_SHARED_CONTEXT } from '@tramvai/tokens-common';
+
+const provider = provide({
+  // first stage at server-side, where `asyncLocalStorage` context is available
+  provide: commandLineListTokens.customerStart,
+  useFactory: ({ loggerSharedContext, requestManager }) => {
+    return function updateLoggerContext() {
+      // depend of environment read UserAgent from request object or window.navigator
+      const userAgent = typeof window === 'undefined'
+        ? requestManager.getHeader('user-agent')
+        : window.navigator.userAgent;
+
+      // `userAgent` property will be added to all logs, sended after `customerStart` stage
+      loggerSharedContext.set('userAgent', userAgent);
+    };
+  },
+  deps: {
+    loggerSharedContext: LOGGER_SHARED_CONTEXT,
+    requestManager: REQUEST_MANAGER_TOKEN, 
+  },
+});
+```
+
+### How to properly format logs?
 
 See [@tinkoff/logger](references/libs/logger.md#how-to-log-properly) library documentation

@@ -155,33 +155,33 @@ Reporters can change the way logs are showed (json, fancy logs in browser, send 
 
 Be default, enabled only reporters for displaying logs in console based on [display logs settings](#display-logs)
 
-Reporters are depends of logger level settings as reporters will not be called if level of the current log are lower than display logs setting
+Reporters are depends of logger level settings as reporters will not be called if level of the current log are lower than display logs setting (except reporters with [emitLevels](#emitLevels) property).
 
 ```tsx
 import { logger } from '@tinkoff/logger';
 
 interface Reporter {
   log(logObj: LogObj): void;
+
+  emitLevels?: {
+    trace?: boolean;
+    debug?: boolean;
+    info?: boolean;
+    warn?: boolean;
+    error?: boolean;
+    fatal?: boolean;
+  }
 }
 
 logger.addReporter(reporter as Reporter); // add new reporter to list of previously added reporters
 logger.setReporters([reporter1, reporter2]); // replace current reporters with passed list. that allows to override default settings
 ```
 
-#### BeforeReporter
+##### emitLevels
 
-Same as usual `Reporter` but `BeforeReporter` are called unconditionally for every log and get called before any other extension.
+Reporters with `emitLevels` property will be called independently of display logs settings.
 
-```tsx
-import { logger } from '@tinkoff/logger';
-
-interface Reporter {
-  log(logObj: LogObj): void;
-}
-
-logger.addBeforeReporter(reporter as Reporter); // add new beforeReporter to list of previously added beforeReporter
-logger.setBeforeReporters([reporter1, reporter2]); // replace current beforeReporters with passed list. that allows to override default settings
-```
+By default, bundled [RemoteReporter](#RemoteReporter) use this property for logs filter.
 
 ### Bundled Reporters
 
@@ -226,12 +226,12 @@ const log = logger({ name: 'test-remote' }); // settings for remote will be inhe
 log.error('error'); // will be sent to api
 log.info('test'); // will not be sent to api
 
-const remoteLog = logger({ name: 'remote-for-all', remote: true }); // `remote` allows to override settings from RemoteReporter and send logs unconditionally
+const remoteLog = logger({ name: 'remote-for-all', defaults: { remote: true } }); // `remote` allows to override settings from RemoteReporter and send logs unconditionally
 
 remoteLog.info('test'); // will be sent to api
 remoteLog.debug('test'); // will be sent to api
 
-const traceLog = logger({ name: 'log-trace', emitLevels: { trace: true } }); // override RemoteReporter settings
+const traceLog = logger({ name: 'log-trace', defaults: { remote: { emitLevels: { trace: true } }}}); // override RemoteReporter settings
 
 traceLog.trace('test'); // will be sent to api
 traceLog.error('test'); // will not be sent to api

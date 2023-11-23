@@ -5,6 +5,9 @@ export type Options = {
   key?: string;
   enabled?: boolean;
   level?: LogLevel;
+  /**
+   * @deprecated use reporters
+   */
   beforeReporters?: Reporter[];
   reporters?: Reporter[];
   filters?: Filter[];
@@ -38,8 +41,13 @@ export interface Logger {
   trace: LogFn;
 
   child(options: Options | string): Logger;
-
+  /**
+   * @deprecated use addReporter
+   */
   addBeforeReporter(reporter: Reporter): void;
+  /**
+   * @deprecated use setReporters
+   */
   setBeforeReporters(reporters: Reporter | Reporter[]): void;
   addReporter(reporter: Reporter): void;
   setReporters(reporters: Reporter | Reporter[]): void;
@@ -67,6 +75,8 @@ export type Factory = Logger & LoggerStatic & ((configOrName: string | Options) 
 
 export type LogLevel = keyof typeof LEVELS;
 
+export type EmitLevels = Partial<Record<keyof typeof LEVELS, boolean>>;
+
 export interface LogObj {
   name: string;
   date: Date;
@@ -77,6 +87,7 @@ export interface LogObj {
 }
 
 export interface Reporter {
+  emitLevels?: EmitLevels;
   log(logObj: LogObj): void;
 }
 

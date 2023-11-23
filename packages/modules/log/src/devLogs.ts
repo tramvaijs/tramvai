@@ -177,8 +177,6 @@ export const clientProviders: Provider[] = [
 
         const ssrLogger = logger({
           name: 'ssr-logger',
-          // сетим пустой массив в beforeReporters, чтобы не подтягивать настройки рутового логгера с RemoteReporter
-          beforeReporters: [],
           reporters: [new BrowserReporter()],
           extensions: [new DevLogsExtension(logs)],
         });

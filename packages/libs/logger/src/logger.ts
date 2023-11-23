@@ -182,11 +182,11 @@ class Logger implements LoggerInterface {
   }
 
   addBeforeReporter(reporter: Reporter) {
-    this.beforeReporters = this.beforeReporters.concat(reporter);
+    this.reporters = this.reporters.concat(reporter);
   }
 
   setBeforeReporters(reporters: Reporter | Reporter[]) {
-    this.beforeReporters = toArray(reporters);
+    this.reporters = toArray(reporters);
   }
 
   addReporter(reporter: Reporter) {
@@ -245,22 +245,6 @@ class Logger implements LoggerInterface {
   private log(level: number, args: LogArgs) {
     let logObj: LogObj;
 
-    if (this.beforeReporters.length) {
-      logObj = this.createLogObj(level, args);
-    }
-
-    for (const reporter of this.beforeReporters) {
-      reporter.log(logObj);
-    }
-
-    if (typeof this.level === 'undefined') {
-      if (level > Logger.level) {
-        return false;
-      }
-    } else if (level > this.level) {
-      return false;
-    }
-
     if (!logObj) {
       logObj = this.createLogObj(level, args);
     }
@@ -275,8 +259,17 @@ class Logger implements LoggerInterface {
       logObj = extension.extend(logObj);
     }
 
+    const emitLevelCheckFailed = level > (this.level ?? Logger.level);
+
     for (const reporter of this.reporters) {
-      reporter.log(logObj);
+      if (emitLevelCheckFailed) {
+        // send logs to reporters with emitLevels without filter by level
+        if (reporter.emitLevels) {
+          reporter.log(logObj);
+        }
+      } else {
+        reporter.log(logObj);
+      }
     }
 
     return true;

@@ -59,7 +59,7 @@ import { sharedProviders } from './shared';
         });
 
         return () => {
-          logger.addBeforeReporter(instantMetricsReporter);
+          logger.addReporter(instantMetricsReporter);
         };
       },
       deps: {

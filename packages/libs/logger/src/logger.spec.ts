@@ -1,6 +1,7 @@
 import matchers from 'expect/build/matchers';
 import { Logger } from './logger';
 import { LEVELS } from './constants';
+import { RemoteReporter } from './reporters';
 
 jest.setSystemTime(0);
 
@@ -69,6 +70,13 @@ describe('@tinkoff/logger', () => {
     const reporter2 = {
       log: jest.fn(),
     };
+    const remoteReporter = new RemoteReporter({
+      requestCount: 1,
+      emitLevels: { error: true },
+      makeRequest: () => Promise.resolve(),
+    });
+
+    jest.spyOn(remoteReporter, 'log');
 
     beforeEach(() => {
       reporter1.log.mockClear();
@@ -142,96 +150,27 @@ describe('@tinkoff/logger', () => {
         ],
       });
     });
-  });
 
-  describe('beforeReporters', () => {
-    const reporter1 = {
-      log: jest.fn(),
-    };
-    const reporter2 = {
-      log: jest.fn(),
-    };
+    it('should pass all logs to reporters with emitLevels property', () => {
+      const logger = new Logger({
+        name: '',
+        level: 'error',
+        reporters: [reporter1, remoteReporter],
+        defaults: { remote: true },
+      });
 
-    beforeEach(() => {
-      reporter1.log.mockClear();
-      reporter2.log.mockClear();
-    });
+      logger.info({ event: 'test' });
 
-    it('beforeReporters can be dynamically added', () => {
-      const logger = new Logger({ name: '' });
-
-      logger.error({ event: 'err', message: '1' });
-      expect(reporter1.log).not.toHaveBeenCalled();
-      expect(reporter2.log).not.toHaveBeenCalled();
-
-      logger.addBeforeReporter(reporter1);
-      logger.error({ event: 'err', message: '2' });
-
-      expect(reporter1.log).toMatchLog({ event: 'err', message: '2' });
-      expect(reporter2.log).not.toHaveBeenCalled();
-
-      logger.addBeforeReporter(reporter2);
-      logger.error({ event: 'err', message: '3' });
-      expect(reporter1.log).toMatchLog({ event: 'err', message: '3' });
-      expect(reporter2.log).toMatchLog({ event: 'err', message: '3' });
-    });
-
-    it('beforeReporters can be replaced', () => {
-      const logger = new Logger({ name: '', beforeReporters: [reporter1] });
-
-      logger.error('test1');
-
-      expect(reporter1.log).toMatchLog('test1');
-      expect(reporter2.log).not.toHaveBeenCalled();
-
-      logger.setBeforeReporters([reporter2]);
-
-      logger.error('test2');
-      expect(reporter1.log).not.toMatchLog('test2');
-      expect(reporter2.log).toMatchLog('test2');
-    });
-
-    it('should call beforeReporters on log', () => {
-      const logger = new Logger({ name: '', beforeReporters: [reporter1, reporter2] });
-
-      logger.info('test');
-      expect(reporter1.log).toHaveBeenCalledWith({
+      expect(reporter1.log).not.toBeCalled();
+      expect(remoteReporter.log).toHaveBeenCalledWith({
         type: 'info',
         level: 30,
         name: '',
         date: new Date(),
-        args: ['test'],
-      });
-      expect(reporter2.log).toHaveBeenCalledWith({
-        type: 'info',
-        level: 30,
-        name: '',
-        date: new Date(),
-        args: ['test'],
-      });
-
-      logger.error({ event: 'err', message: 'testError' });
-      expect(reporter1.log).toHaveBeenCalledWith({
-        type: 'error',
-        level: 10,
-        name: '',
-        date: new Date(),
+        remote: true,
         args: [
           {
-            event: 'err',
-            message: 'testError',
-          },
-        ],
-      });
-      expect(reporter2.log).toHaveBeenCalledWith({
-        type: 'error',
-        level: 10,
-        name: '',
-        date: new Date(),
-        args: [
-          {
-            event: 'err',
-            message: 'testError',
+            event: 'test',
           },
         ],
       });

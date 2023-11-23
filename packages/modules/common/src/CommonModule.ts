@@ -25,10 +25,9 @@ import { ComponentRegistry } from './componentRegistry/componentRegistry';
 import { RequestManagerModule } from './requestManager/RequestManagerModule';
 import { ResponseManagerModule } from './responseManager/ResponseManagerModule';
 import { createConsumerContext } from './createConsumerContext/createConsumerContext';
-
 import { CommandModule } from './command/CommandModule';
 import { PubSubModule } from './pubsub/PubSubModule';
-
+import { AsyncLocalStorageModule } from './async-local-storage/server';
 import { providers as serverProviders } from './providers/serverProviders';
 import { ActionModule } from './actions/ActionModule';
 import { StateModule } from './state/StateModule';
@@ -47,6 +46,7 @@ import { ExecutionContextManager } from './executionContext/executionContextMana
     RequestManagerModule,
     ResponseManagerModule,
     CacheModule,
+    AsyncLocalStorageModule,
   ],
   providers: [
     provide({
