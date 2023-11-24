@@ -157,6 +157,13 @@ export class DedupePlugin {
       for (const moduleId of v) {
         const module = compilation.findModule(moduleId);
 
+        // по какой-то причине модуль не нашелся в Compilation, хотя был обработан в normalModuleFactory
+        // @TODO: при возникновении проблем с DedupePlugin в будущем, еще раз исследовать этот кейс
+        if (!module) {
+          v.delete(moduleId);
+          continue;
+        }
+
         bestModule = bestModule ?? module;
         bestModule = this.pickBetterModule(bestModule, module);
       }
