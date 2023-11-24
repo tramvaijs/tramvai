@@ -83,6 +83,7 @@ it('should populate defaults for config', () => {
           "fileSystemPages": {
             "enabled": false,
             "pagesDir": "pages",
+            "rootErrorBoundaryPath": "error.tsx",
             "routesDir": "routes",
           },
           "generateDataQaTag": false,
@@ -326,6 +327,7 @@ it('should populate defaults for overridable options', () => {
           "fileSystemPages": {
             "enabled": true,
             "pagesDir": "pages",
+            "rootErrorBoundaryPath": "error.tsx",
             "routesDir": "routes",
           },
           "generateDataQaTag": false,

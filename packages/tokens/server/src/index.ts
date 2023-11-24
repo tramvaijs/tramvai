@@ -1,6 +1,7 @@
 import type { Server } from 'http';
 import { createToken } from '@tinkoff/dippy';
 import type { Papi } from '@tramvai/papi';
+import type { AnyError } from '@tramvai/safe-strings';
 
 declare module '@tramvai/papi' {
   export interface Options {
@@ -132,6 +133,14 @@ export const LIVENESS_PROBE_TOKEN = createToken<() => Promise<any>>('liveness-pr
  * Enable Early Hints. By default return `true` when `EARLY_HINTS_ENABLED` env variable has a `"true"` value
  */
 export const EARLY_HINTS_ENABLED_TOKEN = createToken<() => boolean>('early hints enabled');
+
+/**
+ * @description
+ *  Provide custom error for root error boundary in case of static generation
+ */
+export const STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN = createToken<AnyError>(
+  'root error boundary static error'
+);
 
 export interface ServerModuleStaticsOptions {
   path: string;

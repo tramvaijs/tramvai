@@ -4,6 +4,7 @@ import isObject from '@tinkoff/utils/is/object';
 import prop from '@tinkoff/utils/object/prop';
 import mapObj from '@tinkoff/utils/object/map';
 import { resolve } from 'path';
+import fs from 'fs';
 import type { BuildType } from '../typings/projectType';
 import type { Env } from '../typings/Env';
 import type { ConfigEntry, OverridableOption } from '../typings/configEntry/common';
@@ -228,6 +229,16 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
         }
       }
     }
+
+    const rootErrorBoundaryPath = resolve(
+      config.rootDir,
+      config.root,
+      config.fileSystemPages.rootErrorBoundaryPath
+    );
+
+    config.fileSystemPages.rootErrorBoundaryPath = fs.existsSync(rootErrorBoundaryPath)
+      ? rootErrorBoundaryPath
+      : undefined;
   } else if (isChildApp(config)) {
     config.buildPath = resolve(rootDir, ...config.output.split('/'));
   } else if (isModule(config)) {

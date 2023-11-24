@@ -94,6 +94,11 @@
             "componentsPattern": {
               "title": "Test Regexp to add only files with specific name to list of FS Components",
               "type": "string"
+            },
+            "rootErrorBoundaryPath": {
+              "title": "Path to RootErrorBoundary component (relative to \"root\" directory)",
+              "default": "error.tsx",
+              "type": "string"
             }
           },
           "additionalProperties": false
@@ -1142,23 +1147,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6357": {
+                        "__@match@6358": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6359": {
+                        "__@replace@6360": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6362": {
+                        "__@search@6363": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6364": {
+                        "__@split@6365": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6366": {
+                        "__@matchAll@6367": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1815,23 +1820,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6357": {
+                        "__@match@6358": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6359": {
+                        "__@replace@6360": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6362": {
+                        "__@search@6363": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6364": {
+                        "__@split@6365": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6366": {
+                        "__@matchAll@6367": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2488,23 +2493,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6357": {
+                        "__@match@6358": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6359": {
+                        "__@replace@6360": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6362": {
+                        "__@search@6363": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6364": {
+                        "__@split@6365": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6366": {
+                        "__@matchAll@6367": {
                           "type": "object",
                           "additionalProperties": false
                         }

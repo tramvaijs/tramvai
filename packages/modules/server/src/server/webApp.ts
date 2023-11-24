@@ -25,6 +25,7 @@ import type {
 import { REACT_SERVER_RENDER_MODE, type FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { optional, provide } from '@tinkoff/dippy';
+import type { STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN } from '@tramvai/tokens-server';
 import { errorHandler } from './error';
 
 export const webAppFactory = ({ server }: { server: typeof SERVER_TOKEN }) => {
@@ -54,6 +55,7 @@ export const webAppInitCommand = ({
   beforeError,
   afterError,
   fetchWebpackStats,
+  staticRootErrorBoundaryError,
 }: {
   app: ExtractDependencyType<typeof WEB_FASTIFY_APP_TOKEN>;
   logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
@@ -67,6 +69,9 @@ export const webAppInitCommand = ({
   beforeError: ExtractDependencyType<typeof WEB_FASTIFY_APP_BEFORE_ERROR_TOKEN>;
   afterError: ExtractDependencyType<typeof WEB_FASTIFY_APP_AFTER_ERROR_TOKEN>;
   fetchWebpackStats: ExtractDependencyType<typeof FETCH_WEBPACK_STATS_TOKEN>;
+  staticRootErrorBoundaryError: ExtractDependencyType<
+    typeof STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN
+  >;
 }) => {
   const log = logger('server:webapp');
 
@@ -78,7 +83,13 @@ export const webAppInitCommand = ({
   };
 
   return async function webAppInit() {
-    errorHandler(app, { log, beforeError, afterError, fetchWebpackStats });
+    await errorHandler(app, {
+      log,
+      beforeError,
+      afterError,
+      fetchWebpackStats,
+      staticRootErrorBoundaryError,
+    });
 
     await app.register(async (instance) => {
       await runHandlers(instance, beforeInit);

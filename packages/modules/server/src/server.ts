@@ -8,7 +8,7 @@ import {
   APP_INFO_TOKEN,
   provide,
 } from '@tramvai/core';
-import { SERVER_TOKEN } from '@tramvai/tokens-server';
+import { STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN, SERVER_TOKEN } from '@tramvai/tokens-server';
 import { FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
 import {
   WEB_FASTIFY_APP_TOKEN,
@@ -111,6 +111,10 @@ EventEmitter.defaultMaxListeners = 50;
         beforeError: { token: WEB_FASTIFY_APP_BEFORE_ERROR_TOKEN, optional: true },
         afterError: { token: WEB_FASTIFY_APP_AFTER_ERROR_TOKEN, optional: true },
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
+        staticRootErrorBoundaryError: {
+          token: STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN,
+          optional: true,
+        },
       },
     },
     provide({

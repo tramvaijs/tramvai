@@ -174,6 +174,11 @@ export interface ApplicationConfigEntry extends CliConfigEntry {
      * @title Test Regexp to add only files with specific name to list of FS Components
      */
     componentsPattern: string;
+    /**
+     * @title Path to RootErrorBoundary component (relative to "root" directory)
+     * @default "error.tsx"
+     */
+    rootErrorBoundaryPath?: string;
   };
   /**
    * @title Configure the options on webpack splitChunks

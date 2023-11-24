@@ -112,6 +112,7 @@ describe('JSON schema для tramvai.json', () => {
             "fileSystemPages": {
               "enabled": false,
               "pagesDir": "pages",
+              "rootErrorBoundaryPath": "error.tsx",
               "routesDir": "routes",
             },
             "generateDataQaTag": false,

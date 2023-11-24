@@ -153,7 +153,7 @@ Root Error Boundary works only server-side
 
 :::
 
-You can provide this boundary by creating a file `error.tsx` in a project source directory with default export of the component.
+You can provide this boundary by creating a file `error.tsx` in a project source directory with default export of the component. You also can override path for `error.tsx` with option `rootErrorBoundaryPath` in tramvai configuration for application; path relative to project root.
 
 This components will have access to `error` and `url` props, and need to render complete HTML page, e.g.:
 
@@ -199,6 +199,17 @@ Also, this component will be hydrated, so, you can use any React features here.
 If this component also crashes at the rendering stage, in case of `HttpError` user will get an empty `response.body`, otherwise [finalhandler library](https://github.com/pillarjs/finalhandler) will send default HTML page with some information about error.
 
 :::
+
+`RootErrorBoundary` also generates the static page on the `tramvai static` command by path `_errors/5xx/index.html` in your output for static. In this scenario of rendering, the error object in props would be equal to this json:
+
+```json
+{
+  "name": "STATIC_ROOT_ERROR_BOUNDARY_ERROR",
+  "message": "Default error for root error boundary"
+}
+```
+
+You can rely on these constant values of errors to provide different renders for RootErrorBoundary. It's possible to override this error for the static page by providing a value for token `STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN` from `@tramvai/tokens-server`.
 
 ## How to
 

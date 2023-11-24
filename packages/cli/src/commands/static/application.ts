@@ -4,6 +4,7 @@ import path from 'path';
 import { node } from 'execa';
 import waitOn from 'wait-on';
 import envCi from 'env-ci';
+import isString from '@tinkoff/utils/is/string';
 import type { Context } from '../../models/context';
 import type { CommandResult } from '../../models/command';
 import type { ApplicationConfigEntry } from '../../typings/configEntry/application';
@@ -29,7 +30,7 @@ export const staticApp = async (
 
   await network.computeAvailablePorts();
 
-  const clientConfigManager = createConfigManager(configEntry, {
+  const clientConfigManager = createConfigManager<ApplicationConfigEntry>(configEntry, {
     env: 'production',
     ...options,
     buildType: 'client',
@@ -57,7 +58,11 @@ export const staticApp = async (
     });
   }
 
-  const { name, host, port, staticPort, staticHost, output } = serverConfigManager;
+  const {
+    host,
+    port,
+    fileSystemPages: { rootErrorBoundaryPath },
+  } = serverConfigManager;
   const root = serverConfigManager.buildPath;
   const assetsPrefix = process.env.ASSETS_PREFIX;
 
@@ -137,6 +142,11 @@ export const staticApp = async (
   });
 
   let paths = await appBundleInfo(serverConfigManager);
+
+  if (isString(rootErrorBoundaryPath)) {
+    // implicit connection with packages/modules/server/src/server/error.ts
+    paths.push('/_errors/5xx');
+  }
 
   if (options.onlyPages) {
     paths = intersection(paths, options.onlyPages);

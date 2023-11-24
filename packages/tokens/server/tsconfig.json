@@ -1,20 +1,23 @@
 {
-  "extends": "../../../tsconfig.lib.json",
-  "include": [
-    "./src"
-  ],
-  "compilerOptions": {
-    "declarationDir": "./lib",
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "strict": true
-  },
-  "references": [
-    {
-      "path": "../../libs/dippy"
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true
     },
-    {
-      "path": "../../tramvai/papi"
-    }
-  ]
+    "references": [
+        {
+            "path": "../../libs/dippy"
+        },
+        {
+            "path": "../../tramvai/papi"
+        },
+        {
+            "path": "../../libs/safe-strings"
+        }
+    ]
 }
