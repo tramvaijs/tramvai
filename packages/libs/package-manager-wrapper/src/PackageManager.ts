@@ -31,7 +31,7 @@ export interface DedupeOptions extends Options {
 }
 
 export abstract class PackageManager {
-  readonly name: 'npm' | 'yarn' | 'unknown' = 'unknown';
+  readonly name: 'npm' | 'yarn' | 'pnpm' | 'unknown' = 'unknown';
 
   protected rootDir: string;
   protected registry?: string;

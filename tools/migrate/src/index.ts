@@ -22,7 +22,7 @@ const log = logger('tramvai-migrate');
 logger.enable('tramvai-migrate');
 
 // eslint-disable-next-line max-statements
-(async () => {
+export async function run() {
   const { name: cwdPackageName } = await readJSON(resolve(cwd, 'package.json')).catch(() => ({}));
   const tramvaiJSONPath = await getTramvaiJSONPath(cwd);
 
@@ -110,6 +110,6 @@ logger.enable('tramvai-migrate');
   await writeJSON(appliedFilename, appliedInfo);
 
   log.info('Migrations successfully completed');
-})();
+}
 
 export * from './types';

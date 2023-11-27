@@ -4,6 +4,7 @@ import type { PackageManager, PackageManagerOptions } from './PackageManager';
 import { NpmPackageManager } from './NpmPackageManager';
 import { UnknownPackageManager } from './UnsupportedPackageManager';
 import { YarnPackageManager } from './YarnPackageManager';
+import { PnpmPackageManager } from './PnpmPackageManager';
 
 const checkLockFile = (rootDir: string, lockName: string) => {
   return existsSync(resolve(rootDir, lockName));
@@ -20,6 +21,8 @@ export const resolvePackageManager = (
     packageManager = new YarnPackageManager(packageManagerOptions);
   } else if (checkLockFile(rootDir, 'package-lock.json')) {
     packageManager = new NpmPackageManager(packageManagerOptions);
+  } else if (checkLockFile(rootDir, 'pnpm-lock.yaml')) {
+    packageManager = new PnpmPackageManager(packageManagerOptions);
   } else {
     if (throwUnknown) {
       throw new Error(`Cannot find supported packageManager in "${rootDir}"`);

@@ -65,6 +65,7 @@ export default async function createNew(context: Context, params: Params): Promi
   const sharedDir = getPathToShared();
   const blockDir = getPathToBlock(type);
   const isNpm = packageManager === 'npm';
+  const isYarn = packageManager === 'yarn';
   const isJest = testingFramework === 'jest';
 
   const blockDirectoryName = {
@@ -72,12 +73,13 @@ export default async function createNew(context: Context, params: Params): Promi
     multirepo: 'src',
   }[template];
 
-  await renderTemplate(templateDir, directoryName, { configEntry, isJest, isNpm });
-  await renderTemplate(sharedDir, directoryName, { configEntry, isJest, isNpm });
+  await renderTemplate(templateDir, directoryName, { configEntry, isJest, isNpm, isYarn });
+  await renderTemplate(sharedDir, directoryName, { configEntry, isJest, isNpm, isYarn });
   await renderTemplate(blockDir, path.join(directoryName, blockDirectoryName), {
     configEntry,
     isJest,
     isNpm,
+    isYarn,
   });
   if (template === 'monorepo') {
     const monorepoBlockDir = getPathToMonorepoBlock();

@@ -70,7 +70,7 @@ const devDependencies = [
   'typescript',
 ];
 
-const packagesInstallCommands = {
+const packagesInstallCommands: Record<PackageManagers, { deps: string[]; devDeps: string[] }> = {
   npm: {
     deps: ['install', '--save', '--package-lock', '--legacy-peer-deps'],
     devDeps: ['install', '--save-dev', '--legacy-peer-deps'],
@@ -78,6 +78,10 @@ const packagesInstallCommands = {
   yarn: {
     deps: ['add'],
     devDeps: ['add', '--dev'],
+  },
+  pnpm: {
+    deps: ['add'],
+    devDeps: ['add', '--save-dev'],
   },
 };
 

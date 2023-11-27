@@ -22,7 +22,7 @@ class NewCommand extends CLICommand<Params> {
     {
       name: '--packageManager',
       value: '[packageManager]',
-      description: 'Package manager for the project <npm|yarn>',
+      description: 'Package manager for the project <npm|yarn|pnpm>',
     },
     {
       name: '--testingFramework',

@@ -1,6 +1,6 @@
-type PackageManagers = 'npm' | 'yarn';
+type PackageManagers = 'npm' | 'yarn' | 'pnpm';
 
-const choices = ['npm', 'yarn'];
+const choices = ['npm', 'yarn', 'pnpm'];
 
 const packageManagerQuestion = (answer: string) => ({
   type: 'list' as const,
