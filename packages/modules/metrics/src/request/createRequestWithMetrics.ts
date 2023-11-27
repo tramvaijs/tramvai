@@ -12,6 +12,7 @@ const POSSIBLE_ERRORS = [
   'ETIMEDOUT',
 ];
 
+// eslint-disable-next-line max-statements
 export const getUrlAndOptions = (args: Args) => {
   let url;
   let options;

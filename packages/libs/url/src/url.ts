@@ -151,7 +151,16 @@ export const addQuery = (url: UrlString, query: Query) => {
 
 /* eslint-disable no-param-reassign */
 export const rawAssignUrl = (url: URL, params: FormatParams) => {
-  const { href, path, query, origin, port, username, password, ...rest } = params;
+  const { path, query, port, username, password } = params;
+  // we can't use `{ ...rest } = URL` in Node.js >= 20 because of https://github.com/nodejs/node/pull/46904/files
+  const rest = {
+    hash: params.hash,
+    host: params.host,
+    hostname: params.hostname,
+    pathname: params.pathname,
+    protocol: params.protocol,
+    search: params.search,
+  };
 
   if (path) {
     const parsedPath = fromPath(path);
@@ -178,9 +187,19 @@ export const rawAssignUrl = (url: URL, params: FormatParams) => {
     url.password = password;
   }
 
-  // убираем на всякий случай все параметры которые могут вызвать ошибку при присваивании
-  // в объект Url, например, чтобы явно не скрывать их при работе с результатом вызова parse
-  Object.assign(url, rest);
+  // we need to add main params to new url, usually it is host and pathname.
+  // and we can't pass undefined values, it can replace other dependent URL parameters
+  for (const key in rest) {
+    type UrlKey = keyof Pick<
+      URL,
+      'hash' | 'host' | 'hostname' | 'pathname' | 'protocol' | 'search'
+    >;
+    const value = rest[key as UrlKey];
+
+    if (typeof value !== 'undefined') {
+      url[key as unknown as UrlKey] = value;
+    }
+  }
 
   if (typeof port !== 'undefined') {
     url.port = port;
