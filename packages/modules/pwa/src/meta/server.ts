@@ -1,7 +1,7 @@
 import { declareModule, provide } from '@tramvai/core';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 import { appConfig } from '@tramvai/cli/lib/external/config';
-import type { PwaMetaOptions } from '@tramvai/cli';
+import type { PwaMetaOptions } from '@tramvai/cli/lib/typings/public';
 import { PWA_META_TOKEN } from '../tokens';
 
 const metaMap: Record<keyof PwaMetaOptions, string> = {

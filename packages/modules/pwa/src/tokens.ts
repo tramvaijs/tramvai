@@ -1,6 +1,6 @@
 import { createToken } from '@tinkoff/dippy';
 import type { Workbox } from 'workbox-window';
-import type { PwaMetaOptions } from '@tramvai/cli';
+import type { PwaMetaOptions } from '@tramvai/cli/lib/typings/public';
 
 export type WebManifest = {
   [key: string]: any;

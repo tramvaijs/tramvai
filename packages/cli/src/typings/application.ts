@@ -20,19 +20,23 @@ declare module '*.woff2' {
 type ImageString = string;
 
 declare module '*.png' {
-  export default ImageString;
+  const src: ImageString;
+  export default src;
   export const image: ImageObject;
 }
 declare module '*.jpg' {
-  export default ImageString;
+  const src: ImageString;
+  export default src;
   export const image: ImageObject;
 }
 declare module '*.jpeg' {
-  export default ImageString;
+  const src: ImageString;
+  export default src;
   export const image: ImageObject;
 }
 declare module '*.webp' {
-  export default ImageString;
+  const src: ImageString;
+  export default src;
   export const image: ImageObject;
 }
 
