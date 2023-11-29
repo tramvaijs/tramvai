@@ -331,7 +331,7 @@ export interface CliConfigEntry extends ConfigEntry {
           /**
            * @title if dependency is marked as singleton the dependency will be initialized only once and will not be updated
            * @description Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides
-           * @default: false
+           * @default false
            */
           singleton: boolean;
         }

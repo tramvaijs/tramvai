@@ -1169,23 +1169,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6358": {
+                              "__@match@6362": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6360": {
+                              "__@replace@6364": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6363": {
+                              "__@search@6367": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6365": {
+                              "__@split@6369": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6367": {
+                              "__@matchAll@6371": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1427,7 +1427,7 @@
                             "singleton": {
                               "title": "if dependency is marked as singleton the dependency will be initialized only once and will not be updated",
                               "description": "Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides",
-                              "default": ": false",
+                              "default": false,
                               "type": "boolean"
                             }
                           },
@@ -1851,23 +1851,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6358": {
+                                "__@match@6362": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6360": {
+                                "__@replace@6364": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6363": {
+                                "__@search@6367": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6365": {
+                                "__@split@6369": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6367": {
+                                "__@matchAll@6371": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2109,7 +2109,7 @@
                               "singleton": {
                                 "title": "if dependency is marked as singleton the dependency will be initialized only once and will not be updated",
                                 "description": "Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides",
-                                "default": ": false",
+                                "default": false,
                                 "type": "boolean"
                               }
                             },
@@ -2533,23 +2533,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6358": {
+                                  "__@match@6362": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6360": {
+                                  "__@replace@6364": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6363": {
+                                  "__@search@6367": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6365": {
+                                  "__@split@6369": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6367": {
+                                  "__@matchAll@6371": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
@@ -2791,7 +2791,7 @@
                                 "singleton": {
                                   "title": "if dependency is marked as singleton the dependency will be initialized only once and will not be updated",
                                   "description": "Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides",
-                                  "default": ": false",
+                                  "default": false,
                                   "type": "boolean"
                                 }
                               },
