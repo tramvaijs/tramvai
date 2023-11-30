@@ -41,7 +41,9 @@ export const rule: Rule.RuleModule = {
               node: fnProperty.value,
               messageId: 'disallowedArrowFn',
               fix: (fixer) => [
-                fixer.replaceText(fnProperty, `fn () { ${fnCode.slice(1, fnCode.length - 1)} }`),
+                fnCode[0] === '{'
+                  ? fixer.replaceText(fnProperty, `fn () { ${fnCode.slice(1, fnCode.length - 1)} }`)
+                  : fixer.replaceText(fnProperty, `fn () { return ${fnCode} }`),
               ],
             });
           }

@@ -35,6 +35,15 @@ const tests: {
         },
       ],
     },
+    {
+      code: `declareAction({ name: 'bothTestPageAction', fn: () => console.info('universal test action!') });`,
+      output: `declareAction({ name: 'bothTestPageAction', fn () { return console.info('universal test action!') } });`,
+      errors: [
+        {
+          messageId: 'disallowedArrowFn',
+        },
+      ],
+    },
   ],
 };
 
