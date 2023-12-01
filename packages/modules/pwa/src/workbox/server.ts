@@ -2,30 +2,41 @@ import { commandLineListTokens, declareModule, provide, Scope } from '@tramvai/c
 import { PROXY_CONFIG_TOKEN } from '@tramvai/tokens-server';
 import { appConfig } from '@tramvai/cli/lib/external/config';
 import { PWA_SW_SCOPE_TOKEN, PWA_SW_URL_TOKEN } from '../tokens';
-import { providers } from './shared';
+import { providers, sharedPwaLightModuleProviders } from './shared/providers/swProviders';
+import { normalizeSwUrl } from './shared/utils/normalizeSwUrl';
+import { validateRelativeUrl, validateSwScope } from './shared/utils/validateUrl';
 
-const validateSwScope = (scope: string) => {
-  if (!scope.startsWith('/')) {
-    throw new Error(`Service Worker scope should start from "/", got ${scope}`);
-  }
-  if (!scope.endsWith('/')) {
-    throw new Error(`Service Worker scope should ends with slash, got ${scope}`);
-  }
-};
+const validateSwUrlAndScopeProvider = provide({
+  provide: commandLineListTokens.init,
+  useFactory: ({ swUrl, swScope }) =>
+    function validateSwUrlAndScope() {
+      if (!process.env.TRAMVAI_PWA_WORKBOX_ENABLED) {
+        return;
+      }
 
-const validateRelativeUrl = (url: string) => {
-  if (!url.startsWith('/')) {
-    throw new Error(`Service Worker url should start from "/", got ${url}`);
-  }
-  if (!url.endsWith('.js')) {
-    throw new Error(`Service Worker url should has .js extension, got ${url}`);
-  }
-};
+      validateSwScope(swScope);
+      validateRelativeUrl(swUrl);
+    },
+  deps: {
+    swUrl: PWA_SW_URL_TOKEN,
+    swScope: PWA_SW_SCOPE_TOKEN,
+  },
+});
 
 export const TramvaiPwaWorkboxModule = declareModule({
   name: 'TramvaiPwaWorkboxModule',
   providers: [
     ...providers,
+    provide({
+      provide: PWA_SW_URL_TOKEN,
+      useFactory: ({ swScope }) => {
+        const swDest = process.env.TRAMVAI_PWA_SW_DEST as string;
+        return normalizeSwUrl(swDest, swScope);
+      },
+      deps: {
+        swScope: PWA_SW_SCOPE_TOKEN,
+      },
+    }),
     provide({
       provide: PROXY_CONFIG_TOKEN,
       scope: Scope.SINGLETON,
@@ -43,21 +54,11 @@ export const TramvaiPwaWorkboxModule = declareModule({
         swScope: PWA_SW_SCOPE_TOKEN,
       },
     }),
-    provide({
-      provide: commandLineListTokens.init,
-      useFactory: ({ swUrl, swScope }) =>
-        function validateSwUrlAndScope() {
-          if (!process.env.TRAMVAI_PWA_WORKBOX_ENABLED) {
-            return;
-          }
-
-          validateSwScope(swScope);
-          validateRelativeUrl(swUrl);
-        },
-      deps: {
-        swUrl: PWA_SW_URL_TOKEN,
-        swScope: PWA_SW_SCOPE_TOKEN,
-      },
-    }),
+    validateSwUrlAndScopeProvider,
   ],
+});
+
+export const TramvaiPwaLightWorkboxModule = declareModule({
+  name: 'TramvaiPwaLightWorkboxModule',
+  providers: [...sharedPwaLightModuleProviders, validateSwUrlAndScopeProvider],
 });

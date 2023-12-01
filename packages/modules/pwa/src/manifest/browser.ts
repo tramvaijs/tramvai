@@ -4,3 +4,8 @@ export const TramvaiPwaManifestModule = declareModule({
   name: 'TramvaiPwaManifestModule',
   providers: [],
 });
+
+export const TramvaiPwaLightManifestModule = declareModule({
+  name: 'TramvaiPwaLightManifestModule',
+  providers: [],
+});

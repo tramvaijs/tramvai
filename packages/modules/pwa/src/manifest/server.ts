@@ -1,17 +1,8 @@
-import { commandLineListTokens, declareModule, provide, Scope } from '@tramvai/core';
-import { ResourceType, ResourceSlot, RESOURCES_REGISTRY } from '@tramvai/tokens-render';
+import { declareModule, provide, Scope } from '@tramvai/core';
 import { PROXY_CONFIG_TOKEN } from '@tramvai/tokens-server';
 import { appConfig } from '@tramvai/cli/lib/external/config';
 import { PWA_MANIFEST_URL_TOKEN, PWA_SW_SCOPE_TOKEN } from '../tokens';
-
-const validateRelativeUrl = (url: string) => {
-  if (!url.startsWith('/')) {
-    throw new Error(`Webmanifest url should start from "/", got ${url}`);
-  }
-  if (!(url.endsWith('.json') || url.endsWith('.webmanifest'))) {
-    throw new Error(`Webmanifest url should has .json or .webmanifest extension, got ${url}`);
-  }
-};
+import { registerWebManifestProvider, validateRelativeUrlProvider } from './shared/providers';
 
 export const TramvaiPwaManifestModule = declareModule({
   name: 'TramvaiPwaManifestModule',
@@ -34,27 +25,6 @@ export const TramvaiPwaManifestModule = declareModule({
       },
     }),
     provide({
-      provide: commandLineListTokens.customerStart,
-      useFactory: ({ resourcesRegistry, manifestUrl }) =>
-        async function registerWebManifest() {
-          // @todo why boolean here?
-          if (!process.env.TRAMVAI_PWA_MANIFEST_ENABLED) {
-            return;
-          }
-
-          resourcesRegistry.register({
-            type: ResourceType.asIs,
-            slot: ResourceSlot.HEAD_META,
-            // @todo what about crossorigin, maybe optional?
-            payload: `<link rel="manifest" href="${manifestUrl}">`,
-          });
-        },
-      deps: {
-        resourcesRegistry: RESOURCES_REGISTRY,
-        manifestUrl: PWA_MANIFEST_URL_TOKEN,
-      },
-    }),
-    provide({
       provide: PWA_MANIFEST_URL_TOKEN,
       useFactory: ({ swScope }) => {
         const manifestDest = process.env.TRAMVAI_PWA_MANIFEST_DEST as string;
@@ -68,19 +38,24 @@ export const TramvaiPwaManifestModule = declareModule({
         swScope: PWA_SW_SCOPE_TOKEN,
       },
     }),
-    provide({
-      provide: commandLineListTokens.init,
-      useFactory: ({ manifestUrl }) =>
-        function validateSwUrlAndScope() {
-          if (!process.env.TRAMVAI_PWA_WORKBOX_ENABLED) {
-            return;
-          }
+    ...(process.env.TRAMVAI_PWA_MANIFEST_ENABLED
+      ? [registerWebManifestProvider, validateRelativeUrlProvider]
+      : []),
+  ],
+});
 
-          validateRelativeUrl(manifestUrl);
-        },
-      deps: {
-        manifestUrl: PWA_MANIFEST_URL_TOKEN,
-      },
+export const TramvaiPwaLightManifestModule = declareModule({
+  name: 'TramvaiPwaLightManifestModule',
+  providers: [
+    provide({
+      provide: PWA_MANIFEST_URL_TOKEN,
+      useValue: '/manifest.webmanifest',
     }),
+    provide({
+      provide: PWA_SW_SCOPE_TOKEN,
+      useValue: '/',
+    }),
+    registerWebManifestProvider,
+    validateRelativeUrlProvider,
   ],
 });
