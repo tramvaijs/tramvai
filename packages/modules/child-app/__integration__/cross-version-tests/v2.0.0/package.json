@@ -7,6 +7,7 @@
   "devDependencies": {
     "@tramvai/test-integration": "2.0.0",
     "cross-env": "^7.0.3",
+    "detect-port": "^1.5.1",
     "fastify": "^4.14.1",
     "@fastify/http-proxy": "^8.4.0",
     "ts-node": "^10.9.1"

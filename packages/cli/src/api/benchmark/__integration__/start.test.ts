@@ -26,8 +26,6 @@ describe('@tramvai/cli benchmark command', () => {
           rootDir: FIXTURES_DIR,
           target: 'app',
           resolveSymlinks: false,
-          port: 0,
-          staticPort: 0,
         },
         times: 2,
       });

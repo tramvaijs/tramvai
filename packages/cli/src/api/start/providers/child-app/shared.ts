@@ -23,6 +23,7 @@ export const sharedProviders: readonly Provider[] = [
         appEnv: parameters.env,
         env: 'development',
         port: portManager.port,
+        staticPort: portManager.staticPort,
       }),
     deps: {
       configEntry: CONFIG_ENTRY_TOKEN,
@@ -52,13 +53,15 @@ export const sharedProviders: readonly Provider[] = [
   provide({
     provide: CLOSE_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ staticServer }) => {
-      return () => {
+    useFactory: ({ staticServer, portManager }) => {
+      return async () => {
+        await portManager.cleanup();
         return stopServer(staticServer);
       };
     },
     deps: {
       staticServer: STATIC_SERVER_TOKEN,
+      portManager: PORT_MANAGER_TOKEN,
     },
   }),
 ] as const;

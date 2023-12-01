@@ -5,7 +5,7 @@ import fastifyCompress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import zlib from 'zlib';
 import { CLOSE_HANDLER_TOKEN, INIT_HANDLER_TOKEN, PROCESS_HANDLER_TOKEN } from '../tokens';
-import { CONFIG_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../di/tokens';
+import { CONFIG_MANAGER_TOKEN, PORT_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../di/tokens';
 import { createServer } from '../../start/utils/createServer';
 import { stopServer } from '../../start/utils/stopServer';
 import { listenServer } from '../../start/utils/listenServer';
@@ -82,13 +82,16 @@ export const sharedProviders: readonly Provider[] = [
   provide({
     provide: CLOSE_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ staticServer }) => {
+    useFactory: ({ staticServer, portManager }) => {
       return async () => {
+        await portManager.cleanup();
+
         return stopServer(staticServer);
       };
     },
     deps: {
       staticServer: STATIC_SERVER_TOKEN,
+      portManager: PORT_MANAGER_TOKEN,
     },
   }),
 ] as const;

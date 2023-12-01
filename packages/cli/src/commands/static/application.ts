@@ -26,17 +26,21 @@ export const staticApp = async (
   configEntry: ApplicationConfigEntry,
   options: Params
 ): Promise<CommandResult> => {
-  const network = new PortManager({ configEntry, commandParams: options });
+  const portManager = new PortManager({
+    configEntry,
+    commandParams: options,
+    logger: context.logger,
+  });
 
-  await network.computeAvailablePorts();
+  await portManager.computeAvailablePorts();
 
   const clientConfigManager = createConfigManager<ApplicationConfigEntry>(configEntry, {
     env: 'production',
     ...options,
     buildType: 'client',
     modern: false,
-    port: network.port,
-    staticPort: network.staticPort,
+    port: portManager.port,
+    staticPort: portManager.staticPort,
   });
   const serverConfigManager = clientConfigManager.withSettings({ buildType: 'server' });
 
@@ -192,6 +196,8 @@ export const staticApp = async (
   } else {
     staticServer.close();
   }
+
+  await portManager.cleanup();
 
   return {
     status: 'ok',

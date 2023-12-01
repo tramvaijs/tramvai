@@ -2,9 +2,15 @@ import http from 'http';
 import { ENV_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { SERVER_TOKEN } from '@tramvai/tokens-server';
 import { CommonModule } from '@tramvai/module-common';
+import detectPort from 'detect-port';
 import { createTestApp } from './createTestApp';
 
 describe('test/unit/app/createTestApp', () => {
+  beforeEach(async () => {
+    process.env.PORT = (await detectPort(0)).toString();
+    process.env.PORT_STATIC = (await detectPort(0)).toString();
+  });
+
   it('should return app', async () => {
     const { app, close } = await createTestApp();
     const envManager = app.di.get(ENV_MANAGER_TOKEN);

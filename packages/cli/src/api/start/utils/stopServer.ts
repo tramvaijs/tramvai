@@ -5,6 +5,7 @@ export const stopServer = async (server: StoppableServer) => {
     server.stop((err) => {
       if (err) {
         reject(err);
+
         return;
       }
 

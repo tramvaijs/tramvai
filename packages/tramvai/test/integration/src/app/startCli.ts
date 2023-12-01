@@ -76,8 +76,6 @@ export const startCli = async (
       ...env,
       MOCKER_ENABLED: 'true',
     },
-    port: 0,
-    staticPort: 0,
     ...cliOptions,
   });
 

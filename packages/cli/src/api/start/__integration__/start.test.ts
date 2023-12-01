@@ -3,7 +3,6 @@ import supertest from 'supertest';
 import { outputFile } from 'fs-extra';
 import { start } from '@tramvai/cli';
 import type { PromiseType } from 'utility-types';
-import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
 import { getServerUrl } from '@tramvai/test-integration';
 import { initPlaywright } from '@tramvai/test-pw';
 import { createServer } from '../utils/createServer';
@@ -49,16 +48,14 @@ describe('@tramvai/cli start command', () => {
       let startResult: PromiseType<ReturnType<typeof start>>;
 
       beforeAll(async () => {
-        serverPort = await getPort();
-        staticServerPort = await getPort();
-
         startResult = await start({
           rootDir: FIXTURES_DIR,
           target: 'app',
           resolveSymlinks: false,
-          port: serverPort,
-          staticPort: staticServerPort,
         });
+
+        serverPort = getListeningPort(startResult.server);
+        staticServerPort = getListeningPort(startResult.staticServer);
       });
 
       afterAll(() => {
@@ -66,15 +63,6 @@ describe('@tramvai/cli start command', () => {
       });
 
       it('should start application by target', async () => {
-        const { server, staticServer } = startResult;
-
-        expect(server?.address()).toMatchObject({
-          port: serverPort,
-        });
-        expect(staticServer?.address()).toMatchObject({
-          port: staticServerPort,
-        });
-
         const responseServer = await supertestByPort(serverPort).get('/').expect(200);
 
         expect(responseServer.text)
@@ -162,15 +150,10 @@ describe('@tramvai/cli start command', () => {
     });
 
     it('should start application from config', async () => {
-      const serverPort = await getPort();
-      const staticServerPort = await getPort();
-
       const root = resolve(FIXTURES_DIR, 'app');
       const { server, staticServer, close } = await start({
         rootDir: root,
         resolveSymlinks: false,
-        port: serverPort,
-        staticPort: staticServerPort,
         config: {
           name: 'app',
           type: 'application',
@@ -178,12 +161,11 @@ describe('@tramvai/cli start command', () => {
         },
       });
 
-      expect(server?.address()).toMatchObject({
-        port: serverPort,
-      });
-      expect(staticServer?.address()).toMatchObject({
-        port: staticServerPort,
-      });
+      const serverPort = getListeningPort(server);
+      const staticServerPort = getListeningPort(staticServer);
+
+      expect(serverPort).toEqual(expect.any(Number));
+      expect(staticServerPort).toEqual(expect.any(Number));
 
       const responseServer = await supertestByPort(serverPort).get('/').expect(200);
 
@@ -201,39 +183,12 @@ describe('@tramvai/cli start command', () => {
       return close();
     });
 
-    it('should start server on random ports', async () => {
-      const { server, staticServer, close } = await start({
-        rootDir: FIXTURES_DIR,
-        target: 'app',
-        port: 0,
-        staticPort: 0,
-        resolveSymlinks: false,
-      });
-
-      expect(server?.address()).toMatchObject({
-        port: expect.any(Number),
-      });
-      expect(staticServer?.address()).toMatchObject({
-        port: expect.any(Number),
-      });
-
-      await supertestByPort(getListeningPort(server)).get('/').expect(200);
-
-      const testStatic = supertestByPort(getListeningPort(staticServer));
-      await testStatic.get('/dist/client/platform.js').expect(200);
-      await testStatic.get('/dist/server/server.js').expect(200);
-
-      return close();
-    });
-
     // eslint-disable-next-line jest/expect-expect
     it('should allow to exclude bundles from build', async () => {
       let { server, close } = await start({
         rootDir: FIXTURES_DIR,
         target: 'app',
         resolveSymlinks: false,
-        port: 0,
-        staticPort: 0,
       });
 
       let testServer = supertestByPort(getListeningPort(server));
@@ -250,8 +205,6 @@ describe('@tramvai/cli start command', () => {
         target: 'app',
         resolveSymlinks: false,
         onlyBundles: ['main', 'second'],
-        port: 0,
-        staticPort: 0,
       }));
 
       testServer = supertestByPort(getListeningPort(server));
@@ -264,14 +217,12 @@ describe('@tramvai/cli start command', () => {
       return close();
     });
 
-    it('should NOT try to launch app on the next available port if it was provided via config', async () => {
+    it('should NOT try to launch app at the next available port if it was provided via config', async () => {
       const testServerStub = createServer();
       const testStaticServerStub = createServer();
 
-      // To avoid situation when two subsequent calls
-      // of the `detectPortSync` return the same free port.
-      await listenServer(testServerStub, '0.0.0.0', getPort() + 50);
-      await listenServer(testStaticServerStub, '0.0.0.0', getPort());
+      await listenServer(testServerStub, '0.0.0.0', 0);
+      await listenServer(testStaticServerStub, '0.0.0.0', 0);
 
       await expect(
         start({
@@ -285,35 +236,6 @@ describe('@tramvai/cli start command', () => {
 
       return Promise.all([stopServer(testServerStub), stopServer(testStaticServerStub)]);
     });
-
-    it('should try to launch app on the next available port if it was NOT provided via config', async () => {
-      const testServerStub = createServer();
-      const testStaticServerStub = createServer();
-
-      await listenServer(testServerStub, '0.0.0.0', PortManager.DEFAULT_PORT);
-      await listenServer(testStaticServerStub, '0.0.0.0', PortManager.DEFAULT_STATIC_PORT);
-
-      const { server, staticServer, close } = await start({
-        rootDir: FIXTURES_DIR,
-        target: 'app',
-        resolveSymlinks: false,
-      });
-
-      const testServer = supertestByPort(getListeningPort(server));
-      const testStatic = supertestByPort(getListeningPort(staticServer));
-
-      expect(server?.address()).toMatchObject({
-        port: expect.any(Number),
-      });
-      expect(staticServer?.address()).toMatchObject({
-        port: expect.any(Number),
-      });
-
-      await testServer.get('/').expect(200);
-      await testStatic.get('/').expect(404);
-
-      return Promise.all([close(), stopServer(testServerStub), stopServer(testStaticServerStub)]);
-    });
   });
 
   describe('module', () => {
@@ -323,7 +245,6 @@ describe('@tramvai/cli start command', () => {
         rootDir: FIXTURES_DIR,
         target: 'module',
         resolveSymlinks: false,
-        port: 0,
       });
 
       const testStatic = supertestByPort(getListeningPort(staticServer));
@@ -335,22 +256,20 @@ describe('@tramvai/cli start command', () => {
     });
 
     it('should start module by specific config', async () => {
-      const staticServerPort = getPort();
-
       const { staticServer, close } = await start({
         config: {
           type: 'module',
           name: 'module',
           root: resolve(FIXTURES_DIR, 'module'),
         },
-        port: staticServerPort,
+        port: PortManager.DEFAULT_MODULE_STATIC_PORT,
       });
 
       expect(staticServer?.address()).toMatchObject({
-        port: staticServerPort,
+        port: PortManager.DEFAULT_MODULE_STATIC_PORT,
       });
 
-      const testStatic = supertestByPort(staticServerPort);
+      const testStatic = supertestByPort(PortManager.DEFAULT_MODULE_STATIC_PORT);
 
       await testStatic.get('/module/0.1.0/module_server.js').expect(200);
       await testStatic.get('/module/0.1.0/module_client.js').expect(200);

@@ -1,6 +1,7 @@
 import { start } from '@tramvai/cli';
 import { startCli } from '@tramvai/test-integration';
 import { resolve } from 'path';
+import detectPort from 'detect-port';
 
 const EXAMPLE_DIR = __dirname;
 
@@ -37,7 +38,7 @@ export const startRootApp = ({
   );
 };
 
-export const startChildApp = (
+export const startChildApp = async (
   name: string,
   {
     shared = {},
@@ -45,8 +46,10 @@ export const startChildApp = (
     shared?: { deps?: string[] };
   } = {}
 ) => {
+  const port = await detectPort(0);
+  const staticPort = await detectPort(0);
+
   return start({
-    port: 0,
     config: {
       type: 'child-app',
       root: resolve(EXAMPLE_DIR, 'child-apps', name),
@@ -59,6 +62,8 @@ export const startChildApp = (
         },
       },
     },
+    port,
+    staticPort,
     rootDir: EXAMPLE_DIR,
     resolveSymlinks: false,
   });

@@ -3,6 +3,7 @@ import { checkApplication } from '../../validators/commands/checkBuild';
 import { checkConfigExists } from '../../validators/commands/checkConfigExists';
 import { checkPwaDependencies } from '../../validators/commands/checkPwaDependencies';
 import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigrationsAndCheckVersions';
+import { checkSwcDependencies } from '../../validators/commands/checkSwcDependencies';
 
 export type Params = {
   target: string;
@@ -49,6 +50,7 @@ class AnalyzeCommand extends CLICommand<Params> {
     checkApplication,
     runMigrationsAndCheckVersions,
     checkPwaDependencies,
+    checkSwcDependencies,
   ];
 
   action(parameters: Params) {

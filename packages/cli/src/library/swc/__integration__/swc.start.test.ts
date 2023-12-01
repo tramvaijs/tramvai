@@ -30,8 +30,6 @@ const getModuleCode = (code: string, name: string) => {
 beforeAll(async () => {
   app = await start({
     rootDir: __dirname,
-    port: 0,
-    staticPort: 0,
     strictErrorHandle: true,
     config: {
       name: 'swc-app',
