@@ -16,7 +16,7 @@ import { logger } from '../logger';
 const checkExternal = (path: string, parentId): boolean => {
   return (
     rollupExternalModules(path) ||
-    !!path.match(/\.(css|svg)$/) ||
+    !!path.match(/\.(css|svg|svg\?react)$/) ||
     !!path.match('./(tsconfig|package).json')
   );
 };
