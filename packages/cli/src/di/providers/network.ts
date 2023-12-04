@@ -7,12 +7,25 @@ import { Logger } from '../../models/logger';
 
 export const networkProviders: readonly Provider[] = [
   provide({
-    provide: PORT_MANAGER_TOKEN,
-    useClass: PortManager,
     deps: {
       configEntry: CONFIG_ENTRY_TOKEN,
       commandParams: COMMAND_PARAMETERS_TOKEN,
       logger: 'network logger',
+    },
+    provide: PORT_MANAGER_TOKEN,
+    useFactory: (deps) => {
+      // @ts-expect-error
+      const portManager = new PortManager(deps);
+
+      ['SIGINT', 'SIGTERM'].forEach((signal) => {
+        process.on(signal, async () => {
+          await portManager.cleanup();
+
+          process.exit();
+        });
+      });
+
+      return portManager;
     },
   }),
   provide({
