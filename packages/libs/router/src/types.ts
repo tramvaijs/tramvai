@@ -56,6 +56,7 @@ export interface Navigation {
   navigateState?: any;
   history?: boolean;
   cancelled?: boolean;
+  skipped?: boolean;
   code?: number;
 
   redirect?: boolean;

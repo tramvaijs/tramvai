@@ -387,6 +387,8 @@ export abstract class AbstractRouter {
     throw new Error('Navigation blocked');
   }
 
+  cancel(): Navigation | void {}
+
   protected normalizePathname(pathname?: string) {
     let normalized = pathname;
 

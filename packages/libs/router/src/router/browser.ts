@@ -101,7 +101,7 @@ export class Router extends ClientRouter {
 
   protected commitNavigation(navigation: Navigation) {
     // if we have parallel navigation do not update current url, as it outdated anyway
-    if (navigation.cancelled) {
+    if (navigation.cancelled || navigation.skipped) {
       logger.debug({
         event: 'delay-ignore-commit',
         navigation,
@@ -288,5 +288,21 @@ export class Router extends ClientRouter {
         sessionStorage.setItem(APPLIED_VIEW_TRANSITIONS_KEY, JSON.stringify(valueToSave));
       } catch (error) {}
     }
+  }
+
+  cancel() {
+    if (!this.isNavigating()) return;
+
+    logger.debug({
+      event: 'cancelled',
+      navigation: this.currentNavigation,
+    });
+
+    const cancelled = this.currentNavigation;
+
+    this.currentNavigation.skipped = true;
+    this.currentNavigation = null;
+
+    return cancelled;
   }
 }
