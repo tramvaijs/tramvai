@@ -24,6 +24,10 @@ export const routes: Route[] = [
     path: '/dynamic/:id/',
   },
   {
+    name: 'history-fallback',
+    path: '/history-fallback/',
+  },
+  {
     name: 'inner-page',
     path: '/inner/page/',
   },

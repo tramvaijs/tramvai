@@ -13,6 +13,7 @@ export const TramvaiPwaManifestModule = declareModule({
       useFactory: ({ manifestUrl, swScope }) => {
         return {
           context: [manifestUrl],
+          // appConfig.assetsPrefix available in 'development' mode
           target: appConfig.assetsPrefix ?? process.env.ASSETS_PREFIX ?? '',
           pathRewrite: (path: string) => {
             return path.replace(swScope, '/');

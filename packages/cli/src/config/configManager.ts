@@ -206,13 +206,12 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     );
 
     const pwa = config.experiments?.pwa;
-
     if (pwa.webmanifest?.enabled) {
       pwa.webmanifest = {
         ...pwa.webmanifest,
         scope: pwa.webmanifest.scope ?? pwa.sw?.scope,
         name: pwa.webmanifest.name ?? config.name,
-        short_name: pwa.webmanifest.name ?? config.name,
+        short_name: pwa.webmanifest.short_name ?? config.name,
         theme_color: pwa.webmanifest.theme_color ?? pwa.meta.themeColor,
       };
 

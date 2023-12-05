@@ -347,6 +347,76 @@ describe('router/spa', () => {
 
       expect(await getPageTitle(page)).toBe('Default Page Component');
     });
+
+    it('should increment index in history state', async () => {
+      const { page, router } = await getPageWrapper('/');
+
+      await router.navigate('/test/');
+      const historyState = await page.evaluate(() => window.history.state);
+
+      expect(historyState).toMatchObject({ index: 1 });
+    });
+
+    it('should keep index in history state after page refresh', async () => {
+      const { page, router } = await getPageWrapper('/');
+
+      await router.navigate('/test/');
+      await router.navigate('/dynamic/123/');
+
+      await page.reload();
+
+      const historyState = await page.evaluate(() => window.history.state);
+
+      expect(historyState).toMatchObject({ index: 2 });
+    });
+
+    it('should decrement index in history state', async () => {
+      const { page, router } = await getPageWrapper('/');
+
+      await router.navigate('/test/');
+      await router.navigate('/dynamic/123/');
+
+      await page.goBack();
+
+      const historyState = await page.evaluate(() => window.history.state);
+
+      expect(historyState).toMatchObject({ index: 1 });
+    });
+
+    it('should navigate to historyFallback if history state is empty', async () => {
+      const { serverUrl } = getApp();
+      const { page, router } = await getPageWrapper('/');
+
+      const back = async () => {
+        await page.evaluate(() =>
+          (window as any).contextExternal.di
+            .get('router router')
+            .back({ replace: true, historyFallback: `/history-fallback/` })
+        );
+      };
+
+      await router.navigate('/test/');
+      await router.navigate('/dynamic/123/');
+
+      await back();
+
+      expect(page.url()).toBe(`${serverUrl}/test/`);
+
+      await back();
+
+      expect(page.url()).toBe(`${serverUrl}/`);
+
+      let historyState = await page.evaluate(() => window.history.state);
+
+      expect(historyState).toMatchObject({ index: 0 });
+
+      await back();
+
+      historyState = await page.evaluate(() => window.history.state);
+
+      expect(historyState).toMatchObject({ index: 0 });
+      expect(page.url()).toBe(`${serverUrl}/history-fallback/`);
+    });
   });
 
   describe('using history api directly', () => {

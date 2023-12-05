@@ -18,7 +18,15 @@ export const TramvaiPwaMetaModule = declareModule({
   providers: [
     provide({
       provide: PWA_META_TOKEN,
-      useValue: appConfig.experiments?.pwa?.meta ?? {},
+      useFactory: () => {
+        let meta = {};
+        try {
+          if (process.env.TRAMVAI_PWA_META) {
+            meta = JSON.parse(process.env.TRAMVAI_PWA_META);
+          }
+        } catch (e) {}
+        return meta;
+      },
     }),
     provide({
       provide: RENDER_SLOTS,

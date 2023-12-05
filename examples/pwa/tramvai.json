@@ -54,7 +54,8 @@
           "webmanifest": {
             "enabled": true,
             "dest": "/manifest.[hash].webmanifest",
-            "name": "my manifest"
+            "name": "my manifest",
+            "short_name": "also my manifest but short"
           },
           "icon": {
             "src": "images/pwa-icon.png",

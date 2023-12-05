@@ -42,6 +42,7 @@ export type UpdateCurrentRouteOptions = BaseNavigateOptions;
 
 export interface HistoryOptions {
   historyFallback: string;
+  replace?: boolean;
 }
 
 export type NavigationType = 'navigate' | 'updateCurrentRoute';

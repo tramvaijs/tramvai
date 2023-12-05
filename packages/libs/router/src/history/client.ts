@@ -8,6 +8,7 @@ interface HistoryState {
   key: string;
   type: NavigationType;
   navigateState?: any;
+  index: number;
 }
 
 const isHistoryState = (state: any): state is HistoryState => {
@@ -41,7 +42,11 @@ const generatePreviousNavigateState = (navigation: Navigation): PreviousNavigate
   return state;
 };
 
-const generateState = (navigation: Navigation, currentState?: HistoryState): HistoryState => {
+const generateState = (
+  navigation: Navigation,
+  currentState?: HistoryState,
+  index: number = 0
+): HistoryState => {
   const key = generateKey(navigation);
   const previousNavigateState = generatePreviousNavigateState(navigation);
   let { type } = navigation;
@@ -59,6 +64,7 @@ const generateState = (navigation: Navigation, currentState?: HistoryState): His
     key,
     type,
     navigateState,
+    index,
   };
 };
 
@@ -89,6 +95,7 @@ export class ClientHistory extends History {
     this.currentState = isHistoryState(window.history?.state)
       ? window.history.state
       : generateState(navigation);
+    this.currentIndex = this.currentState.index;
     this.historyWrapper.init(this.currentState);
     this.historyWrapper.subscribe(async ({ path, state }) => {
       try {
@@ -136,7 +143,7 @@ export class ClientHistory extends History {
       this.currentIndex++;
     }
 
-    this.currentState = generateState(navigation, this.currentState);
+    this.currentState = generateState(navigation, this.currentState, this.currentIndex);
 
     this.historyWrapper.navigate({
       path: url.path,
@@ -146,14 +153,13 @@ export class ClientHistory extends History {
   }
 
   go(to: number, options?: HistoryOptions) {
-    const index = this.currentIndex + to;
-
-    if (index < 0) {
+    if (this.currentIndex < 1) {
       if (options?.historyFallback) {
         return this.listener({
           url: options.historyFallback,
           type: 'navigate',
           history: false,
+          replace: options.replace,
         });
       }
 
@@ -167,6 +173,8 @@ export class ClientHistory extends History {
         });
       }
     }
+
+    this.currentIndex += to;
 
     const promise = new Promise<void>((resolve, reject) => {
       this.goPromiseResolve = resolve;

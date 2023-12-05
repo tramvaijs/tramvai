@@ -157,7 +157,17 @@ const action = declareAction({
 
 ### History Back
 
-`back()` method will go back through history
+```tsx
+type HistoryOptions = {
+  historyFallback: string;
+  replace?: boolean;
+};
+```
+
+`back(options?: HistoryOptions)` method will go back through history
+
+- `historyFallback` - optional url for navigation. It is navigated to passed url **only** if browser history is empty.
+- `replace` - whether the passed `historyFallback` url will be replaced in the browser history or added to the history.
 
 ### History Forward
 

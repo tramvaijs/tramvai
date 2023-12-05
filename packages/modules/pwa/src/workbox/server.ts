@@ -43,6 +43,7 @@ export const TramvaiPwaWorkboxModule = declareModule({
       useFactory: ({ swUrl, swScope }) => {
         return {
           context: [swUrl, swUrl.replace(/\.js$/, '.modern.js')],
+          // appConfig.assetsPrefix available in 'development' mode
           target: appConfig.assetsPrefix ?? process.env.ASSETS_PREFIX ?? '',
           pathRewrite: (path: string) => {
             return path.replace(swScope, '/');

@@ -93,7 +93,7 @@ describe('packages/modules/pwa - assets', () => {
 
     it('should use "name" parameter', () => {
       expect(webmanifestContent.name).toBe('my manifest');
-      expect(webmanifestContent.short_name).toBe('my manifest');
+      expect(webmanifestContent.short_name).toBe('also my manifest but short');
     });
 
     it('should borrow scope from "pwa.sw.scope" parameter', () => {
