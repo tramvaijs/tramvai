@@ -3,7 +3,7 @@ id: streaming
 title: Streaming Rendering
 ---
 
-Full [Streaming Rendering](https://www.patterns.dev/posts/streaming-ssr) is **partially supported** by `tramvai` framework.
+React [Streaming Rendering](https://www.patterns.dev/posts/streaming-ssr) is **partially supported** by `tramvai` framework.
 
 Streaming can significantly improve TTFB metric, but have some disadvantages:
 - Require completely different framework architecture
@@ -16,7 +16,7 @@ With `renderToPipeableStream` `tramvai` still waiting `commandLineRunner` and pa
 
 [Deferred Actions](03-features/09-data-fetching/06-streaming-data.md) is based on this feature.
 
-## How to use `renderToPipeableStream`
+## Usage
 
 :::caution
 
@@ -24,11 +24,28 @@ Experimental feature
 
 :::
 
+### Enable `renderToPipeableStream`
+
 ```ts
 import { REACT_SERVER_RENDER_MODE } from '@tramvai/tokens-render';
 
 const provider = provide({
   provide: REACT_SERVER_RENDER_MODE,
   useValue: 'streaming',
+});
+```
+
+### Response stream timeout
+
+Default timeout for `renderToPipeableStream` response is `5000` milliseconds. Deferred Actions which are not resolved in this time will be rejected with `AbortedDeferredError` error.
+
+If you want to provide custom timeout value, you can provide `REACT_STREAMING_RENDER_TIMEOUT` token:
+
+```ts
+import { REACT_STREAMING_RENDER_TIMEOUT } from '@tramvai/tokens-render';
+
+const provider = provide({
+  provide: REACT_STREAMING_RENDER_TIMEOUT,
+  useValue: 10000,
 });
 ```

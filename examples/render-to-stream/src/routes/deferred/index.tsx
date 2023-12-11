@@ -37,6 +37,13 @@ const failedDeferredAction = declareAction({
   },
   deferred: true,
 });
+const abortedDeferredAction = declareAction({
+  name: 'abortedDeferred',
+  async fn() {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+  },
+  deferred: true,
+});
 
 export const DeferredPage: PageComponent = () => {
   return (
@@ -80,6 +87,18 @@ export const DeferredPage: PageComponent = () => {
           }}
         </Await>
       </Suspense>
+      <Suspense fallback={<div>Loading aborted error...</div>}>
+        <Await
+          action={abortedDeferredAction}
+          error={(reason) => {
+            return <div>Error: {reason.message}</div>;
+          }}
+        >
+          {(data) => {
+            return <></>;
+          }}
+        </Await>
+      </Suspense>
     </>
   );
 };
@@ -89,6 +108,7 @@ DeferredPage.actions = [
   fastDeferredAction,
   failedFastDeferredAction,
   failedDeferredAction,
+  abortedDeferredAction,
 ];
 
 export default DeferredPage;

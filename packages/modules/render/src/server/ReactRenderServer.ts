@@ -1,12 +1,18 @@
 import { Writable } from 'stream';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
+import { AbortedDeferredError, AbortedStreamError } from '@tinkoff/errors';
 import type { DI_TOKEN } from '@tramvai/core';
-import type { CONTEXT_TOKEN, LOGGER_TOKEN } from '@tramvai/module-common';
+import type {
+  CONTEXT_TOKEN,
+  DEFERRED_ACTIONS_MAP_TOKEN,
+  LOGGER_TOKEN,
+} from '@tramvai/module-common';
 import type {
   EXTEND_RENDER,
   CUSTOM_RENDER,
   REACT_SERVER_RENDER_MODE,
   WebpackStats,
+  REACT_STREAMING_RENDER_TIMEOUT,
 } from '@tramvai/tokens-render';
 import each from '@tinkoff/utils/array/each';
 import type { ChunkExtractor } from '@loadable/server';
@@ -17,8 +23,8 @@ import type {
 import { renderReact } from '../react';
 import { flushFiles } from './blocks/utils/flushFiles';
 
-// @todo customize
-const RENDER_TIMEOUT = 30000;
+type StreamingTimeout = ExtractDependencyType<typeof REACT_STREAMING_RENDER_TIMEOUT>;
+type DeferredActions = ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
 
 class HtmlWritable extends Writable {
   responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
@@ -120,6 +126,8 @@ export class ReactRenderServer {
 
   context: typeof CONTEXT_TOKEN;
 
+  deferredActions: DeferredActions;
+
   di: typeof DI_TOKEN;
 
   log: ReturnType<typeof LOGGER_TOKEN>;
@@ -127,6 +135,8 @@ export class ReactRenderServer {
   responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
 
   responseStream: typeof SERVER_RESPONSE_STREAM;
+
+  streamingTimeout: StreamingTimeout;
 
   renderMode: typeof REACT_SERVER_RENDER_MODE;
 
@@ -140,6 +150,8 @@ export class ReactRenderServer {
     logger,
     responseTaskManager,
     responseStream,
+    streamingTimeout,
+    deferredActions,
   }) {
     this.context = context;
     this.customRender = customRender;
@@ -149,6 +161,8 @@ export class ReactRenderServer {
     this.log = logger('module-render');
     this.responseTaskManager = responseTaskManager;
     this.responseStream = responseStream;
+    this.streamingTimeout = streamingTimeout;
+    this.deferredActions = deferredActions;
   }
 
   render({
@@ -198,6 +212,10 @@ export class ReactRenderServer {
           event: 'streaming-render:start',
         });
 
+        const timeout = this.streamingTimeout;
+        const unfinishedActions = [];
+        let isAborted = false;
+
         const { pipe, abort } = renderToPipeableStream(renderResult, {
           // we need to run hydration only after first chunk is sent to client
           // https://github.com/reactwg/react-18/discussions/114
@@ -226,7 +244,12 @@ export class ReactRenderServer {
             // so this is a best place to error logging
             log.error({
               event: 'streaming-render:error',
-              error,
+              error: isAborted
+                ? new AbortedStreamError({
+                    reason: `${timeout}ms timeout exceeded`,
+                    unfinishedActions,
+                  })
+                : error,
             });
           },
           onShellError(error) {
@@ -235,10 +258,31 @@ export class ReactRenderServer {
           },
         });
 
+        // global response stream timeo
         setTimeout(() => {
+          isAborted = true;
+
+          // abort unfinished deferred actions
+          this.deferredActions.forEach((action, name) => {
+            if (action.isRejected() || action.isResolved()) {
+              return;
+            }
+
+            unfinishedActions.push(name);
+
+            action.reject(new AbortedDeferredError());
+          });
+
+          // abort render stream
           abort();
-          reject(new Error('React renderToPipeableStream timeout exceeded'));
-        }, RENDER_TIMEOUT);
+
+          reject(
+            new AbortedStreamError({
+              reason: `${timeout}ms timeout exceeded`,
+              unfinishedActions,
+            })
+          );
+        }, timeout);
       });
     }
 

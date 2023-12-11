@@ -6,14 +6,14 @@ import {
   ResourceType,
 } from '@tramvai/tokens-render';
 import { DEFERRED_ACTIONS_MAP_TOKEN } from '@tramvai/tokens-common';
-import type { Deferred } from '@tramvai/tokens-common';
-import { __Deferred } from './deferred.inline';
+import type { Deferred as IDeferred } from '@tramvai/tokens-common';
+import { Deferred } from './deferred.inline';
 import { generateDeferredReject, generateDeferredResolve } from './clientScriptsUtils';
 
 export const providers = [
   provide({
     provide: DEFERRED_ACTIONS_MAP_TOKEN,
-    useFactory: () => new Map<string, Deferred>(),
+    useFactory: () => new Map<string, IDeferred>(),
   }),
   provide({
     provide: commandLineListTokens.generatePage,
@@ -24,7 +24,7 @@ export const providers = [
           resourcesRegistry.register({
             slot: ResourceSlot.HEAD_CORE_SCRIPTS,
             type: ResourceType.inlineScript,
-            payload: `window.__Deferred = ${__Deferred}
+            payload: `window.__Deferred = ${Deferred}
 window.__TRAMVAI_DEFERRED_ACTIONS = {};`,
           });
 

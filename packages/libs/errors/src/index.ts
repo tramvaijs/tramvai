@@ -8,3 +8,5 @@ export * from './execution/executionAbortError';
 export * from './execution/utils';
 export * from './action/conditionFail';
 export * from './router/block';
+export * from './streaming/abortedDeferred';
+export * from './streaming/abortedStream';

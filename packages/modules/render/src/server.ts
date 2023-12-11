@@ -5,6 +5,7 @@ import {
   RESPONSE_MANAGER_TOKEN,
   CONTEXT_TOKEN,
   CREATE_CACHE_TOKEN,
+  DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { ClientHintsModule, USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
@@ -22,6 +23,7 @@ import {
   BACK_FORWARD_CACHE_ENABLED,
   REACT_SERVER_RENDER_MODE,
   FETCH_WEBPACK_STATS_TOKEN,
+  REACT_STREAMING_RENDER_TIMEOUT,
 } from '@tramvai/tokens-render';
 import { Scope, optional } from '@tinkoff/dippy';
 import { satisfies } from '@tinkoff/user-agent';
@@ -243,6 +245,8 @@ Page Error Boundary will be rendered for the client`,
         logger: LOGGER_TOKEN,
         responseTaskManager: SERVER_RESPONSE_TASK_MANAGER,
         responseStream: SERVER_RESPONSE_STREAM,
+        streamingTimeout: REACT_STREAMING_RENDER_TIMEOUT,
+        deferredActions: DEFERRED_ACTIONS_MAP_TOKEN,
       },
     }),
     provide({
@@ -312,9 +316,8 @@ Page Error Boundary will be rendered for the client`,
     provide({
       provide: 'modernSatisfiesMemoryCache',
       scope: Scope.SINGLETON,
-      // @todo - use larger `max` option and `memory-lfu` type after successful TCORE-4668 experiment
       useFactory: ({ createCache }) => {
-        return createCache('memory', { max: 50 });
+        return createCache('memory', { max: 200 });
       },
       deps: {
         createCache: CREATE_CACHE_TOKEN,
@@ -331,6 +334,10 @@ Page Error Boundary will be rendered for the client`,
     provide({
       provide: REACT_SERVER_RENDER_MODE,
       useValue: 'sync',
+    }),
+    provide({
+      provide: REACT_STREAMING_RENDER_TIMEOUT,
+      useValue: 5000,
     }),
   ],
 })

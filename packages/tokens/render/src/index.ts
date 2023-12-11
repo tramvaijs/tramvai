@@ -199,6 +199,8 @@ export type ReactServerRenderMode = 'sync' | 'streaming';
 // @todo ReactServerRenderMode or () => ReactServerRenderMode
 export const REACT_SERVER_RENDER_MODE = createToken<ReactServerRenderMode>('reactServerRenderMode');
 
+export const REACT_STREAMING_RENDER_TIMEOUT = createToken<number>('react streaming render timeout');
+
 export interface WebpackStats {
   assetsByChunkName: Record<string, string[]>;
   namedChunkGroups?: Record<string, { name: string; chunks: string[]; assets: string[] }>;

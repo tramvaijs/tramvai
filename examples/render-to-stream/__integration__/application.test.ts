@@ -165,6 +165,7 @@ describe('render-to-stream', () => {
         Response: ok
         Error: Failed Fast Deferred
         Error: Failed Deferred
+        Error: Deferred Action Abort
         this Footer in render-to-stream"
       `);
 

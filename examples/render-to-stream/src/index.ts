@@ -13,6 +13,7 @@ import {
   ResourceSlot,
   REACT_SERVER_RENDER_MODE,
   RESOURCE_INLINE_OPTIONS,
+  REACT_STREAMING_RENDER_TIMEOUT,
 } from '@tramvai/tokens-render';
 
 import { Header } from './components/features/Header/Header';
@@ -66,6 +67,10 @@ createApp({
       provide: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
       useValue:
         (process.env.SPA_ACTIONS_RUN_MODE as typeof ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN) ?? 'after',
+    }),
+    provide({
+      provide: REACT_STREAMING_RENDER_TIMEOUT,
+      useValue: 1100,
     }),
   ],
   // регистрируем экшены, которые будут выполняться для всех страниц приложения

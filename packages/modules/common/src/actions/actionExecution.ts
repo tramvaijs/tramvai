@@ -21,7 +21,7 @@ import { ActionChecker } from './actionChecker';
 import type { ActionType } from './constants';
 import { actionType } from './constants';
 import { actionTramvaiReducer } from './actionTramvaiReducer';
-import { Deferred } from './deferred/deferred';
+import { Deferred } from './deferred/deferred.inline';
 
 const EMPTY_DEPS = {};
 

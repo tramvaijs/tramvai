@@ -16,7 +16,6 @@ import type {
   SERVER_RESPONSE_TASK_MANAGER,
 } from '@tramvai/tokens-server-private';
 import { actionServerStateEvent } from './actionTramvaiReducer';
-import { Deferred } from './deferred/deferred';
 import { generateDeferredReject, generateDeferredResolve } from './deferred/clientScriptsUtils';
 
 const DEFAULT_PAYLOAD = {};

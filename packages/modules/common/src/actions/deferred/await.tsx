@@ -2,7 +2,7 @@ import { useDi } from '@tramvai/react';
 import { DEFERRED_ACTIONS_MAP_TOKEN } from '@tramvai/tokens-common';
 import type { TramvaiAction } from '@tramvai/types-actions-state-context';
 import { deserializeError } from '@tramvai/safe-strings';
-import { Deferred } from './deferred';
+import { Deferred } from './deferred.inline';
 
 export function Await<Result>({
   action,

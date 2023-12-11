@@ -37,6 +37,7 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
     <script></script>
     <script></script>
     <script></script>
+    <script></script>
     <script charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
@@ -115,6 +116,8 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
       </div>
       <template id="B:1"></template>
       <div>Loading long error...</div>
+      <template id="B:2"></template>
+      <div>Loading aborted error...</div>
       
       <div class="Footer__footer_L7U1b"><div>this Footer in render-to-stream</div></div>
       <script></script>
@@ -138,6 +141,8 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
           Failed Deferred
         </div>
       </div>
+      <script></script>
+      <script></script>
       <script></script>
     </div>
     

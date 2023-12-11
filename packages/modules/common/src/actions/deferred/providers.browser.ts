@@ -1,7 +1,6 @@
 import { provide } from '@tramvai/core';
 import type { Deferred } from '@tramvai/tokens-common';
 import { DEFERRED_ACTIONS_MAP_TOKEN } from '@tramvai/tokens-common';
-import { __Deferred } from './deferred.inline';
 
 declare global {
   interface Window {

@@ -1,33 +1,41 @@
-import type { Deferred } from '@tramvai/tokens-common';
+import type { Deferred as IDeferred } from '@tramvai/tokens-common';
 
-export function __Deferred(this: Deferred & Record<string, any>) {
-  this.initPromise = () => {
+export class Deferred implements IDeferred {
+  promise: Promise<any>;
+  resolve!: (value: any) => void;
+  reject!: (reason: any) => void;
+
+  resolveData: any;
+  rejectReason: any;
+
+  isResolved = () => {
+    return typeof this.resolveData !== 'undefined';
+  };
+
+  isRejected = () => {
+    return typeof this.rejectReason !== 'undefined';
+  };
+
+  reset = () => {
+    this.resolveData = undefined;
+    this.rejectReason = undefined;
+    this.promise = this.initPromise();
+  };
+
+  private initPromise = () => {
     return new Promise((resolve, reject) => {
-      this.resolve = (value) => {
+      this.resolve = (value: any) => {
         this.resolveData = value;
         resolve(value);
       };
-
-      this.reject = (reason) => {
+      this.reject = (reason: any) => {
         this.rejectReason = reason;
         reject(reason);
       };
     });
   };
 
-  this.promise = this.initPromise();
-
-  this.isResolved = () => {
-    return typeof this.resolveData !== 'undefined';
-  };
-
-  this.isRejected = () => {
-    return typeof this.rejectReason !== 'undefined';
-  };
-
-  this.reset = () => {
-    this.resolveData = undefined;
-    this.rejectReason = undefined;
+  constructor() {
     this.promise = this.initPromise();
-  };
+  }
 }

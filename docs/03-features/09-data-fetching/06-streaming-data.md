@@ -114,6 +114,10 @@ After that, at page initia load (or with disabled JS) you will see header, foote
 
 You can change `deferred: true` to `conditions: { onlyBrowser: true }` and compare how slower results render will be.
 
+### Actions timeout
+
+Deferred actions execution time are limited by [response stream timeout](03-features/010-rendering/06-streaming.md#response-stream-timeout).
+
 ## How-to
 
 ### Use deferred actions with route dynamic parameters
