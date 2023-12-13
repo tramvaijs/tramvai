@@ -16,12 +16,12 @@ strip = "symbols"
 members = ["plugins/*"]
 
 [workspace.dependencies]
-swc_common = { version = "0.31.12" }
-swc_ecma_parser = { version = "0.134.12" }
+swc_common = { version = "0.33.10" }
+swc_ecma_parser = { version = "0.141.30" }
 if_chain = { version = "1.0.2" }
 
 [workspace.dependencies.swc_core]
-version = "0.76.44"
+version = "0.86.100"
 features = [
   "ecma_plugin_transform",
   "ecma_utils",

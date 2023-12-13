@@ -10,7 +10,7 @@ import type { TranspilerConfig } from '../webpack/utils/transpiler';
 
 const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasi';
 
-const NOT_SUPPORTED_FIELDS = ['alias', 'generateDataQaTag', 'enableFillActionNamePlugin'];
+const NOT_SUPPORTED_FIELDS = ['alias', 'enableFillActionNamePlugin'];
 let warningWasShown = false;
 
 export const getSwcOptions = (config: TranspilerConfig): SwcOptions => {
@@ -25,6 +25,7 @@ export const getSwcOptions = (config: TranspilerConfig): SwcOptions => {
     removeTypeofWindow,
     tramvai = false,
     rootDir = process.cwd(),
+    generateDataQaTag = false,
   } = config;
 
   if (!warningWasShown) {
@@ -143,6 +144,7 @@ Having swc config may conflict with @tramvai/cli configuration`
           [resolveTramvaiSwcPlugin('lazy_component'), {}],
           isServer && [resolveTramvaiSwcPlugin('dynamic_import_to_require'), {}],
           tramvai && env === 'development' && [resolveTramvaiSwcPlugin('provider_stack'), {}],
+          generateDataQaTag && [resolveTramvaiSwcPlugin('react_element_info_unique'), {}],
         ].filter(Boolean) as Array<[string, Record<string, any>]>,
       },
     },

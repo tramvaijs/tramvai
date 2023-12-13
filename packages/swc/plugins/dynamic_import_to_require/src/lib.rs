@@ -38,7 +38,7 @@ impl VisitMut for ReplaceDynamicImport {
                 ModuleItem::ModuleDecl(ModuleDecl::Import(ImportDecl {
                     span: DUMMY_SP,
                     type_only: false,
-                    asserts: None,
+                    with: None,
                     src: Box::new("@swc/helpers".into()),
                     specifiers: vec![ImportSpecifier::Named(ImportNamedSpecifier {
                         span: DUMMY_SP,

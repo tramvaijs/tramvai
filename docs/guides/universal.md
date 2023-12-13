@@ -5,7 +5,6 @@ title: Separating code for server and client
 
 The tramvai framework and its core components are universal and work equally well in all environments. tramvai cli collects server and client code into separate assemblies. At the same time, it is required to manually control the execution of user code in the required environment. The main mechanisms for this are package.json, dependency injection and direct checks in the code against the environment.
 
-
 Learn more about how webpack picks the right files for different `target`, [in this article](https://www.jonathancreamer.com/how-webpack-decides-what-entry-to-load-from-a-package-json/).
 
 User code that depends on the environment can be divided into several types:
@@ -20,34 +19,34 @@ To execute branches of code or in specific environments, several checks can be u
 
 #### process.env
 
-When building a project, tramvai cli sets two variables indicating the environment - `process.env.SERVER` and `process.env.BROWSER`. Webpack will automatically remove code with a condition that does not match the current environment, for example, the following code will not be included in the server bundle:
-
-```javascript
-if (process.env.BROWSER) {
-  console.log(window.innerWidth, window.innerHeight);
-}
-```
-
 To exclude code from a production build, regardless of the environment, you can use the variable `process.env.NODE_ENV`:
 
 ```javascript
 if (process.env.NODE_ENV === 'development') {
-  console.log('отладочная информация');
+  console.log('debug information');
+}
+```
+
+#### typeof window
+
+When building a project, you can rely on `typeof window`. Webpack will automatically remove code with a condition that does not match the current environment, for example, the following code will not be included in the server bundle:
+
+```javascript
+if (typeof window !== 'undefined') {
+  console.log(window.innerWidth, window.innerHeight);
 }
 ```
 
 To exclude imported libraries from the assembly, you need to replace the top-level `import` with `require` inside the condition:
 
 ```javascript
-if (process.env.BROWSER) {
+if (typeof window !== 'undefined') {
   const logger = require('@tinkoff/logger');
   const log = logger('debug');
 
   log.info(window.location.href);
 }
 ```
-
-#### typeof window
 
 For additional optimizations, the [babel plugin](https://github.com/FormidableLabs/babel-plugin-transform-define) is used, which turns `typeof window` from the server assembly to `'undefined'`, and from the client assembly to `'object'`, which allows webpack to cut out unnecessary code, for example, the following condition works similarly to checking `process.env.BROWSER`:
 
@@ -79,6 +78,12 @@ Next, in `package.json`, you need to tell the bundler which code to use for diff
   "browser": "./module.client.js"
 }
 ```
+
+:::note
+
+This is a recommended way to use code separation while declaring your own modules in tramvai project.
+
+:::
 
 ### npm packages
 

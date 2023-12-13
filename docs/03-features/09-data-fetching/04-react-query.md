@@ -646,7 +646,7 @@ As a parameter `key` you can use:
 - a function that takes the parameters with which `query` is called and returns a string - `key: (this: { deps }, options) => 'query-name'`. Where through `this.deps` you can get resolved deps for the query.
 - a function that accepts parameters, with which `query` is called, and returns an array, where any serializable data can be used as elements - `key: (this: { deps }, options) => ['query-name', options, { bar: 'baz' }]`
 
-::: note
+:::note
 
 If you pass parameter `key` as a function, you should pass actionNamePostfix to avoid duplicates in the server-client cache
 
