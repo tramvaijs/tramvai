@@ -33,6 +33,7 @@ import { provide } from '@tramvai/core';
 
 provide({
   provide: REGISTER_INSTANT_METRIC_TOKEN,
+  scope: Scope.SINGLETON,
   multi: true,
   deps: {
     metrics: METRICS_MODULE_TOKEN,

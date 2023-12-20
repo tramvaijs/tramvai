@@ -1,4 +1,4 @@
-import { Module } from '@tramvai/core';
+import { Module, Scope } from '@tramvai/core';
 import { createLayout, composeLayoutOptions } from '@tinkoff/layout-factory';
 import {
   DEFAULT_LAYOUT_COMPONENT,
@@ -14,6 +14,7 @@ const RenderChildrenComponent = ({ children }) => children;
   providers: [
     {
       provide: DEFAULT_LAYOUT_COMPONENT,
+      scope: Scope.SINGLETON,
       useFactory: ({ layoutOptions }) => {
         const options = composeLayoutOptions(layoutOptions);
         return createLayout(options);
@@ -24,6 +25,7 @@ const RenderChildrenComponent = ({ children }) => children;
     },
     {
       provide: 'componentDefaultList',
+      scope: Scope.SINGLETON,
       multi: true,
       useFactory: (components) => ({
         ...components,

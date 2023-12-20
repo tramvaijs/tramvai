@@ -135,6 +135,7 @@ export * from '@tramvai/tokens-metrics';
     }),
     provide({
       provide: COMMAND_LINE_EXECUTION_END_TOKEN,
+      scope: Scope.SINGLETON,
       useFactory: ({ metrics }) => {
         return commandLineMetrics(metrics);
       },

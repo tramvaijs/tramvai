@@ -134,7 +134,7 @@ function makeRecord<T>(
 function providerToRecord<T>(provider: Provider): RecordProvide<T> {
   let factory;
   let resolvedDeps;
-  let scope = Scope.REQUEST;
+  let scope = (provider.provide.isModernToken && provider.provide.options.scope) ?? Scope.REQUEST;
 
   if ('useFactory' in provider) {
     factory = (deps: ProvideDepsIterator<any>) => provider.useFactory(deps);
@@ -143,6 +143,8 @@ function providerToRecord<T>(provider: Provider): RecordProvide<T> {
     }
     if (provider.scope) {
       scope = provider.scope;
+    } else if (provider.provide.isModernToken && provider.provide.options.scope) {
+      scope = provider.provide.options.scope;
     }
   } else if ('useClass' in provider) {
     // eslint-disable-next-line new-cap
@@ -152,6 +154,8 @@ function providerToRecord<T>(provider: Provider): RecordProvide<T> {
     }
     if (provider.scope) {
       scope = provider.scope;
+    } else if (provider.provide.isModernToken && provider.provide.options.scope) {
+      scope = provider.provide.options.scope;
     }
   }
   return makeRecord<T>(factory, resolvedDeps, scope, false, (provider as any).__stack);
@@ -305,7 +309,9 @@ export class Container {
         multiRecord = makeRecord(
           undefined,
           {},
-          provider.scope || Scope.REQUEST,
+          provider.scope ||
+            (provider.provide.isModernToken && provider.provide.options.scope) ||
+            Scope.REQUEST,
           true,
           (provider as any).__stack
         );

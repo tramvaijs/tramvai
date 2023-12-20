@@ -77,16 +77,18 @@ You can register header and footer components through providers:
 
 ```tsx
 import { DEFAULT_HEADER_COMPONENT, DEFAULT_FOOTER_COMPONENT } from '@tramvai/tokens-render';
-import { provide } from '@tramvai/core';
+import { provide, Scope } from '@tramvai/core';
 
 createApp({
   providers: [
     provide({
       provide: DEFAULT_HEADER_COMPONENT,
+      scope: Scope.SINGLETON,
       useValue: DefaultHeader,
     }),
     provide({
       provide: DEFAULT_FOOTER_COMPONENT,
+      scope: Scope.SINGLETON,
       useValue: DefaultFooter,
     }),
   ],

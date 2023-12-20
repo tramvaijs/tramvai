@@ -1,6 +1,6 @@
 import flatten from '@tinkoff/utils/array/flatten';
 
-import { Module, DI_TOKEN, provide, optional } from '@tramvai/core';
+import { Module, DI_TOKEN, provide, optional, Scope } from '@tramvai/core';
 import toArray from '@tinkoff/utils/array/toArray';
 import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import {
@@ -111,6 +111,7 @@ import { papiExecutorProvider } from './server/executor';
     // необходимо для утилит. Подумать как можно убрать в будующем. Если убрать не будет ломающим изменением
     provide({
       provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+      scope: Scope.SINGLETON,
       multi: true,
       useValue: createPapiMethod({
         method: 'get',

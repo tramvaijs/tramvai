@@ -1,4 +1,4 @@
-import { Module, commandLineListTokens } from '@tramvai/core';
+import { Module, Scope, commandLineListTokens } from '@tramvai/core';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
 import { createPapiMethod } from '@tramvai/papi';
 import type { Counter } from '@tramvai/tokens-metrics';
@@ -13,6 +13,7 @@ import { setInstantMetrics } from './store';
     ...sharedProviders,
     {
       provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+      scope: Scope.SINGLETON,
       multi: true,
       useFactory({
         metrics,

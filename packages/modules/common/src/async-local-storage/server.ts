@@ -15,7 +15,7 @@ import { ASYNC_LOCAL_STORAGE_TOKEN } from '@tramvai/tokens-common';
     provide({
       provide: WEB_FASTIFY_APP_INIT_TOKEN,
       multi: true,
-      scope: Scope.REQUEST,
+      scope: Scope.SINGLETON,
       useFactory: ({ app, storage }) => {
         return () => {
           app.addHook('onRequest', (req, reply, done) => {

@@ -1,5 +1,5 @@
 import type { Server } from 'http';
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 import type { Papi } from '@tramvai/papi';
 import type { AnyError } from '@tramvai/safe-strings';
 
@@ -19,13 +19,17 @@ declare module '@tramvai/papi' {
  * @description
  * Specifies base url for public papi handlers. By default equals to `/[appName]/papi`
  */
-export const SERVER_MODULE_PAPI_PUBLIC_URL = createToken<string>('serverModulePapiPublicUrl');
+export const SERVER_MODULE_PAPI_PUBLIC_URL = createToken<string>('serverModulePapiPublicUrl', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
  * Specifies base url for private papi handlers. By default equals `/[appName]/private/papi`
  */
-export const SERVER_MODULE_PAPI_PRIVATE_URL = createToken<string>('serverModulePapiPrivateUrl');
+export const SERVER_MODULE_PAPI_PRIVATE_URL = createToken<string>('serverModulePapiPrivateUrl', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
@@ -33,6 +37,7 @@ export const SERVER_MODULE_PAPI_PRIVATE_URL = createToken<string>('serverModuleP
  */
 export const SERVER_MODULE_PAPI_PRIVATE_ROUTE = createToken<Papi>('serverModulePapiPrivateRoute', {
   multi: true,
+  scope: Scope.SINGLETON,
 });
 
 /**
@@ -41,6 +46,7 @@ export const SERVER_MODULE_PAPI_PRIVATE_ROUTE = createToken<Papi>('serverModuleP
  */
 export const SERVER_MODULE_PAPI_PUBLIC_ROUTE = createToken<Papi>('serverModulePapiPublicRoute', {
   multi: true,
+  scope: Scope.SINGLETON,
 });
 
 /**
@@ -95,7 +101,10 @@ export const DEPENDENCIES_VERSION_FILTER_TOKEN = createToken<DepsFilter>(
  * List of the utility URLs on server (e.g. healthz and readyz)
  * Url matching is happens with a library `path-to-regexp`.
  */
-export const UTILITY_SERVER_PATHS = createToken<string>('server utility paths', { multi: true });
+export const UTILITY_SERVER_PATHS = createToken<string>('server utility paths', {
+  multi: true,
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description

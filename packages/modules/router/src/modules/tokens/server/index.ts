@@ -1,4 +1,4 @@
-import type { Provider } from '@tramvai/core';
+import { Scope, type Provider } from '@tramvai/core';
 import { REQUEST_MANAGER_TOKEN, RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
 import { additionalRouterParameters } from '../../tokens';
@@ -17,6 +17,7 @@ export const serverTokens: Provider[] = [
   },
   {
     provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+    scope: Scope.SINGLETON,
     multi: true,
     useValue: bundleInfoPapi,
   },

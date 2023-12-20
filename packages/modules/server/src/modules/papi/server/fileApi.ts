@@ -1,6 +1,6 @@
 import eachObj from '@tinkoff/utils/object/each';
 
-import type { Provider } from '@tramvai/core';
+import { Scope, type Provider } from '@tramvai/core';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
 import { createPapiMethod, getPapiParameters, isPapiMethod } from '@tramvai/papi';
@@ -47,6 +47,7 @@ change settings serverApiDir in tramvai.json`,
 
 export const fileApiProvider: Provider = {
   provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+  scope: Scope.SINGLETON,
   multi: true,
   useFactory: getFileApi,
   deps: {

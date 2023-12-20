@@ -1,4 +1,4 @@
-import { commandLineListTokens, declareModule, provide } from '@tramvai/core';
+import { Scope, commandLineListTokens, declareModule, provide } from '@tramvai/core';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { ROUTER_TOKEN } from '@tramvai/tokens-router';
 import isNil from '@tinkoff/utils/is/nil';
@@ -64,6 +64,7 @@ export const BrowserTimingModule = declareModule({
     }),
     provide({
       provide: COMMAND_LINE_EXECUTION_END_TOKEN,
+      scope: Scope.SINGLETON,
       multi: true,
       useValue: (di, type, status, timingInfo, key) => {
         Object.keys(timingInfo).forEach((line) => {

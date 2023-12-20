@@ -10,7 +10,7 @@ import type {
   ACTION_EXECUTION_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
-import { isSilentError } from '@tinkoff/errors';
+import { ExecutionAbortError, isSilentError } from '@tinkoff/errors';
 import type {
   SERVER_RESPONSE_STREAM,
   SERVER_RESPONSE_TASK_MANAGER,
@@ -64,9 +64,20 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
       (executionContext, abortController) => {
         return new Promise<void>((resolve, reject) => {
           const timeoutMarker = setTimeout(() => {
-            this.log.warn(
-              `page actions has exceeded timeout of ${this.deps.limitTime}ms, ignore some results of execution`
-            );
+            const unfinishedActions: string[] = [];
+
+            this.deps.actionExecution.execution.forEach((value, key) => {
+              if (value.status === 'pending') {
+                unfinishedActions.push(key);
+              }
+            });
+
+            this.log.warn({
+              event: `actions-execution-timeout`,
+              message: `Page actions has exceeded timeout of ${this.deps.limitTime}ms, ignore some results of execution.
+You can find more detailed information from "action-execution-error" logs, and find relative logs by using the same "x-request-id" header`,
+              unfinishedActions,
+            });
 
             abortController.abort();
 
@@ -136,20 +147,41 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
 
                 return promise;
               })
+              .then((payload) => {
+                if (executionContext.abortSignal.aborted) {
+                  const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
+                  const actionName = parameters?.name ?? 'unknown';
+                  const contextName = `${executionContext.name}.${actionName}`;
+
+                  this.log.warn({
+                    error: new ExecutionAbortError({
+                      message: `Execution aborted in context "${contextName}"`,
+                      contextName,
+                    }),
+                    event: `action-execution-error`,
+                    message: `${actionName} has exceeded timeout of ${this.deps.limitTime}ms, execution results will be ignored.
+This action will be automatically executed on client - https://tramvai.dev/docs/features/data-fetching/action#synchronizing-between-server-and-client
+If the request in this action takes too long, you can move it to the client using "onlyBrowser" condition or use Deferred Actions.
+Also, the necessary network accesses may not be present.`,
+                  });
+                }
+
+                return payload;
+              })
               .catch((error) => {
                 const isCriticalError = stopRunAtError(error);
 
                 if (!isSilentError(error)) {
                   const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
 
-                  this.log.error({
+                  this.log.warn({
                     error,
                     event: `action-execution-error`,
                     message: `${parameters?.name ?? 'unknown'} execution error, ${
                       isCriticalError
                         ? `${error.name} error are expected and will stop actions execution and prevent page rendering`
                         : `this action will be automatically executed on client - https://tramvai.dev/docs/features/data-fetching/action#synchronizing-between-server-and-client
-If the request in this action takes too long, you can move it to the client using "onlyBrowser" condition.
+If the request in this action takes too long, you can move it to the client using "onlyBrowser" condition or use Deferred Actions.
 Also, the necessary network accesses may not be present.`
                     }`,
                   });

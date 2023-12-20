@@ -5,7 +5,7 @@ import type {
   FastifyReply,
   FastifyRequest as OriginalFastifyRequest,
 } from 'fastify';
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 import type { Papi } from '@tramvai/papi';
 import type { Duplex } from 'stream';
 
@@ -74,7 +74,7 @@ export const WEB_FASTIFY_APP_TOKEN = createToken<FastifyInstance>('webApp fastif
  */
 export const WEB_FASTIFY_APP_BEFORE_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>(
   'webApp fastify beforeInit',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**
@@ -84,7 +84,7 @@ export const WEB_FASTIFY_APP_BEFORE_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HA
  */
 export const WEB_FASTIFY_APP_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>(
   'webApp fastify init',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**
@@ -93,7 +93,7 @@ export const WEB_FASTIFY_APP_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>(
  */
 export const WEB_FASTIFY_APP_METRICS_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>(
   'webApp fastify metrics',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**

@@ -89,7 +89,7 @@ If you need to use other application dependencies from di in the handler, you ca
 // ...
 import { createPapiMethod } from '@tramvai/papi';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
-import { provide } from '@tramvai/core';
+import { provide, Scope } from '@tramvai/core';
 
 createApp({
   // ...
@@ -97,6 +97,7 @@ createApp({
     // ...
     provide({
       provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+      scope: Scope.SINGLETON,
       multi: true,
       useFactory: () => {
         return createPapiMethod({

@@ -23,6 +23,9 @@
   "dependencies": {
     "@tinkoff/meta-tags-generate": "0.0.0-stub"
   },
+  "devDependencies": {
+    "@tramvai/react": "0.0.0-stub"
+  },
   "peerDependencies": {
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",

@@ -39,6 +39,9 @@
         },
         {
             "path": "../../tramvai/test/mocks"
+        },
+        {
+            "path": "../../tramvai/react"
         }
     ]
 }

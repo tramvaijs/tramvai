@@ -21,11 +21,8 @@ export const cachesToken = createToken<Cache[]>('_cachesList');
     },
     {
       provide: CREATE_CACHE_TOKEN,
-      useFactory: ({ caches, isChildDi }): CacheFactory => {
-        if (isChildDi) {
-          return cacheFactory;
-        }
-
+      scope: Scope.SINGLETON,
+      useFactory: ({ caches }): CacheFactory => {
         return (type?, ...args) => {
           const cache = cacheFactory(type, ...args);
 
@@ -36,7 +33,6 @@ export const cachesToken = createToken<Cache[]>('_cachesList');
       },
       deps: {
         caches: cachesToken,
-        isChildDi: { token: IS_DI_CHILD_CONTAINER_TOKEN, optional: true },
       },
     },
     {

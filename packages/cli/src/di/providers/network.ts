@@ -13,20 +13,7 @@ export const networkProviders: readonly Provider[] = [
       logger: 'network logger',
     },
     provide: PORT_MANAGER_TOKEN,
-    useFactory: (deps) => {
-      // @ts-expect-error
-      const portManager = new PortManager(deps);
-
-      ['SIGINT', 'SIGTERM'].forEach((signal) => {
-        process.on(signal, async () => {
-          await portManager.cleanup();
-
-          process.exit();
-        });
-      });
-
-      return portManager;
-    },
+    useClass: PortManager,
   }),
   provide({
     provide: 'network logger',

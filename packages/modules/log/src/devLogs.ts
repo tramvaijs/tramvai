@@ -57,6 +57,7 @@ export class DevLogsExtension implements Extension {
 export const serverProviders: Provider[] = [
   provide({
     provide: LOGGER_INIT_HOOK,
+    scope: Scope.SINGLETON,
     multi: true,
     useFactory({ reporter }) {
       return (loggerInstance) => {

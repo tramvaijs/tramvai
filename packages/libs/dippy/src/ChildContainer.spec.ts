@@ -1,6 +1,7 @@
 import { ChildContainer } from './ChildContainer';
 import { Container } from './Container';
 import { Scope } from './constant';
+import { createToken } from './createToken/createToken';
 
 describe('new ChildContainer', () => {
   it('Обработка создания child версий инстансов', () => {
@@ -467,6 +468,172 @@ describe('new ChildContainer', () => {
       expect(childContainer.get('b')).toBe('root:child');
       expect(subRootContainer.get('b')).toBe('root:root');
       expect(subChildContainer.get('b')).toBe('root:child');
+    });
+  });
+});
+
+describe('new ChildContainer, scoped tokens', () => {
+  it('Обработка создания child версий инстансов', () => {
+    const result: string[] = [];
+    const resultTest = ['create C', 'create A', 'create C', 'create A', 'create B'];
+    const A = createToken<any>('A');
+    const B = createToken<any>('B', { scope: Scope.SINGLETON });
+    const C = createToken<any>('C');
+
+    const rootContainer = new Container([
+      {
+        provide: C,
+        useClass: class C {
+          constructor() {
+            result.push('create C');
+          }
+        },
+      },
+      {
+        provide: A,
+        useClass: class A {
+          constructor() {
+            result.push('create A');
+          }
+        },
+        deps: { C: 'C' },
+      },
+      {
+        provide: B,
+        useClass: class B {
+          constructor() {
+            result.push('create B');
+          }
+        },
+      },
+    ]);
+    const childContainer1 = new ChildContainer(rootContainer);
+    const childContainer2 = new ChildContainer(rootContainer);
+
+    childContainer1.get(A);
+    childContainer2.get(A);
+
+    childContainer1.get(B);
+    childContainer2.get(B);
+
+    expect(result).toEqual(resultTest);
+    childContainer1.get(A);
+    childContainer2.get(A);
+
+    childContainer1.get(B);
+    childContainer2.get(B);
+    expect(result).toEqual(resultTest);
+
+    rootContainer.get(C);
+    expect(result).toEqual([...resultTest, 'create C']);
+
+    rootContainer.get(A);
+    expect(result).toEqual([...resultTest, 'create C', 'create A']);
+  });
+
+  it('singleton провайдеры должны иметь доступ только к провайдерам из родительского контейнера', () => {
+    const calls: { name: string; de: string }[] = [];
+    const de = createToken<any>('de', { scope: Scope.SINGLETON });
+    const rootTest = createToken<any>('rootTest', { scope: Scope.SINGLETON });
+    const rootDelay = createToken<any>('rootDelay', { scope: Scope.SINGLETON });
+    const request = createToken<any>('request', { scope: Scope.REQUEST });
+
+    const rootContainer = new Container([
+      {
+        provide: de,
+        scope: Scope.SINGLETON,
+        useFactory: () => {
+          return 'root';
+        },
+      },
+      {
+        provide: rootTest,
+        scope: Scope.SINGLETON,
+        useFactory: ({ de }) => {
+          calls.push({ name: 'rootTest', de });
+        },
+        deps: {
+          de,
+        },
+      },
+      {
+        provide: rootDelay,
+        useFactory: ({ de }) => {
+          calls.push({ name: 'rootDelay', de });
+        },
+        deps: {
+          de,
+        },
+      },
+      {
+        provide: request,
+        useFactory: ({ de, root }) => {
+          calls.push({ name: 'request', de });
+        },
+        deps: {
+          de,
+          root: rootDelay,
+        },
+      },
+    ]);
+    const childContainer = new ChildContainer(rootContainer);
+
+    childContainer.register({ provide: de, scope: Scope.REQUEST, useFactory: () => 'child' });
+
+    expect(rootContainer.get(de)).toBe('root');
+    expect(childContainer.get(de)).toBe('child');
+
+    rootContainer.get(rootTest);
+    childContainer.get(rootTest);
+    childContainer.get(request);
+
+    expect(calls).toEqual([
+      { name: 'rootTest', de: 'root' },
+      { name: 'rootDelay', de: 'root' },
+      { name: 'request', de: 'child' },
+    ]);
+  });
+
+  describe('sub di hierarchy', () => {
+    it('should not leak to root container', () => {
+      const a = createToken<any>('a');
+      const b = createToken<any>('b', { scope: Scope.SINGLETON });
+
+      const rootContainer = new Container([
+        {
+          provide: a,
+          useValue: 'root',
+        },
+        {
+          provide: b,
+          useFactory: ({ a }) => `root:${a}`,
+          deps: {
+            a,
+          },
+        },
+      ]);
+      const subRootContainer = new Container(
+        [
+          {
+            provide: b,
+            useFactory: ({ a }) => {
+              return `sub:${a}`;
+            },
+            deps: {
+              a,
+            },
+          },
+        ],
+        rootContainer
+      );
+
+      const childContainer = new ChildContainer(rootContainer);
+
+      const subChildContainer = new ChildContainer(subRootContainer, childContainer);
+
+      expect(subChildContainer.get(b)).toBe('sub:root');
+      expect(childContainer.get(b)).toBe('root:root');
+      expect(rootContainer.get(b)).toBe('root:root');
     });
   });
 });

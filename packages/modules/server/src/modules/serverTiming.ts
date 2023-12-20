@@ -1,4 +1,4 @@
-import { declareModule, provide } from '@tramvai/core';
+import { Scope, declareModule, provide } from '@tramvai/core';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
@@ -8,6 +8,7 @@ export const ServerTimingModule = declareModule({
   providers: [
     provide({
       provide: COMMAND_LINE_EXECUTION_END_TOKEN,
+      scope: Scope.SINGLETON,
       multi: true,
       useValue: (di, type, status, timingInfo) => {
         if (type === 'server' && status === 'customer') {

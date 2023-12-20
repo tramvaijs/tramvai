@@ -1,8 +1,8 @@
 import type { ScopeVariants } from './Provider';
 
 export const Scope = {
-  REQUEST: 'request' as ScopeVariants,
-  SINGLETON: 'singleton' as ScopeVariants,
+  REQUEST: 'request' as const,
+  SINGLETON: 'singleton' as const,
 };
 
 export const Errors = {

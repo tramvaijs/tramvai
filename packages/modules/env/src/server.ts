@@ -50,6 +50,7 @@ export { ENV_MANAGER_TOKEN, ENV_USED_TOKEN };
     }),
     provide({
       provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+      scope: Scope.SINGLETON,
       multi: true,
       useFactory: ({ environmentManager }: { environmentManager: typeof ENV_MANAGER_TOKEN }) => {
         return createPapiMethod({

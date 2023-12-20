@@ -1,3 +1,4 @@
+import type { ScopeVariants } from '../Provider';
 import type { TokenType, TokenOptions } from './createToken.h';
 
 /**
@@ -65,11 +66,14 @@ export type MultiTokenInterface<T = any> = T extends null | undefined
 
 export type TokenInterface<T = any> = BaseTokenInterface<T> | MultiTokenInterface<T>;
 
-export function createToken<Type = any>(name?: string): BaseTokenInterface<Type>;
+export function createToken<Type = any>(
+  name?: string,
+  options?: { scope?: ScopeVariants }
+): BaseTokenInterface<Type>;
 
 export function createToken<Type = any>(
   name: string,
-  options: { multi: true }
+  options: { multi: true; scope?: ScopeVariants }
 ): MultiTokenInterface<Type>;
 
 export function createToken<T = any>(name?: string, options?: TokenOptions): T {

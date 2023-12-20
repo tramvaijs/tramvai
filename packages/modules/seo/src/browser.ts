@@ -1,6 +1,6 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import isArray from '@tinkoff/utils/is/array';
-import { Module, provide } from '@tramvai/core';
+import { Module, Scope, provide } from '@tramvai/core';
 import { Meta, Update } from '@tinkoff/meta-tags-generate';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { INITIAL_APP_STATE_TOKEN } from '@tramvai/module-common';
@@ -31,6 +31,7 @@ declare module '@tinkoff/router' {
     provide({
       // Update meta only when all actions were completed.
       provide: COMMAND_LINE_EXECUTION_END_TOKEN,
+      scope: Scope.SINGLETON,
       multi: true,
       useFactory: () => {
         return function updateMeta(di, type, status) {

@@ -103,6 +103,7 @@ import { ExecutionContextManager } from './executionContext/executionContextMana
     }),
     provide({
       provide: EXECUTION_CONTEXT_MANAGER_TOKEN,
+      scope: Scope.SINGLETON,
       useClass: ExecutionContextManager,
     }),
     ...serverProviders,

@@ -39,11 +39,12 @@ The module is automatically installed and added with the @tramvai/module-common 
 For example you want to add custom [extension](references/libs/logger.md#extension):
 
 ```ts
-import { provide } from '@tramvai/core';
+import { provide, Scope } from '@tramvai/core';
 import { LOGGER_INIT_HOOK } from '@tramvai/tokens-common';
 
 const provider = provide({
   provide: LOGGER_INIT_HOOK,
+  scope: Scope.SINGLETON,
   useValue: (loggerInstance) => {
     loggerInstance.addExtension({
       extend(logObj: LogObj): LogObj {

@@ -44,6 +44,7 @@ const composeOptions = (multiOptions, defaultOptions?) =>
     }),
     provide({
       provide: REGISTER_INSTANT_METRIC_TOKEN,
+      scope: Scope.SINGLETON,
       multi: true,
       useFactory: ({ metrics }) =>
         [

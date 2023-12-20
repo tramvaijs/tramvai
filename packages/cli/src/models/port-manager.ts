@@ -3,6 +3,7 @@ import { join } from 'path';
 import findCacheDir from 'find-cache-dir';
 import detectPort from 'detect-port';
 import { lock } from 'proper-lockfile';
+import noop from '@tinkoff/utils/function/noop';
 
 import type { ConfigEntry } from '../typings/configEntry/common';
 import type { Params as StartParams } from '../api/start';
@@ -20,10 +21,13 @@ export class PortManager {
   static readonly DEFAULT_MODULE_PORT = 3040;
   static readonly DEFAULT_STATIC_PORT = 4000;
   static readonly DEFAULT_MODULE_STATIC_PORT = 4040;
+  private static readonly cachePath = join(
+    findCacheDir({ cwd: __dirname, create: true, name: 'tramvai' }),
+    'used-ports'
+  );
 
   private readonly configEntry: ConfigEntry;
   private readonly commandParams: StartParams | StartProdParams;
-  private readonly cachePath: string;
   private readonly logger: Logger;
 
   public port: number | null = null;
@@ -33,11 +37,35 @@ export class PortManager {
     this.configEntry = configEntry;
     this.commandParams = commandParams;
     this.logger = logger;
+  }
 
-    this.cachePath = join(
-      findCacheDir({ cwd: __dirname, create: true, name: 'tramvai' }),
-      'used-ports'
-    );
+  private async handleConfigValues() {
+    if (this.commandParams.port !== undefined && this.commandParams.port !== 0) {
+      // @ts-expect-error There is a string actually
+      this.port = parseInt(this.commandParams.port, 10);
+    }
+
+    if (this.commandParams.staticPort !== undefined && this.commandParams.staticPort !== 0) {
+      // @ts-expect-error There is a string actually
+      this.staticPort = parseInt(this.commandParams.staticPort, 10);
+    }
+
+    switch (this.configEntry.type) {
+      case 'child-app':
+        await this.forChildApp();
+        break;
+
+      case 'module':
+        await this.forModule();
+        break;
+
+      case 'application':
+        await this.forApplication();
+        break;
+
+      default:
+        break;
+    }
   }
 
   /**
@@ -48,75 +76,62 @@ export class PortManager {
    * because we must pass a final number to the config manager.
    */
   public async computeAvailablePorts() {
-    await this.createCacheFile();
-    const release = await this.lockCacheFile();
+    if (process.env.USE_CONCURRENT_PORT_DETECTING === 'true') {
+      await this.createCacheFile();
+      const release = await this.lockCacheFile();
 
-    try {
-      if (this.commandParams.port !== undefined && this.commandParams.port !== 0) {
-        // @ts-expect-error There is a string actually
-        this.port = parseInt(this.commandParams.port, 10);
+      try {
+        await this.handleConfigValues();
+
+        await this.appendCacheFile([this.port, this.staticPort].join(','));
+      } catch (error) {
+        this.logger.event({
+          type: 'warning',
+          event: 'PORT_MANAGER:GET_AVAILABLE_PORTS',
+          message: `Can't get free ports for ${this.configEntry.type}:`,
+          payload: error.message ?? '',
+        });
+      } finally {
+        await release();
       }
 
-      if (this.commandParams.staticPort !== undefined && this.commandParams.staticPort !== 0) {
-        // @ts-expect-error There is a string actually
-        this.staticPort = parseInt(this.commandParams.staticPort, 10);
-      }
-
-      switch (this.configEntry.type) {
-        case 'child-app':
-          await this.forChildApp();
-          break;
-
-        case 'module':
-          await this.forModule();
-          break;
-
-        case 'application':
-          await this.forApplication();
-          break;
-
-        default:
-          break;
-      }
-
-      await this.appendCacheFile([this.port, this.staticPort].join(','));
-    } catch (error) {
-      this.logger.event({
-        type: 'warning',
-        event: 'PORT_MANAGER:GET_AVAILABLE_PORTS',
-        message: `Can't get free ports for ${this.configEntry.type}:`,
-        payload: error.message ?? '',
-      });
-    } finally {
-      await release();
+      return;
     }
+
+    await this.handleConfigValues();
   }
 
   /**
    * Cleanup a cache file by removing ports were written previously.
    */
   public async cleanup() {
-    const release = await this.lockCacheFile();
+    if (process.env.USE_CONCURRENT_PORT_DETECTING === 'true') {
+      const release = await this.lockCacheFile();
 
-    try {
-      const cache = await this.readCacheFile();
+      try {
+        const cache = await this.readCacheFile();
 
-      await this.writeCacheFile(
-        cache
-          .filter(Boolean)
-          .filter((port) => port !== this.port.toString() && port !== this.staticPort.toString())
-          .join(',')
-      );
-    } catch (error) {
-      this.logger.event({
-        type: 'warning',
-        event: 'PORT_MANAGER:CLEANUP',
-        message: "Can't perform a cleanup of previously used ports:",
-        payload: error.message ?? '',
-      });
-    } finally {
-      await release();
+        await this.writeCacheFile(
+          cache
+            .filter(Boolean)
+            .filter((port) => port !== this.port.toString() && port !== this.staticPort.toString())
+            .join(',')
+        );
+      } catch (error) {
+        this.logger.event({
+          type: 'warning',
+          event: 'PORT_MANAGER:CLEANUP',
+          message: "Can't perform a cleanup of previously used ports:",
+          payload: error.message ?? '',
+        });
+      } finally {
+        await release();
+      }
+
+      return;
     }
+
+    noop();
   }
 
   private async forApplication() {
@@ -138,20 +153,20 @@ export class PortManager {
   }
 
   private lockCacheFile() {
-    return lock(this.cachePath, { retries: 10 });
+    return lock(PortManager.cachePath, { retries: 10 });
   }
 
   private async createCacheFile() {
     try {
-      await access(this.cachePath);
+      await access(PortManager.cachePath);
     } catch (error) {
-      await outputFile(this.cachePath, '');
+      await outputFile(PortManager.cachePath, '');
     }
   }
 
   private async readCacheFile() {
     try {
-      const content = await readFile(this.cachePath, { encoding: 'utf-8' });
+      const content = await readFile(PortManager.cachePath, { encoding: 'utf-8' });
 
       return content.split(',');
     } catch (error) {
@@ -160,30 +175,34 @@ export class PortManager {
   }
 
   private async writeCacheFile(content: string) {
-    await outputFile(this.cachePath, content);
+    await outputFile(PortManager.cachePath, content);
   }
 
   private async appendCacheFile(content: string) {
-    await appendFile(this.cachePath, `,${content}`);
+    await appendFile(PortManager.cachePath, `,${content}`);
   }
 
   private async resolveFreePort(initial: number) {
     try {
-      const cache = await this.readCacheFile();
-      let port = await detectPort(initial);
-      let attempts = 1;
+      if (process.env.USE_CONCURRENT_PORT_DETECTING === 'true') {
+        const cache = await this.readCacheFile();
+        let port = await detectPort(initial);
+        let attempts = 1;
 
-      while (cache.includes(port.toString())) {
-        if (attempts >= 3) {
-          throw new Error(`Max attempts exceeded (${attempts})`);
+        while (cache.includes(port.toString())) {
+          if (attempts >= 3) {
+            throw new Error(`Max attempts exceeded (${attempts})`);
+          }
+
+          port = await detectPort(0);
+
+          attempts++;
         }
 
-        port = await detectPort(0);
-
-        attempts++;
+        return port;
       }
 
-      return port;
+      return detectPort(initial);
     } catch (error) {
       this.logger.event({
         type: 'info',

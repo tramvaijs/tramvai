@@ -1,5 +1,5 @@
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
-import { DI_TOKEN } from '@tinkoff/dippy';
+import { DI_TOKEN, Scope } from '@tinkoff/dippy';
 import { Module, provide } from '@tramvai/core';
 import { depsGraph } from './papi/deps-graph';
 
@@ -9,6 +9,7 @@ import { depsGraph } from './papi/deps-graph';
       ? [
           provide({
             provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+            scope: Scope.SINGLETON,
             multi: true,
             useFactory: depsGraph,
             deps: {

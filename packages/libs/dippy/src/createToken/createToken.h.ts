@@ -1,3 +1,5 @@
+import type { ScopeVariants } from '../Provider';
+
 export interface TokenType<T> {
   name: symbol;
   options: TokenOptions;
@@ -8,4 +10,5 @@ export interface TokenType<T> {
 
 export interface TokenOptions {
   multi?: boolean;
+  scope?: ScopeVariants;
 }
