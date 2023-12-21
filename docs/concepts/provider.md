@@ -10,46 +10,55 @@ provider is a simple object that provides an implementation for an interface (id
 
 ```tsx
 type Provider = {
-  provide: Token | string; // provider id
+  provide: Token; // provider id
   useValue?: any; // implementation of the identifier
-  useFactory?: any; // implementation of the identifier
-  useClass?: any; // implementation of the identifier
-  deps?: Record<string, Token | string>; // list of dependencies that the provider needs to work
-  multi?: boolean; // the ability to register multiple provider implementations, if true, when receiving the value of this identifier, all registered values ​​will come in the scope array
+  useFactory?: () => any; // implementation of the identifier
+  useClass?: Class; // implementation of the identifier
+  deps?: Record<string, Token>; // list of dependencies that the provider needs to work
   scope?: 'request' | 'singleton'; // If a singleton, then the container will register one instance of the provider for all client requests. If request will create its own instance for each client and Request
 };
 ```
 
 ## Types of providers
 
+### Factory
+
+When the instance is initialized, the function passed to `useFactory` will be called, if `deps` were specified, then the function will be called with the object of implementations as the first argument.
+
+`ExtractDependencyType` helper is used to get the resolved type of the dependency. Inside `useFactory`, `deps` will already has correct types.
+
+```tsx
+import { provide, ExtractDependencyType } from '@tramvai/core';
+
+class Implement {
+  constructor({ logger }: { logger: ExtractDependencyType<typeof LOGGER> }) {}
+}
+
+const provider = provide({
+  provide: TOKEN,
+  useFactory: (deps) => new Implement(deps),
+  deps: {
+    logger: LOGGER,
+  },
+});
+```
+
 ### Class
 
 When the instance is initialized, the class passed to `useClass` will be created, if `deps` were specified, then the class will be called with the object of implementations as the first argument
 
 ```tsx
-import { provide } from '@tramvai/core';
+import { provide, ExtractDependencyType } from '@tramvai/core';
+
+class Implement {
+  constructor({ logger }: { logger: ExtractDependencyType<typeof LOGGER> }) {}
+}
+
 const provider = provide({
-  provide: 'token',
-  useClass: class ImplementClass {
-    constructor({ logger }) {}
-  },
+  provide: TOKEN,
+  useClass: Implement,
   deps: {
-    logger: 'logger',
-  },
-});
-```
-
-### Factory
-
-When the instance is initialized, the function passed to `useFactory` will be called, if `deps` were specified, then the function will be called with the object of implementations as the first argument
-
-```tsx
-import { provide } from '@tramvai/core';
-const provider = provide({
-  provide: 'token',
-  useFactory: ({ logger }) => new Implement(logger),
-  deps: {
-    logger: 'logger',
+    logger: LOGGER,
   },
 });
 ```
@@ -60,27 +69,29 @@ Sets the provider's value to the data that was passed in the `useValue` paramete
 
 ```tsx
 import { provide } from '@tramvai/core';
+
 const provider = provide({
-  provide: 'token',
+  provide: TOKEN,
   useValue: { appName: 'APP' },
 });
 ```
 
 ## Multi providers
 
-We may need to be able to register multiple implementations for a single token. For example, several actions for one step. To implement this, you need to pass the `multi` parameter to the provider. In this case, an array of providers is stored in the di container:
+We may need to be able to register multiple implementations for a single token. For example, several actions for one step. To implement this, you need to pass the `multi` parameter to the token options. In this case, an array of providers is stored in the di container:
 
 ```tsx
-import { provide } from '@tramvai/core';
+import { provide, createToken } from '@tramvai/core';
+
+const MULTI_TOKEN = createToken<{ route: string }>('multi token', { multi: true });
+
 const providers = [
   provide({
-    provide: 'token',
-    multi: true,
+    provide: MULTI_TOKEN,
     useValue: { route: '/' },
   }),
   provide({
-    provide: 'token',
-    multi: true,
+    provide: MULTI_TOKEN,
     useValue: { route: '/cards' },
   }),
 ];
@@ -108,41 +119,43 @@ type Provider = {
 
 ### Optional Dependencies
 
-We don't always need mandatory dependencies to work. And we want to point out that the dependency is not necessary to work and it is not necessary to throw an error. To do this, you can pass the `optional` parameter, which will disable throwing an error if there is no dependency. Instead of implementing the dependency, the provider will receive the value `null`.
+We don't always need mandatory dependencies to work. And we want to point out that the dependency is not necessary to work and it is not necessary to throw an error. To do this, you can use `optional` helper (add the `optional` parameter underhood), which will disable throwing an error if there is no dependency. Instead of implementing the dependency, the provider will receive the value `null`.
 
 ```tsx
-import { provide } from '@tramvai/core';
+import { provide, optional, ExtractDependencyType } from '@tramvai/core';
+
+class Implement {
+  constructor({ logger }: { logger: ExtractDependencyType<typeof LOGGER> | null }) {}
+}
 
 const provider = provide({
-  provide: 'token',
-  useClass: class A {
-    constructor({ log }) {}
-  },
+  provide: TOKEN,
+  useClass: Implement,
   deps: {
-    log: {
-      token: 'log',
-      optional: true,
-    },
-  } as const,
+    logger: optional(LOGGER),
+  },
 });
 ```
 
 ### Multi dependencies
 
-Some providers are multi-providers and instead of one implementation, we will receive an array of implementations. For correct type inference, we must pass the `multi: true` parameter, apply `as const` for the `deps` block for correct type inference via TS:
+Some providers are multi-providers and instead of one implementation, we will receive an array of implementations. Type inference for `deps` inside `provide` helper will be done automatically, for provider implementation use `ExtractDependencyType` helper.
 
 ```tsx
-import { provide } from '@tramvai/core';
+import { provide, createToken, ExtractDependencyType } from '@tramvai/core';
 
-const COMMANDS_TOKEN = createToken<string>('commands', { multi: true });
+const COMMANDS_TOKEN = createToken<Command>('commands', { multi: true });
+
+class Implement {
+  // commands: Command[]
+  constructor({ commands }: { commands: ExtractDependencyType<typeof COMMANDS_TOKEN> }) {
+    commands.forEach();
+  }
+}
 
 const provider = provide({
-  provide: 'token',
-  useClass: class A {
-    constructor({ commands }) {
-      commands.forEach();
-    }
-  },
+  provide: TOKEN,
+  useClass: Implement,
   deps: {
     commands: COMMANDS_TOKEN,
   },
@@ -153,19 +166,21 @@ const provider = provide({
 
 For `multi` and `optional` dependencies, if provider was not founded, empty `[]` will be resolved, as opposed to `null` for standard tokens.
 
-```ts
-import { provide, optional, createToken } from '@tramvai/core';
+```tsx
+import { provide, optional, createToken, ExtractDependencyType } from '@tramvai/core';
 
-const COMMANDS_TOKEN = createToken<string>('commands', { multi: true });
+const COMMANDS_TOKEN = createToken<Command>('commands', { multi: true });
+
+class Implement {
+  // commands: Command[]
+  constructor({ commands }: { commands: ExtractDependencyType<typeof COMMANDS_TOKEN> }) {
+    commands.forEach();
+  }
+}
 
 const provider = provide({
-  provide: 'token',
-  useClass: class A {
-    // `commands` - empty array
-    constructor({ commands }) {
-      commands.forEach();
-    }
-  },
+  provide: TOKEN,
+  useClass: Implement,
   deps: {
     commands: optional(COMMANDS_TOKEN),
   },
@@ -178,17 +193,18 @@ DI does not allow declaring dependencies that depend on each other, for example:
 
 ```tsx
 import { provide } from '@tramvai/core';
+
 const providers = [
   provide({
-    provide: 'A',
+    provide: A,
     deps: {
-      B: 'B',
+      B: B,
     },
   }),
   provide({
-    provide: 'B',
+    provide: B,
     deps: {
-      A: 'A',
+      A: A,
     },
   }),
 ];
@@ -200,49 +216,71 @@ Such providers should reconsider and make a common part in a separate class, and
 
 ## Scope
 
-> option only affects the operation of the container on the server, only one common container running on the client, in which service providers with a different crowd kept together
+> Scope only affects providers at server-side, where child DI containers are created for each request.
+> In the browser, you can consider that all providers have a `Singleton` scope.
 
 Allows you to create singleton instances that will be shared between multiple clients. In standard behavior, each declared provider will be automatically deleted and recreated for each new client. This functionality was made in order for us to be able to store both singletons, for example, cache, and various personalized data. For example, user status and personalization.
 
 By default, all providers have the value `Scope.REQUEST`, which means that provider values ​​will be generated for each client. The exception is the `useValue` providers, which behave like a singleton.
 
-## Interface
+:::tip
+
+It is incorrect to use `Scope.REQUEST` providers as dependencies of `Scope.SINGLETON` providers. Only one `Request` provider instance will be created for `Singleton` providers. If this `Request` provider is stateful, it can lead to unexpected behavior. If provider is stateless, `Singleton` scope is optimal for performance.
+
+:::
 
 ```tsx
 import { provide } from '@tramvai/core';
+
 const provider = provide({
-  provide: 'Cache',
+  provide: CACHE,
   useFactory: Cache,
   scope: Scope.SINGLETON,
 });
 ```
 
-In this case, the `Cache` provider will be registered as a global singleton, since the `scope` parameter was passed and a single instance for all users will be used.
+In this case, the `CACHE` provider will be registered as a global singleton, since the `scope` parameter was passed and a single instance for all users will be used.
 
 ## Tokens
 
 Tokens are used as an identifier for the provider in DI. By the value of the token, the provider is registered and the implementation is searched.
 
-## Interface
+Our recommendation is to use CAMEL_CASE for tokens names. Also, you need to pass TS interface to `createToken` generic function to correct type inference, and a **unique** string as token name to avoid possible collisions.
 
 ```tsx
-type token = Token | string;
-```
+import { provide, createToken } from '@tramvai/core';
 
-A token can be either a string or a specially created using the `createToken` function into which an interface can be passed. In this case, you can use both a string and createToken at the same time, the main thing is that the identifier is the same
-
-## createToken
-
-```tsx
-import { createToken } from '@tinkoff/dippy';
-import { provide } from '@tramvai/core';
-
-const loggerToken = createToken<Logger>('logger');
+const LOGGER_TOKEN = createToken<Logger>('my-app-scope logger');
 
 const provider = provide({
-  provide: loggerToken,
+  provide: LOGGER_TOKEN,
   useClass: Logger,
 });
 ```
 
-The main difference is that you can pass an implementation interface to createToken, which will then be used for type checking when getting dependencies and creating providers.
+### Multi token
+
+As in [multi providers example](#multi-providers), you need to pass `{ multi: true }` options to `createToken`.
+
+```tsx
+import { provide, createToken } from '@tramvai/core';
+
+const MULTI_TOKEN = createToken<() => void>('multi token', { multi: true });
+```
+
+### Scoped token
+
+It is possible to create [scoped provider](#scope) automatically, by passing `scope` parameter to `createToken` options. It is very useful for popular tokens, like `commandLineRunnerTokens`.
+
+```tsx
+import { provide, createToken, Scope } from '@tramvai/core';
+
+const CACHE = createToken<Cache>('cache', { scope: Scope.SINGLETON });
+
+const provider = provide({
+  provide: CACHE,
+  useFactory: Cache,
+});
+```
+
+You can always override this behaviour by declare different `scope` parameter in provider.
