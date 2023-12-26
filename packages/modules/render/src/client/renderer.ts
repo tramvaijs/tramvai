@@ -51,7 +51,7 @@ const renderer: Renderer = ({ element, container, callback, log, renderMode }) =
 
     const hydrateRootFn = () =>
       startTransition(() => {
-        hydrateRoot(container, wrappedElement, {
+        hydrateRoot(container(), wrappedElement, {
           onRecoverableError: (error, errorInfo) => {
             const match = (error?.message ?? '').match(reactMinifiedErrorRegex);
             const key = match?.[1] ?? error?.message;
@@ -87,7 +87,7 @@ const renderer: Renderer = ({ element, container, callback, log, renderMode }) =
   }
 
   const { hydrate } = require('react-dom');
-  return hydrate(element, container, callback);
+  return hydrate(element, container(), callback);
 };
 
 export { renderer };

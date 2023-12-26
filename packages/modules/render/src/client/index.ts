@@ -49,7 +49,7 @@ export function rendering({
       di,
     });
 
-    const container = document.querySelector('.application');
+    const container = () => document.querySelector('.application');
     const executeRendererCallbacks = (renderErr?: Error) =>
       rendererCallback?.forEach((cb) => {
         try {

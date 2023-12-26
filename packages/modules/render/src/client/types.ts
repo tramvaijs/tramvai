@@ -4,7 +4,7 @@ import type { REACT_SERVER_RENDER_MODE } from '@tramvai/tokens-render';
 type Renderer = (params: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   element: any;
-  container: Element;
+  container: () => Element;
   callback: () => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   log: any;
