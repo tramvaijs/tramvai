@@ -30,6 +30,7 @@ createApp({
       provide: DEFAULT_HEADER_COMPONENT,
       useValue: Header,
     }),
+    // eslint-disable-next-line valid-typeof
     ...(typeof window !== undefined
       ? [
           provide({
@@ -41,6 +42,7 @@ createApp({
                 // wb can be `null` if Service Worker is not supported or registration failed
                 const swVersion = await wb?.messageSW({ type: 'GET_VERSION' });
 
+                // eslint-disable-next-line no-console
                 console.log('Service Worker version:', swVersion);
               };
             },

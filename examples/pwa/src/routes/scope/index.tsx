@@ -1,9 +1,12 @@
 import type { PageComponent } from '@tramvai/react';
-
 import styles from './index.module.css';
 
 export const MainPage: PageComponent = () => {
-  return <h2 className={styles.title}>Main Page</h2>;
+  return (
+    <>
+      <h2 className={styles.title}>Main Page</h2>
+    </>
+  );
 };
 
 MainPage.seo = {
@@ -12,4 +15,5 @@ MainPage.seo = {
   },
 };
 
+// eslint-disable-next-line import/no-default-export
 export default MainPage;

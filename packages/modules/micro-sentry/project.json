@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-micro-sentry",
+  "sourceRoot": "packages/modules/micro-sentry/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/micro-sentry/package.json",
+        "packages/modules/micro-sentry/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

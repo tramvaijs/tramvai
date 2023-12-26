@@ -110,7 +110,7 @@ After steps below Sentry will be enabled while local development.
 
 1. Go to the Sentry UI
 2. Click on tab `Settings`
-3. In the tab `Projects` pick up your project выберите свой проект
+3. In the tab `Projects` pick up your project
 4. Choose `Client Keys (DSN)`
 5. From `DSN` field copy text with `Default` .
 
