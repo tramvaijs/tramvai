@@ -16,6 +16,7 @@ interface ImageObject {
   src: string;
   width: number;
   height: number;
+  blurDataURL: string;
 }
 ```
 

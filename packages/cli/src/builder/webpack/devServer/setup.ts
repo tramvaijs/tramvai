@@ -82,7 +82,10 @@ export const createDevServer = ({
     });
 
     if (configManager.hotRefresh.enabled) {
-      app.use(getHotModulePrefix(configManager), webpackHotMiddleware(compiler, { log: false }));
+      app.use(
+        getHotModulePrefix(configManager),
+        webpackHotMiddleware(compiler, { log: false, statsOptions: { cached: false } })
+      );
     }
 
     const rootDir = di.get(CONFIG_ROOT_DIR_TOKEN);

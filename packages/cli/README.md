@@ -305,3 +305,4 @@ Documentation:
 
 - [How to use React Profiler](https://legacy.reactjs.org/blog/2018/09/10/introducing-the-react-profiler.html)
 - [Introducing a new React profiler (React 18)](https://github.com/reactwg/react-18/discussions/76)
+- [React DevTools tutorial](https://react-devtools-tutorial.vercel.app/)
