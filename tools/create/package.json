@@ -3,7 +3,7 @@
   "version": "0.0.0-stub",
   "description": "",
   "main": "lib/index.js",
-  "bin": "./bin/create.sh",
+  "bin": "./bin/create.js",
   "files": [
     "bin"
   ],
