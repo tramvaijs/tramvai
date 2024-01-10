@@ -210,7 +210,6 @@ export interface CliConfigEntry extends ConfigEntry {
     watchOptions?: Configuration['watchOptions'];
     /**
      * @title Use the specified type of source maps for building in development mode
-     * @default "eval"
      */
     devtool: 'eval' | 'eval-cheap-source-map' | 'eval-cheap-module-source-map' | 'eval-source-map';
   };

@@ -121,9 +121,7 @@ it('should populate defaults for config', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "application",
-          "webpack": {
-            "devtool": "eval",
-          },
+          "webpack": {},
         },
         "child-app": {
           "cssMinimize": "css-minimizer",
@@ -175,9 +173,7 @@ it('should populate defaults for config', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "child-app",
-          "webpack": {
-            "devtool": "eval",
-          },
+          "webpack": {},
         },
       },
     }
@@ -195,6 +191,7 @@ it('should populate defaults for overridable options', () => {
           client: 'assets/compiled',
         },
         sourceMap: false,
+        webpack: { devtool: 'eval-source-map' },
         externals: ['test'],
         fileSystemPages: { enabled: true },
         experiments: {
@@ -250,6 +247,7 @@ it('should populate defaults for overridable options', () => {
           provide: {
             Buffer: ['buffer', 'Buffer'],
           },
+          devtool: 'eval-source-map',
         },
       },
     },
@@ -373,7 +371,7 @@ it('should populate defaults for overridable options', () => {
           "transpileOnlyModernLibs": true,
           "type": "application",
           "webpack": {
-            "devtool": "eval",
+            "devtool": "eval-source-map",
           },
         },
         "child-app": {
@@ -437,7 +435,7 @@ it('should populate defaults for overridable options', () => {
           "transpileOnlyModernLibs": true,
           "type": "child-app",
           "webpack": {
-            "devtool": "eval",
+            "devtool": "eval-source-map",
             "provide": {
               "Buffer": [
                 "buffer",

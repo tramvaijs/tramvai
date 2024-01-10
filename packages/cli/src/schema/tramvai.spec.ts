@@ -150,9 +150,7 @@ describe('JSON schema для tramvai.json', () => {
             },
             "transpileOnlyModernLibs": true,
             "type": "application",
-            "webpack": {
-              "devtool": "eval",
-            },
+            "webpack": {},
           },
           "module": {
             "cssMinimize": "css-minimizer",
@@ -204,9 +202,7 @@ describe('JSON schema для tramvai.json', () => {
             },
             "transpileOnlyModernLibs": true,
             "type": "module",
-            "webpack": {
-              "devtool": "eval",
-            },
+            "webpack": {},
           },
         },
       }

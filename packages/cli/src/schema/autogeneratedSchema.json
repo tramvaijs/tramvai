@@ -1191,7 +1191,6 @@
             },
             "devtool": {
               "title": "Use the specified type of source maps for building in development mode",
-              "default": "eval",
               "enum": [
                 "eval",
                 "eval-cheap-module-source-map",
@@ -1864,7 +1863,6 @@
             },
             "devtool": {
               "title": "Use the specified type of source maps for building in development mode",
-              "default": "eval",
               "enum": [
                 "eval",
                 "eval-cheap-module-source-map",
@@ -2537,7 +2535,6 @@
             },
             "devtool": {
               "title": "Use the specified type of source maps for building in development mode",
-              "default": "eval",
               "enum": [
                 "eval",
                 "eval-cheap-module-source-map",
