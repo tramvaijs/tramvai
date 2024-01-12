@@ -43,6 +43,10 @@ const getResourceUrl = (resource: PageResource) => {
   return result;
 };
 
+export const removeSourceMapFromString = (file: string) => {
+  return file.replace(/(\n\/\/# sourceMappingURL=.*)/g, '');
+};
+
 export interface ResourcesInlinerType {
   shouldAddResource(resource: PageResource): boolean;
   shouldInline(resource: PageResource): boolean;
@@ -264,7 +268,7 @@ export class ResourcesInliner implements ResourcesInlinerType {
     result.push({
       ...resource,
       type: getInlineType(resource.type),
-      payload: text,
+      payload: removeSourceMapFromString(text),
     });
     if (resource.type === ResourceType.style) {
       // If we don't add data-href then extract-css-chunks-webpack-plugin

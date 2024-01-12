@@ -9,6 +9,8 @@ import {
 import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
 import { StorageRecord } from '@tinkoff/htmlpagebuilder';
 import { RESOURCE_INLINE_OPTIONS } from '@tramvai/tokens-render';
+import { ROUTES_TOKEN } from '@tramvai/tokens-router';
+import { ENV_MANAGER_TOKEN } from '@tramvai/tokens-common';
 
 createApp({
   name: 'render',
@@ -48,19 +50,27 @@ createApp({
       multi: true,
     },
     provide({
+      provide: ROUTES_TOKEN,
+      multi: true,
+      useValue: [{ name: 'sourcemap', path: '/sourcemap' }],
+    }),
+    provide({
       provide: commandLineListTokens.resolvePageDeps,
       multi: true,
-      useFactory: ({ resourcesRegistry }) => {
+      useFactory: ({ resourcesRegistry, envManager }) => {
         return () => {
+          if (typeof window !== 'undefined') return;
+
           resourcesRegistry.register({
             slot: ResourceSlot.BODY_END,
             type: ResourceType.style,
-            payload: 'https://test.acdn.tinkoff.ru/123.css',
+            payload: `${envManager.get('RESOURCES_API')}123.css`,
           });
         };
       },
       deps: {
         resourcesRegistry: RESOURCES_REGISTRY,
+        envManager: ENV_MANAGER_TOKEN,
       },
     }),
     {

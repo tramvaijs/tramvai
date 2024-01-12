@@ -4,19 +4,28 @@ import type { Url } from '@tinkoff/url';
 import { parse } from '@tinkoff/url';
 
 interface Options {
-  currentRoute?: Route;
+  currentRoute?: Route | NavigationRoute;
   currentUrl?: Url;
 }
+
+const isNavigationRoute = (route: Options['currentRoute']): route is NavigationRoute => {
+  return (
+    (route as NavigationRoute).actualPath !== undefined &&
+    (route as NavigationRoute).params !== undefined
+  );
+};
 
 export const createMockRouter = ({
   currentRoute = { name: 'root', path: '/' },
   currentUrl = parse(currentRoute.path),
 }: Options = {}): AbstractRouter => {
-  let route: NavigationRoute = {
-    params: {},
-    actualPath: currentRoute.path,
-    ...currentRoute,
-  };
+  let route: NavigationRoute = isNavigationRoute(currentRoute)
+    ? currentRoute
+    : {
+        params: {},
+        actualPath: currentRoute.path,
+        ...currentRoute,
+      };
   let url = currentUrl;
   let blocked = false;
 
