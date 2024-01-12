@@ -1,6 +1,7 @@
 type Listener = (...args: Array<any>) => void;
 export class SimpleEmitter {
-  listeners: Listener[] = [];
+  listeners: Set<Listener> = new Set();
+
   emit(name?: string) {
     this.listeners.forEach((listener) => {
       listener();
@@ -8,7 +9,7 @@ export class SimpleEmitter {
   }
 
   addListener(event: string, fn: Listener) {
-    this.listeners.push(fn);
+    this.listeners.add(fn);
   }
 
   on(event: string, fn: Listener) {
@@ -16,13 +17,7 @@ export class SimpleEmitter {
   }
 
   removeListener(event: string, fn: Listener) {
-    const listeners = [];
-    for (let i = 0; i < this.listeners.length; i++) {
-      if (this.listeners[i] !== fn) {
-        listeners.push(this.listeners[i]);
-      }
-    }
-    this.listeners = listeners;
+    this.listeners.delete(fn);
   }
 
   off(event: string, fn: Listener) {

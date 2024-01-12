@@ -7,6 +7,8 @@ import type { ApplicationConfigEntry } from '../../../typings/configEntry/applic
 import type { ModuleFederationIgnoreEntriesOptions } from '../plugins/ModuleFederationIgnoreEntries';
 import { ModuleFederationIgnoreEntries } from '../plugins/ModuleFederationIgnoreEntries';
 import { rootErrorBoundaryFactory } from '../blocks/rootErrorBoundary';
+import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
+import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
 
 export const commonApplication =
   (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
@@ -22,6 +24,12 @@ export const commonApplication =
       .use(ModuleFederationIgnoreEntries, [
         { entries: ['polyfill'] } as ModuleFederationIgnoreEntriesOptions,
       ]);
+
+    config.plugin('module-federation-validate-duplicates').use(ModuleFederationFixRange, [
+      {
+        flexibleTramvaiVersions: configManager.shared.flexibleTramvaiVersions,
+      } as ModuleFederationFixRangeOptions,
+    ]);
 
     config.batch(rootErrorBoundaryFactory(configManager));
   };

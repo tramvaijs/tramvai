@@ -15,9 +15,11 @@ import { configToEnv } from '../blocks/configToEnv';
 import sourcemaps from '../blocks/sourcemaps';
 import type { ChildAppConfigEntry } from '../../../typings/configEntry/child-app';
 import { extractCssPluginFactory } from '../blocks/extractCssPlugin';
+import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
+import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
 
 export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: Config) => {
-  const { name, root, sourceMap, buildType } = configManager;
+  const { name, root, sourceMap, buildType, shared } = configManager;
 
   const cssLocalIdentName =
     configManager.env === 'production'
@@ -100,5 +102,11 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
       },
       shared: getSharedModules(configManager),
     } as UniversalFederationPluginOptions,
+  ]);
+
+  config.plugin('module-federation-validate-duplicates').use(ModuleFederationFixRange, [
+    {
+      flexibleTramvaiVersions: shared.flexibleTramvaiVersions,
+    } as ModuleFederationFixRangeOptions,
   ]);
 };
