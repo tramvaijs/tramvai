@@ -2,8 +2,8 @@ import type { Configuration } from 'webpack';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import type { ConfigEntry, OverridableOption } from './common';
 
+export type TranspilationLoader = 'babel' | 'swc';
 type SimplifiedSvgoConfig = string | { name: string; params: Record<string, any> };
-
 type Notifications = {
   /**
    * @title Defines when success notifications are shown
@@ -48,7 +48,7 @@ export type TranspilationExperiments = {
    * @title specify loader to transpile js-ts code
    * @default "babel"
    */
-  loader: OverridableOption<'babel' | 'swc'>;
+  loader: OverridableOption<TranspilationLoader>;
 };
 
 export interface Experiments {

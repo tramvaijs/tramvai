@@ -1,6 +1,23 @@
 import { sync as mockResolve } from 'resolve';
 import type { Context } from '../../models/context';
 import { checkSwcDependencies } from './checkSwcDependencies';
+import type { TranspilationLoader } from '../../typings/configEntry/cli';
+
+const getContextWithLoader = (loader: TranspilationLoader) => {
+  return {
+    config: {
+      getProject: () => {
+        return {
+          experiments: {
+            transpilation: {
+              loader,
+            },
+          },
+        };
+      },
+    },
+  } as any as Context;
+};
 
 const mockSwcIntegration = (version, mockCliVersion, mockRootVersion) => {
   jest.mock(
@@ -42,7 +59,7 @@ jest.mock('resolve', () => ({
 
 describe('validators/checkSwcDependencies', () => {
   const mockLog = jest.fn();
-  const context = {} as Context;
+  const context = getContextWithLoader('swc');
 
   beforeEach(() => {
     mockLog.mockClear();
@@ -50,13 +67,21 @@ describe('validators/checkSwcDependencies', () => {
     (mockResolve as jest.Mock).mockClear();
   });
 
-  it('returns ok if there is no @tramvai/swc-integration', async () => {
-    expect(await checkSwcDependencies(context, {})).toMatchInlineSnapshot(`
+  it('returns ok if there is no @tramvai/swc-integration with babel transpiler', async () => {
+    expect(await checkSwcDependencies(getContextWithLoader('babel'), {})).toMatchInlineSnapshot(`
       {
         "name": "checkSwcDependencies",
         "status": "ok",
       }
     `);
+  });
+
+  it('returns error if there is no @tramvai/swc-integration with swc transpiler', async () => {
+    const result = await checkSwcDependencies(context, {});
+    expect(result.message).toBe(
+      '@swc/core or @tramvai/swc-integration module is not found. Continue without checking dependencies. Install @tramvai/swc-integration package in case if you use swc-loader'
+    );
+    expect(result.status).toBe('error');
   });
 
   it('returns ok if there is @tramvai/swc-integration with correct version from root & cli', async () => {
@@ -111,6 +136,14 @@ describe('validators/checkSwcDependencies', () => {
       process.cwd() (version: 1.0.1)",
         "name": "checkSwcDependencies",
         "status": "error",
+      }
+    `);
+  });
+  it('returns ok with babel transpiler', async () => {
+    expect(await checkSwcDependencies(getContextWithLoader('babel'), {})).toMatchInlineSnapshot(`
+      {
+        "name": "checkSwcDependencies",
+        "status": "ok",
       }
     `);
   });
