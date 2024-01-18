@@ -1,16 +1,17 @@
-import isString from '@tinkoff/utils/is/string';
 import isObject from '@tinkoff/utils/is/object';
 import type { Build, BuildParams } from './build.h';
 import { createInputOptions, createOutputOptions } from './common';
-import { getBrowserSourceFilename } from '../fileNames.ts';
+import { getBrowserEntryFilename, getBrowserSourceFilename } from '../fileNames.ts';
 import { normalizeFilenameForBrowserObjectField } from '../packageJson';
 import { buildFileName as buildModuleFileName } from './node-es';
 
 const buildFileName = (params: BuildParams) => {
   const mainFileName = params.packageJSON.main;
-  const browserField = params.packageJSON.browser;
+  const entryBrowserFilename = getBrowserEntryFilename(params);
 
-  return isString(browserField) ? browserField : mainFileName.replace(/\.js$/, '.browser.js');
+  return entryBrowserFilename === mainFileName
+    ? mainFileName.replace(/\.js$/, '.browser.js')
+    : entryBrowserFilename;
 };
 
 export const build: Build = {
@@ -19,7 +20,8 @@ export const build: Build = {
     return Boolean(packageJSON.main && packageJSON.browser);
   },
   async getOptions(params) {
-    const browserField = params.packageJSON.browser;
+    const mainFileName = params.packageJSON.main;
+    const entryBrowserFilename = getBrowserEntryFilename(params);
 
     const input = createInputOptions(params, {
       entry: getBrowserSourceFilename(params),
@@ -32,9 +34,10 @@ export const build: Build = {
       format: 'esm',
       exportsField: 'auto',
       postfix: '.browser.js',
-      // keep entry filename when browser field is string, e.g. `"browser": "lib/index.browser.js"`,
+      // keep entry filename when browser entry point specified, e.g. `"browser": "lib/index.browser.js"`,
+      // or `"browser": { "./lib/server.js": "./lib/browser.js" }, "main": "lib/server.js"`,
       // otherwise output file `lib/index.browser.browser.js` will be created
-      postfixForEntry: !isString(browserField),
+      postfixForEntry: entryBrowserFilename === mainFileName,
     });
 
     return {

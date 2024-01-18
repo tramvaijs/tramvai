@@ -2,7 +2,7 @@
 
 Module for child app
 
-Link to complete Child-App documentation - https://tramvai.dev/docs/features/child-app/app-integration/
+Link to complete Child-App documentation - https://tramvai.dev/docs/features/child-app/overview/
 
 
 ## Installation

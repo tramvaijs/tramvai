@@ -21,8 +21,7 @@ const docusaurusConfig = {
         },
         docs: {
           path: resolve('./tmp-docs'),
-          editUrl:
-            'https://github.com/tramvaijs/tramvai/-/edit/master/docs/get-started/overview.md',
+          editUrl: 'https://github.com/tramvaijs/tramvai/-/edit/master/docs',
           // sidebars file relative to website dir.
           sidebarPath: require.resolve('./sidebars.public.js'),
           versions: {

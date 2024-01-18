@@ -1,0 +1,24 @@
+{
+  "name": "library-browser-object",
+  "version": "0.1.0",
+  "main": "lib/server.js",
+  "module": "lib/server.es.js",
+  "browser": {
+    "./lib/server.js": "./lib/browser.js",
+    "./lib/external.js": "./lib/external.browser.js",
+    "./lib/nested/foo.server.js": "./lib/nested/foo.browser.js"
+  },
+  "typings": "src/index.ts",
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tramvai-build --watch"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@tramvai/build": "file:./../../../../build"
+  },
+  "private": true,
+  "license": "Apache-2.0"
+}
