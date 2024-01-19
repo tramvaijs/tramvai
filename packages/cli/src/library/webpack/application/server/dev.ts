@@ -13,6 +13,7 @@ import configResolve from '../../blocks/configResolve';
 import type { UI_SHOW_PROGRESS_TOKEN } from '../../../../di/tokens';
 import sourcemaps from '../../blocks/sourcemaps';
 import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
+import { getApplicationUrl } from '../../../../utils/getApplicationUrl';
 
 export const webpackServerConfig = ({
   configManager,
@@ -91,9 +92,11 @@ export const webpackServerConfig = ({
     {
       publicPath: process.env.ASSETS_PREFIX
         ? 'process.env.ASSETS_PREFIX'
-        : `"http://${configManager.staticHost}:${
-            configManager.staticPort
-          }/${configManager.output.client.replace(/\/$/, '')}/"`,
+        : `"${getApplicationUrl({
+            host: configManager.staticHost,
+            port: configManager.staticPort,
+            protocol: configManager.httpProtocol,
+          })}/${configManager.output.client.replace(/\/$/, '')}/"`,
     },
   ]);
 

@@ -22,6 +22,7 @@ import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
 import { extendEntry } from '../../utils/extendEntry';
 import { extractCssPluginFactory } from '../../blocks/extractCssPlugin';
 import { splitChunksConfig } from './prod/optimization/splitChunks';
+import { getApplicationUrl } from '../../../../utils/getApplicationUrl';
 
 // eslint-disable-next-line max-statements
 export const webpackClientConfig = ({
@@ -66,9 +67,11 @@ export const webpackClientConfig = ({
   config.output
     .path(configManager.buildPath)
     .publicPath(
-      `http://${configManager.staticHost}:${
-        configManager.staticPort
-      }/${configManager.output.client.replace(/\/$/, '')}/`
+      `${getApplicationUrl({
+        host: configManager.staticHost,
+        port: configManager.staticPort,
+        protocol: configManager.httpProtocol,
+      })}/${configManager.output.client.replace(/\/$/, '')}/`
     )
     .filename('[name].js')
     .chunkFilename('[name].chunk.js')

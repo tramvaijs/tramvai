@@ -1,6 +1,5 @@
 import type { Provider } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
-
 import { CLOSE_HANDLER_TOKEN, INIT_HANDLER_TOKEN } from '../../tokens';
 import {
   CONFIG_MANAGER_TOKEN,
@@ -8,14 +7,17 @@ import {
   COMMAND_PARAMETERS_TOKEN,
   STATIC_SERVER_TOKEN,
   PORT_MANAGER_TOKEN,
+  SELF_SIGNED_CERTIFICATE_TOKEN,
 } from '../../../../di/tokens';
 import { stopServer } from '../../utils/stopServer';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
 import { createConfigManager } from '../../../../config/configManager';
 import { createServer } from '../../utils/createServer';
 import { listenServer } from '../../utils/listenServer';
+import { selfSignedCertificateProvider } from '../../../shared/providers/selfSignedCertificateProvider';
 
 export const sharedProviders: readonly Provider[] = [
+  ...selfSignedCertificateProvider,
   provide({
     provide: CONFIG_MANAGER_TOKEN,
     useFactory: ({ configEntry, parameters, portManager }) =>
@@ -34,7 +36,15 @@ export const sharedProviders: readonly Provider[] = [
   }),
   provide({
     provide: STATIC_SERVER_TOKEN,
-    useFactory: createServer,
+    useFactory: ({ selfSignedCertificate }) => {
+      return createServer(selfSignedCertificate);
+    },
+    deps: {
+      selfSignedCertificate: {
+        token: SELF_SIGNED_CERTIFICATE_TOKEN,
+        optional: true,
+      },
+    },
   }),
   provide({
     provide: INIT_HANDLER_TOKEN,

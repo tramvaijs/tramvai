@@ -85,6 +85,22 @@ export class StartProdCommand extends CLICommand<Params> {
       transformer: (value: string) => value !== 'false',
       description: 'Enable/disable persistent file cache for used cli builder',
     },
+    {
+      name: '--https',
+      value: '[https]',
+      transformer: (value: string) => value !== 'false',
+      description: 'Enable/disable https protocol for application',
+    },
+    {
+      name: '--httpsKey',
+      value: '[httpsKey]',
+      description: 'Path to https key certificate',
+    },
+    {
+      name: '--httpsCert',
+      value: '[httpsCert]',
+      description: 'Path to https certificate',
+    },
   ];
 
   alias = 'sp';

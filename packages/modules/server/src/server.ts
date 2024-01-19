@@ -75,7 +75,9 @@ EventEmitter.defaultMaxListeners = 50;
     provide({
       provide: SERVER_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ factory }) => factory(),
+      useFactory: ({ factory }) => {
+        return factory();
+      },
       deps: {
         factory: SERVER_FACTORY_TOKEN,
       },
@@ -177,6 +179,8 @@ EventEmitter.defaultMaxListeners = 50;
         { key: 'DEPLOY_COMMIT', optional: true, dehydrate: false },
         { key: 'DEPLOY_VERSION', optional: true, dehydrate: false },
         { key: 'DEPLOY_REPOSITORY', optional: true, dehydrate: false },
+        { key: 'HOST', optional: true, dehydrate: false, value: process.env.HOST },
+        { key: 'HTTPS', optional: true, dehydrate: false, value: process.env.HTTPS },
       ],
     },
     {

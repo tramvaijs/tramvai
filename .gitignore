@@ -81,5 +81,6 @@ examples-standalone/**/.tramvai-migrate-applied.json
 examples-standalone/**/.yalc
 examples-standalone/**/yalc.lock
 
+certificates/
 *.pem
 *.key

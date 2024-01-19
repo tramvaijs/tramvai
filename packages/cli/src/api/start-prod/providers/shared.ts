@@ -6,16 +6,11 @@ import fastifyStatic from '@fastify/static';
 import zlib from 'zlib';
 import { CLOSE_HANDLER_TOKEN, INIT_HANDLER_TOKEN, PROCESS_HANDLER_TOKEN } from '../tokens';
 import { CONFIG_MANAGER_TOKEN, PORT_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../di/tokens';
-import { createServer } from '../../start/utils/createServer';
 import { stopServer } from '../../start/utils/stopServer';
 import { listenServer } from '../../start/utils/listenServer';
 import { isApplication, isChildApp } from '../../../config/validate';
 
 export const sharedProviders: readonly Provider[] = [
-  provide({
-    provide: STATIC_SERVER_TOKEN,
-    useFactory: createServer,
-  }),
   provide({
     provide: INIT_HANDLER_TOKEN,
     multi: true,

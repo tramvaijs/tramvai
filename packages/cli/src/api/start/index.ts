@@ -11,6 +11,9 @@ import type { Builder } from '../../typings/build/Builder';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all';
+  https?: boolean;
+  httpsKey?: string;
+  httpsCert?: string;
   host?: string;
   port?: number;
   staticPort?: number;

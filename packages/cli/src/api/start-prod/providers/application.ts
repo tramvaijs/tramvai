@@ -7,6 +7,8 @@ import {
   CONFIG_ENTRY_TOKEN,
   CONFIG_MANAGER_TOKEN,
   PORT_MANAGER_TOKEN,
+  SELF_SIGNED_CERTIFICATE_TOKEN,
+  STATIC_SERVER_TOKEN,
 } from '../../../di/tokens';
 import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
 import { CLOSE_HANDLER_TOKEN, SERVER_PROCESS_TOKEN } from '../tokens';
@@ -14,8 +16,23 @@ import { DEBUG_ARGV } from '../../../config/constants';
 import { safeRequire } from '../../../utils/safeRequire';
 import type { ConfigManager } from '../../../config/configManager';
 import { createConfigManager } from '../../../config/configManager';
+import { selfSignedCertificateProvider } from '../../shared/providers/selfSignedCertificateProvider';
+import { createServer } from '../../start/utils/createServer';
 
 export const applicationsProviders: readonly Provider[] = [
+  ...selfSignedCertificateProvider,
+  provide({
+    provide: STATIC_SERVER_TOKEN,
+    useFactory: ({ selfSignedCertificate }) => {
+      return createServer(selfSignedCertificate);
+    },
+    deps: {
+      selfSignedCertificate: {
+        token: SELF_SIGNED_CERTIFICATE_TOKEN,
+        optional: true,
+      },
+    },
+  }),
   provide({
     provide: CONFIG_MANAGER_TOKEN,
     useFactory: ({ configEntry, parameters, portManager }) =>
@@ -35,16 +52,15 @@ export const applicationsProviders: readonly Provider[] = [
   }),
   provide({
     provide: SERVER_PROCESS_TOKEN,
-    useFactory: ({ configManager, parameters }) => {
+    useFactory: ({ configManager, parameters, selfSignedCertificate }) => {
       const { env } = parameters;
       const serverConfigManager = (
         configManager as ConfigManager<ApplicationConfigEntry>
       ).withSettings({
         buildType: 'server',
       });
-      const { debug, port, assetsPrefix } = serverConfigManager;
+      const { debug, port, assetsPrefix, https } = serverConfigManager;
       const root = serverConfigManager.buildPath;
-
       return fork(path.resolve(root, 'server.js'), [], {
         execArgv: debug ? DEBUG_ARGV : [],
         cwd: root,
@@ -58,12 +74,20 @@ export const applicationsProviders: readonly Provider[] = [
           PORT: `${port}`,
           PORT_SERVER: `${port}`,
           ASSETS_PREFIX: assetsPrefix,
+          HOST: serverConfigManager.host,
+          HTTPS: serverConfigManager.https
+            ? JSON.stringify({
+                key: selfSignedCertificate.keyPath,
+                cert: selfSignedCertificate.certificatePath,
+              })
+            : null,
         },
       });
     },
     deps: {
       configManager: CONFIG_MANAGER_TOKEN,
       parameters: COMMAND_PARAMETERS_TOKEN,
+      selfSignedCertificate: SELF_SIGNED_CERTIFICATE_TOKEN,
     },
   }),
   provide({

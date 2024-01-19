@@ -8,6 +8,7 @@ import { isApplication } from '../../../config/validate';
 const label = (name) => chalk.bold.cyan(`▸ ${name}:`);
 const link = (url) => chalk.underline.blue(url);
 
+// eslint-disable-next-line max-statements
 export function showBanner(di: Container) {
   if (!di.get({ token: UI_SHOW_BANNER_TOKEN, optional: true })) {
     return;
@@ -31,14 +32,21 @@ export function showBanner(di: Container) {
     titleLines.push(`${label('FileSystemPages')}  true`);
   }
 
-  const server = `http://${config.host.replace('0.0.0.0', 'localhost')}:${config.port}`;
-  const staticServer = `http://${config.staticHost.replace('0.0.0.0', 'localhost')}:${
-    config.staticPort
-  }`;
+  // TODO: add information about hosted url !
+  const baseServerUrl = `${config.httpProtocol}://${config.host.replace('0.0.0.0', 'localhost')}`;
+  const server = `${baseServerUrl}:${config.port}`;
+
+  const staticServer = `${config.httpProtocol}://${config.staticHost.replace(
+    '0.0.0.0',
+    'localhost'
+  )}:${config.staticPort}`;
 
   if (config.type === 'application') {
     // Listeners
     messageLines.push(chalk.bold('Static: ') + link(staticServer));
+    if (config.host !== '0.0.0.0' && config.https) {
+      messageLines.push(chalk.bold('App:    ') + link(baseServerUrl));
+    }
     messageLines.push(chalk.bold('App:    ') + link(server));
   }
 

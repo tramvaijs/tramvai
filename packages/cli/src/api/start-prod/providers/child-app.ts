@@ -5,11 +5,17 @@ import {
   CONFIG_ENTRY_TOKEN,
   CONFIG_MANAGER_TOKEN,
   PORT_MANAGER_TOKEN,
+  STATIC_SERVER_TOKEN,
 } from '../../../di/tokens';
 import { createConfigManager } from '../../../config/configManager';
 import type { ChildAppConfigEntry } from '../../../typings/configEntry/child-app';
+import { createServer } from '../../start/utils/createServer';
 
 export const childAppProviders: readonly Provider[] = [
+  provide({
+    provide: STATIC_SERVER_TOKEN,
+    useFactory: createServer,
+  }),
   provide({
     provide: CONFIG_MANAGER_TOKEN,
     useFactory: ({ configEntry, parameters, portManager }) =>

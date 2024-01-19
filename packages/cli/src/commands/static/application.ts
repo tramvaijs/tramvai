@@ -127,7 +127,9 @@ export const staticApp = async (
     handleServerOutput(context.logger, chunk);
   });
 
-  const readinessProbePath = `http://localhost:${envVariables.UTILITY_SERVER_PORT ?? port}/readyz`;
+  const readinessProbePath = `${clientConfigManager.httpProtocol}://localhost:${
+    envVariables.UTILITY_SERVER_PORT ?? port
+  }/readyz`;
 
   await Promise.race([
     server,

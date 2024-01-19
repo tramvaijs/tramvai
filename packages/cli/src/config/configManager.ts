@@ -30,6 +30,7 @@ export interface Settings<E extends Env> {
   trace?: boolean;
   sourceMap?: boolean;
   host?: string;
+  https?: boolean;
   port?: number;
   staticHost?: string;
   staticPort?: number;
@@ -93,6 +94,7 @@ export type ConfigManager<
     withSettings(settings: Settings<E>): ConfigManager<C, E>;
     dehydrate(): [C, Settings<E>];
     assetsPrefix?: string;
+    httpProtocol?: 'https' | 'http';
   };
 
 export const DEFAULT_STATIC_HOST = 'localhost';
@@ -137,6 +139,8 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
       'unknown',
     trace: false,
     host: '0.0.0.0',
+    https: !!settings.https,
+    httpProtocol: settings.https ? 'https' : 'http',
     profile: false,
     noClientRebuild: false,
     noServerRebuild: false,
@@ -196,10 +200,9 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     config.assetsPrefix =
       process.env.ASSETS_PREFIX && process.env.ASSETS_PREFIX !== 'static'
         ? process.env.ASSETS_PREFIX
-        : `http://${config.staticHost}:${config.staticPort}/${config.output.client.replace(
-            /\/$/,
-            ''
-          )}/`;
+        : `${config.httpProtocol}://${config.staticHost}:${
+            config.staticPort
+          }/${config.output.client.replace(/\/$/, '')}/`;
     config.buildPath = resolve(
       rootDir,
       buildType === 'server' ? config.output.server : config.output.client

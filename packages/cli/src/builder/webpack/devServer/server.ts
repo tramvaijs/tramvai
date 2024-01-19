@@ -17,6 +17,7 @@ import { ThreadWorkerBridge } from './pool/thread/pool';
 import { createWorkerPool } from './pool/pool';
 import type { SERVER_TOKEN } from '../../../di/tokens';
 import { CLOSE_HANDLER_TOKEN } from '../tokens';
+import { getApplicationUrl } from '../../../utils/getApplicationUrl';
 
 const EXITED_UNEXPECTEDLY = `
 
@@ -59,7 +60,11 @@ export const serverRunner = ({
     const file = `${Object.keys(config.entryPoints.entries())[0]}.js`;
     const filename = path.resolve(config.output.get('path'), file);
     // настоящая ссылка на файл используется для отладки в debug режиме
-    const realFilename = `http://${configManager.staticHost}:${configManager.staticPort}/${configManager.output.server}/${file}`;
+    const realFilename = `${getApplicationUrl({
+      host: configManager.staticHost,
+      port: configManager.staticPort,
+      protocol: configManager.httpProtocol,
+    })}/${configManager.output.server}/${file}`;
     const serverCompiler = compiler.compilers.find((comp) => comp.name === 'server');
 
     if (!serverCompiler) {
