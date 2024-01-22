@@ -55,6 +55,8 @@ export const modernLibs = [
   'cacheable-lookup',
   'node-abort-controller',
   '@hubert',
+  '@lexical',
+  'lexical',
 ];
 
 const regexStringFactory = ({ except }: { except?: boolean } = {}) =>
