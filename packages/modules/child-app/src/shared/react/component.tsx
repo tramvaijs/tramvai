@@ -5,6 +5,7 @@ import { CHILD_APP_INTERNAL_RENDER_TOKEN } from '@tramvai/tokens-child-app';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { useDi, UniversalErrorBoundary } from '@tramvai/react';
 import { RenderContext } from './render-context';
+import { Extractor } from './extractor';
 
 const FailedChildAppFallback = ({
   config: { name, version, tag, fallback: Fallback },
@@ -35,6 +36,7 @@ const FailedChildAppFallback = ({
   return Fallback ? <Fallback /> : null;
 };
 
+// eslint-disable-next-line max-statements
 const ChildAppWrapper = ({
   name,
   version,
@@ -102,7 +104,11 @@ const ChildAppWrapper = ({
       return null;
     }
 
-    return <Cmp di={di} props={props} />;
+    return (
+      <Extractor di={di}>
+        <Cmp di={di} props={props} />
+      </Extractor>
+    );
   } catch (error: any) {
     log.error({
       event: 'get-render',

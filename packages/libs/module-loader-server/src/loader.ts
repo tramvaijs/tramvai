@@ -44,7 +44,7 @@ export class ServerLoader {
   constructor(deps: LoaderDeps = {}) {
     this.log = deps.log || DEFAULT_LOGGER;
     this.cache = deps.cache || createDefaultCache();
-    this.request = deps.request || makeRequest();
+    this.request = deps.request || makeRequest(deps.requestOptions);
     this.externals = deps.externals || {};
     this.fetchRequests = new Map();
     this.timeout = deps.timeout || DEFAULT_TIMEOUT;

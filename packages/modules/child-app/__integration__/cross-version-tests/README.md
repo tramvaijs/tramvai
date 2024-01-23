@@ -33,6 +33,7 @@ By default only repository versions of apps is checked when running integration 
 
 To run cross version tests:
 
+- run `yarn pvm write-versions` in repository root otherwise dependencies will not be shared
 - install dependencies in every dir inside `cross-version-tests` expect for `latest` dir
 - run integrations tests with env `CHILD_APP_TEST_CROSS_VERSION`
 

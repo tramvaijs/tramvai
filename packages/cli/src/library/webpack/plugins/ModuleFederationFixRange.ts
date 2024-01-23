@@ -166,7 +166,8 @@ export class ModuleFederationFixRange implements webpack.WebpackPluginInstance {
     if (requiredVersion && this.flexibleTramvaiVersions) {
       const isTramvai = isUnifiedVersion(name) || isDependantLib(name);
 
-      if (isTramvai && requiredVersion[0] > 2) {
+      // exclude local stub versions, because `^0.0.0-stub` will have lowest priority and unexpected versions can be used
+      if (isTramvai && requiredVersion[0] > 2 && resolvedVersion !== '0.0.0-stub') {
         // 1 is used for `^` range modifier
         // see https://github.com/webpack/webpack/blob/56363993156e06a1230c9759eba277a22e6b6604/lib/util/semver.js#LL235C20-L235C20
         requiredVersion[0] = 1;

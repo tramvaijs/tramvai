@@ -109,6 +109,7 @@ describe.each(TEST_CASES)(
     let childAppRouter: PromiseType<ReturnType<typeof start>>;
     let childAppReactQuery: PromiseType<ReturnType<typeof start>>;
     let childAppError: PromiseType<ReturnType<typeof start>>;
+    let childAppLoadable: PromiseType<ReturnType<typeof start>>;
     let rootApp: PromiseType<ReturnType<typeof startCli>>;
 
     beforeAll(async () => {
@@ -116,18 +117,25 @@ describe.each(TEST_CASES)(
 
       await outputFile(REFRESH_CMP_PATH, REFRESH_CMP_CONTENT_START);
 
-      [childAppBase, childAppState, childAppRouter, childAppReactQuery, childAppError] =
-        await Promise.all([
-          startChildApp('base'),
-          startChildApp('state'),
-          startChildApp('router'),
-          startChildApp('react-query', {
-            shared: {
-              deps: ['@tramvai/react-query', '@tramvai/module-react-query'],
-            },
-          }),
-          startChildApp('error'),
-        ]);
+      [
+        childAppBase,
+        childAppState,
+        childAppRouter,
+        childAppReactQuery,
+        childAppError,
+        childAppLoadable,
+      ] = await Promise.all([
+        startChildApp('base'),
+        startChildApp('state'),
+        startChildApp('router'),
+        startChildApp('react-query', {
+          shared: {
+            deps: ['@tramvai/react-query', '@tramvai/module-react-query'],
+          },
+        }),
+        startChildApp('error'),
+        startChildApp('loadable'),
+      ]);
     });
 
     const mockerApp = fastify({
@@ -168,6 +176,9 @@ describe.each(TEST_CASES)(
 
           case 'error':
             return reply.from(`${getStaticUrl(childAppError)}/error/${filename}`);
+
+          case 'loadable':
+            return reply.from(`${getStaticUrl(childAppLoadable)}/loadable/${filename}`);
         }
       });
 
@@ -185,6 +196,7 @@ describe.each(TEST_CASES)(
         },
         env: {
           CHILD_APP_EXTERNAL_URL: `http://localhost:${mockerPort}/`,
+          HTTP_CLIENT_CIRCUIT_BREAKER_DISABLED: 'true',
         },
       });
     });
@@ -212,6 +224,7 @@ describe.each(TEST_CASES)(
         childAppRouter.close(),
         childAppReactQuery.close(),
         childAppError.close(),
+        childAppLoadable.close(),
         rootApp.close(),
       ]);
     });
@@ -783,6 +796,60 @@ describe.each(TEST_CASES)(
               `"<div>Error page still works</div><div id="fallback">Error fallback</div>"`
             );
           });
+        });
+      });
+    }
+
+    // loadable was added after v3.27.2
+    if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
+      describe('loadable', () => {
+        it('loadable components assets is loaded successfully', async () => {
+          const { serverUrl } = rootApp;
+          const { page } = await getPageWrapper();
+
+          let loadableAssets: string[] = [];
+
+          page.on('request', (request) => {
+            const url = request.url();
+            const resourceType = request.resourceType();
+
+            if (
+              (resourceType === 'script' || resourceType === 'stylesheet') &&
+              url.includes('/loadable/')
+            ) {
+              loadableAssets.push(url);
+            }
+          });
+
+          await page.goto(`${serverUrl}/loadable/`);
+
+          // assets for rendered on server-side components
+          expect(
+            [
+              'loadable@0.0.0-stub.css',
+              'loadable_client@0.0.0-stub.js',
+              'granular-node_modules_date-fns_esm_index_js-node_modules_mini-css-extract-plugin_dist_hmr_hot-04ede6_client.chunk',
+              'lazy-cmp_client.chunk',
+              'examples_child-app_child-apps_loadable_index_ts_client.chunk',
+            ].every((assets) => {
+              return loadableAssets.some((url) => url.includes(assets));
+            })
+          ).toBeTruthy();
+
+          expect(await page.locator('.application').innerHTML()).toMatchInlineSnapshot(
+            `"<div>Content from root</div><!--$--><h2 class="loadable__lazy-cmp-module__LazyCmp_COgmb">Lazy</h2><div id="loadable">Child App: <!-- -->I'm little child app</div><button id="loadable-toggle" type="button">toggle unused component</button><!--/$-->"`
+          );
+
+          loadableAssets = [];
+          const button = await page.$('#loadable-toggle');
+          await button?.click();
+
+          // assets for rendered on client-side components
+          expect(loadableAssets[0].includes('lazy-cmp-unused_client.chunk')).toBeTruthy();
+
+          expect(await page.locator('.application').innerHTML()).toMatchInlineSnapshot(
+            `"<div>Content from root</div><!--$--><h2 class="loadable__lazy-cmp-module__LazyCmp_COgmb">Lazy</h2><div id="loadable">Child App: <!-- -->I'm little child app</div><button id="loadable-toggle" type="button">toggle unused component</button><!--/$--><h2 class="loadable__lazy-cmp-unused-module__LazyCmp__8W4y">Lazy Unused</h2>"`
+          );
         });
       });
     }

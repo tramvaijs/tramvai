@@ -32,6 +32,7 @@ export interface ChildAppExternalConfig {
     baseUrl: string;
     entry: string;
     stats: string;
+    statsLoadable: string;
   };
 
   css?: {

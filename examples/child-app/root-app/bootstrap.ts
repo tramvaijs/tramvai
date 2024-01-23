@@ -31,6 +31,7 @@ createApp({
     'react-query': () => import(/* webpackChunkName: "react-query" */ './bundles/react-query'),
     router: () => import(/* webpackChunkName: "router" */ './bundles/router'),
     state: () => import(/* webpackChunkName: "state" */ './bundles/state'),
+    loadable: () => import(/* webpackChunkName: "loadable" */ './bundles/loadable'),
   },
   modules: [
     CommonModule,
@@ -157,6 +158,14 @@ createApp({
             latest: {
               version: '0.0.0-stub',
               baseUrl: 'http://localhost:5041/',
+            },
+          },
+        },
+        {
+          name: 'loadable',
+          byTag: {
+            latest: {
+              version: '0.0.0-stub',
             },
           },
         },

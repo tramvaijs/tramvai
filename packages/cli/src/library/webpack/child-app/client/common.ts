@@ -1,5 +1,6 @@
 import type Config from 'webpack-chain';
 import { ChunkCorrelationPlugin } from '@module-federation/node';
+import LoadablePlugin from '@loadable/webpack-plugin';
 
 import type { ConfigManager } from '../../../../config/configManager';
 
@@ -30,6 +31,13 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
   config.plugin('stats-plugin').use(ChunkCorrelationPlugin, [
     {
       filename: `${name}_stats@${version}.json`,
+    },
+  ]);
+
+  config.plugin('loadable-stats-plugin').use(LoadablePlugin, [
+    {
+      writeToDisk: true,
+      filename: `${name}_stats_loadable@${version}.json`,
     },
   ]);
 

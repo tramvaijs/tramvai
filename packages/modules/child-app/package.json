@@ -6,6 +6,8 @@
     "./lib/server.js": "./lib/browser.js",
     "./lib/server/child/singletonProviders.js": "./lib/browser/child/singletonProviders.js",
     "./lib/server/child/providers.js": "./lib/browser/child/providers.js",
+    "./lib/shared/react/extractor.js": "./lib/shared/react/extractor.browser.js",
+    "./lib/shared/child/extractorProviders.js": "./lib/shared/child/extractorProviders.browser.js",
     "./lib/server.es.js": "./lib/browser.js"
   },
   "main": "lib/server.js",
@@ -27,6 +29,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "@loadable/server": "^5.15.0",
     "@tinkoff/env-validators": "0.0.0-stub",
     "@tinkoff/module-loader-client": "0.0.0-stub",
     "@tinkoff/module-loader-server": "0.0.0-stub",

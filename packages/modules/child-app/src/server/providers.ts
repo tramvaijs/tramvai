@@ -4,6 +4,7 @@ import { Scope, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import {
   CREATE_CACHE_TOKEN,
+  ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
   LOGGER_TOKEN,
   STORE_TOKEN,
@@ -15,6 +16,7 @@ import {
   RESOURCES_REGISTRY,
   ResourceType,
   REACT_SERVER_RENDER_MODE,
+  RENDER_FLOW_AFTER_TOKEN,
 } from '@tramvai/tokens-render';
 import {
   CHILD_APP_RENDER_MANAGER_TOKEN,
@@ -56,6 +58,7 @@ export const serverProviders: Provider[] = [
     deps: {
       logger: LOGGER_TOKEN,
       createCache: CREATE_CACHE_TOKEN,
+      envManager: ENV_MANAGER_TOKEN,
     },
   }),
   provide({
@@ -99,10 +102,11 @@ export const serverProviders: Provider[] = [
     },
   }),
   provide({
-    provide: RENDER_SLOTS,
+    provide: RENDER_FLOW_AFTER_TOKEN,
     multi: true,
     useFactory: registerChildAppRenderSlots,
     deps: {
+      resourcesRegistry: RESOURCES_REGISTRY,
       logger: LOGGER_TOKEN,
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
       resolveFullConfig: CHILD_APP_RESOLVE_CONFIG_TOKEN,

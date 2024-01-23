@@ -19,6 +19,10 @@ export interface Cache {
   set: (key: string, module: any) => void;
 }
 
+export interface RequestOptions {
+  circuitBreakerEnabled?: boolean;
+}
+
 export interface LoaderDeps {
   log?: Logger;
   request?: RequestFunc;
@@ -26,6 +30,7 @@ export interface LoaderDeps {
   externals?: Record<string, any>;
   debug?: string[];
   timeout?: number;
+  requestOptions?: RequestOptions;
 }
 
 export interface LoadOptions {

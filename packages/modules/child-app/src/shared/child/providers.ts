@@ -10,11 +10,14 @@ import {
   INITIAL_APP_STATE_TOKEN,
   STORE_MIDDLEWARE,
 } from '@tramvai/tokens-common';
+import type { LoadableStats } from '../webpack/moduleFederation';
+import { extractorProviders } from './extractorProviders';
 
-export const getChildProviders = (appDi: Container): Provider[] => {
+export const getChildProviders = (appDi: Container, loadableStats?: LoadableStats): Provider[] => {
   const parentDispatcherContext = appDi.get(DISPATCHER_CONTEXT_TOKEN);
 
   return [
+    ...extractorProviders(loadableStats),
     provide({
       provide: DISPATCHER_CONTEXT_TOKEN,
       useFactory: ({ dispatcher, middlewares, initialState, parentAllowedStores }) => {

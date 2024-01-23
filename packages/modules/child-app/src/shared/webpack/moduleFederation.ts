@@ -50,6 +50,10 @@ export interface ModuleFederationStats {
   }>;
 }
 
+export interface LoadableStats {
+  [key: string]: any;
+}
+
 export const getSharedScope = (scope = 'default') => {
   return __webpack_share_scopes__[scope];
 };

@@ -3,6 +3,7 @@ import { createToken } from '@tinkoff/dippy';
 import type { Action, Command, TramvaiAction } from '@tramvai/core';
 import type { INITIAL_APP_STATE_TOKEN } from '@tramvai/tokens-common';
 import type { StoreClass } from '@tramvai/state';
+import type { ChunkExtractor } from '@loadable/server';
 import type {
   ChildAppLoader,
   ChildAppDiManager,
@@ -196,3 +197,11 @@ export const CHILD_APP_COMMON_INITIAL_STATE_TOKEN = createToken<
  */
 export const CHILD_APP_INTERNAL_RENDER_TOKEN =
   createToken<ComponentType<WrapperProps<any>>>('child-app render');
+
+/**
+ * @private
+ * @description Instance of loadable ChunkExtractor for specific child app
+ */
+export const CHILD_APP_INTERNAL_CHUNK_EXTRACTOR = createToken<ChunkExtractor>(
+  'child-app chunk extractor'
+);

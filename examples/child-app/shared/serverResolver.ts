@@ -12,6 +12,7 @@ const portMapping = {
   'react-query': 4046,
   router: 4047,
   state: 4048,
+  loadable: 4049,
 };
 
 const cliStarts: Array<ReturnType<typeof start>> = [];

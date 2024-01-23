@@ -9,7 +9,7 @@ import type { ApplicationConfigEntry } from '../../../../../../typings/configEnt
 import type { SplitChunksOptions } from '../../../../types/webpack';
 
 // based on [nextjs code](https://github.com/vercel/next.js/blob/aaeb349ce3e8c4c3435a43a29af4379266818e7b/packages/next/build/webpack-config.ts#L707)
-const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]) => {
+export const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]) => {
   const topLevelFrameworkPaths: string[] = [];
   const visitedFrameworkPackages = new Set<string>();
 

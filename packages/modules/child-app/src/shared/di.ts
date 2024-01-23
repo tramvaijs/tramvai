@@ -61,9 +61,11 @@ export class DiManager implements ChildAppDiManager {
     }
 
     const di = new ChildContainer(singletonDi, this.appDi);
+    const statsLoadable =
+      'getLoadableStats' in this.loader ? (this.loader as any).getLoadableStats(config) : undefined;
 
     // add providers on the Request Level to make it possible to reuse providers from the root-app ChildContainer
-    const childProviders = getChildProviders(this.appDi);
+    const childProviders = getChildProviders(this.appDi, statsLoadable);
 
     childProviders.forEach((provider) => {
       di.register(provider);

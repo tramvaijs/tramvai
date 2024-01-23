@@ -58,4 +58,11 @@ export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
       bundle: 'state',
     },
   },
+  {
+    name: 'loadable',
+    path: '/loadable',
+    config: {
+      bundle: 'loadable',
+    },
+  },
 ];

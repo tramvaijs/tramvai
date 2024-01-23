@@ -79,3 +79,25 @@ const Page = () => {
   );
 }
 ```
+
+## How to
+
+### Code splitting
+
+[@tramvai/react `lazy`](references/tramvai/react.md#lazy) is supported in Child Apps:
+
+```tsx title="components/root.tsx"
+import { lazy } from '@tramvai/react';
+
+const LazyFooCmp = lazy(() => import('./heavy-components/foo'));
+const LazyBarCmp = lazy(() => import('./heavy-components/bar'));
+
+export const RootCmp = (props) => {
+  return (
+    <div>
+      <h1>Child App</h1>
+      {props.condition ? <LazyFooCmp /> : <LazyBarCmp />}
+    </div>
+  );
+};
+```

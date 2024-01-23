@@ -32,7 +32,8 @@
     "@tramvai/react-query": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",
     "@tramvai/tokens-child-app": "0.0.0-stub",
-    "@tramvai/tokens-common": "0.0.0-stub"
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "date-fns": "^2.11.0"
   },
   "peerDependencies": {
     "react": ">=16.14.0",
