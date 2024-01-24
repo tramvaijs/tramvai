@@ -41,6 +41,7 @@ it('should populate defaults for config', () => {
             "minicss": {
               "useImportModule": true,
             },
+            "minifier": "terser",
             "pwa": {
               "icon": {
                 "dest": "pwa-icons",
@@ -140,6 +141,7 @@ it('should populate defaults for config', () => {
             "minicss": {
               "useImportModule": true,
             },
+            "minifier": "terser",
             "transpilation": {
               "loader": "babel",
             },
@@ -278,6 +280,7 @@ it('should populate defaults for overridable options', () => {
             "minicss": {
               "useImportModule": true,
             },
+            "minifier": "terser",
             "pwa": {
               "icon": {
                 "dest": "pwa-icons",
@@ -395,6 +398,7 @@ it('should populate defaults for overridable options', () => {
             "minicss": {
               "useImportModule": true,
             },
+            "minifier": "terser",
             "transpilation": {
               "loader": {
                 "development": "babel",

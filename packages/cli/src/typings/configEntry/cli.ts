@@ -3,6 +3,8 @@ import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import type { ConfigEntry, OverridableOption } from './common';
 
 export type TranspilationLoader = 'babel' | 'swc';
+export type Minifier = 'terser' | 'swc';
+
 type SimplifiedSvgoConfig = string | { name: string; params: Record<string, any> };
 type Notifications = {
   /**
@@ -68,6 +70,11 @@ export interface Experiments {
    * @default {}
    */
   transpilation: TranspilationExperiments;
+  /**
+   * @title specify minifer for terser plugin
+   * @default "terser"
+   */
+  minifier: OverridableOption<Minifier>;
 }
 
 /**

@@ -56,6 +56,10 @@ export const webpackServerConfig = ({
   } else {
     config.plugin('terser').use(TerserPlugin, [
       {
+        minify:
+          configManager.experiments.minifier === 'swc'
+            ? TerserPlugin.swcMinify
+            : TerserPlugin.terserMinify,
         extractComments: false,
         terserOptions: {
           ecma: 5, // на сервере в страницу встраивается код, который может подключаться через import и terser его соптимизирует в es6

@@ -896,6 +896,40 @@
                 }
               },
               "additionalProperties": false
+            },
+            "minifier": {
+              "cli_overridable": "",
+              "title": "specify minifer for terser plugin",
+              "default": "terser",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "development": {
+                      "enum": [
+                        "swc",
+                        "terser"
+                      ],
+                      "type": "string"
+                    },
+                    "production": {
+                      "enum": [
+                        "swc",
+                        "terser"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "enum": [
+                    "swc",
+                    "terser"
+                  ],
+                  "type": "string"
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -1147,23 +1181,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6363": {
+                        "__@match@6365": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6365": {
+                        "__@replace@6367": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6368": {
+                        "__@search@6370": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6370": {
+                        "__@split@6372": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6372": {
+                        "__@matchAll@6374": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1630,6 +1664,40 @@
                 }
               },
               "additionalProperties": false
+            },
+            "minifier": {
+              "cli_overridable": "",
+              "title": "specify minifer for terser plugin",
+              "default": "terser",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "development": {
+                      "enum": [
+                        "swc",
+                        "terser"
+                      ],
+                      "type": "string"
+                    },
+                    "production": {
+                      "enum": [
+                        "swc",
+                        "terser"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "enum": [
+                    "swc",
+                    "terser"
+                  ],
+                  "type": "string"
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -1819,23 +1887,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6363": {
+                        "__@match@6365": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6365": {
+                        "__@replace@6367": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6368": {
+                        "__@search@6370": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6370": {
+                        "__@split@6372": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6372": {
+                        "__@matchAll@6374": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2302,6 +2370,40 @@
                 }
               },
               "additionalProperties": false
+            },
+            "minifier": {
+              "cli_overridable": "",
+              "title": "specify minifer for terser plugin",
+              "default": "terser",
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "development": {
+                      "enum": [
+                        "swc",
+                        "terser"
+                      ],
+                      "type": "string"
+                    },
+                    "production": {
+                      "enum": [
+                        "swc",
+                        "terser"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "enum": [
+                    "swc",
+                    "terser"
+                  ],
+                  "type": "string"
+                }
+              ]
             }
           },
           "additionalProperties": false
@@ -2491,23 +2593,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6363": {
+                        "__@match@6365": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6365": {
+                        "__@replace@6367": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6368": {
+                        "__@search@6370": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6370": {
+                        "__@split@6372": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6372": {
+                        "__@matchAll@6374": {
                           "type": "object",
                           "additionalProperties": false
                         }

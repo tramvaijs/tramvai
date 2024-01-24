@@ -70,6 +70,7 @@ describe('JSON schema для tramvai.json', () => {
               "minicss": {
                 "useImportModule": true,
               },
+              "minifier": "terser",
               "pwa": {
                 "icon": {
                   "dest": "pwa-icons",
@@ -169,6 +170,7 @@ describe('JSON schema для tramvai.json', () => {
               "minicss": {
                 "useImportModule": true,
               },
+              "minifier": "terser",
               "transpilation": {
                 "loader": "babel",
               },

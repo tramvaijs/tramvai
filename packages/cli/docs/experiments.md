@@ -79,3 +79,13 @@ To use `loader="swc"` you need to install special integration package:
 ### Defaults
 
 - `loader="babel"` - babel in not experimental setup and can be safely used
+
+## minifier
+
+Settings for the minification process
+
+- `minifier="terser"|"swc"` - use specific [minifier](https://webpack.js.org/plugins/terser-webpack-plugin/#swc) for terser webpack plugin
+
+### Defaults
+
+- `minifier="terser"` - terser is default minifier for terser plugin

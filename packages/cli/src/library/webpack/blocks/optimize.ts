@@ -50,6 +50,10 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
   config.plugin('terser').use(TerserPlugin, [
     {
       extractComments: false,
+      minify:
+        configManager.experiments.minifier === 'swc'
+          ? TerserPlugin.swcMinify
+          : TerserPlugin.terserMinify,
       parallel: terser.parallel,
       terserOptions: {
         ...tramvaiReactProfileTerserOptions,
