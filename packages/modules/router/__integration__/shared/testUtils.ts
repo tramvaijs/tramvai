@@ -35,10 +35,10 @@ export const checkIsSpa = (page: Page) => {
   };
 };
 
-export const checkLatestNavigationType = (page: Page) => {
-  return page.evaluate(() => {
-    return window.__LATEST_NAVIGATION_TYPE__;
-  });
+export const checkLatestNavigationType = (page: Page, type: string) => {
+  return page.waitForFunction((expectedType) => {
+    return window.__LATEST_NAVIGATION_TYPE__ === expectedType;
+  }, type);
 };
 
 export const internalRouterStateFromDi = (page: Page) => {

@@ -288,14 +288,14 @@ describe('router/spa', () => {
 
       await router.navigate({ query: { a: '1' } });
 
-      expect(await checkLatestNavigationType(page)).toBe('navigate');
+      await checkLatestNavigationType(page, 'navigate');
       await page.goBack();
 
-      expect(await checkLatestNavigationType(page)).toBe('navigate');
+      await checkLatestNavigationType(page, 'navigate');
 
       await page.goForward();
 
-      expect(await checkLatestNavigationType(page)).toBe('navigate');
+      await checkLatestNavigationType(page, 'navigate');
       expect(page.url()).toBe(`${serverUrl}/?a=1`);
     });
     it('should navigate by history', async () => {
@@ -312,16 +312,16 @@ describe('router/spa', () => {
       expect(page.url()).toBe(`${serverUrl}/after/action/redirect/`);
 
       await page.goBack();
-      expect(await checkLatestNavigationType(page)).toBe('navigate');
+      await checkLatestNavigationType(page, 'navigate');
       await page.goBack();
-      expect(await checkLatestNavigationType(page)).toBe('updateCurrentRoute');
+      await checkLatestNavigationType(page, 'updateCurrentRoute');
 
       expect(page.url()).toBe(`${serverUrl}/test/?a=1`);
 
       await page.reload();
 
       await page.goForward();
-      expect(await checkLatestNavigationType(page)).toBe('updateCurrentRoute');
+      await checkLatestNavigationType(page, 'updateCurrentRoute');
 
       expect(page.url()).toBe(`${serverUrl}/test/`);
     });
@@ -334,7 +334,7 @@ describe('router/spa', () => {
       await router.updateCurrentRoute({ replace: true, query: { b: '2' } });
 
       await page.goBack();
-      expect(await checkLatestNavigationType(page)).toBe('navigate');
+      await checkLatestNavigationType(page, 'navigate');
 
       expect(page.url()).toBe(`${serverUrl}/?a=1`);
 
@@ -350,7 +350,7 @@ describe('router/spa', () => {
       await router.updateCurrentRoute({ replace: true, query: { b: '2' } });
 
       await page.goBack();
-      expect(await checkLatestNavigationType(page)).toBe('navigate');
+      await checkLatestNavigationType(page, 'navigate');
 
       expect(page.url()).toBe(`${serverUrl}/dynamic/first/?a=1`);
 

@@ -88,9 +88,10 @@ describe('seo', () => {
 
       expect(await page.title()).toBe('Hello, this is Tramvai!');
 
-      await sleep(300);
-
-      expect(await page.title()).toBe('WoW, such dynamic!');
+      await page.waitForFunction(
+        (expectedTitle) => document.title === expectedTitle,
+        'WoW, such dynamic!'
+      );
     });
   });
 });
