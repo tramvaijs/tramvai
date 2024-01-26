@@ -7,7 +7,7 @@ import type { PromiseType } from 'utility-types';
 import waitOn from 'wait-on';
 import { requestFactory, renderFactory } from '@tramvai/test-helpers';
 import type { StartOptions } from './types';
-import { getServerUrl, getUtilityServerUrl, getStaticUrl } from './utils';
+import { getServerUrl, getUtilityServerUrl, getStaticUrl, getServerDomain } from './utils';
 import { wrapPapi } from './papi';
 import { wrapMocker } from './mocker';
 
@@ -81,6 +81,7 @@ export const startCli = async (
 
   const serverUrl = getServerUrl(cliResult);
   const staticUrl = getStaticUrl(cliResult);
+  const domain = getServerDomain(cliResult);
   // @FIXME: the utility port might be defined on the provider level and we don't have access to it
   // in this case. So the value might be inconsistent with actual utility server (actually, already inconsistent for tincoin)
   const utilityServerUrl = getUtilityServerUrl(env, cliResult);
@@ -119,6 +120,7 @@ export const startCli = async (
     ...cliResult,
     serverUrl,
     staticUrl,
+    domain,
     stdout,
     stderr,
     request,

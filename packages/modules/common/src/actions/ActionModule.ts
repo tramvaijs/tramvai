@@ -24,6 +24,7 @@ import {
   SERVER_RESPONSE_STREAM,
   SERVER_RESPONSE_TASK_MANAGER,
 } from '@tramvai/tokens-server-private';
+import { ROUTER_TOKEN } from '@tramvai/tokens-router';
 import { actionTramvaiReducer } from './actionTramvaiReducer';
 import { ActionExecution } from './actionExecution';
 import { ActionRegistry } from './actionRegistry';
@@ -87,6 +88,7 @@ const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeR
         deferredMap: DEFERRED_ACTIONS_MAP_TOKEN,
         responseTaskManager: optional(SERVER_RESPONSE_TASK_MANAGER),
         serverResponseStream: optional(SERVER_RESPONSE_STREAM),
+        router: ROUTER_TOKEN,
       },
     }),
     provide({

@@ -6,6 +6,7 @@ title: Actions
 ## Explanation
 
 Actions is the standard way to perform any side-effects in the application, including:
+
 - making requests
 - dispatching store events
 - redirects and navigation
@@ -22,6 +23,7 @@ You can find `declareAction` interface in [`@tramvai/core` package documentation
 ### Lifecycle
 
 Actions can be executed at different stages:
+
 - Server-side, for every request
 - Client-side, after page initialization
 - Client-side, after SPA transition
@@ -110,6 +112,8 @@ You need to use `actions` static property of [page components](03-features/03-pa
 
 Actions execution result will not be connected with page directly, and you need to create specific [reducer](03-features/08-state-management.md#reducer) for this data as transport layer between action and page component.
 
+Page actions are aborted on route changing, so you may control your action behavior via `abortSignal`.
+
 :::tip
 
 [React-Query](references/modules/react-query.md) is the great tool to reduce boilerplate for fetching data with interface similar to `declareAction`
@@ -138,6 +142,11 @@ const loadMessagesAction = declareAction({
     const messages = await loadMessagesFromApi();
 
     this.context.dispatch(messagesLoaded(messages));
+
+    // it's also possible to subscribe on pageAction abortion due to route changing
+    this.abortSignal.addEventListener('abort', () => {
+      this.context.dispatch(/* ... */);
+    });
   },
 });
 
@@ -219,7 +228,7 @@ const ProductCard = ({ id }: { id: number }) => {
   }, [id]);
 
   return <>...</>;
-}
+};
 ```
 
 ### Context
@@ -236,7 +245,7 @@ const nestedAction = declareAction({
   name: 'nested',
   async fn() {
     await doAsyncStuff();
-  }
+  },
 });
 
 const rootAction = declareAction({
@@ -247,7 +256,7 @@ const rootAction = declareAction({
 
     // highlight-next-line
     this.dispatch(someEvent());
-  }
+  },
 });
 
 const MainPage: PageComponent = () => <h1>Main Page</h1>;
@@ -284,6 +293,7 @@ const logAction = declareAction({
 ### AbortController
 
 Any actions has their own execution context, which is regulated by the [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) API. What does it mean for application developers:
+
 - You can subscribe to parent abort signal through `this.abortSignal` in action `fn` function
 - You can cancel requests in nested actions through `this.abortController.abort()` in action `fn` function
 
@@ -299,7 +309,7 @@ const action = declareAction({
   async fn() {
     // after timeout exceeds, first request or request in innerAction will be aborted
     setTimeout(() => {
-      this.abortController.abort()
+      this.abortController.abort();
     }, 1000);
 
     const { payload } = await this.deps.httpClient.request({

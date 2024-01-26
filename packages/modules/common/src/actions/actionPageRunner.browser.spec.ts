@@ -1,8 +1,12 @@
+/**
+ * @jest-environment jsdom
+ */
 import noop from '@tinkoff/utils/function/noop';
 import { createAction, declareAction } from '@tramvai/core';
 import { throwRedirectFoundError } from '@tinkoff/errors';
 import { createContainer } from '@tinkoff/dippy';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { Router } from '@tinkoff/router';
 import { ActionPageRunner } from './actionPageRunner.browser';
 import { ActionExecution } from './actionExecution';
 import { ExecutionContextManager } from '../executionContext/executionContextManager';
@@ -27,12 +31,16 @@ describe('actionPageRunnerBrowser', () => {
       executionContextManager,
       deferredActionsMap: new Map(),
     });
+    const router = new Router({});
     const actionRunner = new ActionPageRunner({
       actionExecution,
       logger,
       executionContextManager,
       commandLineExecutionContext: () => null,
+      router,
     });
+
+    jest.spyOn(router, 'registerHook');
 
     await actionRunner.runActions([
       createAction({ name: 'test1', fn: () => result.push(1) }),
@@ -45,6 +53,7 @@ describe('actionPageRunnerBrowser', () => {
       }),
     ]);
 
+    expect(router.registerHook).toBeCalledTimes(1);
     expect(result).toEqual([1, 2, 3]);
   });
 
@@ -66,6 +75,7 @@ describe('actionPageRunnerBrowser', () => {
         logger,
         executionContextManager,
         commandLineExecutionContext: () => null,
+        router: new Router({}),
       });
 
       expect.assertions(1);
@@ -102,6 +112,7 @@ describe('actionPageRunnerBrowser', () => {
         logger,
         executionContextManager,
         commandLineExecutionContext: () => null,
+        router: new Router({}),
       });
 
       const stopRunAtError = (error: Error) => {

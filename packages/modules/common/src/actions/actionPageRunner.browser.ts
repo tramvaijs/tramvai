@@ -7,6 +7,7 @@ import type {
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
 } from '@tramvai/tokens-common';
+import type { ROUTER_TOKEN } from '@tramvai/tokens-router';
 import type { ActionExecution } from './actionExecution';
 
 const DEFAULT_PAYLOAD = {};
@@ -22,6 +23,7 @@ export class ActionPageRunner {
         typeof COMMAND_LINE_EXECUTION_CONTEXT_TOKEN
       >;
       logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
+      router: ExtractDependencyType<typeof ROUTER_TOKEN>;
     }
   ) {
     this.log = deps.logger('action:action-page-runner');
@@ -34,7 +36,15 @@ export class ActionPageRunner {
     return this.deps.executionContextManager.withContext(
       this.deps.commandLineExecutionContext(),
       { name: 'pageActions', values: { pageActions: true } },
-      async (executionContext) => {
+      async (executionContext, abortController) => {
+        const unregisterAbortPageActionsHookOnNavigate = this.deps.router.registerHook(
+          'beforeNavigate',
+          function abortPageActionsOnNavigation() {
+            unregisterAbortPageActionsHookOnNavigate();
+            abortController.abort('pageActions are aborted because of route changing');
+            return Promise.resolve();
+          }
+        );
         const actionMapper = (action: Action | TramvaiAction<any[], any, any>) => {
           return Promise.resolve()
             .then(() => {
@@ -63,7 +73,10 @@ export class ActionPageRunner {
             });
         };
 
-        await Promise.all(actions.map(actionMapper));
+        await Promise.all(actions.map(actionMapper)).finally(() => {
+          // unregister hook for abortion of page actions if actions has been executed or stopped
+          unregisterAbortPageActionsHookOnNavigate();
+        });
       }
     );
   }

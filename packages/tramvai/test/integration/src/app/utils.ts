@@ -20,6 +20,12 @@ export const getServerUrl = ({ server }: CliResult) => {
   return `${extractHttpProtocolFromServerInstance(server)}://localhost:${port}`;
 };
 
+export const getServerDomain = ({ server }: CliResult) => {
+  const { port } = server?.address() as AddressInfo;
+
+  return `localhost:${port}`;
+};
+
 export const getStaticUrl = ({ staticServer }: CliResult) => {
   const { port } = staticServer?.address() as AddressInfo;
 
