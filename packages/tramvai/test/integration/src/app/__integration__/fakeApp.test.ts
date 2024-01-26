@@ -64,7 +64,7 @@ describe('test/integration/app/runFakeApp', () => {
     await browser.close();
   });
 
-  it.skip('should work with mocker', async () => {
+  it('should work with mocker', async () => {
     await app.mocker.addMocks('CONFIG_API', {
       'GET /test/': {
         status: 200,
