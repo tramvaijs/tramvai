@@ -24,6 +24,10 @@ export const webpackServerConfig = ({
 
   config.externals(configManager.externals.map((s) => new RegExp(`^${s}`)));
 
+  const minifierValueFromConfig = configManager.experiments.minifier;
+  const minifier =
+    minifierValueFromConfig === 'swc' ? TerserPlugin.swcMinify : TerserPlugin.terserMinify;
+
   if (configManager.disableProdOptimization) {
     // with this option for id of module path to file will be used
     config.optimization.set('moduleIds', 'named');
@@ -32,6 +36,7 @@ export const webpackServerConfig = ({
 
     config.plugin('terser').use(TerserPlugin, [
       {
+        minify: minifier,
         extractComments: false,
         terserOptions: {
           ecma: 5, // на сервере в страницу встраивается код, который может подключаться через import и terser его соптимизирует в es6
@@ -47,7 +52,8 @@ export const webpackServerConfig = ({
             comments: true,
             semicolons: false,
             preserve_annotations: true,
-            indent_start: 2,
+            // currently doesn't support by swc
+            ...(minifierValueFromConfig === 'swc' ? {} : { indent_start: 2 }),
             beautify: true,
           },
         },

@@ -14,6 +14,10 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
     keep_classnames: isProductionProfilingEnabled,
   };
 
+  const minifierValueFromConfig = configManager.experiments.minifier;
+  const minifier =
+    minifierValueFromConfig === 'swc' ? TerserPlugin.swcMinify : TerserPlugin.terserMinify;
+
   if (disableProdOptimization) {
     // with this option for id of module path to file will be used
     config.optimization.set('moduleIds', 'named');
@@ -22,6 +26,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
 
     config.plugin('terser').use(TerserPlugin, [
       {
+        minify: minifier,
         extractComments: false,
         terserOptions: {
           ...tramvaiReactProfileTerserOptions,
@@ -31,7 +36,8 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
             comments: true,
             semicolons: false,
             preserve_annotations: true,
-            indent_start: 2,
+            // currently doesn't support by swc
+            ...(minifierValueFromConfig === 'swc' ? {} : { indent_start: 2 }),
             beautify: true,
           },
           compress: {
@@ -50,10 +56,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
   config.plugin('terser').use(TerserPlugin, [
     {
       extractComments: false,
-      minify:
-        configManager.experiments.minifier === 'swc'
-          ? TerserPlugin.swcMinify
-          : TerserPlugin.terserMinify,
+      minify: minifier,
       parallel: terser.parallel,
       terserOptions: {
         ...tramvaiReactProfileTerserOptions,

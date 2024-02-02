@@ -1,32 +1,34 @@
 import { sync as resolve } from 'resolve';
 import type { Validator } from './validator.h';
-import type { TranspilationExperiments, TranspilationLoader } from '../../typings/configEntry/cli';
+import type { Experiments, TranspilationLoader, Minifier } from '../../typings/configEntry/cli';
 
 const validator = 'checkSwcDependencies';
 
-export const extractLoaderFromConfigEntry = (
-  transpilationExperiments?: TranspilationExperiments
-): TranspilationLoader => {
-  const defaultTranspiler = 'babel';
-  if (!transpilationExperiments) {
-    return defaultTranspiler;
+const extractFieldFromConfigEntry = <T extends Minifier | TranspilationLoader>(
+  experimentField: T,
+  defaultValue: T
+): T => {
+  if (!experimentField) return defaultValue;
+  if (typeof experimentField === 'string') {
+    return experimentField as T;
   }
 
-  const { loader } = transpilationExperiments;
-
-  if (typeof loader === 'string') {
-    return loader as any;
-  }
-
-  return loader[process.env.NODE_ENV] ?? defaultTranspiler;
+  return experimentField[process.env.NODE_ENV] ?? defaultValue;
 };
 
 export const checkSwcDependencies: Validator = async (context, parameters) => {
   const configEntry = context.config.getProject(parameters.target);
 
-  const loader = extractLoaderFromConfigEntry((configEntry as any)?.experiments?.transpilation);
+  const loader = extractFieldFromConfigEntry<TranspilationLoader>(
+    (configEntry as any)?.experiments?.transpilation?.loader,
+    'babel'
+  );
+  const minifier = extractFieldFromConfigEntry<Minifier>(
+    (configEntry as any)?.experiments?.minifier,
+    'terser'
+  );
 
-  if (loader === 'babel') {
+  if (!(loader === 'swc' || minifier === 'swc')) {
     return {
       name: validator,
       status: 'ok',
@@ -55,7 +57,7 @@ export const checkSwcDependencies: Validator = async (context, parameters) => {
         name: validator,
         status: 'error',
         message:
-          '@swc/core or @tramvai/swc-integration module is not found. Continue without checking dependencies. Install @tramvai/swc-integration package in case if you use swc-loader',
+          '@swc/core or @tramvai/swc-integration module is not found. Continue without checking dependencies. Install @tramvai/swc-integration package in case if you use swc-loader/swc-minifier',
       };
     }
 
