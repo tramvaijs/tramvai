@@ -14,7 +14,6 @@ import 'core-js/stable/url';
 import 'abort-controller/polyfill';
 
 import 'intersection-observer';
-import 'element-closest-polyfill';
 
 // CSS variables
 
@@ -25,8 +24,6 @@ cssVars();
 // Web API
 
 if (typeof window !== 'undefined') {
-  require('whatwg-fetch');
-
   // Polyfill doesn't add ResizeObserver to the window
   if (!window.ResizeObserver) {
     window.ResizeObserver = require('resize-observer-polyfill').default;

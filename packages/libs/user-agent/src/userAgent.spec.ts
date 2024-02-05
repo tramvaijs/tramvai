@@ -266,6 +266,39 @@ describe('supported browsers', () => {
       }
     `);
   });
+
+  it('mobile samsung', () => {
+    const ua =
+      'Mozilla/5.0 (Linux; Android 9; LM-X220) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/23.0 Chrome/115.0.0.0 Mobile Safari/537.36';
+    expect(parseUserAgentHeader(ua)).toMatchInlineSnapshot(`
+      {
+        "browser": {
+          "browserEngine": "chrome",
+          "major": "23",
+          "name": "samsung browser",
+          "version": "23.0",
+        },
+        "cpu": {
+          "architecture": undefined,
+        },
+        "device": {
+          "model": "LM-X220",
+          "type": "mobile",
+          "vendor": "LG",
+        },
+        "engine": {
+          "name": "Blink",
+          "version": "115.0.0.0",
+        },
+        "mobileOS": "android",
+        "os": {
+          "name": "Android",
+          "version": "9",
+        },
+        "sameSiteNoneCompatible": true,
+      }
+    `);
+  });
 });
 
 describe('mobile devices', () => {

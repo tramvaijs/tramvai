@@ -50,7 +50,7 @@ export * from '@tramvai/tokens-render';
 const REQUEST_TTL = 5 * 60 * 1000;
 
 export const DEFAULT_POLYFILL_CONDITION =
-  '!window.Promise.prototype.finally || !window.URL || !window.URLSearchParams || !window.AbortController || !window.IntersectionObserver || !Object.fromEntries || !window.ResizeObserver';
+  '!window.Promise.prototype.finally || !window.URL || !window.AbortController || !window.IntersectionObserver || !Object.fromEntries || !window.ResizeObserver';
 
 @Module({
   imports: [ClientHintsModule, LayoutModule],

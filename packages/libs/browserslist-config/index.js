@@ -5,34 +5,34 @@
 
 const defaults = [
   // desktop
-  'Chrome >= 49',
-  'Safari >= 11',
-  'Firefox >= 52',
+  'Chrome >= 59',
+  'Safari >= 12.1',
+  'Firefox >= 115',
   'Opera >= 62',
-  'Edge >= 18',
+  'Edge >= 79',
   // mobile
-  'ChromeAndroid >= 40',
-  'ios_saf >= 10',
+  'ChromeAndroid >= 59',
+  'ios_saf >= 12.1',
   'OperaMobile >= 48',
-  'FirefoxAndroid >= 68',
-  'Samsung >= 4',
-  'Android >= 5',
-  'UCAndroid >= 11',
+  'FirefoxAndroid >= 119',
+  'Samsung >= 7',
+  'Android >= 8',
+  'UCAndroid >= 13',
 ];
 
 // https://philipwalton.com/articles/deploying-es2015-code-in-production-today/
 const modern = [
   // desktop
   'Chrome >= 61',
-  'Safari >= 12',
-  'Firefox >= 60',
+  'Safari >= 12.1',
+  'Firefox >= 115',
   'Opera >= 62',
   'Edge >= 79',
   // mobile
   'ChromeAndroid >= 61',
-  'ios_saf >= 12',
+  'ios_saf >= 12.1',
   'OperaMobile >= 73',
-  'FirefoxAndroid >= 68',
+  'FirefoxAndroid >= 119',
   'Samsung >= 8.2',
 ];
 
