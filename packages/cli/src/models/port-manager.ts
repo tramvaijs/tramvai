@@ -18,8 +18,8 @@ interface NetworkConstructorPayload {
 
 export class PortManager {
   static readonly DEFAULT_PORT = 3000;
-  static readonly DEFAULT_MODULE_PORT = 3040;
   static readonly DEFAULT_STATIC_PORT = 4000;
+  // Child Apps and modules use only static port
   static readonly DEFAULT_MODULE_STATIC_PORT = 4040;
   private static readonly cachePath = join(
     findCacheDir({ cwd: __dirname, create: true, name: 'tramvai' }),
@@ -141,13 +141,13 @@ export class PortManager {
   }
 
   private async forModule() {
-    this.port = this.port ?? (await this.resolveFreePort(PortManager.DEFAULT_MODULE_PORT));
+    this.port = this.port ?? (await this.resolveFreePort(PortManager.DEFAULT_MODULE_STATIC_PORT));
     this.staticPort =
       this.staticPort ?? (await this.resolveFreePort(PortManager.DEFAULT_MODULE_STATIC_PORT));
   }
 
   private async forChildApp() {
-    this.port = this.port ?? (await this.resolveFreePort(PortManager.DEFAULT_MODULE_PORT));
+    this.port = this.port ?? (await this.resolveFreePort(PortManager.DEFAULT_MODULE_STATIC_PORT));
     this.staticPort =
       this.staticPort ?? (await this.resolveFreePort(PortManager.DEFAULT_MODULE_STATIC_PORT));
   }
