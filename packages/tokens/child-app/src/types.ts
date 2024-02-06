@@ -8,6 +8,7 @@ import type {
   Action,
   TramvaiAction,
 } from '@tramvai/core';
+import type { Route } from '@tinkoff/router';
 
 export interface ChildApp {
   name: string;
@@ -66,8 +67,8 @@ export interface ChildAppFinalConfig
   key: string;
 }
 export interface ChildAppPreloadManager {
-  preload(config: ChildAppRequestConfig): Promise<void>;
-  prefetch(config: ChildAppRequestConfig): Promise<void>;
+  preload(config: ChildAppRequestConfig, route?: Route): Promise<void>;
+  prefetch(config: ChildAppRequestConfig, route?: Route): Promise<void>;
   isPreloaded(config: ChildAppRequestConfig): boolean;
   runPreloaded(): Promise<void>;
   pageRender(): void;

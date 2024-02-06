@@ -102,3 +102,145 @@ export const RootCmp = () => {
   return <div>Route path: {route.actualPath}</div>;
 };
 ```
+
+### Multi-page Child Apps
+
+:::warning
+
+Experimental and unstable, public API can be changed in the future.
+
+[File-System Routing](03-features/03-pages.md#file-system-routing) is not supported yet.
+
+:::
+
+For a complex features, you may want to have one Child App, which can be rendered in multiple pages.
+
+Child Apps support pages with a limited set of features:
+- [`lazy` component from `@tramvai/react`](references/tramvai/react.md)
+- Unique list of actions for every page
+- Code-splitting by [granular](https://web.dev/granular-chunking-nextjs/) strategy
+- Preloading for pages for specific routes
+
+Application routing still declared and configured in Root Application.
+
+#### Application
+
+:hourglass: At first, you need to declare routes in Root App with `unstable_childAppPageComponent` property, e.g.:
+
+```ts
+const routes = [
+  {
+    name: 'lazy-foo',
+    path: '/lazy/foo',
+    config: {
+      pageComponent: '@/pages/LazyPage',
+      unstable_childAppPageComponent: 'FooCmp',
+    },
+  },
+  {
+    name: 'lazy-bar',
+    path: '/lazy/bar',
+    config: {
+      pageComponent: '@/pages/LazyPage',
+      unstable_childAppPageComponent: 'BarCmp',
+    },
+  },
+];
+```
+
+:hourglass: The same Child App will be used in a page component on both routes:
+
+```tsx title="app/src/pages/LazyPage.tsx"
+import type { PageComponent } from '@tramvai/react';
+import { ChildApp } from '@tramvai/module-child-app';
+
+export const LazyPage: PageComponent = () => {
+  return (
+    <>
+      <ChildApp name="lazy" />
+    </>
+  );
+};
+
+LazyPage.childApps = [{ name: 'lazy' }];
+
+export default LazyPage;
+```
+
+### Child App
+
+:hourglass: In Child App UI component you need to use `children` property, where current page component will be passed:
+
+```tsx title="child-app/src/components/root.tsx"
+import type { PropsWithChildren } from 'react';
+
+export const RootCmp = ({ children }: PropsWithChildren<{}>) => {
+  return (
+    <>
+      <h1>Lazy Child App</h1>
+
+      {children}
+    </>
+  )
+};
+```
+
+:hourglass: Also you need to create all required page components, e.g.:
+
+```tsx title="child-app/src/components/foo.tsx"
+import { declareAction } from '@tramvai/core';
+
+const fooPageAction = declareAction({
+  name: 'foo-page-action',
+  async fn() {
+    // do something
+  },
+});
+
+export const FooCmp = () => {
+  return (
+    <>
+      <h2>Foo Page</h2>
+    </>
+  )
+};
+
+FooCmp.actions = [fooPageAction];
+
+export default FooCmp;
+```
+
+:hourglass: Then, you need to register all components in Child App through `CHILD_APP_PAGE_COMPONENTS_TOKEN`:
+
+```ts title="child-app/src/index.ts"
+import { provide } from '@tramvai/core';
+import { createChildApp } from '@tramvai/child-app-core';
+import { CommonChildAppModule } from '@tramvai/module-common';
+import { CHILD_APP_PAGE_COMPONENTS_TOKEN } from '@tramvai/tokens-child-app';
+import { lazy } from '@tramvai/react';
+import { RouterChildAppModule } from '@tramvai/module-router';
+import { RootCmp } from './components/root';
+
+// declare lazy components for code-splitting
+const FooCmp = lazy(() => import('./components/foo'));
+const BarCmp = lazy(() => import('./components/bar'));
+
+export default createChildApp({
+  name: 'lazy',
+  render: RootCmp,
+  // provide required modules
+  modules: [CommonChildAppModule, RouterChildAppModule],
+  providers: [
+    provide({
+      provide: CHILD_APP_PAGE_COMPONENTS_TOKEN,
+      // the same keys as in App routes list in `unstable_childAppPageComponent` properties
+      useValue: {
+        FooCmp,
+        BarCmp,
+      },
+    }),
+  ],
+});
+```
+
+Thats all! In `/lazy/foo` or `/lazy/bar` route you will see `FooCmp` or `BarCmp` component respectively, and only specific actions will be executed.

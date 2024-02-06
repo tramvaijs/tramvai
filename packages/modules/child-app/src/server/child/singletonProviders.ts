@@ -1,8 +1,7 @@
-import flatten from '@tinkoff/utils/array/flatten';
 import type { Container } from '@tinkoff/dippy';
 import type { Provider } from '@tramvai/core';
 import { provide } from '@tramvai/core';
-import { CHILD_APP_INTERNAL_ACTION_TOKEN, commandLineListTokens } from '@tramvai/tokens-child-app';
+import { CHILD_APP_PAGE_SERVICE_TOKEN, commandLineListTokens } from '@tramvai/tokens-child-app';
 import { ACTION_PAGE_RUNNER_TOKEN } from '@tramvai/tokens-common';
 
 export const getChildProviders = (appDi: Container): Provider[] => {
@@ -10,14 +9,16 @@ export const getChildProviders = (appDi: Container): Provider[] => {
     provide({
       provide: commandLineListTokens.resolvePageDeps,
       multi: true,
-      useFactory: ({ actionRunner, actions }) => {
-        return function childAppRunActions() {
-          return actionRunner.runActions(flatten(actions));
+      useFactory: ({ actionRunner, childAppPageService }) => {
+        return async function childAppRunActions() {
+          await childAppPageService.resolveComponent();
+
+          return actionRunner.runActions(childAppPageService.getActions());
         };
       },
       deps: {
         actionRunner: ACTION_PAGE_RUNNER_TOKEN,
-        actions: CHILD_APP_INTERNAL_ACTION_TOKEN,
+        childAppPageService: CHILD_APP_PAGE_SERVICE_TOKEN,
       },
     }),
   ];

@@ -249,3 +249,40 @@ You may specify a full config to debug to a specific Child App:
    ```
 
 1. Run Root App with `CHILD_APP_DEBUG` environment variable with value of Child App names needed to debug
+
+## How to
+
+### How to get current configuration for Child App
+
+For example, you need to get Child App name and version. You can use token `CHILD_APP_INTERNAL_CONFIG_TOKEN` for it, e.g.:
+
+```ts
+import { provide } from '@tramvai/core';
+import { createChildApp, commandLineListTokens } from '@tramvai/child-app-core';
+import { CHILD_APP_INTERNAL_CONFIG_TOKEN } from '@tramvai/tokens-child-app';
+import { CommonChildAppModule } from '@tramvai/module-common';
+import { RootCmp } from './components/root';
+
+// eslint-disable-next-line import/no-default-export
+export default createChildApp({
+  name: 'fancy-child',
+  render: RootCmp,
+  modules: [CommonChildAppModule],
+  providers: [
+    provide({
+      provide: commandLineListTokens.customerStart,
+      useFactory: ({ analytics, config }) => {
+        return function sendRenderEvent() {
+          const { name, version } = config;
+
+          analytics.send({ event: 'child-app-render', name, version });
+        };
+      },
+      deps: {
+        analytics: SOME_ANALYTICS_TOKEN,
+        config: CHILD_APP_INTERNAL_CONFIG_TOKEN,
+      }
+    }),
+  ],
+});
+```

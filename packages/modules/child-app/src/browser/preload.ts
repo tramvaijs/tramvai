@@ -1,13 +1,17 @@
-import type {
-  ChildAppCommandLineRunner,
-  ChildAppRequestConfig,
-  ChildAppLoader,
-  ChildAppPreloadManager,
-  CHILD_APP_RESOLVE_CONFIG_TOKEN,
-  ChildAppFinalConfig,
-  CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
+import {
+  type ChildAppCommandLineRunner,
+  type ChildAppRequestConfig,
+  type ChildAppLoader,
+  type ChildAppPreloadManager,
+  type CHILD_APP_RESOLVE_CONFIG_TOKEN,
+  type ChildAppFinalConfig,
+  type CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
+  type CHILD_APP_DI_MANAGER_TOKEN,
+  CHILD_APP_PAGE_SERVICE_TOKEN,
 } from '@tramvai/tokens-child-app';
 import type { STORE_TOKEN } from '@tramvai/tokens-common';
+import { optional } from '@tinkoff/dippy';
+import type { Route } from '@tinkoff/router';
 import { ChildAppStore } from '../shared/store';
 
 export class PreloadManager implements ChildAppPreloadManager {
@@ -16,6 +20,7 @@ export class PreloadManager implements ChildAppPreloadManager {
   private store: typeof STORE_TOKEN;
   private resolutionConfigManager: typeof CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN;
   private resolveExternalConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
+  private diManager: typeof CHILD_APP_DI_MANAGER_TOKEN;
 
   private pageHasRendered = false;
   private pageHasLoaded = false;
@@ -30,21 +35,28 @@ export class PreloadManager implements ChildAppPreloadManager {
     resolutionConfigManager,
     resolveExternalConfig,
     store,
+    diManager,
   }: {
     loader: ChildAppLoader;
     runner: ChildAppCommandLineRunner;
     resolutionConfigManager: typeof CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN;
     resolveExternalConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
     store: typeof STORE_TOKEN;
+    diManager: typeof CHILD_APP_DI_MANAGER_TOKEN;
   }) {
     this.loader = loader;
     this.runner = runner;
     this.store = store;
     this.resolutionConfigManager = resolutionConfigManager;
     this.resolveExternalConfig = resolveExternalConfig;
+    this.diManager = diManager;
   }
 
-  async preload(request: ChildAppRequestConfig, onlyPrefetch = false): Promise<void> {
+  async preload(
+    request: ChildAppRequestConfig,
+    route?: Route,
+    onlyPrefetch = false
+  ): Promise<void> {
     await this.init();
 
     const config = this.resolveExternalConfig(request);
@@ -71,6 +83,7 @@ export class PreloadManager implements ChildAppPreloadManager {
         const promise = (async () => {
           try {
             await this.loader.load(config);
+            await this.resolveComponent(config, route);
 
             if (!onlyPrefetch) {
               await this.run('customer', config);
@@ -89,11 +102,14 @@ export class PreloadManager implements ChildAppPreloadManager {
 
         return promise;
       }
+    } else {
+      // case for SPA-navigation to another page of same Child App without prefetch
+      await this.resolveComponent(config, route);
     }
   }
 
-  async prefetch(request: ChildAppRequestConfig): Promise<void> {
-    return this.preload(request, true);
+  async prefetch(request: ChildAppRequestConfig, route?: Route): Promise<void> {
+    return this.preload(request, route, true);
   }
 
   isPreloaded(request: ChildAppRequestConfig): boolean {
@@ -115,6 +131,8 @@ export class PreloadManager implements ChildAppPreloadManager {
       promises.push(
         (async () => {
           await this.loader.init(config);
+          // case for client initialization of Child App
+          await this.resolveComponent(config);
           await this.run('customer', config);
         })()
       );
@@ -182,5 +200,15 @@ export class PreloadManager implements ChildAppPreloadManager {
     }
 
     await this.runner.run('client', status, config);
+  }
+
+  // preload child app page component - we need to register page actions before running all child app actions
+  private async resolveComponent(config: ChildAppFinalConfig, route?: Route) {
+    const di = this.diManager.getChildDi(config);
+    const childAppPageService = di?.get(optional(CHILD_APP_PAGE_SERVICE_TOKEN));
+
+    if (childAppPageService) {
+      await childAppPageService.resolveComponent(route);
+    }
   }
 }

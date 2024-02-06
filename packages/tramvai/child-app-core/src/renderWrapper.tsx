@@ -3,6 +3,7 @@ import type { Container } from '@tinkoff/dippy';
 import type { ComponentType } from 'react';
 import { DIContext } from '@tramvai/react';
 import { EXTEND_RENDER } from '@tramvai/tokens-render';
+import { CHILD_APP_RENDER_CHILDREN_TOKEN } from '@tramvai/tokens-child-app';
 
 export interface WrapperProps<T extends Record<string, any>> {
   di: Container;
@@ -16,8 +17,18 @@ export const renderWrapper = <T extends Record<string, any>>(Cmp: ComponentType<
         token: EXTEND_RENDER,
         optional: true,
       });
+      const ChildCmp = di.get({
+        token: CHILD_APP_RENDER_CHILDREN_TOKEN,
+        optional: true,
+      });
 
-      let Result = <Cmp {...props} />;
+      let Result = ChildCmp ? (
+        <Cmp {...props}>
+          <ChildCmp di={di} />
+        </Cmp>
+      ) : (
+        <Cmp {...props} />
+      );
 
       if (wrappers) {
         for (const wrapper of wrappers) {

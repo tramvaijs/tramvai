@@ -1,12 +1,16 @@
-import type {
-  ChildAppCommandLineRunner,
-  ChildAppRequestConfig,
-  ChildAppLoader,
-  ChildAppPreloadManager,
-  ChildAppStateManager,
-  CHILD_APP_RESOLVE_CONFIG_TOKEN,
-  ChildAppFinalConfig,
-  CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
+import { optional } from '@tinkoff/dippy';
+import type { Route } from '@tinkoff/router';
+import {
+  type ChildAppCommandLineRunner,
+  type ChildAppRequestConfig,
+  type ChildAppLoader,
+  type ChildAppPreloadManager,
+  type ChildAppStateManager,
+  type CHILD_APP_RESOLVE_CONFIG_TOKEN,
+  type ChildAppFinalConfig,
+  type CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
+  type CHILD_APP_DI_MANAGER_TOKEN,
+  CHILD_APP_PAGE_SERVICE_TOKEN,
 } from '@tramvai/tokens-child-app';
 
 export class PreloadManager implements ChildAppPreloadManager {
@@ -15,6 +19,7 @@ export class PreloadManager implements ChildAppPreloadManager {
   private stateManager: ChildAppStateManager;
   private resolutionConfigManager: typeof CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN;
   private readonly resolveFullConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
+  private diManager: typeof CHILD_APP_DI_MANAGER_TOKEN;
 
   private shouldRunImmediately = false;
   private map = new Map<string, Promise<ChildAppFinalConfig>>();
@@ -26,21 +31,24 @@ export class PreloadManager implements ChildAppPreloadManager {
     stateManager,
     resolutionConfigManager,
     resolveFullConfig,
+    diManager,
   }: {
     loader: ChildAppLoader;
     runner: ChildAppCommandLineRunner;
     stateManager: ChildAppStateManager;
     resolutionConfigManager: typeof CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN;
     resolveFullConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
+    diManager: typeof CHILD_APP_DI_MANAGER_TOKEN;
   }) {
     this.loader = loader;
     this.runner = runner;
     this.stateManager = stateManager;
     this.resolutionConfigManager = resolutionConfigManager;
     this.resolveFullConfig = resolveFullConfig;
+    this.diManager = diManager;
   }
 
-  async preload(request: ChildAppRequestConfig): Promise<void> {
+  async preload(request: ChildAppRequestConfig, route?: Route): Promise<void> {
     await this.resolutionConfigManager.init();
 
     const config = this.resolveFullConfig(request);
@@ -61,7 +69,15 @@ export class PreloadManager implements ChildAppPreloadManager {
       .catch(() => {
         // Actual error will be logged by the internals of this.loader
       })
-      .then(() => {
+      .then(async () => {
+        // preload child app page component - we need to register page actions before running all child app actions
+        const di = this.diManager.getChildDi(config);
+        const childAppPageService = di?.get(optional(CHILD_APP_PAGE_SERVICE_TOKEN));
+
+        if (childAppPageService) {
+          await childAppPageService.resolveComponent();
+        }
+
         if (this.shouldRunImmediately) {
           return this.run('customer', config);
         }
@@ -76,8 +92,8 @@ export class PreloadManager implements ChildAppPreloadManager {
     }
   }
 
-  async prefetch(request: ChildAppRequestConfig): Promise<void> {
-    return this.preload(request);
+  async prefetch(request: ChildAppRequestConfig, route?: Route): Promise<void> {
+    return this.preload(request, route);
   }
 
   isPreloaded(request: ChildAppRequestConfig): boolean {

@@ -802,12 +802,12 @@ describe.each(TEST_CASES)(
 
     // loadable was added after v3.27.2
     if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
-      describe('loadable', () => {
-        it('loadable components assets is loaded successfully', async () => {
+      describe('multi-page and loadable', () => {
+        it('loadable page is loaded after direct navigation', async () => {
           const { serverUrl } = rootApp;
           const { page } = await getPageWrapper();
 
-          let loadableAssets: string[] = [];
+          const loadableAssets: string[] = [];
 
           page.on('request', (request) => {
             const url = request.url();
@@ -836,19 +836,102 @@ describe.each(TEST_CASES)(
             })
           ).toBeTruthy();
 
-          expect(await page.locator('.application').innerHTML()).toMatchInlineSnapshot(
-            `"<div>Content from root</div><!--$--><h2 class="loadable__lazy-cmp-module__LazyCmp_COgmb">Lazy</h2><div id="loadable">Child App: <!-- -->I'm little child app</div><button id="loadable-toggle" type="button">toggle unused component</button><!--/$-->"`
+          expect(await page.locator('#loadable').innerHTML()).toMatchInlineSnapshot(
+            `"Child App: <!-- -->I'm little child app"`
           );
+          expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
+            `"<li>global-server</li><li>lazy-server</li>"`
+          );
+        });
 
-          loadableAssets = [];
-          const button = await page.$('#loadable-toggle');
-          await button?.click();
+        it('loadable page is loaded after SPA-navigation from another Child App', async () => {
+          const { serverUrl } = rootApp;
+          const { page, router } = await getPageWrapper();
+
+          const loadableAssets: string[] = [];
+
+          page.on('request', (request) => {
+            const url = request.url();
+            const resourceType = request.resourceType();
+
+            if (
+              (resourceType === 'script' || resourceType === 'stylesheet') &&
+              url.includes('/loadable/')
+            ) {
+              loadableAssets.push(url);
+            }
+          });
+
+          await page.goto(`${serverUrl}/base/`);
+
+          await router.navigate('/loadable/');
+
+          // assets for rendered on server-side components
+          expect(
+            [
+              'loadable@0.0.0-stub.css',
+              'loadable_client@0.0.0-stub.js',
+              'granular-node_modules_date-fns_esm_index_js-node_modules_mini-css-extract-plugin_dist_hmr_hot-04ede6_client.chunk',
+              'lazy-cmp_client.chunk',
+              'examples_child-app_child-apps_loadable_index_ts_client.chunk',
+            ].every((assets) => {
+              return loadableAssets.some((url) => url.includes(assets));
+            })
+          ).toBeTruthy();
+
+          expect(await page.locator('#loadable').innerHTML()).toMatchInlineSnapshot(
+            `"Child App: I'm little child app"`
+          );
+          expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
+            `"<li>global-client</li><li>lazy-client</li>"`
+          );
+        });
+
+        it('another loadable page is loaded after SPA-navigation from the same Child App', async () => {
+          const { serverUrl } = rootApp;
+          const { page, router } = await getPageWrapper();
+
+          const loadableAssets: string[] = [];
+
+          await page.goto(`${serverUrl}/loadable/`);
+
+          page.on('request', (request) => {
+            const url = request.url();
+            const resourceType = request.resourceType();
+
+            if (
+              (resourceType === 'script' || resourceType === 'stylesheet') &&
+              url.includes('/loadable/')
+            ) {
+              loadableAssets.push(url);
+            }
+          });
+
+          await router.navigate('/loadable/bar/');
 
           // assets for rendered on client-side components
           expect(loadableAssets[0].includes('lazy-cmp-unused_client.chunk')).toBeTruthy();
 
-          expect(await page.locator('.application').innerHTML()).toMatchInlineSnapshot(
-            `"<div>Content from root</div><!--$--><h2 class="loadable__lazy-cmp-module__LazyCmp_COgmb">Lazy</h2><div id="loadable">Child App: <!-- -->I'm little child app</div><button id="loadable-toggle" type="button">toggle unused component</button><!--/$--><h2 class="loadable__lazy-cmp-unused-module__LazyCmp__8W4y">Lazy Unused</h2>"`
+          expect(await page.locator('#loadable').innerHTML()).toMatchInlineSnapshot(
+            `"Child App: <!-- -->I'm little child app"`
+          );
+          expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
+            `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li>"`
+          );
+        });
+
+        it('actions called between different pages navigation on the same Child App', async () => {
+          const { serverUrl } = rootApp;
+          const { page, router } = await getPageWrapper();
+
+          await page.goto(`${serverUrl}/loadable/`);
+
+          await router.navigate('/loadable/bar/');
+
+          await router.navigate('/loadable/foo/');
+
+          expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
+            `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li><li>global-client</li><li>lazy-client</li>"`
           );
         });
       });

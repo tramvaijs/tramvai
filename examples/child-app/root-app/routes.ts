@@ -63,6 +63,23 @@ export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
     path: '/loadable',
     config: {
       bundle: 'loadable',
+      unstable_childAppPageComponent: 'FooCmp',
+    },
+  },
+  {
+    name: 'loadable-foo',
+    path: '/loadable/foo',
+    config: {
+      bundle: 'loadable',
+      unstable_childAppPageComponent: 'FooCmp',
+    },
+  },
+  {
+    name: 'loadable-bar',
+    path: '/loadable/bar',
+    config: {
+      bundle: 'loadable',
+      unstable_childAppPageComponent: 'BarCmp',
     },
   },
 ];

@@ -1,7 +1,10 @@
 import type { ComponentType } from 'react';
+import type { Container } from '@tinkoff/dippy';
 import { createToken } from '@tinkoff/dippy';
-import type { Action, Command, TramvaiAction } from '@tramvai/core';
-import type { INITIAL_APP_STATE_TOKEN } from '@tramvai/tokens-common';
+import type { Route } from '@tinkoff/router';
+import type { Command, PageAction } from '@tramvai/core';
+import type { ActionsRegistry, INITIAL_APP_STATE_TOKEN } from '@tramvai/tokens-common';
+import type { LazyComponentWrapper } from '@tramvai/react';
 import type { StoreClass } from '@tramvai/state';
 import type { ChunkExtractor } from '@loadable/server';
 import type {
@@ -99,12 +102,21 @@ export const CHILD_APP_INTERNAL_CONFIG_TOKEN = createToken<ChildAppFinalConfig>(
 );
 
 /**
- * @public
- * @description Actions of child app
+ * @private
+ * @description Global actions of child app
  */
-export const CHILD_APP_INTERNAL_ACTION_TOKEN = createToken<
-  Action | TramvaiAction<any[], any, any> | (Action | TramvaiAction<any[], any, any>)[]
->('child-app action', multiOptions);
+export const CHILD_APP_INTERNAL_ACTION_TOKEN = createToken<PageAction | PageAction[]>(
+  'child-app action',
+  multiOptions
+);
+
+/**
+ * @private
+ * @description Registry of child app actions
+ */
+export const CHILD_APP_ACTIONS_REGISTRY_TOKEN = createToken<ActionsRegistry>(
+  'child-app actions registry'
+);
 
 /**
  * @deprecated use CHILD_APP_INTERNAL_ROOT_STATE_ALLOWED_STORE_TOKEN
@@ -205,3 +217,42 @@ export const CHILD_APP_INTERNAL_RENDER_TOKEN =
 export const CHILD_APP_INTERNAL_CHUNK_EXTRACTOR = createToken<ChunkExtractor>(
   'child-app chunk extractor'
 );
+
+/**
+ * @public
+ * @description Service to work with Child Apps page components and actions
+ */
+export const CHILD_APP_PAGE_SERVICE_TOKEN =
+  createToken<ChildAppPageService>('child-app page service');
+
+/**
+ * @public
+ * @description Child Apps page components list
+ */
+export const CHILD_APP_PAGE_COMPONENTS_TOKEN = createToken<Record<string, ChildAppPageComponent>>(
+  'child-app page components',
+  { multi: true }
+);
+
+/**
+ * @private
+ * @description Children for `createChildApp.render` component
+ */
+export const CHILD_APP_RENDER_CHILDREN_TOKEN = createToken<ComponentType<{ di: Container }>>(
+  'child-app render children'
+);
+
+export interface ChildAppPageService {
+  resolveComponent(route?: Route): Promise<void>;
+  getComponentName(route?: Route): string | void;
+  getComponent(route?: Route): ChildAppPageComponent | void;
+  getActions(route?: Route): PageAction[];
+}
+
+export type ChildAppPageComponent = ComponentType<{}> & {
+  actions?: PageAction[];
+};
+
+export type ChildAppPageComponentDecl =
+  | ChildAppPageComponent
+  | LazyComponentWrapper<ChildAppPageComponent>;

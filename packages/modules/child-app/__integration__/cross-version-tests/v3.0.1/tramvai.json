@@ -60,6 +60,11 @@
       "name": "state",
       "root": "child-apps/state",
       "type": "child-app"
+    },
+    "loadable": {
+      "name": "loadable",
+      "root": "child-apps/loadable",
+      "type": "child-app"
     }
   }
 }

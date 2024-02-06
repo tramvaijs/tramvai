@@ -54,6 +54,9 @@
         },
         {
             "path": "../../libs/router"
+        },
+        {
+            "path": "../common"
         }
     ]
 }

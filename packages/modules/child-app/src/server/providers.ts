@@ -79,6 +79,7 @@ export const serverProviders: Provider[] = [
       stateManager: CHILD_APP_STATE_MANAGER_TOKEN,
       resolutionConfigManager: CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
       resolveFullConfig: CHILD_APP_RESOLVE_CONFIG_TOKEN,
+      diManager: CHILD_APP_DI_MANAGER_TOKEN,
     },
   }),
   provide({

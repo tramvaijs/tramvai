@@ -1,11 +1,10 @@
 import noop from '@tinkoff/utils/function/noop';
-import flatten from '@tinkoff/utils/array/flatten';
 import type { Container } from '@tinkoff/dippy';
 import type { Provider } from '@tramvai/core';
 import { provide } from '@tramvai/core';
 import {
-  CHILD_APP_INTERNAL_ACTION_TOKEN,
   CHILD_APP_INTERNAL_ROOT_STATE_SUBSCRIPTION_TOKEN,
+  CHILD_APP_PAGE_SERVICE_TOKEN,
   commandLineListTokens,
 } from '@tramvai/tokens-child-app';
 import { ACTION_PAGE_RUNNER_TOKEN, CONTEXT_TOKEN } from '@tramvai/tokens-common';
@@ -49,23 +48,27 @@ export const getChildProviders = (appDi: Container): Provider[] => {
     provide({
       provide: commandLineListTokens.clear,
       multi: true,
-      useFactory: ({ actionRunner, actions }) => {
-        return function childAppRunActions() {
-          return actionRunner.runActions(flatten(actions));
+      useFactory: ({ actionRunner, childAppPageService }) => {
+        return async function childAppRunActions() {
+          await childAppPageService.resolveComponent();
+
+          return actionRunner.runActions(childAppPageService.getActions());
         };
       },
       deps: {
         actionRunner: ACTION_PAGE_RUNNER_TOKEN,
-        actions: CHILD_APP_INTERNAL_ACTION_TOKEN,
+        childAppPageService: CHILD_APP_PAGE_SERVICE_TOKEN,
       },
     }),
     provide({
       provide: commandLineListTokens.spaTransition,
       multi: true,
-      useFactory: ({ spaMode, actionRunner, actions }) => {
+      useFactory: ({ spaMode, actionRunner, childAppPageService }) => {
         if (spaMode !== 'after') {
-          return function childAppRunActions() {
-            return actionRunner.runActions(flatten(actions));
+          return async function childAppRunActions() {
+            await childAppPageService.resolveComponent();
+
+            return actionRunner.runActions(childAppPageService.getActions());
           };
         }
 
@@ -73,7 +76,7 @@ export const getChildProviders = (appDi: Container): Provider[] => {
       },
       deps: {
         actionRunner: ACTION_PAGE_RUNNER_TOKEN,
-        actions: CHILD_APP_INTERNAL_ACTION_TOKEN,
+        childAppPageService: CHILD_APP_PAGE_SERVICE_TOKEN,
         spaMode: {
           token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
           optional: true,
@@ -83,10 +86,12 @@ export const getChildProviders = (appDi: Container): Provider[] => {
     provide({
       provide: commandLineListTokens.afterSpaTransition,
       multi: true,
-      useFactory: ({ spaMode, actionRunner, actions }) => {
+      useFactory: ({ spaMode, actionRunner, childAppPageService }) => {
         if (spaMode === 'after') {
-          return function childAppRunActions() {
-            return actionRunner.runActions(flatten(actions));
+          return async function childAppRunActions() {
+            await childAppPageService.resolveComponent();
+
+            return actionRunner.runActions(childAppPageService.getActions());
           };
         }
 
@@ -94,7 +99,7 @@ export const getChildProviders = (appDi: Container): Provider[] => {
       },
       deps: {
         actionRunner: ACTION_PAGE_RUNNER_TOKEN,
-        actions: CHILD_APP_INTERNAL_ACTION_TOKEN,
+        childAppPageService: CHILD_APP_PAGE_SERVICE_TOKEN,
         spaMode: {
           token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
           optional: true,

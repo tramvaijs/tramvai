@@ -1,26 +1,32 @@
 {
-  "extends": "../../../tsconfig.lib.json",
-  "include": [
-    "./src"
-  ],
-  "compilerOptions": {
-    "declarationDir": "./lib",
-    "outDir": "./lib",
-    "rootDir": "./src",
-    "strict": true
-  },
-  "references": [
-    {
-      "path": "../../libs/dippy"
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true
     },
-    {
-      "path": "../common"
-    },
-    {
-      "path": "../../tramvai/core"
-    },
-    {
-      "path": "../../tramvai/state"
-    }
-  ]
+    "references": [
+        {
+            "path": "../../libs/dippy"
+        },
+        {
+            "path": "../common"
+        },
+        {
+            "path": "../../tramvai/core"
+        },
+        {
+            "path": "../../tramvai/state"
+        },
+        {
+            "path": "../../libs/router"
+        },
+        {
+            "path": "../../tramvai/react"
+        }
+    ]
 }
