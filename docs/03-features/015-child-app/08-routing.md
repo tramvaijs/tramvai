@@ -167,7 +167,7 @@ LazyPage.childApps = [{ name: 'lazy' }];
 export default LazyPage;
 ```
 
-### Child App
+#### Child App
 
 :hourglass: In Child App UI component you need to use `children` property, where current page component will be passed:
 

@@ -20,7 +20,7 @@ export const DEPENDANT_LIBS_MAP = new Map([
   ['@tramvai-tinkoff/safe-strings', '@tramvai-tinkoff/module-router-extension-dco'],
   ['@tramvai-tinkoff/dco-client', '@tramvai-tinkoff/module-router-extension-dco'],
   ['@tramvai-tinkoff/dynamic-components', '@tramvai/module-dynamic-components'],
-  ['@tramvai-tinkoff/media-checkers', ''],
+  ['@tramvai-tinkoff/media-checkers', '@tramvai-tinkoff/module-header'],
   ['@tramvai-tinkoff/ui-container', ''],
   ['@tramvai-tinkoff/ui-grid', ''],
   ['@tramvai-tinkoff/ui-bp-desktop-md', ''],

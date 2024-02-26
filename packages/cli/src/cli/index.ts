@@ -100,6 +100,7 @@ export async function cliInitialized(cliArgs = process.argv) {
       type: 'error',
       event: 'GLOBAL:ERROR',
       message: e.message || e,
+      payload: e.details || e.stack,
     });
     sentry.captureException(e);
 
