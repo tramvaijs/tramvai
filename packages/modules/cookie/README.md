@@ -8,7 +8,7 @@ Module is already provided with the `@tramvai/module-common` so no additional ac
 
 ## Explanation
 
-Implements interface `CookieManager` and adds provider `COOKIE_MANAGER` from the `@tinkoff/core`
+Implements interface `CookieManager` and adds provider `COOKIE_MANAGER_TOKEN` from the `@tramvai/module-common`
 
 ### Features
 
@@ -21,7 +21,8 @@ Implements interface `CookieManager` and adds provider `COOKIE_MANAGER` from the
 ### Get cookie
 
 ```tsx
-import { COOKIE_MANAGER, Module, provide } from '@tramvai/core';
+import { Module, provide } from '@tramvai/core';
+import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
 
 @Module({
   providers: [
@@ -31,7 +32,7 @@ import { COOKIE_MANAGER, Module, provide } from '@tramvai/core';
         cookie.get('sid'); // > ads.api3
       },
       deps: {
-        cookie: COOKIE_MANAGER,
+        cookie: COOKIE_MANAGER_TOKEN,
       },
     }),
   ],
