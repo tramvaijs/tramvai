@@ -6,6 +6,7 @@ import { setMedia } from '../shared/stores/media';
 import { COOKIE_NAME_MEDIA_INFO } from '../shared/constants';
 import { mediaBreakpoints } from '../shared/mediaBreakpoints';
 import { getDisplayMode } from './getDisplayMode';
+import { requestIdleCallback } from './requestIdleCallback';
 
 declare global {
   interface Window {
@@ -44,11 +45,16 @@ export const matchMediaCommand = ({
         value: JSON.stringify(media),
       });
 
-      return context.dispatch(
-        setMedia({
-          ...media,
-          supposed: false,
-        })
+      // TCORE-4601 - React hydration error (421) caused when media store updated before hydration is finished,
+      // in cases when media store passed to components inside Suspense boundaries.
+      // Recipe from https://github.com/reactwg/react-18/discussions/5
+      return requestIdleCallback(() =>
+        context.dispatch(
+          setMedia({
+            ...media,
+            supposed: false,
+          })
+        )
       );
     };
 

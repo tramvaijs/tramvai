@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test';
 
+import { sleep } from '@tramvai/test-integration';
 import { testChrome, testSafari } from './test.fixture';
 import {
   chromeClientHints,
@@ -75,6 +76,24 @@ testChrome.describe('CSR Client Hints Module in Chrome', async () => {
     testChrome
       .expect(await ClientHints.mediaStore(page))
       .toEqual(expect.objectContaining({ displayMode: 'unknown' }));
+  });
+
+  testChrome('No hydration errors', async ({ app, context }) => {
+    await context.clearCookies();
+
+    const page = await context.newPage();
+    const messages: string[] = [];
+
+    page.on('console', (msg) => messages.push(msg.text()));
+
+    await page.goto(`${app.serverUrl}/hydration-error/`, { waitUntil: 'load' });
+
+    // wait for suspense hydration
+    await sleep(500);
+
+    testChrome
+      .expect(messages.every((message) => !message.includes('hydrate:recover-after-error')))
+      .toBe(true);
   });
 });
 
