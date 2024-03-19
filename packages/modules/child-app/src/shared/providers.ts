@@ -191,6 +191,7 @@ export const sharedProviders: Provider[] = [
   provide({
     provide: REGISTER_CLEAR_CACHE_TOKEN,
     multi: true,
+    scope: Scope.SINGLETON,
     useFactory: ({ diManager }) => {
       return (type: string) => {
         diManager.forEachChildDi((di) => {
