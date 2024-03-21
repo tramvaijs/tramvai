@@ -24,8 +24,8 @@ By creating different apps and by specifying proper cli execution we may run dif
    - `shared`
 5. Additionally copy next files to new directory from `examples/child-app`: `tramvai.json`, `env.development.js` with appropriate modifications if required by specific version
 6. Copy the files `./latest/cli.ts`, `./latest/tsconfig.json` to new directory and make modification to it if required by specific versions
-7. Add new version to test cases inside `child-app.test.ts`
-8. Add installation for new deps in ci
+7. Add new version to test cases inside `packages/modules/child-app/__integration__/test-cases.ts`
+8. Update matrix and add installation for new deps in ci
 
 ### Execute cross version tests locally
 
@@ -34,8 +34,10 @@ By default only repository versions of apps is checked when running integration 
 To run cross version tests:
 
 - run `yarn pvm write-versions` in repository root otherwise dependencies will not be shared
-- install dependencies in every dir inside `cross-version-tests` expect for `latest` dir
-- run integrations tests with env `CHILD_APP_TEST_CROSS_VERSION`
+- install dependencies in every dir inside `cross-version-tests` except for `latest` dir
+- run integrations tests with env variables: `CHILD_APP_TEST_CROSS_VERSION=true`, `ROOT_APP_VERSION=latest`, `CHILD_APP_VERSION=latest`
+
+`ROOT_APP_VERSION` and `CHILD_APP_VERSION` can have any values, which will be combined for existing test case from `packages/modules/child-app/__integration__/test-cases.ts`
 
 ### Run different versions locally
 

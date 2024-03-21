@@ -1,5 +1,4 @@
 import { expect } from '@playwright/test';
-
 import { sleep } from '@tramvai/test-integration';
 import { testChrome, testSafari } from './test.fixture';
 import {
@@ -42,7 +41,7 @@ testChrome.describe('CSR Client Hints Module in Chrome', async () => {
     async ({ app, context, ClientHints }) => {
       const page = await context.newPage();
 
-      await page.goto(app.serverUrl);
+      await page.goto(app.serverUrl, { waitUntil: 'load' });
 
       testChrome.expect(await ClientHints.mediaStore(page)).toEqual({
         height: expect.anything(),
@@ -60,7 +59,7 @@ testChrome.describe('CSR Client Hints Module in Chrome', async () => {
     await ClientHints.mockDisplayMode('standalone');
     const page = await context.newPage();
 
-    await page.goto(app.serverUrl);
+    await page.goto(app.serverUrl, { waitUntil: 'load' });
 
     testChrome
       .expect(await ClientHints.mediaStore(page))
@@ -71,7 +70,7 @@ testChrome.describe('CSR Client Hints Module in Chrome', async () => {
     await ClientHints.mockDisplayMode('random');
     const page = await context.newPage();
 
-    await page.goto(app.serverUrl);
+    await page.goto(app.serverUrl, { waitUntil: 'load' });
 
     testChrome
       .expect(await ClientHints.mediaStore(page))
@@ -87,9 +86,8 @@ testChrome.describe('CSR Client Hints Module in Chrome', async () => {
     page.on('console', (msg) => messages.push(msg.text()));
 
     await page.goto(`${app.serverUrl}/hydration-error/`, { waitUntil: 'load' });
-
-    // wait for suspense hydration
-    await sleep(500);
+    // wait for media store update
+    await page.evaluate(() => new Promise((resolve) => requestIdleCallback(resolve)));
 
     testChrome
       .expect(messages.every((message) => !message.includes('hydrate:recover-after-error')))

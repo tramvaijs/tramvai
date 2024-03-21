@@ -1,4 +1,7 @@
-import type { DispatcherContext as DispatcherContextInterface } from '@tramvai/types-actions-state-context';
+import type {
+  DispatcherContext as DispatcherContextInterface,
+  Reducer,
+} from '@tramvai/types-actions-state-context';
 import type { Dispatcher } from './dispatcher';
 import type { StoreClass } from '../typings';
 import type { Middleware } from './dispatcher.h';
@@ -63,21 +66,44 @@ export class ChildDispatcherContext<TContext> extends DispatcherContext<TContext
     }
 
     if (this.allowedParentStores.has(storeName)) {
-      // use just storeName to prevent store initialization on the root-app side
-      const storeInstance = this.parentDispatcherContext.getStore({
-        store: storeName,
-        optional: true,
-      });
-
-      if (!storeInstance) {
-        return null;
-      }
-
-      this.storeSubscribe(storeName, storeInstance);
-
-      return storeInstance;
+      return this._getParentAllowedStore(storeName);
     }
 
     return super.getStore(storeClass);
+  }
+
+  // prevent parent allowed store registration in current Child App dispatcher
+  registerStore(store: Reducer<any>) {
+    const { storeName } = store;
+
+    if (this.dispatcher.stores[storeName]) {
+      super.registerStore(store);
+
+      return;
+    }
+
+    if (this.allowedParentStores.has(storeName)) {
+      this._getParentAllowedStore(storeName);
+
+      return;
+    }
+
+    super.registerStore(store);
+  }
+
+  _getParentAllowedStore(storeName: string): InstanceType<StoreClass> | null {
+    // use just storeName to prevent store initialization on the root-app side
+    const storeInstance = this.parentDispatcherContext.getStore({
+      store: storeName,
+      optional: true,
+    });
+
+    if (!storeInstance) {
+      return null;
+    }
+
+    this.storeSubscribe(storeName, storeInstance);
+
+    return storeInstance;
   }
 }

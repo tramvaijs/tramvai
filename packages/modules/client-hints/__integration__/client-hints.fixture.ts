@@ -40,6 +40,9 @@ export class ClientHintsComponentObject {
   }
 
   async mediaStore(page: Page): Promise<Record<string, number | string>> {
+    // wait for media store update
+    await page.evaluate(() => new Promise((resolve) => requestIdleCallback(resolve)));
+
     return page.evaluate("contextExternal.getStore('media').state");
   }
 }

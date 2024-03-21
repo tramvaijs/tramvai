@@ -17,6 +17,17 @@ export const rootStore = createReducer('root', { value: 0 } as State).on(increas
   };
 });
 
+export const increaseAnotherValue = createEvent<void>('increaseAnotherValue');
+
+export const anotherRootStore = createReducer('another root', { value: 0 } as State).on(
+  increaseAnotherValue,
+  (state) => {
+    return {
+      value: state.value + 1,
+    };
+  }
+);
+
 export const updateRootValueAction = createAction({
   name: 'root-app-store',
   fn(context) {
@@ -27,20 +38,39 @@ export const updateRootValueAction = createAction({
   },
 });
 
+export const updateAnotherRootValueAction = createAction({
+  name: 'another-root-app-store',
+  fn(context) {
+    return context.dispatch(increaseAnotherValue());
+  },
+  conditions: {
+    onlyServer: true,
+  },
+});
+
 const Cmp: PageComponent = () => {
   const context = useConsumerContext();
   const state = useStore(rootStore);
+  const anotherState = useStore(anotherRootStore);
 
-  const cb = useCallback(() => {
+  const update = useCallback(() => {
     context.dispatch(increaseValue());
+  }, [context]);
+  const anotherUpdate = useCallback(() => {
+    context.dispatch(increaseAnotherValue());
   }, [context]);
 
   return (
     <>
       <h2>Root</h2>
-      <div>Content from root, state: {state.value}</div>
-      <button id="button" type="button" onClick={cb}>
+      <div>
+        Content from root, state: {state.value} | {anotherState.value}
+      </div>
+      <button id="button" type="button" onClick={update}>
         Update Root State
+      </button>
+      <button id="button-another" type="button" onClick={anotherUpdate}>
+        Update Another Root State
       </button>
       <h3>Child</h3>
       <ChildApp name="state" />
@@ -56,6 +86,6 @@ export default createBundle({
   components: {
     pageDefault: Cmp,
   },
-  reducers: [rootStore],
-  actions: [updateRootValueAction],
+  reducers: [rootStore, anotherRootStore],
+  actions: [updateRootValueAction, updateAnotherRootValueAction],
 });

@@ -42,7 +42,7 @@ export default createChildApp({
     {
       provide: CHILD_APP_INTERNAL_ROOT_STATE_ALLOWED_STORE_TOKEN,
       multi: true,
-      useValue: ['root'],
+      useValue: ['root', 'another root'],
     },
   ],
 });
