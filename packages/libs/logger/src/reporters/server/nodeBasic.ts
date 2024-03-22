@@ -1,4 +1,5 @@
 import util from 'util';
+import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import type { Reporter } from '../../logger.h';
 import { parseStack } from './utils/error';
 import { writeStream } from './utils/stream';
@@ -11,6 +12,7 @@ interface Options {
   formatOptions?: {
     colors?: boolean;
     compact?: boolean;
+    depth?: number;
   };
 }
 
@@ -29,7 +31,7 @@ export class NodeBasicReporter implements Reporter {
   protected options: Options;
 
   constructor(options?: Options) {
-    this.options = { ...DEFAULTS, ...options };
+    this.options = mergeDeep(DEFAULTS, options);
   }
 
   // eslint-disable-next-line class-methods-use-this

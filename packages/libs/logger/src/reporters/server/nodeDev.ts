@@ -1,5 +1,6 @@
 import figures from 'figures';
 import chalk from 'chalk';
+import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import { NodeBasicReporter } from './nodeBasic';
 import { parseStack } from './utils/error';
 import { chalkColor, chalkBgColor } from './utils/chalk';
@@ -24,7 +25,7 @@ const TYPE_ICONS = {
 
 export class NodeDevReporter extends NodeBasicReporter {
   constructor(options) {
-    super({ ...DEFAULTS, ...options });
+    super(mergeDeep(DEFAULTS, options));
   }
 
   // eslint-disable-next-line class-methods-use-this

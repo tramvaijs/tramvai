@@ -20,8 +20,7 @@ yarn add @tinkoff/logger
 
 ### Child loggers
 
-You can create child loggers using method `.child` of the current logger instance.
-Child logger will inherit parent logger settings and can override these settings.
+You can create child loggers using method `.child` of the current logger instance. Child logger will inherit parent logger settings and can override these settings.
 
 :::info
 
@@ -64,7 +63,7 @@ All subsequent setup for log displaying are preserved, e.g. subsequent calls `lo
 
 #### Display logs on server
 
-For control of displaying logs on server environment variables `LOG_LEVEL` and `LOG_ENABLE` are used:
+For control of displaying logs on server environment variables `LOG_LEVEL`, `LOG_ENABLE` and `LOG_DEFAULT_REPORTER_DEPTH` are used:
 
 - LOG_LEVEL = trace | debug | info | warn | error | fatal - enables displaying logs for specified level and higher. E.g.:
   - if `LOG_LEVEL=info` then all logs of levels info, warn, error, fatal will be showed.
@@ -72,6 +71,8 @@ For control of displaying logs on server environment variables `LOG_LEVEL` and `
   - if `LOG_ENABLE=server` then all logs for name `server` will be displayed
   - if `LOG_ENABLE=trace:server*` then for logs with name server only `trace` level will be showed
   - if `LOG_ENABLE=info:server,client,trace:shared` then displaying logs will be enabled for specified loggers using rules above
+- LOG_DEFAULT_REPORTER_DEPTH = `${number}` - specifies how deep the objects will be displayed in the logs. E.g.:
+  - if `LOG_DEFAULT_REPORTER_DEPTH=3` we will see the values in the log objects up to `object.a.b.c`
 
 #### Display logs in browser
 
@@ -170,7 +171,7 @@ interface Reporter {
     warn?: boolean;
     error?: boolean;
     fatal?: boolean;
-  }
+  };
 }
 
 logger.addReporter(reporter as Reporter); // add new reporter to list of previously added reporters
@@ -231,7 +232,10 @@ const remoteLog = logger({ name: 'remote-for-all', defaults: { remote: true } })
 remoteLog.info('test'); // will be sent to api
 remoteLog.debug('test'); // will be sent to api
 
-const traceLog = logger({ name: 'log-trace', defaults: { remote: { emitLevels: { trace: true } }}}); // override RemoteReporter settings
+const traceLog = logger({
+  name: 'log-trace',
+  defaults: { remote: { emitLevels: { trace: true } } },
+}); // override RemoteReporter settings
 
 traceLog.trace('test'); // will be sent to api
 traceLog.error('test'); // will not be sent to api

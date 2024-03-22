@@ -30,7 +30,11 @@ export { LOGGER_TOKEN };
 const DefaultReporter = env.ci || env.test ? NodeBasicReporter : NodeDevReporter;
 const reporter =
   process.env.DEBUG_PLAIN || process.env.NODE_ENV !== 'production'
-    ? new DefaultReporter()
+    ? new DefaultReporter({
+        formatOptions: {
+          depth: Number(process.env.LOG_DEFAULT_REPORTER_DEPTH) || undefined,
+        },
+      })
     : new JSONReporter();
 
 const logger = createLoggerFactory({
