@@ -57,6 +57,7 @@ export const modernLibs = [
   '@hubert',
   '@lexical',
   'lexical',
+  'tiny-lru',
 ];
 
 const regexStringFactory = ({ except }: { except?: boolean } = {}) =>
