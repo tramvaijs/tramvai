@@ -53,7 +53,7 @@ export const testCasesConditions: Record<string, TestCase> = {
     },
     reactQuery: {
       // NOTE: it requires to have semver versions in package.jsons in repo not stub versions
-      scriptsCount: 2, // only runtime and main entry chunk should be loaded, while others should be shared
+      scriptsCount: 4, // except runtime and main entry chunks, shared chunks @tramvai/core and @tramvai/react should be loaded, because we can't share different major versions (v3 and v4), while others should be shared
     },
   },
 };

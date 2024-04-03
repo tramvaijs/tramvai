@@ -32,7 +32,9 @@ const reporter =
   process.env.DEBUG_PLAIN || process.env.NODE_ENV !== 'production'
     ? new DefaultReporter({
         formatOptions: {
-          depth: Number(process.env.LOG_DEFAULT_REPORTER_DEPTH) || undefined,
+          // default value from here - https://github.com/nodejs/node/blob/2c024cd24d0b3ab34df6bf9db1bc145db0529769/lib/internal/util/inspect.js#L182
+          // we can't pass undefined or null here because it works as infinity depth
+          depth: Number(process.env.LOG_DEFAULT_REPORTER_DEPTH) || 2,
         },
       })
     : new JSONReporter();

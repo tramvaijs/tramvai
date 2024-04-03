@@ -8,9 +8,17 @@ describe('test/integration/app/runFakeApp', () => {
   let app: StartCliResult;
 
   beforeAll(async () => {
-    app = await runFakeApp({
-      root: __dirname,
-    });
+    app = await runFakeApp(
+      {
+        root: __dirname,
+      },
+      {
+        env: {
+          // doesn't know why, but sometimes in CI this app get CONFIG_API value from `test/env.js` file (or from somewere else)
+          CONFIG_API: 'test',
+        },
+      }
+    );
   }, 80000);
 
   afterAll(() => {
