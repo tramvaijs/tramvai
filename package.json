@@ -45,6 +45,7 @@
   "dependencies": {},
   "resolutions": {
     "webpack": "^5",
-    "@types/webpack": "^5"
+    "@types/webpack": "^5",
+    "@types/mime": "3.0.4"
   }
 }

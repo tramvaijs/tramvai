@@ -4,11 +4,6 @@ import type { TokenType, TokenOptions } from './createToken.h';
 /**
  * @private
  */
-export const TOKENS_SYMBOL_BY_STRING_NAME_REGISTRY = new Map<string, symbol>();
-
-/**
- * @private
- */
 export function tokenToString(token: symbol): string {
   return token.toString().replace(/^Symbol\((.+)\)$/, '$1');
 }
@@ -29,16 +24,6 @@ export class TokenClass<T> implements TokenType<T> {
   constructor(name?: string, options: TokenOptions = {}) {
     this.name = name ? Symbol.for(name) : Symbol('token');
     this.options = options;
-
-    if (process.env.NODE_ENV === 'development') {
-      if (name) {
-        if (!TOKENS_SYMBOL_BY_STRING_NAME_REGISTRY.has(name)) {
-          TOKENS_SYMBOL_BY_STRING_NAME_REGISTRY.set(name, this.name);
-        } else {
-          console.error(`Token with name "${name}" already created!`);
-        }
-      }
-    }
   }
 
   /**
