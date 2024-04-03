@@ -1,0 +1,45 @@
+{
+  "name": "@tramvai/storybook-addon",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/preset.js",
+  "typings": "lib/preset.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@tramvai/test-mocks": "0.0.0-stub",
+    "@tinkoff/is-modern-lib": "0.0.0-stub",
+    "webpack-chain": "^6.5.1",
+    "webpack-merge": "^5.8.0",
+    "@tanstack/react-query": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/webpack": ">=5.28",
+    "@babel/core": "^7.16.0",
+    "webpack": "5.87.0"
+  },
+  "peerDependencies": {
+    "@tramvai/cli": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/router": "0.0.0-stub",
+    "@tinkoff/url": "0.0.0-stub",
+    "react": ">=16.14.0"
+  }
+}

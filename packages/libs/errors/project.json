@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/errors",
+  "sourceRoot": "packages/libs/errors/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/errors/package.json",
+        "packages/libs/errors/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

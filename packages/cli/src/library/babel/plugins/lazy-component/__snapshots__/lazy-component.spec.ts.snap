@@ -1,0 +1,313 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`lazy-component base: base 1`] = `
+
+import { lazy } from '@tramvai/react';
+
+lazy(() => import('./cmp'))
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { lazy } from '@tramvai/react';
+lazy({
+  chunkName() {
+    return 'cmp';
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: () => import(/* webpackChunkName: "cmp" */ './cmp'),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve() {
+    return require.resolveWeak('./cmp');
+  },
+});
+
+
+`;
+
+exports[`lazy-component comments: comments 1`] = `
+
+import { lazy } from '@tramvai/react';
+
+lazy(() => import(/* webpackChunkName: 'main' */'./inner/first'))
+lazy(() => import(/* stupid comments */'./inner/second'))
+lazy(() => import(/* webpackPreload: true */'./inner/third'))
+
+lazy(() => import(/* webpackPrefetch: true, webpackChunkName: "component"  */'./cmp'))
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { lazy } from '@tramvai/react';
+lazy({
+  chunkName() {
+    return 'main';
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: () => import(/* webpackChunkName: "main" */ './inner/first'),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve() {
+    return require.resolveWeak('./inner/first');
+  },
+});
+lazy({
+  chunkName() {
+    return 'inner-second';
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: () =>
+    import(
+      /* webpackChunkName: "inner-second" */
+      /* stupid comments */
+      './inner/second'
+    ),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve() {
+    return require.resolveWeak('./inner/second');
+  },
+});
+lazy({
+  chunkName() {
+    return 'inner-third';
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: () =>
+    import(
+      /* webpackChunkName: "inner-third" */
+      /* webpackPreload: true */
+      './inner/third'
+    ),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve() {
+    return require.resolveWeak('./inner/third');
+  },
+});
+lazy({
+  chunkName() {
+    return 'component';
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: () =>
+    import(/* webpackPrefetch: true, webpackChunkName: "component" */ './cmp'),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve() {
+    return require.resolveWeak('./cmp');
+  },
+});
+
+
+`;
+
+exports[`lazy-component dynamic: dynamic 1`] = `
+
+import { lazy } from '@tramvai/react';
+
+lazy((props) => import(\`./inner/\${props.name}.js\`))
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { lazy } from '@tramvai/react';
+lazy({
+  chunkName(props) {
+    return \`inner-\${props.name}-js\`.replace(/[^a-zA-Z0-9_!§$()=\\-^°]+/g, '-');
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: (props) =>
+    import(
+      /* webpackChunkName: "inner-[request]" */ \`./inner/\${props.name}.js\`
+    ),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve(props) {
+    return require.resolveWeak(\`./inner/\${props.name}.js\`);
+  },
+});
+
+
+`;
+
+exports[`lazy-component hmr: hmr 1`] = `
+
+import { lazy } from '@tramvai/react';
+
+const MainPage = lazy(() => import('./inner/first'));
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { lazy } from '@tramvai/react';
+const MainPage = lazy(
+  (_c = {
+    chunkName() {
+      return 'inner-first';
+    },
+    requireSync(props) {
+      return __webpack_require__(this.resolve(props));
+    },
+    isReady(props) {
+      const key = this.resolve(props);
+      return !!__webpack_modules__[key];
+    },
+    importAsync: () =>
+      import(/* webpackChunkName: "inner-first" */ './inner/first'),
+    requireAsync(props) {
+      const key = this.resolve(props);
+      return this.importAsync(props).then((resolved) => {
+        return resolved;
+      });
+    },
+    resolve() {
+      return require.resolveWeak('./inner/first');
+    },
+  })
+);
+_c2 = MainPage;
+var _c, _c2;
+$RefreshReg$(_c, 'MainPage$lazy');
+$RefreshReg$(_c2, 'MainPage');
+
+
+`;
+
+exports[`lazy-component long import: long import 1`] = `
+
+import { lazy } from '@tramvai/react';
+
+lazy(() => import('./inner/path/cmp'))
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { lazy } from '@tramvai/react';
+lazy({
+  chunkName() {
+    return 'inner-path-cmp';
+  },
+  requireSync(props) {
+    return __webpack_require__(this.resolve(props));
+  },
+  isReady(props) {
+    const key = this.resolve(props);
+    return !!__webpack_modules__[key];
+  },
+  importAsync: () =>
+    import(/* webpackChunkName: "inner-path-cmp" */ './inner/path/cmp'),
+  requireAsync(props) {
+    const key = this.resolve(props);
+    return this.importAsync(props).then((resolved) => {
+      return resolved;
+    });
+  },
+  resolve() {
+    return require.resolveWeak('./inner/path/cmp');
+  },
+});
+
+
+`;
+
+exports[`lazy-component not lazy: not lazy 1`] = `
+
+const lazy = (imp) => console.log(imp);
+const load = lazy(() => import('./cmp'));
+
+(async () => {
+  const {default: cmp} = await import('./cmp');
+
+  console.log((cmp as any).actions)
+})();
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+const lazy = (imp) => console.log(imp);
+const load = lazy(() => import('./cmp'));
+(async () => {
+  const { default: cmp } = await import('./cmp');
+  console.log(cmp.actions);
+})();
+
+
+`;
+
+exports[`lazy-component tramvai react but not lazy: tramvai react but not lazy 1`] = `
+
+import { withError } from '@tramvai/react';
+
+export const compose = () => {
+  return (cmp) => {
+    withError()(cmp);
+  }
+}
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { withError } from '@tramvai/react';
+export const compose = () => {
+  return (cmp) => {
+    withError()(cmp);
+  };
+};
+
+
+`;

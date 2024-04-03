@@ -1,0 +1,21 @@
+{
+  "$schema": "../../../../../schema.json",
+  "projects": {
+    "app": {
+      "name": "app",
+      "root": "app",
+      "type": "application",
+      "modern": false
+    },
+    "module": {
+      "name": "module",
+      "root": "module",
+      "type": "module"
+    },
+    "package": {
+      "name": "package",
+      "type": "package",
+      "root": "package"
+    }
+  }
+}

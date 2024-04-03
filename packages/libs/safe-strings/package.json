@@ -1,0 +1,25 @@
+{
+  "name": "@tramvai/safe-strings",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/utils.js",
+  "typings": "lib/utils.d.ts",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.3",
+    "tslib": "^2.4.0"
+  },
+  "sideEffects": false,
+  "module": "lib/utils.es.js",
+  "license": "Apache-2.0"
+}

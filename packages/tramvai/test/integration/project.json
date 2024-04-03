@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/test-integration",
+  "sourceRoot": "packages/tramvai/test/integration/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/test/integration/package.json",
+        "packages/tramvai/test/integration/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+import React from 'react';
+import { testComponent } from '@tramvai/test-react';
+import { {{ properCase name }}Page } from './{{ name }}Page';
+
+describe('{{ properCase name }}Page', () => {
+  it('snapshot', () => {
+    const { render } = testComponent(<{{ properCase name }}Page title="Page" />);
+
+    expect(render.getByText('Page')).toBeTruthy();
+  });
+});

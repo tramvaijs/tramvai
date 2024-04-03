@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/module-loader-server",
+  "sourceRoot": "packages/libs/module-loader-server/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/module-loader-server/package.json",
+        "packages/libs/module-loader-server/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

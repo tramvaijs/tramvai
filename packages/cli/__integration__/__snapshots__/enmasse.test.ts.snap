@@ -1,0 +1,259 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`enmasse test module platform --help module 1`] = `
+"Usage: bin-init <command> [options]
+
+Options:
+  -v, --version                                 output the version number
+  -h, --help                                    display help for command
+
+Commands:
+  build|b [options] <target>                    Command to build platform entities - applications, modules, libraries
+  start-prod|sp [options] <target>              Command to run in production mode
+  start|s [options] <target>                    Command to run in development mode
+  lint|l <target>                               Command to run lint
+  task|t <name> [options]                       Run task
+  analyze|a [options] <target>                  Command for analyzing application
+  generate|g [target] [generator]               Command for code generation
+    [target] - application name
+    [generator] - action|reducer|bundle|component|page|module
+  new|n [options] <name>                        Command for generating a new application
+  update|u [to]                                 All tramvai packages update command
+    [to] - target version <latest|prerelease|X.X.X|^X.X.X> (default: latest)
+  add [options] <packageName>                   Tramvai package install command
+  static|st [options] <target>                  Command to export application routes to HTML pages
+  benchmark|bench [options] <command> <target>  Command to run benchmark of the @tramvai/cli
+
+  Run tramvai <command> --help
+ for detailed usage of given command.
+"
+`;
+
+exports[`enmasse test module platform build module 1`] = `
+[
+  {
+    "extension": ".js",
+    "name": "module_client.js",
+    "path": "dist/modules/module/prerelease/module_client.js",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "module_server.js",
+    "path": "dist/modules/module/prerelease/module_server.js",
+    "type": "file",
+  },
+  {
+    "extension": ".css",
+    "name": "module.css",
+    "path": "dist/modules/module/prerelease/module.css",
+    "type": "file",
+  },
+  {
+    "extension": ".json",
+    "name": "stats.json",
+    "path": "dist/modules/module/prerelease/stats.json",
+    "type": "file",
+  },
+]
+`;
+
+exports[`enmasse test package platform --help package 1`] = `
+"Usage: bin-init <command> [options]
+
+Options:
+  -v, --version                                 output the version number
+  -h, --help                                    display help for command
+
+Commands:
+  build|b [options] <target>                    Command to build platform entities - applications, modules, libraries
+  start-prod|sp [options] <target>              Command to run in production mode
+  start|s [options] <target>                    Command to run in development mode
+  lint|l <target>                               Command to run lint
+  task|t <name> [options]                       Run task
+  analyze|a [options] <target>                  Command for analyzing application
+  generate|g [target] [generator]               Command for code generation
+    [target] - application name
+    [generator] - action|reducer|bundle|component|page|module
+  new|n [options] <name>                        Command for generating a new application
+  update|u [to]                                 All tramvai packages update command
+    [to] - target version <latest|prerelease|X.X.X|^X.X.X> (default: latest)
+  add [options] <packageName>                   Tramvai package install command
+  static|st [options] <target>                  Command to export application routes to HTML pages
+  benchmark|bench [options] <command> <target>  Command to run benchmark of the @tramvai/cli
+
+  Run tramvai <command> --help
+ for detailed usage of given command.
+"
+`;
+
+exports[`enmasse test package platform build package 1`] = `
+[
+  {
+    "extension": ".ts",
+    "name": "browser.d.ts",
+    "path": "dist/browser.d.ts",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "browser.js",
+    "path": "dist/browser.js",
+    "type": "file",
+  },
+  {
+    "extension": ".ts",
+    "name": "index.d.ts",
+    "path": "dist/index.d.ts",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "index.es.js",
+    "path": "dist/index.es.js",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "index.js",
+    "path": "dist/index.js",
+    "type": "file",
+  },
+]
+`;
+
+exports[`enmasse test react-app platform --help react-app 1`] = `
+"Usage: bin-init <command> [options]
+
+Options:
+  -v, --version                                 output the version number
+  -h, --help                                    display help for command
+
+Commands:
+  build|b [options] <target>                    Command to build platform entities - applications, modules, libraries
+  start-prod|sp [options] <target>              Command to run in production mode
+  start|s [options] <target>                    Command to run in development mode
+  lint|l <target>                               Command to run lint
+  task|t <name> [options]                       Run task
+  analyze|a [options] <target>                  Command for analyzing application
+  generate|g [target] [generator]               Command for code generation
+    [target] - application name
+    [generator] - action|reducer|bundle|component|page|module
+  new|n [options] <name>                        Command for generating a new application
+  update|u [to]                                 All tramvai packages update command
+    [to] - target version <latest|prerelease|X.X.X|^X.X.X> (default: latest)
+  add [options] <packageName>                   Tramvai package install command
+  static|st [options] <target>                  Command to export application routes to HTML pages
+  benchmark|bench [options] <command> <target>  Command to run benchmark of the @tramvai/cli
+
+  Run tramvai <command> --help
+ for detailed usage of given command.
+"
+`;
+
+exports[`enmasse test react-app platform build react-app 1`] = `
+[
+  {
+    "extension": ".css",
+    "name": "platform.css",
+    "path": "dist/client/platform.css",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "platform.js",
+    "path": "dist/client/platform.js",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "platform.js.map",
+    "path": "dist/client/platform.js.map",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "react.js",
+    "path": "dist/client/react.js",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "react.js.map",
+    "path": "dist/client/react.js.map",
+    "type": "file",
+  },
+  {
+    "extension": ".json",
+    "name": "stats",
+    "path": "dist/client/stats",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "tinkoff-examples_react-app_src_bundles_first_ts.chunk.js",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_first_ts.chunk.js",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "tinkoff-examples_react-app_src_bundles_first_ts.chunk.js.map",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_first_ts.chunk.js.map",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "tinkoff-examples_react-app_src_bundles_main_ts.chunk.js",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_main_ts.chunk.js",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "tinkoff-examples_react-app_src_bundles_main_ts.chunk.js.map",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_main_ts.chunk.js.map",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "tinkoff-examples_react-app_src_bundles_second_ts.chunk.js",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_second_ts.chunk.js",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "tinkoff-examples_react-app_src_bundles_second_ts.chunk.js.map",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_second_ts.chunk.js.map",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "tinkoff-examples_react-app_src_bundles_third_ts.chunk.js",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_third_ts.chunk.js",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "tinkoff-examples_react-app_src_bundles_third_ts.chunk.js.map",
+    "path": "dist/client/tinkoff-examples_react-app_src_bundles_third_ts.chunk.js.map",
+    "type": "file",
+  },
+  {
+    "extension": ".js",
+    "name": "server",
+    "path": "dist/server/server",
+    "type": "file",
+  },
+  {
+    "extension": ".map",
+    "name": "server.map",
+    "path": "dist/server/server.map",
+    "type": "file",
+  },
+  {
+    "extension": ".json",
+    "name": "stats",
+    "path": "dist/server/stats",
+    "type": "file",
+  },
+]
+`;

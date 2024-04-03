@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-log",
+  "sourceRoot": "packages/modules/log/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/log/package.json",
+        "packages/modules/log/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

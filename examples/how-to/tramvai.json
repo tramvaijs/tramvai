@@ -1,0 +1,81 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "actions-execution": {
+      "name": "actions-execution",
+      "root": "actions-execution",
+      "type": "application"
+    },
+    "actions-conditions": {
+      "name": "actions-conditions",
+      "root": "actions-conditions",
+      "type": "application"
+    },
+    "feature-toggle-async": {
+      "name": "feature-toggle-async",
+      "root": "feature-toggle-async",
+      "type": "application"
+    },
+    "react-query-usage": {
+      "name": "react-query-usage",
+      "root": "react-query-usage",
+      "type": "application"
+    },
+    "render-add-resources": {
+      "name": "render-add-resources",
+      "root": "render-add-resources",
+      "type": "application"
+    },
+    "router-static-routes": {
+      "name": "router-static-routes",
+      "root": "router-static-routes",
+      "type": "application"
+    },
+    "router-navigate": {
+      "name": "router-navigate",
+      "root": "router-navigate",
+      "type": "application"
+    },
+    "router-not-found": {
+      "name": "router-not-found",
+      "root": "router-not-found",
+      "type": "application"
+    },
+    "router-not-found-custom-status": {
+      "name": "router-not-found-custom-status",
+      "root": "router-not-found-custom-status",
+      "type": "application"
+    },
+    "router-guards": {
+      "name": "router-guards",
+      "root": "router-guards",
+      "type": "application"
+    },
+    "router-action-error": {
+      "name": "router-action-error",
+      "root": "router-action-error",
+      "type": "application"
+    },
+    "ssr-async-components": {
+      "name": "ssr-async-components",
+      "root": "ssr-async-components",
+      "type": "application"
+    },
+    "ssr-dynamic-components": {
+      "name": "ssr-dynamic-components",
+      "root": "ssr-dynamic-components",
+      "type": "application"
+    },
+    "server-add-path-handler": {
+      "name": "server-add-path-handler",
+      "root": "server-add-path-handler",
+      "type": "application"
+    },
+    "server-add-file-api": {
+      "name": "server-add-file-api",
+      "root": "server-add-file-api",
+      "type": "application",
+      "serverApiDir": "server-add-file-api/papi"
+    }
+  }
+}

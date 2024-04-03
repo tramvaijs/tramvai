@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-sentry",
+  "sourceRoot": "packages/modules/sentry/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/sentry/package.json",
+        "packages/modules/sentry/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

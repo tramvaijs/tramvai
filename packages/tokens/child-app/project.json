@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/tokens-child-app",
+  "sourceRoot": "packages/tokens/child-app/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tokens/child-app/package.json",
+        "packages/tokens/child-app/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

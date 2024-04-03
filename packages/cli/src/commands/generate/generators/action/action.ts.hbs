@@ -1,0 +1,9 @@
+import { declareAction } from '@tramvai/core';
+
+export const {{ camelCase name }}Action = declareAction({
+  name: '{{ dashCase name }}-action',
+  async fn(payload: string) {
+    return payload;
+  },
+  conditions: {},
+});

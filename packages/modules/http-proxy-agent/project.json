@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-http-proxy-agent",
+  "sourceRoot": "packages/modules/http-proxy-agent/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/http-proxy-agent/package.json",
+        "packages/modules/http-proxy-agent/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

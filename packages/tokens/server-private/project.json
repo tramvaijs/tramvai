@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/tokens-server-private",
+  "sourceRoot": "packages/tokens/server-private/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tokens/server-private/package.json",
+        "packages/tokens/server-private/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

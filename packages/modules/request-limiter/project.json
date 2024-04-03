@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-request-limiter",
+  "sourceRoot": "packages/modules/request-limiter/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/request-limiter/package.json",
+        "packages/modules/request-limiter/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

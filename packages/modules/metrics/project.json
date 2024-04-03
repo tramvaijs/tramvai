@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-metrics",
+  "sourceRoot": "packages/modules/metrics/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/metrics/package.json",
+        "packages/modules/metrics/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

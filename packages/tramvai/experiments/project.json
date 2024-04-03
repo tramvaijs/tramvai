@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/experiments",
+  "sourceRoot": "packages/tramvai/experiments/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/experiments/package.json",
+        "packages/tramvai/experiments/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

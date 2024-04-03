@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/state",
+  "sourceRoot": "packages/tramvai/state/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/state/package.json",
+        "packages/tramvai/state/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

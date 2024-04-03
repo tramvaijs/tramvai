@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/test-puppeteer",
+  "sourceRoot": "packages/tramvai/test/puppeteer/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/test/puppeteer/package.json",
+        "packages/tramvai/test/puppeteer/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

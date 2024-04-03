@@ -1,0 +1,28 @@
+{
+  "name": "@tramvai/papi",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "__migrations__"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/url": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.2",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {},
+  "gitHead": "8e826a214c87b188fc4d254cdd8f2a2b2c55f3a8",
+  "module": "lib/index.es.js",
+  "license": "Apache-2.0"
+}

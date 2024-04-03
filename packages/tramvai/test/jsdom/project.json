@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/test-jsdom",
+  "sourceRoot": "packages/tramvai/test/jsdom/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/test/jsdom/package.json",
+        "packages/tramvai/test/jsdom/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

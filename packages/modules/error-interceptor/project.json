@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-error-interceptor",
+  "sourceRoot": "packages/modules/error-interceptor/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/error-interceptor/package.json",
+        "packages/modules/error-interceptor/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

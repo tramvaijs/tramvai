@@ -1,0 +1,25 @@
+{
+  "name": "@tinkoff/error-handlers",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "./lib/server.js",
+  "typings": "./lib/server.d.ts",
+  "browser": "./lib/browser.js",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.gitt"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0"
+  },
+  "module": "./lib/server.es.js",
+  "license": "Apache-2.0"
+}

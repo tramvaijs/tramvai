@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/measure-express-requests",
+  "sourceRoot": "packages/libs/measure-express-requests/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/measure-express-requests/package.json",
+        "packages/libs/measure-express-requests/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+[package]
+name = "react_element_info_unique"
+version = "0.0.0-stub"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+swc_core = { workspace = true }
+swc_ecma_parser = { workspace = true }
+swc_common = { workspace = true }

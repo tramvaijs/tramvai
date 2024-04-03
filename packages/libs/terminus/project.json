@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/terminus",
+  "sourceRoot": "packages/libs/terminus/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/terminus/package.json",
+        "packages/libs/terminus/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

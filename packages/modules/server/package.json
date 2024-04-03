@@ -1,0 +1,64 @@
+{
+  "name": "@tramvai/module-server",
+  "version": "0.0.0-stub",
+  "description": "",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": [
+    "lib/server.js",
+    "lib/server.es.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "afterframe": "^1.0.2",
+    "@tinkoff/errors": "0.0.0-stub",
+    "@tinkoff/monkeypatch": "0.0.0-stub",
+    "@tinkoff/terminus": "0.0.0-stub",
+    "@tinkoff/url": "0.0.0-stub",
+    "@tramvai/module-cache-warmup": "0.0.0-stub",
+    "@tramvai/module-metrics": "0.0.0-stub",
+    "@tramvai/papi": "0.0.0-stub",
+    "@tramvai/tokens-server": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "@tramvai/tokens-server-private": "0.0.0-stub",
+    "@tramvai/safe-strings": "0.0.0-stub",
+    "fastify": "^4.14.1",
+    "@fastify/cookie": "^8.3.0",
+    "@fastify/compress": "^6.2.0",
+    "@fastify/formbody": "^7.4.0",
+    "@fastify/static": "^6.9.0",
+    "@loadable/server": "^5.15.0",
+    "http-proxy-middleware": "^2.0.2"
+  },
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/cli": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/module-environment": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-core-private": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "react": ">=16.14.0",
+    "react-dom": ">=16.14.0",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/http-proxy-middleware": "^0.19.3"
+  },
+  "module": "lib/server.es.js",
+  "license": "Apache-2.0"
+}

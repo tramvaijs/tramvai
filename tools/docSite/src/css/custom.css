@@ -1,0 +1,134 @@
+/* your custom css */
+:root {
+  --ifm-color-primary: #2E8555;
+  --ifm-color-secondary: #205C3B;
+  --ifm-section-background-color: #f1f2f3;
+}
+
+[data-theme='dark'] {
+  --ifm-section-background-color: #1e2125;
+}
+
+.docusaurus-highlight-code-line {
+  background-color: rgb(72, 77, 91);
+}
+
+.main-section:nth-child(even) {
+  background-color: var(--ifm-section-background-color);
+}
+
+/* Navbar Search */
+
+.navbar__search {
+  padding: var(--ifm-navbar-item-padding-vertical) var(--ifm-navbar-item-padding-horizontal);
+}
+
+/* Docs Rating Box */
+
+.docsRating {
+  display: inline-block;
+  padding: 16px 40px;
+  min-height: 66px;
+  margin-top: 5rem;
+  background-color: rgba(100, 215, 255, 0.3);
+  text-align: center;
+  color: #0780ab;
+  line-height: 32px;
+  font-weight: 500;
+  border-radius: var(--ifm-global-radius);
+}
+
+.docsRating svg {
+  height: 1.5em;
+  width: 1.5em;
+  margin: 0 0 0 6px;
+}
+
+.docsRating svg:hover,
+.docsRating svg:focus {
+  cursor: pointer;
+  fill: var(--ifm-color-primary);
+}
+
+.docsRating .i_thumbsup {
+  fill: #56a211;
+  transform: translateY(0.25em);
+  margin-left: 12px;
+}
+
+.docsRating .i_thumbsdown {
+  fill: #e9430f;
+  transform: scale(-1, -1) translateY(-0.25em);
+}
+
+html[data-theme="dark"] .docsRating {
+  color: #cee9f3;
+}
+
+@media only screen and (max-width: 996px) {
+  .docsRating {
+    width: 100%;
+    margin: 36px 0 0 !important;
+    border-radius: var(--ifm-global-radius);
+  }
+}
+
+/* HTML sidebar */
+
+.leaveReply {
+  display: flex;
+  flex-direction: column;
+}
+
+.leaveReply .textArea {
+  border-radius: 0.5rem;
+  margin: 16px 0;
+  padding: 8px;
+}
+
+.sidebar-divider {
+  border-top: 1px solid var(--ifm-color-gray-200);
+  display: block;
+  margin: 0.25rem 0.1rem 0.25rem 0.1rem;
+}
+
+html[data-theme='dark'] .sidebar-divider {
+  border-top: 1px solid var(--ifm-color-gray-800);
+}
+
+.sidebar-title {
+  font-size: 0.8rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ifm-color-gray-600);
+}
+
+html[data-theme='dark'] .sidebar-divider {
+  color: var(--ifm-color-gray-200);
+}
+
+.powered-by-banner {
+  margin-top: 0.5rem;
+}
+
+.powered-by-banner span {
+  font-size: 0.6rem;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--ifm-color-gray-600);
+}
+
+.powered-by-banner img {
+  display: block;
+  max-width: 70px;
+  margin-top: 0.25rem;
+}
+
+@media only screen and (max-width: 998px) {
+  .sidebar-title,
+  .powered-by-banner {
+    margin-left: 0.75rem;
+  }
+}

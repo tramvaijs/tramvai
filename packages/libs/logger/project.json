@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/logger",
+  "sourceRoot": "packages/libs/logger/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/logger/package.json",
+        "packages/libs/logger/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "@tinkoff/mocker",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "module": "./lib/index.es.js",
+  "sideEffects": false,
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "express": "^4.17.1",
+    "fast-glob": "^3.2.2",
+    "http-proxy-middleware": "^2.0.2",
+    "node-fetch": "^2.6.1",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/http-proxy-middleware": "^0.19.3",
+    "@types/node-fetch": "^2.6.2"
+  },
+  "license": "Apache-2.0"
+}

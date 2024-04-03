@@ -1,0 +1,47 @@
+{
+  "projects": {
+    "dedupe-no": {
+      "name": "dedupe-no",
+      "root": "src",
+      "type": "application",
+      "modern": false,
+      "dedupe": {
+        "enabled": false
+      }
+    },
+    "dedupe-eq": {
+      "name": "dedupe-eq",
+      "root": "src",
+      "type": "application",
+      "modern": false,
+      "dedupe": {
+        "enabled": true,
+        "enabledDev": true
+      }
+    },
+    "dedupe-sem": {
+      "name": "dedupe-sem",
+      "root": "src",
+      "type": "application",
+      "modern": false,
+      "dedupe": {
+        "enabledDev": true,
+        "strategy": "semver"
+      }
+    },
+    "dedupe-ignore": {
+      "name": "dedupe",
+      "root": "src",
+      "type": "application",
+      "modern": false,
+      "dedupe": {
+        "enabledDev": true,
+        "strategy": "semver",
+        "ignore": [
+          "package-dep$",
+          "package-dep-css$"
+        ]
+      }
+    }
+  }
+}

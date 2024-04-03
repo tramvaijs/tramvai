@@ -1,0 +1,68 @@
+{
+  "name": "@tramvai/module-common",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "__migrations__"
+  ],
+  "browser": {
+    "./lib/actions/actionPageRunner.js": "./lib/actions/actionPageRunner.browser.js",
+    "./lib/actions/deferred/providers.js": "./lib/actions/deferred/providers.browser.js",
+    "./lib/cache/serverProviders.js": "./lib/cache/clientProviders.js",
+    "./lib/cache/cacheFactory.js": "./lib/cache/cacheFactory.browser.js",
+    "./lib/index.es.js": "./lib/index.browser.js",
+    "./lib/providers/serverProviders.js": "./lib/providers/clientProviders.js",
+    "./lib/child-app/serverProviders.js": "./lib/child-app/clientProviders.js",
+    "./lib/requestManager/RequestManagerModule.js": "./lib/requestManager/RequestManagerModule.browser.js",
+    "./lib/responseManager/ResponseManagerModule.js": "./lib/responseManager/ResponseManagerModule.browser.js",
+    "./lib/async-local-storage/server.js": "./lib/async-local-storage/browser.js"
+  },
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/errors": "0.0.0-stub",
+    "@tinkoff/hook-runner": "0.0.0-stub",
+    "@tinkoff/lru-cache-nano": "^7.9.0",
+    "@akashbabu/lfu-cache": "1.0.2",
+    "@tinkoff/pubsub": "0.0.0-stub",
+    "@tinkoff/url": "0.0.0-stub",
+    "@tramvai/safe-strings": "0.0.0-stub",
+    "@tramvai/experiments": "0.0.0-stub",
+    "@tramvai/module-cookie": "0.0.0-stub",
+    "@tramvai/module-environment": "0.0.0-stub",
+    "@tramvai/module-log": "0.0.0-stub",
+    "@tramvai/tokens-child-app": "0.0.0-stub",
+    "@tramvai/tokens-core-private": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "@tramvai/tokens-server-private": "0.0.0-stub",
+    "@tramvai/types-actions-state-context": "0.0.0-stub",
+    "hoist-non-react-statics": "^3.3.1",
+    "node-abort-controller": "^3.0.1"
+  },
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/cli": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/papi": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/tokens-server": "0.0.0-stub",
+    "react": ">=16.14.0",
+    "tslib": "^2.4.0"
+  },
+  "module": "lib/index.es.js",
+  "license": "Apache-2.0"
+}

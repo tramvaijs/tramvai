@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-environment",
+  "sourceRoot": "packages/modules/env/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/env/package.json",
+        "packages/modules/env/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

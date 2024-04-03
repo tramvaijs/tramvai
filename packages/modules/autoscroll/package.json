@@ -1,0 +1,30 @@
+{
+  "name": "@tramvai/module-autoscroll",
+  "version": "0.0.0-stub",
+  "description": "Компонент с автопрокруткой к началу страницы",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "peerDependencies": {
+    "@tramvai/react": "0.0.0-stub",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-router": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "react": ">=16.14.0",
+    "tslib": "^2.4.0"
+  },
+  "module": "lib/index.es.js",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/browser-cookies",
+  "sourceRoot": "packages/libs/cookies/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/cookies/package.json",
+        "packages/libs/cookies/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

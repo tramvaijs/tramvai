@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/test-helpers",
+  "sourceRoot": "packages/tramvai/test/helpers/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/test/helpers/package.json",
+        "packages/tramvai/test/helpers/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

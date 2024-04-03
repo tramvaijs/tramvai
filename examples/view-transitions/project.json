@@ -1,0 +1,6 @@
+{
+  "name": "view-transitions",
+  "sourceRoot": "examples/view-transitions/src",
+  "projectType": "library",
+  "targets": {}
+}

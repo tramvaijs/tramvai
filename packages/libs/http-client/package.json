@@ -1,0 +1,24 @@
+{
+  "name": "@tramvai/http-client",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "./lib/index.js",
+  "module": "./lib/index.es.js",
+  "typings": "./lib/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0"
+  },
+  "license": "Apache-2.0"
+}

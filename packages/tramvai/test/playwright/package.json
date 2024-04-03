@@ -1,0 +1,40 @@
+{
+  "name": "@tramvai/test-pw",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/test-integration": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "console-with-style": "^1.1.0",
+    "supports-color": "8.1.1",
+    "env-ci": "^5.0.2",
+    "tslib": "^2.4.0"
+  },
+  "peerDependencies": {
+    "playwright-core": "*"
+  },
+  "devDependencies": {
+    "@types/supports-color": "^8.1.1",
+    "@types/env-ci": "^3.1.0",
+    "@tramvai/cli": "0.0.0-stub",
+    "@playwright/test": "1.29.0",
+    "playwright-core": "1.29.0"
+  },
+  "license": "Apache-2.0",
+  "module": "lib/index.es.js"
+}

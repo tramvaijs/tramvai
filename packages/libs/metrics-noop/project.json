@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/metrics-noop",
+  "sourceRoot": "packages/libs/metrics-noop/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/metrics-noop/package.json",
+        "packages/libs/metrics-noop/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

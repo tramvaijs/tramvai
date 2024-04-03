@@ -1,0 +1,60 @@
+{
+    "extends": "../../../../tsconfig.lib.json",
+    "include": [
+        "./src",
+        "../helpers/di"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true
+    },
+    "references": [
+        {
+            "path": "../helpers"
+        },
+        {
+            "path": "../mocks"
+        },
+        {
+            "path": "../../../tokens/common"
+        },
+        {
+            "path": "../../../tokens/server"
+        },
+        {
+            "path": "../../core"
+        },
+        {
+            "path": "../../../modules/common"
+        },
+        {
+            "path": "../../../modules/log"
+        },
+        {
+            "path": "../../../modules/mocker"
+        },
+        {
+            "path": "../../../modules/render"
+        },
+        {
+            "path": "../../../modules/router"
+        },
+        {
+            "path": "../../../modules/server"
+        },
+        {
+            "path": "../../state"
+        },
+        {
+            "path": "../../../cli"
+        },
+        {
+            "path": "../../../modules/metrics"
+        },
+        {
+            "path": "../../../tokens/server-private"
+        }
+    ]
+}

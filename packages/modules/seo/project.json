@@ -1,0 +1,17 @@
+{
+  "name": "@tramvai/module-seo",
+  "sourceRoot": "packages/modules/seo/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/seo/package.json",
+        "packages/modules/seo/lib",
+        "packages/modules/seo/__migrations__",
+        "packages/modules/seo/tests.js",
+        "packages/modules/seo/tests.d.ts"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

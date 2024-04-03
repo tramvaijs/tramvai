@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/mocker",
+  "sourceRoot": "packages/libs/mocker/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/mocker/package.json",
+        "packages/libs/mocker/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

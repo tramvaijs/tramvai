@@ -1,0 +1,25 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`actionExecution in global page Передаем в экшены di, если были добавлены в deps 1`] = `
+[
+  [
+    {
+      "isContext": true,
+    },
+    "@globalAction",
+    {
+      "dep1": "dep1 value",
+      "dep2": "dep2 value",
+    },
+  ],
+  [
+    {
+      "isContext": true,
+    },
+    "@globalAction",
+    {
+      "dep2": "dep2 value",
+    },
+  ],
+]
+`;

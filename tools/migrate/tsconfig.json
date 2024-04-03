@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.lib.json",
+  "include": [
+    "./src"
+  ],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "declarationDir": "./lib",
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "strict": false
+  },
+  "references": [
+    {
+      "path": "../../packages/libs/logger"
+    },
+    {
+      "path": "../../packages/libs/package-manager-wrapper"
+    }
+  ]
+}

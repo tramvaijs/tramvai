@@ -1,0 +1,32 @@
+{
+  "name": "@tramvai/react-lazy-hydration-render",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "./lib/index.js",
+  "typings": "./lib/index.d.ts",
+  "browser": {
+    "./lib/index.es.js": "./lib/index.browser.js",
+    "./lib/use-observer-visible.js": "./lib/use-observer-visible.browser.js"
+  },
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "tslib": "^2.4.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.14.0",
+    "react-dom": ">=16.14.0"
+  },
+  "module": "./lib/index.es.js",
+  "license": "Apache-2.0"
+}

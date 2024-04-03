@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-mocker",
+  "sourceRoot": "packages/modules/mocker/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/mocker/package.json",
+        "packages/modules/mocker/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

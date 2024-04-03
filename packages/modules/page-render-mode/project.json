@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-page-render-mode",
+  "sourceRoot": "packages/modules/page-render-mode/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/page-render-mode/package.json",
+        "packages/modules/page-render-mode/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

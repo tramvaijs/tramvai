@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/url",
+  "sourceRoot": "packages/libs/url/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/url/package.json",
+        "packages/libs/url/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

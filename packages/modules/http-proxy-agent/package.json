@@ -1,0 +1,35 @@
+{
+  "name": "@tramvai/module-http-proxy-agent",
+  "version": "0.0.0-stub",
+  "description": "Enable support for http_proxy, https_proxy and no_proxy env variables",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "module": "lib/server.es.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@tramvai/tokens-common": "0.0.0-stub"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "@tramvai/core": "0.0.0-stub",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/tokens-metrics": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  }
+}

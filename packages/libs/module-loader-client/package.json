@@ -1,0 +1,25 @@
+{
+  "name": "@tinkoff/module-loader-client",
+  "version": "0.0.0-stub",
+  "description": "Helper utils for loading js/css resources in browser",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "module": "lib/index.es.js",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "tslib": "^2.4.0"
+  },
+  "sideEffects": false,
+  "license": "Apache-2.0"
+}

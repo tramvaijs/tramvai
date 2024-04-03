@@ -1,0 +1,50 @@
+{
+  "name": "tramvai",
+  "version": "0.0.0-stub",
+  "license": "Apache-2.0",
+  "private": true,
+  "description": "A modular framework for universal React applications",
+  "keywords": [
+    "react",
+    "universal",
+    "isomorphic",
+    "framework",
+    "SSR"
+  ],
+  "scripts": {
+    "postinstall": "tsc -b tools/monorepo/fix-ts-references tools/monorepo/depscheck tools/build packages/libs/webpack-dedupe-plugin && wsrun -p '@{tinkoff,tramvai}/*' -m copy-external-files",
+    "references": "fix-ts-references --fix",
+    "prewatch": "npm run cli:generate-schema",
+    "watch": "yarn references && tsc -b ./tsconfig.solution.json --watch",
+    "prebuild": "npm run cli:generate-schema",
+    "build": "yarn references && tsc -b ./tsconfig.solution.json",
+    "build:publish": "wsrun -p '@{tinkoff,tramvai}/*' -e -m --serial build",
+    "build:change-typings": "wsrun -p '@{tinkoff,tramvai}/*' -c json -I -f package.json -e \"this.typings=this.typings && this.typings.replace(/^src\\/(.*)\\.ts/, 'lib/\\$1.d.ts')\"",
+    "build:change-versions": "node tools/public-packages/update-public-packages-versions.js",
+    "cli:generate-schema": "yarn workspace @tramvai/cli generate-schema",
+    "publish:all": "node tools/public-packages/publish-public-packages.js"
+  },
+  "workspaces": [
+    "packages/cli",
+    "packages/swc",
+    "packages/!(cli|swc)/*",
+    "packages/!(cli|swc)/*/*",
+    "tools/!(docSite|nx-plugin)",
+    "tools/monorepo/*",
+    "examples/**"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.0.2",
+    "@types/node": "^18.13.0",
+    "@types/webpack-env": "^1.13.16",
+    "expect-type": "^0.13.0",
+    "typescript": "~5.1.0",
+    "json": "^9.0.6",
+    "wsrun": "^5.2.0"
+  },
+  "dependencies": {},
+  "resolutions": {
+    "webpack": "^5",
+    "@types/webpack": "^5"
+  }
+}

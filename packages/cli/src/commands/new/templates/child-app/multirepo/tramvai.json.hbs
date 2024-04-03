@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "{{configEntry.name}}" : {
+      "name": "{{configEntry.name}}",
+      "root": "src",
+      "type": "child-app",
+      "postcss": {
+        "config": "src/postcss"
+      }
+    }
+  }
+}

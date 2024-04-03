@@ -1,0 +1,44 @@
+{
+  "name": "@tramvai/module-seo",
+  "version": "0.0.0-stub",
+  "description": "",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib",
+    "__migrations__",
+    "tests.js",
+    "tests.d.ts"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/meta-tags-generate": "0.0.0-stub"
+  },
+  "devDependencies": {
+    "@tramvai/react": "0.0.0-stub"
+  },
+  "peerDependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/test-helpers": "0.0.0-stub",
+    "@tramvai/test-mocks": "0.0.0-stub",
+    "@tramvai/tokens-core-private": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  },
+  "module": "lib/server.es.js",
+  "license": "Apache-2.0"
+}

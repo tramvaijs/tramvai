@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-cache-warmup",
+  "sourceRoot": "packages/modules/cache-warmup/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/cache-warmup/package.json",
+        "packages/modules/cache-warmup/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

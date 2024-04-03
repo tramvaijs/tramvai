@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-autoscroll",
+  "sourceRoot": "packages/modules/autoscroll/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/autoscroll/package.json",
+        "packages/modules/autoscroll/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

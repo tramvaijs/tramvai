@@ -1,0 +1,37 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "page-render-mode": {
+      "name": "page-render-mode",
+      "root": "src",
+      "type": "application",
+      "modern": true,
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "splitChunks": {
+        "mode": "granularChunks"
+      },
+      "postcss": {
+        "config": "src/postcss",
+        "cssLocalIdentName": "[name]__[local]_[hash:base64:5]"
+      },
+      "hotRefresh": {
+        "enabled": true
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": {
+            "development": "swc",
+            "production": "babel"
+          }
+        }
+      }
+    }
+  }
+}

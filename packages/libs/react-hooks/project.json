@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/react-hooks",
+  "sourceRoot": "packages/libs/react-hooks/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/react-hooks/package.json",
+        "packages/libs/react-hooks/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-cookie",
+  "sourceRoot": "packages/modules/cookie/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/cookie/package.json",
+        "packages/modules/cookie/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

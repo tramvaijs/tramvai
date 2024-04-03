@@ -1,0 +1,12 @@
+import { testAction } from '@tramvai/test-unit';
+import { {{ camelCase name }}Action } from './{{ name }}Action';
+
+describe('{{name}}Action', () => {
+  it('execution', async () => {
+    const { run } = testAction({{ camelCase name }}Action);
+
+    const result = await run('payload');
+
+    expect(result).toEqual('payload');
+  });
+});

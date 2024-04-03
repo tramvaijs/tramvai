@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-deps-graph",
+  "sourceRoot": "packages/modules/deps-graph/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/deps-graph/package.json",
+        "packages/modules/deps-graph/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@tramvai/tokens-render",
+  "version": "0.0.0-stub",
+  "description": "Tramvai tokens for @tramvai/module-render",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@tramvai/react": "0.0.0-stub"
+  },
+  "dependencies": {
+    "@tinkoff/htmlpagebuilder": "0.0.0-stub"
+  },
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "react": ">=16.14.0",
+    "tslib": "^2.4.0"
+  },
+  "license": "Apache-2.0"
+}

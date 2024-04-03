@@ -1,0 +1,44 @@
+name: Packages
+
+on:
+  push:
+    branches:
+      - main
+      - stable-v[0-9]+.x.x
+
+jobs:
+  publish:
+    runs-on: ubuntu-20.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          registry-url: https://registry.npmjs.org/
+
+      - name: Get yarn cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn build:publish
+      - run: yarn build:change-typings
+      - run: yarn build:change-versions
+
+      - name: Publish
+        run: yarn publish:all
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

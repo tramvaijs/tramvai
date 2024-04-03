@@ -1,0 +1,22 @@
+{
+  "$schema": "../../../../../schema.json",
+  "projects": {
+    "app": {
+      "name": "app",
+      "root": "app",
+      "type": "application",
+      "serverApiDir": "app/api",
+      "fileSystemPages": {
+        "enabled": true
+      },
+      "hotRefresh": {
+        "enabled": true
+      }
+    },
+    "module": {
+      "name": "module",
+      "root": "module",
+      "type": "module"
+    }
+  }
+}

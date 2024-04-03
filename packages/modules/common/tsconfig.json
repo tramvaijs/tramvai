@@ -1,0 +1,83 @@
+{
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true
+    },
+    "references": [
+        {
+            "path": "../../tramvai/core"
+        },
+        {
+            "path": "../cookie"
+        },
+        {
+            "path": "../env"
+        },
+        {
+            "path": "../../libs/pubsub"
+        },
+        {
+            "path": "../../libs/dippy"
+        },
+        {
+            "path": "../../libs/hooks"
+        },
+        {
+            "path": "../../tramvai/state"
+        },
+        {
+            "path": "../../libs/url"
+        },
+        {
+            "path": "../../tokens/common"
+        },
+        {
+            "path": "../../tokens/server"
+        },
+        {
+            "path": "../log"
+        },
+        {
+            "path": "../../libs/errors"
+        },
+        {
+            "path": "../../tramvai/papi"
+        },
+        {
+            "path": "../../cli"
+        },
+        {
+            "path": "../../tramvai/experiments"
+        },
+        {
+            "path": "../../tokens/child-app"
+        },
+        {
+            "path": "../../tokens/render"
+        },
+        {
+            "path": "../../tramvai/react"
+        },
+        {
+            "path": "../../tokens/server-private"
+        },
+        {
+            "path": "../../tramvai/types-actions-state-context"
+        },
+        {
+            "path": "../../tokens/core-private"
+        },
+        {
+            "path": "../../libs/safe-strings"
+        },
+        {
+            "path": "../../tokens/router"
+        }
+    ]
+}

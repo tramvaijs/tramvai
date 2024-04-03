@@ -1,0 +1,27 @@
+{
+  "name": "@tinkoff/meta-tags-generate",
+  "version": "0.0.0-stub",
+  "initialVersion": "0.4.22",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "__migrations__",
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "tslib": "^2.4.0"
+  },
+  "module": "lib/index.es.js",
+  "license": "Apache-2.0"
+}

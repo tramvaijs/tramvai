@@ -1,0 +1,8 @@
+{
+    "name": "Tinkoff",
+    "short_name": "Tinkoff",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#fff"
+  }
+  

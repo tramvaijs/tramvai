@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/tinkoff-request-http-client-adapter",
+  "sourceRoot": "packages/libs/tinkoff-request-http-client-adapter/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/tinkoff-request-http-client-adapter/package.json",
+        "packages/libs/tinkoff-request-http-client-adapter/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

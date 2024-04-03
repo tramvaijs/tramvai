@@ -1,0 +1,40 @@
+{
+  "name": "@tramvai/module-react-query",
+  "version": "0.0.0-stub",
+  "description": "Интеграция с react-query",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib",
+    "__migrations__"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/errors": "0.0.0-stub",
+    "@tramvai/safe-strings": "0.0.0-stub",
+    "@tramvai/tokens-child-app": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-react-query": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tanstack/react-query": "^4.7.1"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "react": ">=16.14.0",
+    "tslib": "^2.4.0"
+  },
+  "module": "lib/server.es.js",
+  "license": "Apache-2.0"
+}

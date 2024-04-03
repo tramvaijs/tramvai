@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/tokens-react-query",
+  "sourceRoot": "packages/tokens/react-query/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tokens/react-query/package.json",
+        "packages/tokens/react-query/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

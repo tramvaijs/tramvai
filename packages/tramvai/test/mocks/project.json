@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/test-mocks",
+  "sourceRoot": "packages/tramvai/test/mocks/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/tramvai/test/mocks/package.json",
+        "packages/tramvai/test/mocks/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

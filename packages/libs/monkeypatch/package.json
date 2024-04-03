@@ -1,0 +1,21 @@
+{
+  "name": "@tinkoff/monkeypatch",
+  "version": "0.0.0-stub",
+  "description": "fork of https://github.com/robertklep/node-monkeypatch, designed to apply many patches",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "sideEffects": false,
+  "module": "lib/index.es.js",
+  "license": "Apache-2.0"
+}

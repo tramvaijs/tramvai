@@ -1,0 +1,32 @@
+{
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true
+    },
+    "references": [
+        {
+            "path": "../../libs/dippy"
+        },
+        {
+            "path": "../../libs/logger"
+        },
+        {
+            "path": "../../tramvai/types-actions-state-context"
+        },
+        {
+            "path": "../core"
+        },
+        {
+            "path": "../../tramvai/react"
+        },
+        {
+            "path": "../../libs/url"
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@tramvai/tokens-http-client",
+  "version": "0.0.0-stub",
+  "initialVersion": "0.58.99",
+  "description": "Tramvai tokens for @tramvai/module-http-client",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@tramvai/http-client": "0.0.0-stub",
+    "@tramvai/tinkoff-request-http-client-adapter": "0.0.0-stub"
+  },
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  },
+  "license": "Apache-2.0"
+}

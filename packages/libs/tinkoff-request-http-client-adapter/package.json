@@ -1,0 +1,40 @@
+{
+  "name": "@tramvai/tinkoff-request-http-client-adapter",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/index.js",
+  "browser": {
+    "./lib/agent/createAgent.js": "./lib/agent/createAgent.browser.js",
+    "./lib/index.es.js": "./lib/index.browser.js"
+  },
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/request-core": "^0.9.2",
+    "@tinkoff/request-plugin-cache-deduplicate": "^0.9.2",
+    "@tinkoff/request-plugin-cache-memory": "^0.9.3",
+    "@tinkoff/request-plugin-circuit-breaker": "^0.3.2",
+    "@tinkoff/request-plugin-log": "^0.9.2",
+    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
+    "@tinkoff/request-plugin-transform-url": "^0.9.2",
+    "@tinkoff/request-plugin-validate": "^0.9.2",
+    "@tinkoff/request-plugin-retry": "^0.2.3",
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/http-client": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  },
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "module": "lib/index.es.js"
+}

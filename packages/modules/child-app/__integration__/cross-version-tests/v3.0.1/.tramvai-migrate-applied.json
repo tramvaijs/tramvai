@@ -1,0 +1,1 @@
+{"package":{"module-router":{"migrations":["1-link-from-module.js"]},"react-query":{"migrations":["1-react-query-creating.js"]},"module-react-query":{"migrations":["1-react-query-devtools.js"]},"cli":{"migrations":["d2023-02-01b-tramvai-config-refactoring.js"]}}}

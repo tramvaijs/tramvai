@@ -1,0 +1,25 @@
+{
+  "name": "@tinkoff/url",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/url.js",
+  "typings": "lib/url.d.ts",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "tslib": "^2.4.0"
+  },
+  "sideEffects": false,
+  "module": "lib/url.es.js",
+  "license": "Apache-2.0"
+}

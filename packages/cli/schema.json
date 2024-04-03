@@ -1,0 +1,2965 @@
+{
+  "type": "object",
+  "title": "tramvai.json schema",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "required": [
+    "projects"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "projects": {
+      "type": "object",
+      "title": "Project configs",
+      "minProperties": 1,
+      "patternProperties": {
+        "^[$a-zA-Z_-][0-9a-zA-Z_$-]*$": {
+          "if": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "application"
+              }
+            }
+          },
+          "then": {
+            "additionalProperties": false,
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "name of the project",
+                "type": "string"
+              },
+              "root": {
+                "title": "path to the root directory relative to the tramvai.json",
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "const": "application"
+              },
+              "polyfill": {
+                "title": "Path to polyfill file. By default, looks for the `src/polyfill`",
+                "type": "string"
+              },
+              "serverApiDir": {
+                "title": "Path to folder with papi handlers",
+                "default": "src/api",
+                "type": "string"
+              },
+              "output": {
+                "title": "Controls the cli output locations",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "server": {
+                    "title": "Path to build assets for server",
+                    "default": "dist/server",
+                    "type": "string"
+                  },
+                  "client": {
+                    "title": "Path to build assets for client",
+                    "default": "dist/client",
+                    "type": "string"
+                  },
+                  "static": {
+                    "title": "Path to build static assets",
+                    "default": "dist/static",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "modern": {
+                "title": "Enable build for modern browsers",
+                "default": true,
+                "type": "boolean"
+              },
+              "fileSystemPages": {
+                "title": "File-System Routing feature",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "title": "Read pages from file system",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "routesDir": {
+                    "title": "Folder with pages from which static routers are generated",
+                    "default": "routes",
+                    "anyOf": [
+                      {
+                        "const": false,
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "pagesDir": {
+                    "title": "Folder with components which can be manually added to static routers",
+                    "default": "pages",
+                    "anyOf": [
+                      {
+                        "const": false,
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "componentsPattern": {
+                    "title": "Test Regexp to add only files with specific name to list of FS Components",
+                    "type": "string"
+                  },
+                  "rootErrorBoundaryPath": {
+                    "title": "Path to RootErrorBoundary component (relative to \"root\" directory)",
+                    "default": "error.tsx",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "splitChunks": {
+                "title": "Configure the options on webpack splitChunks",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "mode": {
+                    "default": "granularChunks",
+                    "enum": [
+                      "commonChunk",
+                      false,
+                      "granularChunks"
+                    ]
+                  },
+                  "granularChunksSplitNumber": {
+                    "title": "Move module to shared chunk if used at least as many times in other chunks",
+                    "default": 2,
+                    "type": "number"
+                  },
+                  "granularChunksMinSize": {
+                    "title": "Minimum shared chunk size in bytes",
+                    "default": 20000,
+                    "type": "number"
+                  },
+                  "commonChunkSplitNumber": {
+                    "title": "`@deprecated will be removed in next major release` Move module to common chunk if used at least as many times in other chunks",
+                    "default": 3,
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "checkAsyncTs": {
+                "title": "Configuration for fork-ts-checker-webpack-plugin",
+                "default": false,
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "failOnBuild": {
+                        "description": "при включении этого флага в build-сборку добавляется проверка типов\nпри невалидных типах сборка падает",
+                        "type": "boolean"
+                      },
+                      "pluginOptions": {
+                        "description": "дополнительные опции",
+                        "type": "object",
+                        "properties": {
+                          "async": {
+                            "type": "boolean"
+                          },
+                          "typescript": {
+                            "type": "object",
+                            "properties": {
+                              "memoryLimit": {
+                                "type": "number"
+                              },
+                              "configFile": {
+                                "type": "string"
+                              },
+                              "configOverwrite": {
+                                "type": "object",
+                                "properties": {
+                                  "extends": {
+                                    "type": "string"
+                                  },
+                                  "compilerOptions": {},
+                                  "include": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "exclude": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "files": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "references": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "path": {
+                                          "type": "string"
+                                        },
+                                        "prepend": {
+                                          "type": "boolean"
+                                        }
+                                      },
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "context": {
+                                "type": "string"
+                              },
+                              "build": {
+                                "type": "boolean"
+                              },
+                              "mode": {
+                                "enum": [
+                                  "readonly",
+                                  "write-dts",
+                                  "write-references",
+                                  "write-tsbuildinfo"
+                                ],
+                                "type": "string"
+                              },
+                              "diagnosticOptions": {
+                                "type": "object",
+                                "properties": {
+                                  "syntactic": {
+                                    "type": "boolean"
+                                  },
+                                  "semantic": {
+                                    "type": "boolean"
+                                  },
+                                  "declaration": {
+                                    "type": "boolean"
+                                  },
+                                  "global": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              "profile": {
+                                "type": "boolean"
+                              },
+                              "typescriptPath": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "formatter": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "const": "basic"
+                                  },
+                                  "pathType": {
+                                    "enum": [
+                                      "absolute",
+                                      "relative"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "const": "codeframe"
+                                  },
+                                  "pathType": {
+                                    "enum": [
+                                      "absolute",
+                                      "relative"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "options": {
+                                    "type": "object",
+                                    "properties": {
+                                      "highlightCode": {
+                                        "description": "Syntax highlight the code as JavaScript for terminals. default: false",
+                                        "type": "boolean"
+                                      },
+                                      "linesAbove": {
+                                        "description": "The number of lines to show above the error. default: 2",
+                                        "type": "number"
+                                      },
+                                      "linesBelow": {
+                                        "description": "The number of lines to show below the error. default: 3",
+                                        "type": "number"
+                                      },
+                                      "forceColor": {
+                                        "description": "Forcibly syntax highlight the code as JavaScript (for non-terminals);\noverrides highlightCode.\ndefault: false",
+                                        "type": "boolean"
+                                      },
+                                      "message": {
+                                        "description": "Pass in a string to be displayed inline (if possible) next to the\nhighlighted location in the code. If it can't be positioned inline,\nit will be placed above the code frame.\ndefault: nothing",
+                                        "type": "string"
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "enum": [
+                                  "basic",
+                                  "codeframe"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "issue": {
+                            "type": "object",
+                            "properties": {
+                              "include": {
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "code": {
+                                        "type": "string"
+                                      },
+                                      "file": {
+                                        "type": "string"
+                                      },
+                                      "severity": {
+                                        "enum": [
+                                          "error",
+                                          "warning"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  {
+                                    "type": "array",
+                                    "items": {
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "additionalProperties": false
+                                        },
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "code": {
+                                              "type": "string"
+                                            },
+                                            "file": {
+                                              "type": "string"
+                                            },
+                                            "severity": {
+                                              "enum": [
+                                                "error",
+                                                "warning"
+                                              ],
+                                              "type": "string"
+                                            }
+                                          },
+                                          "additionalProperties": false
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              },
+                              "exclude": {
+                                "anyOf": [
+                                  {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "code": {
+                                        "type": "string"
+                                      },
+                                      "file": {
+                                        "type": "string"
+                                      },
+                                      "severity": {
+                                        "enum": [
+                                          "error",
+                                          "warning"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  {
+                                    "type": "array",
+                                    "items": {
+                                      "anyOf": [
+                                        {
+                                          "type": "object",
+                                          "additionalProperties": false
+                                        },
+                                        {
+                                          "type": "object",
+                                          "properties": {
+                                            "code": {
+                                              "type": "string"
+                                            },
+                                            "file": {
+                                              "type": "string"
+                                            },
+                                            "severity": {
+                                              "enum": [
+                                                "error",
+                                                "warning"
+                                              ],
+                                              "type": "string"
+                                            }
+                                          },
+                                          "additionalProperties": false
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          "logger": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "log": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "error": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "const": "webpack-infrastructure",
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "devServer": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "externals": {
+                "cli_overridable": "",
+                "title": "Pass list to Webpack config externals field",
+                "default": [],
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "development": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "production": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                ]
+              },
+              "experiments": {
+                "title": "Experimental settings",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "serverRunner": {
+                    "title": "How to run server build",
+                    "default": "thread",
+                    "enum": [
+                      "process",
+                      "thread"
+                    ],
+                    "type": "string"
+                  },
+                  "pwa": {
+                    "title": "PWA configuration (works with `TramvaiPwaModule` from `@tramvai/module-progressive-web-app` library)",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "sw": {
+                        "title": "Service-Worker configuration",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "src": {
+                            "title": "Path to sw.ts file (relative to \"root\" directory)",
+                            "default": "sw.ts",
+                            "type": "string"
+                          },
+                          "dest": {
+                            "title": "Name of generated SW file (will be placed in \"output.client\" directory)",
+                            "default": "sw.js",
+                            "type": "string"
+                          },
+                          "scope": {
+                            "title": "Scope of SW (see https://developers.google.com/web/ilt/pwa/introduction-to-service-worker#registration_and_scope)",
+                            "default": "/",
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "workbox": {
+                        "title": "Workbox configuration",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "cli_overridable": "",
+                            "title": "Connect `InjectManifest` from `workbox-webpack-plugin` library",
+                            "default": false,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "development": {
+                                    "type": "boolean"
+                                  },
+                                  "production": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "exclude": {
+                            "title": "Array of regexp specifiers used to exclude assets from the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "include": {
+                            "title": "Array of regexp specifiers used to include assets in the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "chunks": {
+                            "title": "Array of chunk names used to include in the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "excludeChunks": {
+                            "title": "Array of chunk names used to exclude from the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "additionalManifestEntries": {
+                            "title": "A list of entries to be included in the precache manifest, in addition to any entries that are generated as part of the build configuration",
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "integrity": {
+                                      "type": "string"
+                                    },
+                                    "revision": {
+                                      "type": "string"
+                                    },
+                                    "url": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "webmanifest": {
+                        "title": "WebManifest content (manifest.json or webmanifest will be generated based on this options)",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "title": "Create webmanifest file",
+                            "default": false,
+                            "type": "boolean"
+                          },
+                          "dest": {
+                            "title": "Name of generated manifest file (will be placed in \"output.client\" directory). You can use `[hash]` placeholder for manifest cache busting in production mode",
+                            "default": "/manifest.[hash].json",
+                            "type": "string"
+                          },
+                          "scope": {
+                            "title": "prefer to use \"pwa.sw.scope\" instead, this field will be generated automatically",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "short_name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "start_url": {
+                            "type": "string"
+                          },
+                          "display": {
+                            "type": "string"
+                          },
+                          "theme_color": {
+                            "title": "prefer to use \"pwa.meta.themeColor\" instead, this field will be generated automatically",
+                            "type": "string"
+                          },
+                          "background_color": {
+                            "type": "string"
+                          },
+                          "icons": {
+                            "title": "prefer to use \"pwa.icon\" instead, this field will be generated automatically",
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "src": {
+                                  "type": "string"
+                                },
+                                "sizes": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "density": {
+                                  "type": "number"
+                                },
+                                "purpose": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "icon": {
+                        "title": "PWA icons options",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "src": {
+                            "title": "Path to icon file (relative to \"root\" directory)",
+                            "type": "string"
+                          },
+                          "dest": {
+                            "title": "Folder for generated icons (will be placed in \"output.client\" directory)",
+                            "default": "pwa-icons",
+                            "type": "string"
+                          },
+                          "sizes": {
+                            "title": "Icon sizes",
+                            "default": [
+                              36,
+                              48,
+                              72,
+                              96,
+                              144,
+                              192,
+                              512
+                            ],
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "meta": {
+                        "title": "PWA meta options",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "viewport": {
+                            "title": "\"viewport\" meta tag",
+                            "type": "string"
+                          },
+                          "themeColor": {
+                            "title": "\"theme-color\" meta tag",
+                            "type": "string"
+                          },
+                          "mobileApp": {
+                            "title": "\"mobile-web-app-capable\" meta tag",
+                            "type": "string"
+                          },
+                          "mobileAppIOS": {
+                            "title": "\"apple-mobile-web-app-capable\" meta tag",
+                            "type": "string"
+                          },
+                          "appleTitle": {
+                            "title": "\"apple-mobile-web-app-title\" meta tag",
+                            "type": "string"
+                          },
+                          "appleStatusBarStyle": {
+                            "title": "\"apple-mobile-web-app-status-bar-style\" meta tag",
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "viewTransitions": {
+                    "title": "Enable View Transitions API for SPA navigations",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "reactTransitions": {
+                    "title": "Enable React Transitions for SPA navigations",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "webpack": {
+                    "title": "experiments configuration for [webpack](https://webpack.js.org/configuration/experiments/)",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "asyncWebAssembly": {
+                        "description": "Support WebAssembly as asynchronous EcmaScript Module.",
+                        "type": "boolean"
+                      },
+                      "backCompat": {
+                        "description": "Enable backward-compat layer with deprecation warnings for many webpack 4 APIs.",
+                        "title": "Enable backward compatibility with webpack previous major versions",
+                        "default": false,
+                        "type": "boolean"
+                      },
+                      "cacheUnaffected": {
+                        "description": "Enable additional in memory caching of modules that are unchanged and reference only unchanged modules.",
+                        "title": "Enable additional in-memory caching of modules which are unchanged and reference only unchanged modules.",
+                        "default": true,
+                        "type": "boolean"
+                      },
+                      "futureDefaults": {
+                        "description": "Apply defaults of next major version.",
+                        "type": "boolean"
+                      },
+                      "layers": {
+                        "description": "Enable module layers.",
+                        "type": "boolean"
+                      },
+                      "outputModule": {
+                        "description": "Allow output javascript files as module source type.",
+                        "type": "boolean"
+                      },
+                      "syncWebAssembly": {
+                        "description": "Support WebAssembly as synchronous EcmaScript Module (outdated).",
+                        "type": "boolean"
+                      },
+                      "topLevelAwait": {
+                        "description": "Allow using top-level-await in EcmaScript Modules.",
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "minicss": {
+                    "title": "experimental settings for [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "useImportModule": {
+                        "cli_overridable": "",
+                        "title": "Use a new webpack API to execute modules instead of child compilers. This improves performance and memory usage a lot.",
+                        "default": true,
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "development": {
+                                "type": "boolean"
+                              },
+                              "production": {
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "transpilation": {
+                    "title": "experimental settings for code transpilation",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "loader": {
+                        "cli_overridable": "",
+                        "title": "specify loader to transpile js-ts code",
+                        "default": "babel",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "development": {
+                                "enum": [
+                                  "babel",
+                                  "swc"
+                                ],
+                                "type": "string"
+                              },
+                              "production": {
+                                "enum": [
+                                  "babel",
+                                  "swc"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "enum": [
+                              "babel",
+                              "swc"
+                            ],
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "minifier": {
+                    "cli_overridable": "",
+                    "title": "specify minifer for terser plugin",
+                    "default": "terser",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "development": {
+                            "enum": [
+                              "swc",
+                              "terser"
+                            ],
+                            "type": "string"
+                          },
+                          "production": {
+                            "enum": [
+                              "swc",
+                              "terser"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      {
+                        "enum": [
+                          "swc",
+                          "terser"
+                        ],
+                        "type": "string"
+                      }
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              },
+              "sourceMap": {
+                "cli_overridable": "",
+                "title": "Enable source maps",
+                "default": false,
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "development": {
+                        "type": "boolean"
+                      },
+                      "production": {
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
+              "excludesPresetEnv": {
+                "title": "List of modules to exclude from `@babel/preset-env`",
+                "description": "Option doesn't affect build with swc loader",
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "threadLoader": {
+                "title": "Webpack's thread-loader config",
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "define": {
+                "title": "Define static variables that should be replaced by name with provided value",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "shared": {
+                    "default": {},
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "development": {
+                    "default": {},
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "production": {
+                    "default": {},
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "generateDataQaTag": {
+                "title": "`@deprecated` will be removed in next major release.",
+                "default": false,
+                "type": "boolean"
+              },
+              "enableFillActionNamePlugin": {
+                "title": "`@deprecated` will be removed in next major release. Включает использование плагина fill-action-name",
+                "default": false,
+                "type": "boolean"
+              },
+              "postcss": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "config": {
+                    "title": "Path to postcss config file. By default, `postcss.config.js` file is used",
+                    "type": "string"
+                  },
+                  "cssLocalIdentName": {
+                    "cli_overridable": "",
+                    "title": "CSS identifiers build algorithm",
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "development": {
+                            "type": "string"
+                          },
+                          "production": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "string"
+                      }
+                    ]
+                  },
+                  "assetsConfig": {
+                    "title": "Path to postcss config file for assets",
+                    "type": "string"
+                  },
+                  "cssModulePattern": {
+                    "title": "Enable CSS modules for all files matching /RegExp/i.test(filename) regexp.",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "alias": {
+                "title": "`@deprecated` as cli now supports baseUrl and paths from the app's tsconfig.json file.\nJust check or add configuration to your tsconfig file and remove alias from tramvai.json",
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "svgo": {
+                "title": "svgo-loader options",
+                "type": "object",
+                "properties": {
+                  "plugins": {
+                    "title": "svgo plugins, you can find full types in PluginConfig inside `svgo` source code,\nbut this interface too complex and heavy for schema",
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "params": {
+                              "type": "object",
+                              "additionalProperties": false
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "imageOptimization": {
+                "title": "Settings for image-webpack-loader",
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "title": "Enable image-webpack-loader",
+                    "type": "boolean"
+                  },
+                  "options": {
+                    "title": "Pass options to image-webpack-loader",
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "transpileOnlyModernLibs": {
+                "title": "transpile libs based only on @tinkoff/is-modern-lib",
+                "default": true,
+                "type": "boolean"
+              },
+              "webpack": {
+                "title": "Webpack specific settings",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "resolveAlias": {
+                    "title": "Browser package resolve aliases. E.g. { \"stream\": \"stream-browserify\" }",
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "provide": {
+                    "title": "Browser packages to provide with ProvidePlugin. E.g. { \"Buffer\": [\"buffer\", \"Buffer\"] }",
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "watchOptions": {
+                    "title": "Configure https://webpack.js.org/configuration/watch/#watchoptions",
+                    "description": "For OSX users and big projects it's recommended to enable watch polling, e.g. `{ poll: 1000 }`, more info - https://github.com/webpack/watchpack/issues/222",
+                    "type": "object",
+                    "properties": {
+                      "aggregateTimeout": {
+                        "description": "Delay the rebuilt after the first change. Value is a time in ms.",
+                        "type": "number"
+                      },
+                      "followSymlinks": {
+                        "description": "Resolve symlinks and watch symlink and real file. This is usually not needed as webpack already resolves symlinks ('resolve.symlinks').",
+                        "type": "boolean"
+                      },
+                      "ignored": {
+                        "description": "Ignore some files from watching (glob pattern or regexp).",
+                        "anyOf": [
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "exec": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "test": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "source": {
+                                "type": "string"
+                              },
+                              "global": {
+                                "type": "boolean"
+                              },
+                              "ignoreCase": {
+                                "type": "boolean"
+                              },
+                              "multiline": {
+                                "type": "boolean"
+                              },
+                              "lastIndex": {
+                                "type": "number"
+                              },
+                              "compile": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "flags": {
+                                "type": "string"
+                              },
+                              "sticky": {
+                                "type": "boolean"
+                              },
+                              "unicode": {
+                                "type": "boolean"
+                              },
+                              "dotAll": {
+                                "type": "boolean"
+                              },
+                              "hasIndices": {
+                                "type": "boolean"
+                              },
+                              "__@match@6365": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "__@replace@6367": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "__@search@6370": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "__@split@6372": {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              "__@matchAll@6374": {
+                                "type": "object",
+                                "additionalProperties": false
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "poll": {
+                        "description": "Enable polling mode for watching.",
+                        "type": [
+                          "number",
+                          "boolean"
+                        ]
+                      },
+                      "stdin": {
+                        "description": "Stop watching when stdin stream has ended.",
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "devtool": {
+                    "title": "Use the specified type of source maps for building in development mode",
+                    "enum": [
+                      "eval",
+                      "eval-cheap-module-source-map",
+                      "eval-cheap-source-map",
+                      "eval-source-map"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "dedupe": {
+                "title": "Enable DedupePlugin",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "title": "Strategy for DedupePlugin",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "enabledDev": {
+                    "title": "Does DedupePlugin should be enabled in development mode\nWhy it might be useful see [issue](https://github.com/Tinkoff/tramvai/issues/11)",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "strategy": {
+                    "title": "Strategy for DedupePlugin",
+                    "default": "equality",
+                    "enum": [
+                      "equality",
+                      "semver"
+                    ],
+                    "type": "string"
+                  },
+                  "ignore": {
+                    "title": "Sets ignore to DedupePlugin",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false
+              },
+              "terser": {
+                "title": "terser settings",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "parallel": {
+                    "title": "Configuration for enabling parallel compression for terser plugin",
+                    "default": true,
+                    "type": "boolean"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "cssMinimize": {
+                "title": "Set minimizer for css",
+                "default": "css-minimizer",
+                "enum": [
+                  "css-minimizer",
+                  "csso"
+                ],
+                "type": "string"
+              },
+              "hotRefresh": {
+                "title": "React hot-refresh",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "title": "Enable react hot-refresh",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "options": {
+                    "title": "Configure react hot-refresh https://github.com/pmmmwh/react-refresh-webpack-plugin#options",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "overlay": {
+                        "default": false,
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "notifications": {
+                "title": "Controls build notifications settings during development",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "suppressSuccess": {
+                    "title": "Defines when success notifications are shown",
+                    "enum": [
+                      "always",
+                      false,
+                      "initial",
+                      true
+                    ]
+                  },
+                  "suppressWarning": {
+                    "title": "True to suppress the warning notifications, otherwise false",
+                    "type": "boolean"
+                  },
+                  "activateTerminalOnError": {
+                    "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                    "type": "boolean"
+                  },
+                  "client": {
+                    "type": "object",
+                    "properties": {
+                      "suppressSuccess": {
+                        "title": "Defines when success notifications are shown",
+                        "enum": [
+                          "always",
+                          false,
+                          "initial",
+                          true
+                        ]
+                      },
+                      "suppressWarning": {
+                        "title": "True to suppress the warning notifications, otherwise false",
+                        "type": "boolean"
+                      },
+                      "activateTerminalOnError": {
+                        "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "server": {
+                    "type": "object",
+                    "properties": {
+                      "suppressSuccess": {
+                        "title": "Defines when success notifications are shown",
+                        "enum": [
+                          "always",
+                          false,
+                          "initial",
+                          true
+                        ]
+                      },
+                      "suppressWarning": {
+                        "title": "True to suppress the warning notifications, otherwise false",
+                        "type": "boolean"
+                      },
+                      "activateTerminalOnError": {
+                        "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "additionalProperties": false
+              },
+              "shared": {
+                "title": "Specify dependencies that will be shared between application and child-apps",
+                "description": "Properly defining that dependencies may greatly reduce filesize of loaded js on the client",
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "defaultTramvaiDependencies": {
+                    "title": "Should default dependencies list be added to shared list",
+                    "description": "It includes the list of commonly used dependencies in the child-apps\nBy default, it is enabled in application in case of tramvai/module-child-app is specified in package.json\nand for child-apps",
+                    "type": "boolean"
+                  },
+                  "flexibleTramvaiVersions": {
+                    "title": "add caret range specifier for tramvai dependencies",
+                    "description": "minimal versions are inferred from package.json",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "criticalChunks": {
+                    "title": "add chunks to preload as critical in-parallel with \"platform.js\"",
+                    "description": "this option is useful when you need to create async boundary for app dependencies.\nMore info - https://webpack.js.org/concepts/module-federation/#uncaught-error-shared-module-is-not-available-for-eager-consumption",
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "deps": {
+                    "title": "list of the dependencies that will be shared",
+                    "default": [],
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "title": "name of the dependency import",
+                              "type": "string"
+                            },
+                            "singleton": {
+                              "title": "if dependency is marked as singleton the dependency will be initialized only once and will not be updated",
+                              "description": "Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides",
+                              "default": false,
+                              "type": "boolean"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "name",
+              "root",
+              "type"
+            ]
+          },
+          "else": {
+            "if": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "const": "module"
+                }
+              }
+            },
+            "then": {
+              "additionalProperties": false,
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "name of the project",
+                  "type": "string"
+                },
+                "root": {
+                  "title": "path to the root directory relative to the tramvai.json",
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "const": "module"
+                },
+                "output": {
+                  "title": "Path to build module assets",
+                  "default": "dist/modules",
+                  "type": "string"
+                },
+                "postcss": {
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "config": {
+                      "title": "Path to postcss config file. By default, `postcss.config.js` file is used",
+                      "type": "string"
+                    },
+                    "cssLocalIdentName": {
+                      "cli_overridable": "",
+                      "title": "CSS identifiers build algorithm",
+                      "default": "[hash:base64:5]",
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "development": {
+                              "type": "string"
+                            },
+                            "production": {
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "assetsConfig": {
+                      "title": "Path to postcss config file for assets",
+                      "type": "string"
+                    },
+                    "cssModulePattern": {
+                      "title": "Enable CSS modules for all files matching /RegExp/i.test(filename) regexp.",
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "sourceMap": {
+                  "cli_overridable": "",
+                  "title": "Enable source maps",
+                  "default": false,
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "development": {
+                          "type": "boolean"
+                        },
+                        "production": {
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "experiments": {
+                  "title": "Change different experimental cli settings",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "webpack": {
+                      "title": "experiments configuration for [webpack](https://webpack.js.org/configuration/experiments/)",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "asyncWebAssembly": {
+                          "description": "Support WebAssembly as asynchronous EcmaScript Module.",
+                          "type": "boolean"
+                        },
+                        "backCompat": {
+                          "description": "Enable backward-compat layer with deprecation warnings for many webpack 4 APIs.",
+                          "title": "Enable backward compatibility with webpack previous major versions",
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "cacheUnaffected": {
+                          "description": "Enable additional in memory caching of modules that are unchanged and reference only unchanged modules.",
+                          "title": "Enable additional in-memory caching of modules which are unchanged and reference only unchanged modules.",
+                          "default": true,
+                          "type": "boolean"
+                        },
+                        "futureDefaults": {
+                          "description": "Apply defaults of next major version.",
+                          "type": "boolean"
+                        },
+                        "layers": {
+                          "description": "Enable module layers.",
+                          "type": "boolean"
+                        },
+                        "outputModule": {
+                          "description": "Allow output javascript files as module source type.",
+                          "type": "boolean"
+                        },
+                        "syncWebAssembly": {
+                          "description": "Support WebAssembly as synchronous EcmaScript Module (outdated).",
+                          "type": "boolean"
+                        },
+                        "topLevelAwait": {
+                          "description": "Allow using top-level-await in EcmaScript Modules.",
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "minicss": {
+                      "title": "experimental settings for [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "useImportModule": {
+                          "cli_overridable": "",
+                          "title": "Use a new webpack API to execute modules instead of child compilers. This improves performance and memory usage a lot.",
+                          "default": true,
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "development": {
+                                  "type": "boolean"
+                                },
+                                "production": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "transpilation": {
+                      "title": "experimental settings for code transpilation",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "loader": {
+                          "cli_overridable": "",
+                          "title": "specify loader to transpile js-ts code",
+                          "default": "babel",
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "development": {
+                                  "enum": [
+                                    "babel",
+                                    "swc"
+                                  ],
+                                  "type": "string"
+                                },
+                                "production": {
+                                  "enum": [
+                                    "babel",
+                                    "swc"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "enum": [
+                                "babel",
+                                "swc"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "minifier": {
+                      "cli_overridable": "",
+                      "title": "specify minifer for terser plugin",
+                      "default": "terser",
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "development": {
+                              "enum": [
+                                "swc",
+                                "terser"
+                              ],
+                              "type": "string"
+                            },
+                            "production": {
+                              "enum": [
+                                "swc",
+                                "terser"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "enum": [
+                            "swc",
+                            "terser"
+                          ],
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "excludesPresetEnv": {
+                  "title": "List of modules to exclude from `@babel/preset-env`",
+                  "description": "Option doesn't affect build with swc loader",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "threadLoader": {
+                  "title": "Webpack's thread-loader config",
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "define": {
+                  "title": "Define static variables that should be replaced by name with provided value",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "shared": {
+                      "default": {},
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "development": {
+                      "default": {},
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "production": {
+                      "default": {},
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "generateDataQaTag": {
+                  "title": "`@deprecated` will be removed in next major release.",
+                  "default": false,
+                  "type": "boolean"
+                },
+                "enableFillActionNamePlugin": {
+                  "title": "`@deprecated` will be removed in next major release. Включает использование плагина fill-action-name",
+                  "default": false,
+                  "type": "boolean"
+                },
+                "alias": {
+                  "title": "`@deprecated` as cli now supports baseUrl and paths from the app's tsconfig.json file.\nJust check or add configuration to your tsconfig file and remove alias from tramvai.json",
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "svgo": {
+                  "title": "svgo-loader options",
+                  "type": "object",
+                  "properties": {
+                    "plugins": {
+                      "title": "svgo plugins, you can find full types in PluginConfig inside `svgo` source code,\nbut this interface too complex and heavy for schema",
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "params": {
+                                "type": "object",
+                                "additionalProperties": false
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "imageOptimization": {
+                  "title": "Settings for image-webpack-loader",
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "title": "Enable image-webpack-loader",
+                      "type": "boolean"
+                    },
+                    "options": {
+                      "title": "Pass options to image-webpack-loader",
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "transpileOnlyModernLibs": {
+                  "title": "transpile libs based only on @tinkoff/is-modern-lib",
+                  "default": true,
+                  "type": "boolean"
+                },
+                "webpack": {
+                  "title": "Webpack specific settings",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "resolveAlias": {
+                      "title": "Browser package resolve aliases. E.g. { \"stream\": \"stream-browserify\" }",
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "provide": {
+                      "title": "Browser packages to provide with ProvidePlugin. E.g. { \"Buffer\": [\"buffer\", \"Buffer\"] }",
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "watchOptions": {
+                      "title": "Configure https://webpack.js.org/configuration/watch/#watchoptions",
+                      "description": "For OSX users and big projects it's recommended to enable watch polling, e.g. `{ poll: 1000 }`, more info - https://github.com/webpack/watchpack/issues/222",
+                      "type": "object",
+                      "properties": {
+                        "aggregateTimeout": {
+                          "description": "Delay the rebuilt after the first change. Value is a time in ms.",
+                          "type": "number"
+                        },
+                        "followSymlinks": {
+                          "description": "Resolve symlinks and watch symlink and real file. This is usually not needed as webpack already resolves symlinks ('resolve.symlinks').",
+                          "type": "boolean"
+                        },
+                        "ignored": {
+                          "description": "Ignore some files from watching (glob pattern or regexp).",
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "exec": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "test": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "source": {
+                                  "type": "string"
+                                },
+                                "global": {
+                                  "type": "boolean"
+                                },
+                                "ignoreCase": {
+                                  "type": "boolean"
+                                },
+                                "multiline": {
+                                  "type": "boolean"
+                                },
+                                "lastIndex": {
+                                  "type": "number"
+                                },
+                                "compile": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "flags": {
+                                  "type": "string"
+                                },
+                                "sticky": {
+                                  "type": "boolean"
+                                },
+                                "unicode": {
+                                  "type": "boolean"
+                                },
+                                "dotAll": {
+                                  "type": "boolean"
+                                },
+                                "hasIndices": {
+                                  "type": "boolean"
+                                },
+                                "__@match@6365": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "__@replace@6367": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "__@search@6370": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "__@split@6372": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                },
+                                "__@matchAll@6374": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "poll": {
+                          "description": "Enable polling mode for watching.",
+                          "type": [
+                            "number",
+                            "boolean"
+                          ]
+                        },
+                        "stdin": {
+                          "description": "Stop watching when stdin stream has ended.",
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "devtool": {
+                      "title": "Use the specified type of source maps for building in development mode",
+                      "enum": [
+                        "eval",
+                        "eval-cheap-module-source-map",
+                        "eval-cheap-source-map",
+                        "eval-source-map"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "dedupe": {
+                  "title": "Enable DedupePlugin",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "title": "Strategy for DedupePlugin",
+                      "default": true,
+                      "type": "boolean"
+                    },
+                    "enabledDev": {
+                      "title": "Does DedupePlugin should be enabled in development mode\nWhy it might be useful see [issue](https://github.com/Tinkoff/tramvai/issues/11)",
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "strategy": {
+                      "title": "Strategy for DedupePlugin",
+                      "default": "equality",
+                      "enum": [
+                        "equality",
+                        "semver"
+                      ],
+                      "type": "string"
+                    },
+                    "ignore": {
+                      "title": "Sets ignore to DedupePlugin",
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "terser": {
+                  "title": "terser settings",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "parallel": {
+                      "title": "Configuration for enabling parallel compression for terser plugin",
+                      "default": true,
+                      "type": "boolean"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "cssMinimize": {
+                  "title": "Set minimizer for css",
+                  "default": "css-minimizer",
+                  "enum": [
+                    "css-minimizer",
+                    "csso"
+                  ],
+                  "type": "string"
+                },
+                "hotRefresh": {
+                  "title": "React hot-refresh",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "title": "Enable react hot-refresh",
+                      "default": true,
+                      "type": "boolean"
+                    },
+                    "options": {
+                      "title": "Configure react hot-refresh https://github.com/pmmmwh/react-refresh-webpack-plugin#options",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "overlay": {
+                          "default": false,
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "boolean"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "notifications": {
+                  "title": "Controls build notifications settings during development",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "suppressSuccess": {
+                      "title": "Defines when success notifications are shown",
+                      "enum": [
+                        "always",
+                        false,
+                        "initial",
+                        true
+                      ]
+                    },
+                    "suppressWarning": {
+                      "title": "True to suppress the warning notifications, otherwise false",
+                      "type": "boolean"
+                    },
+                    "activateTerminalOnError": {
+                      "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                      "type": "boolean"
+                    },
+                    "client": {
+                      "type": "object",
+                      "properties": {
+                        "suppressSuccess": {
+                          "title": "Defines when success notifications are shown",
+                          "enum": [
+                            "always",
+                            false,
+                            "initial",
+                            true
+                          ]
+                        },
+                        "suppressWarning": {
+                          "title": "True to suppress the warning notifications, otherwise false",
+                          "type": "boolean"
+                        },
+                        "activateTerminalOnError": {
+                          "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "server": {
+                      "type": "object",
+                      "properties": {
+                        "suppressSuccess": {
+                          "title": "Defines when success notifications are shown",
+                          "enum": [
+                            "always",
+                            false,
+                            "initial",
+                            true
+                          ]
+                        },
+                        "suppressWarning": {
+                          "title": "True to suppress the warning notifications, otherwise false",
+                          "type": "boolean"
+                        },
+                        "activateTerminalOnError": {
+                          "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                          "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "shared": {
+                  "title": "Specify dependencies that will be shared between application and child-apps",
+                  "description": "Properly defining that dependencies may greatly reduce filesize of loaded js on the client",
+                  "default": {},
+                  "type": "object",
+                  "properties": {
+                    "defaultTramvaiDependencies": {
+                      "title": "Should default dependencies list be added to shared list",
+                      "description": "It includes the list of commonly used dependencies in the child-apps\nBy default, it is enabled in application in case of tramvai/module-child-app is specified in package.json\nand for child-apps",
+                      "type": "boolean"
+                    },
+                    "flexibleTramvaiVersions": {
+                      "title": "add caret range specifier for tramvai dependencies",
+                      "description": "minimal versions are inferred from package.json",
+                      "default": true,
+                      "type": "boolean"
+                    },
+                    "criticalChunks": {
+                      "title": "add chunks to preload as critical in-parallel with \"platform.js\"",
+                      "description": "this option is useful when you need to create async boundary for app dependencies.\nMore info - https://webpack.js.org/concepts/module-federation/#uncaught-error-shared-module-is-not-available-for-eager-consumption",
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "deps": {
+                      "title": "list of the dependencies that will be shared",
+                      "default": [],
+                      "type": "array",
+                      "items": {
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "title": "name of the dependency import",
+                                "type": "string"
+                              },
+                              "singleton": {
+                                "title": "if dependency is marked as singleton the dependency will be initialized only once and will not be updated",
+                                "description": "Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides",
+                                "default": false,
+                                "type": "boolean"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "name",
+                "root",
+                "type"
+              ]
+            },
+            "else": {
+              "if": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "child-app"
+                  }
+                }
+              },
+              "then": {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "name of the project",
+                    "type": "string"
+                  },
+                  "root": {
+                    "title": "path to the root directory relative to the tramvai.json",
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "const": "child-app"
+                  },
+                  "output": {
+                    "title": "Path to build module assets",
+                    "default": "dist/child-app",
+                    "type": "string"
+                  },
+                  "postcss": {
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "config": {
+                        "title": "Path to postcss config file. By default, `postcss.config.js` file is used",
+                        "type": "string"
+                      },
+                      "cssLocalIdentName": {
+                        "cli_overridable": "",
+                        "title": "CSS identifiers build algorithm",
+                        "default": "[hash:base64:5]",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "development": {
+                                "type": "string"
+                              },
+                              "production": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      },
+                      "assetsConfig": {
+                        "title": "Path to postcss config file for assets",
+                        "type": "string"
+                      },
+                      "cssModulePattern": {
+                        "title": "Enable CSS modules for all files matching /RegExp/i.test(filename) regexp.",
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "sourceMap": {
+                    "cli_overridable": "",
+                    "title": "Enable source maps",
+                    "default": false,
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "development": {
+                            "type": "boolean"
+                          },
+                          "production": {
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  "experiments": {
+                    "title": "Change different experimental cli settings",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "webpack": {
+                        "title": "experiments configuration for [webpack](https://webpack.js.org/configuration/experiments/)",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "asyncWebAssembly": {
+                            "description": "Support WebAssembly as asynchronous EcmaScript Module.",
+                            "type": "boolean"
+                          },
+                          "backCompat": {
+                            "description": "Enable backward-compat layer with deprecation warnings for many webpack 4 APIs.",
+                            "title": "Enable backward compatibility with webpack previous major versions",
+                            "default": false,
+                            "type": "boolean"
+                          },
+                          "cacheUnaffected": {
+                            "description": "Enable additional in memory caching of modules that are unchanged and reference only unchanged modules.",
+                            "title": "Enable additional in-memory caching of modules which are unchanged and reference only unchanged modules.",
+                            "default": true,
+                            "type": "boolean"
+                          },
+                          "futureDefaults": {
+                            "description": "Apply defaults of next major version.",
+                            "type": "boolean"
+                          },
+                          "layers": {
+                            "description": "Enable module layers.",
+                            "type": "boolean"
+                          },
+                          "outputModule": {
+                            "description": "Allow output javascript files as module source type.",
+                            "type": "boolean"
+                          },
+                          "syncWebAssembly": {
+                            "description": "Support WebAssembly as synchronous EcmaScript Module (outdated).",
+                            "type": "boolean"
+                          },
+                          "topLevelAwait": {
+                            "description": "Allow using top-level-await in EcmaScript Modules.",
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "minicss": {
+                        "title": "experimental settings for [mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin)",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "useImportModule": {
+                            "cli_overridable": "",
+                            "title": "Use a new webpack API to execute modules instead of child compilers. This improves performance and memory usage a lot.",
+                            "default": true,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "development": {
+                                    "type": "boolean"
+                                  },
+                                  "production": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "transpilation": {
+                        "title": "experimental settings for code transpilation",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "loader": {
+                            "cli_overridable": "",
+                            "title": "specify loader to transpile js-ts code",
+                            "default": "babel",
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "development": {
+                                    "enum": [
+                                      "babel",
+                                      "swc"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "production": {
+                                    "enum": [
+                                      "babel",
+                                      "swc"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "enum": [
+                                  "babel",
+                                  "swc"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "minifier": {
+                        "cli_overridable": "",
+                        "title": "specify minifer for terser plugin",
+                        "default": "terser",
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "development": {
+                                "enum": [
+                                  "swc",
+                                  "terser"
+                                ],
+                                "type": "string"
+                              },
+                              "production": {
+                                "enum": [
+                                  "swc",
+                                  "terser"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "enum": [
+                              "swc",
+                              "terser"
+                            ],
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "excludesPresetEnv": {
+                    "title": "List of modules to exclude from `@babel/preset-env`",
+                    "description": "Option doesn't affect build with swc loader",
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "threadLoader": {
+                    "title": "Webpack's thread-loader config",
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "define": {
+                    "title": "Define static variables that should be replaced by name with provided value",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "shared": {
+                        "default": {},
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "development": {
+                        "default": {},
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "production": {
+                        "default": {},
+                        "additionalProperties": true,
+                        "type": "object"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "generateDataQaTag": {
+                    "title": "`@deprecated` will be removed in next major release.",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "enableFillActionNamePlugin": {
+                    "title": "`@deprecated` will be removed in next major release. Включает использование плагина fill-action-name",
+                    "default": false,
+                    "type": "boolean"
+                  },
+                  "alias": {
+                    "title": "`@deprecated` as cli now supports baseUrl and paths from the app's tsconfig.json file.\nJust check or add configuration to your tsconfig file and remove alias from tramvai.json",
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "svgo": {
+                    "title": "svgo-loader options",
+                    "type": "object",
+                    "properties": {
+                      "plugins": {
+                        "title": "svgo plugins, you can find full types in PluginConfig inside `svgo` source code,\nbut this interface too complex and heavy for schema",
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "type": "string"
+                                },
+                                "params": {
+                                  "type": "object",
+                                  "additionalProperties": false
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "imageOptimization": {
+                    "title": "Settings for image-webpack-loader",
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "title": "Enable image-webpack-loader",
+                        "type": "boolean"
+                      },
+                      "options": {
+                        "title": "Pass options to image-webpack-loader",
+                        "additionalProperties": true,
+                        "type": "object"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "transpileOnlyModernLibs": {
+                    "title": "transpile libs based only on @tinkoff/is-modern-lib",
+                    "default": true,
+                    "type": "boolean"
+                  },
+                  "webpack": {
+                    "title": "Webpack specific settings",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "resolveAlias": {
+                        "title": "Browser package resolve aliases. E.g. { \"stream\": \"stream-browserify\" }",
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "provide": {
+                        "title": "Browser packages to provide with ProvidePlugin. E.g. { \"Buffer\": [\"buffer\", \"Buffer\"] }",
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "watchOptions": {
+                        "title": "Configure https://webpack.js.org/configuration/watch/#watchoptions",
+                        "description": "For OSX users and big projects it's recommended to enable watch polling, e.g. `{ poll: 1000 }`, more info - https://github.com/webpack/watchpack/issues/222",
+                        "type": "object",
+                        "properties": {
+                          "aggregateTimeout": {
+                            "description": "Delay the rebuilt after the first change. Value is a time in ms.",
+                            "type": "number"
+                          },
+                          "followSymlinks": {
+                            "description": "Resolve symlinks and watch symlink and real file. This is usually not needed as webpack already resolves symlinks ('resolve.symlinks').",
+                            "type": "boolean"
+                          },
+                          "ignored": {
+                            "description": "Ignore some files from watching (glob pattern or regexp).",
+                            "anyOf": [
+                              {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "exec": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "test": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "source": {
+                                    "type": "string"
+                                  },
+                                  "global": {
+                                    "type": "boolean"
+                                  },
+                                  "ignoreCase": {
+                                    "type": "boolean"
+                                  },
+                                  "multiline": {
+                                    "type": "boolean"
+                                  },
+                                  "lastIndex": {
+                                    "type": "number"
+                                  },
+                                  "compile": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "flags": {
+                                    "type": "string"
+                                  },
+                                  "sticky": {
+                                    "type": "boolean"
+                                  },
+                                  "unicode": {
+                                    "type": "boolean"
+                                  },
+                                  "dotAll": {
+                                    "type": "boolean"
+                                  },
+                                  "hasIndices": {
+                                    "type": "boolean"
+                                  },
+                                  "__@match@6365": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "__@replace@6367": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "__@search@6370": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "__@split@6372": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  },
+                                  "__@matchAll@6374": {
+                                    "type": "object",
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "poll": {
+                            "description": "Enable polling mode for watching.",
+                            "type": [
+                              "number",
+                              "boolean"
+                            ]
+                          },
+                          "stdin": {
+                            "description": "Stop watching when stdin stream has ended.",
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "devtool": {
+                        "title": "Use the specified type of source maps for building in development mode",
+                        "enum": [
+                          "eval",
+                          "eval-cheap-module-source-map",
+                          "eval-cheap-source-map",
+                          "eval-source-map"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "dedupe": {
+                    "title": "Enable DedupePlugin",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "title": "Strategy for DedupePlugin",
+                        "default": true,
+                        "type": "boolean"
+                      },
+                      "enabledDev": {
+                        "title": "Does DedupePlugin should be enabled in development mode\nWhy it might be useful see [issue](https://github.com/Tinkoff/tramvai/issues/11)",
+                        "default": false,
+                        "type": "boolean"
+                      },
+                      "strategy": {
+                        "title": "Strategy for DedupePlugin",
+                        "default": "equality",
+                        "enum": [
+                          "equality",
+                          "semver"
+                        ],
+                        "type": "string"
+                      },
+                      "ignore": {
+                        "title": "Sets ignore to DedupePlugin",
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "terser": {
+                    "title": "terser settings",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "parallel": {
+                        "title": "Configuration for enabling parallel compression for terser plugin",
+                        "default": true,
+                        "type": "boolean"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "cssMinimize": {
+                    "title": "Set minimizer for css",
+                    "default": "css-minimizer",
+                    "enum": [
+                      "css-minimizer",
+                      "csso"
+                    ],
+                    "type": "string"
+                  },
+                  "hotRefresh": {
+                    "title": "React hot-refresh",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "title": "Enable react hot-refresh",
+                        "default": true,
+                        "type": "boolean"
+                      },
+                      "options": {
+                        "title": "Configure react hot-refresh https://github.com/pmmmwh/react-refresh-webpack-plugin#options",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "overlay": {
+                            "default": false,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "notifications": {
+                    "title": "Controls build notifications settings during development",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "suppressSuccess": {
+                        "title": "Defines when success notifications are shown",
+                        "enum": [
+                          "always",
+                          false,
+                          "initial",
+                          true
+                        ]
+                      },
+                      "suppressWarning": {
+                        "title": "True to suppress the warning notifications, otherwise false",
+                        "type": "boolean"
+                      },
+                      "activateTerminalOnError": {
+                        "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                        "type": "boolean"
+                      },
+                      "client": {
+                        "type": "object",
+                        "properties": {
+                          "suppressSuccess": {
+                            "title": "Defines when success notifications are shown",
+                            "enum": [
+                              "always",
+                              false,
+                              "initial",
+                              true
+                            ]
+                          },
+                          "suppressWarning": {
+                            "title": "True to suppress the warning notifications, otherwise false",
+                            "type": "boolean"
+                          },
+                          "activateTerminalOnError": {
+                            "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "server": {
+                        "type": "object",
+                        "properties": {
+                          "suppressSuccess": {
+                            "title": "Defines when success notifications are shown",
+                            "enum": [
+                              "always",
+                              false,
+                              "initial",
+                              true
+                            ]
+                          },
+                          "suppressWarning": {
+                            "title": "True to suppress the warning notifications, otherwise false",
+                            "type": "boolean"
+                          },
+                          "activateTerminalOnError": {
+                            "title": "True to activate (focus) the terminal window when a compilation error occurs",
+                            "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  "shared": {
+                    "title": "Specify dependencies that will be shared between application and child-apps",
+                    "description": "Properly defining that dependencies may greatly reduce filesize of loaded js on the client",
+                    "default": {},
+                    "type": "object",
+                    "properties": {
+                      "defaultTramvaiDependencies": {
+                        "title": "Should default dependencies list be added to shared list",
+                        "description": "It includes the list of commonly used dependencies in the child-apps\nBy default, it is enabled in application in case of tramvai/module-child-app is specified in package.json\nand for child-apps",
+                        "type": "boolean"
+                      },
+                      "flexibleTramvaiVersions": {
+                        "title": "add caret range specifier for tramvai dependencies",
+                        "description": "minimal versions are inferred from package.json",
+                        "default": true,
+                        "type": "boolean"
+                      },
+                      "criticalChunks": {
+                        "title": "add chunks to preload as critical in-parallel with \"platform.js\"",
+                        "description": "this option is useful when you need to create async boundary for app dependencies.\nMore info - https://webpack.js.org/concepts/module-federation/#uncaught-error-shared-module-is-not-available-for-eager-consumption",
+                        "default": [],
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "deps": {
+                        "title": "list of the dependencies that will be shared",
+                        "default": [],
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "name": {
+                                  "title": "name of the dependency import",
+                                  "type": "string"
+                                },
+                                "singleton": {
+                                  "title": "if dependency is marked as singleton the dependency will be initialized only once and will not be updated",
+                                  "description": "Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides",
+                                  "default": false,
+                                  "type": "boolean"
+                                }
+                              },
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "name",
+                  "root",
+                  "type"
+                ]
+              },
+              "else": {
+                "additionalProperties": false,
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Package name",
+                    "type": "string"
+                  },
+                  "root": {
+                    "title": "Package root folder (need to contain `package.json`, `tsconfig.json` and `src` folder with source code)",
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string",
+                    "const": "package"
+                  }
+                },
+                "required": [
+                  "name",
+                  "root",
+                  "type"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "default": {}
+    },
+    "migrations": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sourcePattern": {
+          "title": "do migrations only for files that match a glob pattern",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ignorePattern": {
+          "title": "skip migrations for files that match a glob pattern",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

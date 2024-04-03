@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "{{configEntry.name}}" : {
+      "name": "{{configEntry.name}}",
+      "root": "src",
+      "type": "application",
+      "sourceMap": true,
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "postcss": {
+        "config": "src/postcss"
+      },
+      "fileSystemPages": {
+        "enabled": true
+      }
+    }
+  }
+}

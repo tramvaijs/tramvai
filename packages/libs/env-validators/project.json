@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/env-validators",
+  "sourceRoot": "packages/libs/env-validators/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/env-validators/package.json",
+        "packages/libs/env-validators/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

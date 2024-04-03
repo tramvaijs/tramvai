@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/user-agent",
+  "sourceRoot": "packages/libs/user-agent/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/user-agent/package.json",
+        "packages/libs/user-agent/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

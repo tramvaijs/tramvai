@@ -1,0 +1,54 @@
+{
+  "name": "@tramvai/module-http-client",
+  "version": "0.0.0-stub",
+  "initialVersion": "0.58.99",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "browser": {
+    "./lib/papiClientModule.js": "./lib/papiClientModule.browser.js",
+    "./lib/utils/fillHeaders.js": "./lib/utils/fillHeaders.browser.js",
+    "./lib/index.es.js": "./lib/index.browser.js"
+  },
+  "files": [
+    "lib",
+    "tests.js",
+    "tests.d.ts"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tramvai/http-client": "0.0.0-stub",
+    "@tramvai/tinkoff-request-http-client-adapter": "0.0.0-stub",
+    "@tramvai/tokens-http-client": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-server": "0.0.0-stub",
+    "@tramvai/tokens-server-private": "0.0.0-stub"
+  },
+  "devDependencies": {
+    "@tinkoff/request-core": "^0.9.2",
+    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
+    "@types/node-fetch": "^2.6.2"
+  },
+  "peerDependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/papi": "0.0.0-stub",
+    "@tramvai/test-helpers": "0.0.0-stub",
+    "@tramvai/test-unit": "0.0.0-stub",
+    "@tramvai/test-mocks": "0.0.0-stub",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "node-fetch": "^2.6.1",
+    "tslib": "^2.4.0"
+  },
+  "license": "Apache-2.0",
+  "module": "lib/index.es.js"
+}

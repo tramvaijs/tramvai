@@ -1,0 +1,33 @@
+[profile.release]
+# This removes more dead code
+codegen-units = 1
+# TODO: enabling lto enables some optimizations to generate lightweighted wasm files
+# but this causes problems on big source files, see https://github.com/swc-project/swc/issues/7429
+# lto = true
+# Optimize for size
+opt-level = "s"
+# Optimize for performance, this is default so you don't need to specify it
+# opt-level = "z"
+
+# Strip debug symbols
+strip = "symbols"
+
+[workspace]
+members = ["plugins/*"]
+
+[workspace.dependencies]
+swc_common = { version = "0.33.10" }
+swc_ecma_parser = { version = "0.141.30" }
+if_chain = { version = "1.0.2" }
+
+[workspace.dependencies.swc_core]
+version = "0.86.100"
+features = [
+  "ecma_plugin_transform",
+  "ecma_utils",
+  "ecma_visit",
+  "ecma_ast",
+  "common",
+  "ecma_quote",
+  "testing",
+]

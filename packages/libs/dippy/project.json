@@ -1,0 +1,15 @@
+{
+  "name": "@tinkoff/dippy",
+  "sourceRoot": "packages/libs/dippy/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/dippy/package.json",
+        "packages/libs/dippy/__migrations__",
+        "packages/libs/dippy/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

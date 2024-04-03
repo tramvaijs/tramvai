@@ -1,0 +1,9 @@
+# ignore anything but built release wasm files
+target/*
+!target/wasm32-wasi/
+
+target/wasm32-wasi/*
+!target/wasm32-wasi/release
+
+target/wasm32-wasi/release/*
+!target/wasm32-wasi/release/*.wasm

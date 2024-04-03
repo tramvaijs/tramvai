@@ -1,0 +1,36 @@
+{
+  "name": "@tramvai/test-integration",
+  "version": "0.0.0-stub",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/wait-on": "^5.2.0"
+  },
+  "dependencies": {
+    "@tinkoff/mocker": "0.0.0-stub",
+    "@tramvai/test-helpers": "0.0.0-stub",
+    "env-ci": "^5.0.2",
+    "utility-types": "^3.10.0",
+    "wait-on": "^5.3.0"
+  },
+  "peerDependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/cli": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  },
+  "license": "Apache-2.0",
+  "module": "lib/index.es.js"
+}

@@ -1,0 +1,11 @@
+[package]
+name = "create_token_pure"
+version = "0.0.0-stub"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+swc_core = { workspace = true }
+swc_ecma_parser = { workspace = true }

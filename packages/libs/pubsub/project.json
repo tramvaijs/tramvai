@@ -1,0 +1,14 @@
+{
+  "name": "@tinkoff/pubsub",
+  "sourceRoot": "packages/libs/pubsub/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/pubsub/package.json",
+        "packages/libs/pubsub/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

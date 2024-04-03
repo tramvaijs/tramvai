@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/http-client",
+  "sourceRoot": "packages/libs/http-client/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/libs/http-client/package.json",
+        "packages/libs/http-client/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

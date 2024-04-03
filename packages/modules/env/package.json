@@ -1,0 +1,35 @@
+{
+  "name": "@tramvai/module-environment",
+  "version": "0.0.0-stub",
+  "description": "",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Tinkoff/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "peerDependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/papi": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-server": "0.0.0-stub",
+    "@tinkoff/dippy": "0.0.0-stub",
+    "react": ">=16.14.0",
+    "react-dom": ">=16.14.0",
+    "tslib": "^2.4.0"
+  },
+  "gitHead": "8e826a214c87b188fc4d254cdd8f2a2b2c55f3a8",
+  "module": "lib/server.es.js",
+  "license": "Apache-2.0"
+}
