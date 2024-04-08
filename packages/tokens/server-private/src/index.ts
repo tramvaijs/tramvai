@@ -102,7 +102,7 @@ export const WEB_FASTIFY_APP_METRICS_TOKEN = createToken<FASTIFY_APP_INIT_HANDLE
  */
 export const WEB_FASTIFY_APP_LIMITER_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>(
   'webApp fastify limiter',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**
@@ -112,7 +112,7 @@ export const WEB_FASTIFY_APP_LIMITER_TOKEN = createToken<FASTIFY_APP_INIT_HANDLE
  */
 export const WEB_FASTIFY_APP_AFTER_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>(
   'webApp fastify afterInit',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**
@@ -121,7 +121,7 @@ export const WEB_FASTIFY_APP_AFTER_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HAN
  */
 export const WEB_FASTIFY_APP_BEFORE_ERROR_TOKEN = createToken<FASTIFY_APP_ERROR_HANDLER>(
   'webApp fastify beforeError',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**
@@ -130,7 +130,7 @@ export const WEB_FASTIFY_APP_BEFORE_ERROR_TOKEN = createToken<FASTIFY_APP_ERROR_
  */
 export const WEB_FASTIFY_APP_AFTER_ERROR_TOKEN = createToken<FASTIFY_APP_ERROR_HANDLER>(
   'webApp fastify afterError',
-  { multi: true }
+  { multi: true, scope: Scope.SINGLETON }
 );
 
 /**

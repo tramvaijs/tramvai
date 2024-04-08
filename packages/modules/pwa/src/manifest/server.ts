@@ -27,6 +27,7 @@ export const TramvaiPwaManifestModule = declareModule({
     }),
     provide({
       provide: PWA_MANIFEST_URL_TOKEN,
+      scope: Scope.SINGLETON,
       useFactory: ({ swScope }) => {
         const manifestDest = process.env.TRAMVAI_PWA_MANIFEST_DEST as string;
         const normalizedUrl = manifestDest.startsWith('/') ? manifestDest : `/${manifestDest}`;

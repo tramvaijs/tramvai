@@ -1,5 +1,5 @@
 import type { ReactElement, ComponentType } from 'react';
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 import { StorageRecord } from '@tinkoff/htmlpagebuilder';
 import type { UniversalErrorBoundaryFallbackProps } from '@tramvai/react';
 import * as ResourceSlot from './slots';
@@ -97,19 +97,25 @@ export const EXTEND_RENDER = createToken<(current: ReactElement) => ReactElement
  * @description
  * Token for default layout for all pages - root layout
  */
-export const DEFAULT_LAYOUT_COMPONENT = createToken('defaultLayoutComponent');
+export const DEFAULT_LAYOUT_COMPONENT = createToken('defaultLayoutComponent', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
  * Token for default header for page
  */
-export const DEFAULT_HEADER_COMPONENT = createToken('defaultHeaderComponent');
+export const DEFAULT_HEADER_COMPONENT = createToken('defaultHeaderComponent', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
  * Token for default footer for page
  */
-export const DEFAULT_FOOTER_COMPONENT = createToken('defaultFooterComponent');
+export const DEFAULT_FOOTER_COMPONENT = createToken('defaultFooterComponent', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
@@ -125,6 +131,7 @@ export const DEFAULT_ERROR_BOUNDARY_COMPONENT = createToken<
  */
 export const LAYOUT_OPTIONS = createToken<LayoutOptions | LayoutOptions[]>('layoutOptions', {
   multi: true,
+  scope: Scope.SINGLETON,
 });
 
 type ReactComponent = ComponentType<any>;

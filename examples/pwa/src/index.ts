@@ -30,8 +30,7 @@ createApp({
       provide: DEFAULT_HEADER_COMPONENT,
       useValue: Header,
     }),
-    // eslint-disable-next-line valid-typeof
-    ...(typeof window !== undefined
+    ...(typeof window !== 'undefined'
       ? [
           provide({
             provide: commandLineListTokens.listen,
