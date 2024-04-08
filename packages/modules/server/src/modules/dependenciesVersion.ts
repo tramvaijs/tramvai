@@ -22,18 +22,18 @@ try {
     {
       provide: SERVER_MODULE_PAPI_PRIVATE_ROUTE,
       multi: true,
-      useFactory: ({ depsFilter }) => {
+      useFactory: () => {
         const { dependencies = [] } = packageJson ?? {};
         return createPapiMethod({
           path: '/dependenciesVersion',
           method: 'get',
-          handler: async () => {
-            return depsFilter(dependencies);
+          async handler() {
+            return this.deps.depsFilter(dependencies);
+          },
+          deps: {
+            depsFilter: DEPENDENCIES_VERSION_FILTER_TOKEN,
           },
         });
-      },
-      deps: {
-        depsFilter: DEPENDENCIES_VERSION_FILTER_TOKEN,
       },
     },
     {

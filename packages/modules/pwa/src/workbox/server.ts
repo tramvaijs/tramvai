@@ -29,6 +29,7 @@ export const TramvaiPwaWorkboxModule = declareModule({
     ...providers,
     provide({
       provide: PWA_SW_URL_TOKEN,
+      scope: Scope.SINGLETON,
       useFactory: ({ swScope }) => {
         const swDest = process.env.TRAMVAI_PWA_SW_DEST as string;
         return normalizeSwUrl(swDest, swScope);

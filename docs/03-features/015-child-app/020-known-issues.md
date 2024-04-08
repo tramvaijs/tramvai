@@ -21,12 +21,6 @@ Refer to the [FAQ](#faq-about-shared-dependencies) about the details. In summary
 - it is more reliable to provide shared dependency from the root-app than relying on sharing between several child-apps
 - make sure all versions of the shared dependencies are semver compatible
 
-### Token with name already created!
-
-The issue happens when `@tinkoff/dippy` library is shared due to fact that root-app and child-apps will have separate instances of the same tokens packages with the same naming.
-
-For now, just ignore that kind of warnings during development. In production these warnings won't be shown
-
 ### Possible problems with shared dependency
 
 #### react-query: No QueryClient set, use QueryClientProvider to set one

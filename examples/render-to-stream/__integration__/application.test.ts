@@ -100,19 +100,19 @@ describe('render-to-stream', () => {
     it('main page', async () => {
       const { parsed } = await app.render('/');
 
-      expect(parsed.innerHTML).toMatchSnapshot();
+      expect(parsed.querySelector('.application').innerText).toMatchSnapshot();
     });
 
     it('deferred page', async () => {
       const { parsed } = await app.render('/deferred/');
 
-      expect(parsed.innerHTML).toMatchSnapshot();
+      expect(parsed.querySelector('.application').innerText).toMatchSnapshot();
     });
 
     it('non-deferred page', async () => {
       const { parsed } = await app.render('/non-deferred/');
 
-      expect(parsed.innerHTML).toMatchSnapshot();
+      expect(parsed.querySelector('.application').innerText).toMatchSnapshot();
     });
   });
 

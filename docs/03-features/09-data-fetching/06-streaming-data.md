@@ -217,7 +217,7 @@ const deferredAction = declareAction({
 });
 ```
 
-As a workaround, you can wait Deferred Actions manually at client-side in usual client-only action. All deferred actions available in `DEFERRED_ACTIONS_MAP_TOKEN`. Let's update our first example:
+As a workaround, you can wait Deferred Actions manually at client-side in usual action. All deferred actions available in `DEFERRED_ACTIONS_MAP_TOKEN`. Let's update our first example:
 
 ```tsx
 // deferredAction without any changes
@@ -251,29 +251,46 @@ const deferredStateSyncAction = declareAction({
   deps: {
     deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
   },
-  conditions: {
-    onlyBrowser: true,
-  },
 });
 
-const Page: PageComponent = () => {
+// component will be rendered after Deferred Action resolve
+const DeferredStateCmp = () => {
+  const syncAction = useActions(deferredStateSyncAction);
   const state = useStore(deferredState);
+
+  // run sync action immediately
+  useEffect(() => {
+    syncAction();
+  }, []);
 
   return (
     <>
-      <h1>Deferred State Page</h1>
       {state.status === 'pending' ? (
         <div>Loading...</div>
       ) : (
         <div>{`Response: ${state.payload.data}`}</div>
       )}
     </>
+  )
+}
+
+const Page: PageComponent = () => {
+  return (
+    <>
+      <h1>Deferred State Page</h1>
+
+      <Suspense fallback={<div>Loading...</div>}>
+        <Await action={deferredAction}>
+          {() => <DeferredStateCmp />}
+        </Await>
+      </Suspense>
+    </>
   );
 };
 
 Page.reducers = [deferredState];
 
-Page.actions = [deferredAction, deferredStateSyncAction];
+Page.actions = [deferredAction];
 
 export default Page;
 ```

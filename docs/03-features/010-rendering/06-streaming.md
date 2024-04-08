@@ -49,3 +49,46 @@ const provider = provide({
   useValue: 10000,
 });
 ```
+
+## Troubleshooting
+
+### Proxy buffering
+
+To enable HTML streaming, you must disable response buffering on the reverse proxy. `Nginx` for example, with default configuration, will buffer response body (or part of it) in memory, and first byte time will be increased - it is opposite what HTML streaming is supposed to do.
+
+You can disable buffering at application level by setting `X-Accel-Buffering` header:
+
+```ts
+import { commandLineListTokens, provide } from '@tramvai/core';
+import { RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
+
+const provider = provide({
+  provide: commandLineListTokens.generatePage,
+  useFactory: () => {
+    return function addXAccelBufferingHeader() {
+      responseManager.setHeader('X-Accel-Buffering', 'no');
+    }
+  },
+  deps: {
+    responseManager: RESPONSE_MANAGER_TOKEN,
+  },
+});
+```
+
+For `Nginx` configuration, disable [`proxy_buffering`](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_buffering):
+
+```
+proxy_buffering off;
+```
+
+### Proxy response timeout
+
+If you use [Deferred Actions](03-features/09-data-fetching/06-streaming-data.md), probably you have a slow API calls. With increased [streaming timeout](#response-stream-timeout), complete response time can exceed the reverse proxy timeout. This will lead to `ERR_INCOMPLETE_CHUNKED_ENCODING` errors, broken HTML and possible hydration errors.
+
+To prevent this, for `Nginx` you can increase [`proxy_read_timeout`](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_read_timeout):
+
+```
+proxy_read_timeout 30s;
+```
+
+`REACT_STREAMING_RENDER_TIMEOUT` always needs to be lower than proxy timeout.

@@ -77,3 +77,37 @@ RedirectPage.actions = [redirectAction];
 
 export default RedirectPage;
 ```
+
+## Redirect in CommandLineRunner
+
+:::tip
+
+Use when redirect logic is complex and common for all pages
+
+:::
+
+For example, you want to check some cookie, and if this cookie does not exist, application need to redirect to another page. If you want to prevent page component rendering and force redirect, you can throw `RedirectFoundError` from `@tinkoff/errors` library:
+
+```tsx
+import { commandLineListTokens, provide } from '@tramvai/core';
+import { COOKIE_MANAGER_TOKEN } from '@tramvai/tokens-common';
+import { RedirectFoundError } from '@tinkoff/errors';
+
+createApp({
+  providers: [
+    provide({
+      provide: commandLineListTokens.customerStart,
+      useFactory: ({ cookieManager }) => {
+        return function readCustomCookie() {
+          if (!cookieManager.get('someSessionCookie')) {
+            throw new RedirectFoundError({ nextUrl: '/login/' });
+          }
+        };
+      },
+      deps: {
+        cookieManager: COOKIE_MANAGER_TOKEN,
+      },
+    }),
+  ],
+});
+```

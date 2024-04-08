@@ -139,6 +139,7 @@ const composeOptions = (multiOptions, defaultOptions?) =>
     }),
     provide({
       provide: SENTRY_DSN_TOKEN,
+      scope: Scope.SINGLETON,
       useFactory: ({ envManager }: { envManager: typeof ENV_MANAGER_TOKEN }) =>
         envManager.get('SENTRY_DSN'),
       deps: {
