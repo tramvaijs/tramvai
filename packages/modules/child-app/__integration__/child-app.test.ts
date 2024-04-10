@@ -423,7 +423,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
         }
       });
 
-      await page.goto(`${serverUrl}/react-query/`);
+      await page.goto(`${serverUrl}/react-query/`, { waitUntil: 'domcontentloaded' });
 
       expect(loadedScripts).toHaveLength(reactQuery.scriptsCount);
     });
