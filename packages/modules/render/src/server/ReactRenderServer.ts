@@ -214,7 +214,6 @@ export class ReactRenderServer {
 
         const timeout = this.streamingTimeout;
         const unfinishedActions = [];
-        let isAborted = false;
 
         const { pipe, abort } = renderToPipeableStream(renderResult, {
           // we need to run hydration only after first chunk is sent to client
@@ -240,16 +239,12 @@ export class ReactRenderServer {
           },
           onError(error) {
             // error can be inside Suspense boundaries, this is not critical, continue rendering.
+            // also render stream `abort` method calls will trigger this callback.
             // for criticall errors, this callback will be called with `onShellError`,
             // so this is a best place to error logging
             log.error({
               event: 'streaming-render:error',
-              error: isAborted
-                ? new AbortedStreamError({
-                    reason: `${timeout}ms timeout exceeded`,
-                    unfinishedActions,
-                  })
-                : error,
+              error,
             });
           },
           onShellError(error) {
@@ -260,8 +255,6 @@ export class ReactRenderServer {
 
         // global response stream timeo
         setTimeout(() => {
-          isAborted = true;
-
           // abort unfinished deferred actions
           this.deferredActions.forEach((action, name) => {
             if (action.isRejected() || action.isResolved()) {
@@ -273,15 +266,15 @@ export class ReactRenderServer {
             action.reject(new AbortedDeferredError());
           });
 
-          // abort render stream
-          abort();
+          const reason = new AbortedStreamError({
+            reason: `${timeout}ms timeout exceeded`,
+            unfinishedActions,
+          });
 
-          reject(
-            new AbortedStreamError({
-              reason: `${timeout}ms timeout exceeded`,
-              unfinishedActions,
-            })
-          );
+          // abort render stream
+          abort(reason);
+
+          reject(reason);
         }, timeout);
       });
     }
