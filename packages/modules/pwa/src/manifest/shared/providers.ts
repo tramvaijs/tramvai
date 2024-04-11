@@ -1,6 +1,6 @@
-import { commandLineListTokens, declareModule, provide, Scope } from '@tramvai/core';
+import { commandLineListTokens, declareModule, DI_TOKEN, provide, Scope } from '@tramvai/core';
 import { ResourceType, ResourceSlot, RESOURCES_REGISTRY } from '@tramvai/tokens-render';
-import { PWA_MANIFEST_URL_TOKEN } from '../../tokens';
+import { PWA_MANIFEST_INIT_COMMAND_LINE, PWA_MANIFEST_URL_TOKEN } from '../../tokens';
 
 const validateRelativeUrl = (url: string) => {
   if (!url.startsWith('/')) {
@@ -23,18 +23,30 @@ export const validateRelativeUrlProvider = provide({
 });
 
 export const registerWebManifestProvider = provide({
-  provide: commandLineListTokens.customerStart,
-  useFactory: ({ resourcesRegistry, manifestUrl }) =>
-    async function registerWebManifest() {
-      resourcesRegistry.register({
-        type: ResourceType.asIs,
-        slot: ResourceSlot.HEAD_META,
-        // @todo what about crossorigin, maybe optional?
-        payload: `<link rel="manifest" href="${manifestUrl}">`,
+  provide: commandLineListTokens.init,
+  useFactory: ({ manifestCommandLine, manifestUrl, di }) =>
+    function registerWebManifestCommandLine() {
+      di.register({
+        provide: manifestCommandLine
+          ? commandLineListTokens[manifestCommandLine]
+          : commandLineListTokens.customerStart,
+        useFactory: ({ resourcesRegistry }) =>
+          function registerWebManifestAsResource() {
+            resourcesRegistry.register({
+              type: ResourceType.asIs,
+              slot: ResourceSlot.HEAD_META,
+              // @todo what about crossorigin, maybe optional?
+              payload: `<link rel="manifest" href="${manifestUrl}">`,
+            });
+          },
+        deps: {
+          resourcesRegistry: RESOURCES_REGISTRY,
+        },
       });
     },
   deps: {
-    resourcesRegistry: RESOURCES_REGISTRY,
     manifestUrl: PWA_MANIFEST_URL_TOKEN,
+    di: DI_TOKEN,
+    manifestCommandLine: { token: PWA_MANIFEST_INIT_COMMAND_LINE, optional: true },
   },
 });

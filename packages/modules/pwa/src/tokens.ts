@@ -1,6 +1,7 @@
 import { createToken } from '@tinkoff/dippy';
 import type { Workbox } from 'workbox-window';
 import type { PwaMetaOptions } from '@tramvai/cli/lib/typings/public';
+import type { commandLineListTokens } from '@tramvai/core';
 
 export type WebManifest = {
   [key: string]: any;
@@ -37,3 +38,10 @@ export const PWA_MANIFEST_URL_TOKEN = createToken<string>('pwa manifest url');
  * @description Token to owerwrite default - `pwa.meta` (meta tags will be added to all pages)
  */
 export const PWA_META_TOKEN = createToken<PwaMetaOptions>('pwa meta');
+
+/**
+ * @description Token to overwrite default manifest init behaviour on customerStart
+ */
+export const PWA_MANIFEST_INIT_COMMAND_LINE = createToken<keyof typeof commandLineListTokens>(
+  'pwa manifest init command line'
+);
