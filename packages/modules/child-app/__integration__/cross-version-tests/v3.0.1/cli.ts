@@ -49,6 +49,7 @@ export const startChildApp = async (
       hotRefresh: {
         enabled: true,
       },
+      shared,
     },
     port,
     staticPort,

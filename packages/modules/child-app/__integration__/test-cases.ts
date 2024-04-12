@@ -48,12 +48,12 @@ export const testCasesConditions: Record<string, TestCase> = {
     rootAppVersion: 'latest',
     childAppsVersion: 'v3.0.1',
     router: {
-      prefetchScriptsCount: 2, // versions that has support for prefetch in routing
+      prefetchScriptsCount: 4, // versions that has support for prefetch in routing
       nonBlockingSpa: true, // latest root-app has updated code to support non-blocking loading on spa navigations
     },
     reactQuery: {
       // NOTE: it requires to have semver versions in package.jsons in repo not stub versions
-      scriptsCount: 4, // except runtime and main entry chunks, shared chunks @tramvai/core and @tramvai/react should be loaded, because we can't share different major versions (v3 and v4), while others should be shared
+      scriptsCount: 6, // except runtime and main entry chunks, shared chunks @tramvai/core and @tramvai/react should be loaded, because we can't share different major versions (v3 and v4), while others should be shared
     },
   },
 };

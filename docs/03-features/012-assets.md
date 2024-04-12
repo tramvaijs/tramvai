@@ -7,6 +7,13 @@ title: Images and Fonts
 
 ### Raster
 
+To use local images in your project, you should install `sharp` library separately. It helps us to generate miniatures for images and also process images for pwa icons for PWA module.  
+We don't install this library by default because of its size and because many developers don't need it.
+
+```bash
+$ yarn add sharp --save-dev
+```
+
 **Supported formats:** `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`
 
 Import of raster image emits a separate file, while default export returns URL string and named export returns `image` object with the following interface:
