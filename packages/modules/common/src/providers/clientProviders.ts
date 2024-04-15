@@ -17,22 +17,14 @@ export const providers = [
 
         return JSON.parse(initialState);
       } catch (e: any) {
-        if ((window as any).logger) {
-          const log = (window as any).logger('tramvai-state');
-
-          log.error({
-            event: 'initial-state-parse-error',
-            error: e,
-            initialState,
-          });
-        } else {
-          // if logger is not ready, we still can log this error in inline scripts with error interceptors.
-          // force unhandled promise reject, because we don't need to break application here with sync error.
-          // eslint-disable-next-line promise/catch-or-return
-          Promise.resolve().then(() => {
-            throw Object.assign(e, { initialState, event: 'initial-state-parse-error' });
-          });
-        }
+        // Can't use LOGGER_TOKEN - circular dependency.
+        // Can't use window.logger - remote reporter will be not ready at this moment.
+        // But we still can log this error in inline scripts with error interceptors.
+        // Force unhandled promise reject, because we don't need to break application here with sync error.
+        // eslint-disable-next-line promise/catch-or-return
+        Promise.resolve().then(() => {
+          throw Object.assign(e, { initialState, event: 'initial-state-parse-error' });
+        });
 
         return {};
       }
