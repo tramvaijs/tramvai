@@ -2,7 +2,7 @@ import type { BrowserSentryClientOptions } from '@micro-sentry/browser';
 import { declareModule, provide } from '@tramvai/core';
 import { ENV_MANAGER_TOKEN } from '@tramvai/module-common';
 
-import { sharedProviders } from './providers';
+import { browserProviders } from './providers';
 import { MICRO_SENTRY_OPTIONS_TOKEN } from './tokens';
 
 export * from './tokens';
@@ -10,6 +10,7 @@ export * from './tokens';
 export const TramvaiMicroSentryModule = declareModule({
   name: 'TramvaiMicroSentryModule',
   providers: [
+    ...browserProviders,
     provide({
       provide: MICRO_SENTRY_OPTIONS_TOKEN,
       useFactory: ({ envManager }) => {
@@ -23,7 +24,6 @@ export const TramvaiMicroSentryModule = declareModule({
         envManager: ENV_MANAGER_TOKEN,
       },
     }),
-    ...sharedProviders,
   ],
   imports: [],
 });
