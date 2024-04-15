@@ -143,7 +143,7 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
               type: 'commonjs2',
             }
           : {
-              name: 'window["child-app__" + document.currentScript.src]',
+              name: 'window["child-app__" + (document.currentScript.src || document.currentScript.dataset.src)]',
               type: 'assign',
             },
       exposes: {

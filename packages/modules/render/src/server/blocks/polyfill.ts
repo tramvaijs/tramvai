@@ -1,4 +1,8 @@
-import type { PageResource, FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
+import type {
+  PageResource,
+  FETCH_WEBPACK_STATS_TOKEN,
+  REACT_SERVER_RENDER_MODE,
+} from '@tramvai/tokens-render';
 import { ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import { flushFiles } from './utils/flushFiles';
 
@@ -6,10 +10,12 @@ export const polyfillResources = async ({
   condition,
   modern,
   fetchWebpackStats,
+  renderMode,
 }: {
   condition: string;
   modern: boolean;
   fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
+  renderMode: typeof REACT_SERVER_RENDER_MODE;
 }) => {
   const webpackStats = await fetchWebpackStats({ modern });
 
@@ -32,6 +38,9 @@ export const polyfillResources = async ({
     result.push({
       type: ResourceType.inlineScript,
       slot: ResourceSlot.HEAD_POLYFILLS,
+      // all scripts are "async" for streaming, so we need to guarantee that polyfills will be loaded before.
+      // will hurt performance, because polufills will block page rendering
+      // todo: research solution to use "async" for polyfills and wait this script in the application entry point
       payload: `(function (){
   var con;
   try {
@@ -39,7 +48,9 @@ export const polyfillResources = async ({
   } catch (e) {
     con = true;
   }
-  if (con) { document.write('<script defer="defer" charset="utf-8" data-critical="true" crossorigin="anonymous" src="${href}"><\\/script>')}
+  if (con) { document.write('<script${
+    renderMode === 'streaming' ? '' : ' defer="defer"'
+  } charset="utf-8" data-critical="true" crossorigin="anonymous" src="${href}"><\\/script>')}
 })()`,
     });
   });
