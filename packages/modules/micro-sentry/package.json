@@ -22,6 +22,7 @@
     "@micro-sentry/browser": "^7.0.1"
   },
   "peerDependencies": {
+    "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub"
   },
