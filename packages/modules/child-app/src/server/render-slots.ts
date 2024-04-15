@@ -28,6 +28,12 @@ const deferScriptAttrs = {
   defer: 'defer',
   async: null,
 };
+// for cases when Child App script was loaded or failed when script was added at server-side,
+// and Child App initialization logic executed after that, we need to get script loading status
+const entryAttrs = {
+  onload: `this.setAttribute('loaded', 'true')`,
+  onerror: `this.setAttribute('loaded', 'false')`,
+};
 
 export const registerChildAppRenderSlots =
   ({
@@ -54,12 +60,12 @@ export const registerChildAppRenderSlots =
     // https://github.com/reactwg/react-18/discussions/114
     const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
 
-    const addChunk = (entry?: string) => {
-      if (!entry) {
+    const addChunk = (chunk?: string, isEntry = false) => {
+      if (!chunk) {
         return;
       }
 
-      const extension = extname(entry);
+      const extension = extname(chunk);
 
       switch (extension) {
         case '.js':
@@ -67,10 +73,11 @@ export const registerChildAppRenderSlots =
             type: ResourceType.script,
             // we need to load Child Apps scripts before main application scripts
             slot: ResourceSlot.HEAD_DYNAMIC_SCRIPTS,
-            payload: entry,
+            payload: chunk,
             attrs: {
               'data-critical': 'true',
               ...scriptTypeAttr,
+              ...(isEntry ? entryAttrs : {}),
             },
           });
           break;
@@ -78,7 +85,7 @@ export const registerChildAppRenderSlots =
           result.push({
             type: ResourceType.style,
             slot: ResourceSlot.HEAD_CORE_STYLES,
-            payload: entry,
+            payload: chunk,
             attrs: {
               'data-critical': 'true',
             },
@@ -134,7 +141,7 @@ export const registerChildAppRenderSlots =
       const di = diManager.getChildDi(config);
       const loadableAssets = di?.get(CHILD_APP_INTERNAL_CHUNK_EXTRACTOR)?.getMainAssets();
 
-      addChunk(config.client.entry);
+      addChunk(config.client.entry, true);
 
       if (config.css) {
         addChunk(config.css.entry);

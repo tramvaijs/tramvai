@@ -13,6 +13,7 @@ import type { STORE_TOKEN } from '@tramvai/tokens-common';
 import { optional } from '@tinkoff/dippy';
 import type { Route } from '@tinkoff/router';
 import { ChildAppStore } from '../shared/store';
+import { getModuleFromGlobal } from './loader';
 
 export class PreloadManager implements ChildAppPreloadManager {
   private loader: ChildAppLoader;
@@ -178,8 +179,13 @@ export class PreloadManager implements ChildAppPreloadManager {
         const config = this.resolveExternalConfig(request);
 
         if (config) {
-          this.currentlyPreloaded.set(config.key, config);
-          this.hasPreloadBefore.add(config.key);
+          // double check that Child App script is already loaded.
+          // in streaming mode with async scripts it may not be loaded yet,
+          // and we will run client initialization flow for this Child App, like it was not preloaded
+          if (getModuleFromGlobal(config.client.entry)) {
+            this.currentlyPreloaded.set(config.key, config);
+            this.hasPreloadBefore.add(config.key);
+          }
         }
       });
 

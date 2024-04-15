@@ -6,10 +6,14 @@ import type { LoadModuleOptions } from './types.h';
 const normalizeUrl = (url: string) => url?.replace(/^https?:/, '');
 
 const findLoadingScript = (url: string) =>
-  find(
-    (script) => !!script.src && (script.src === url || normalizeUrl(script.src) === url),
-    document.scripts
-  );
+  find((script) => {
+    const isSameScript = !!script.src && (script.src === url || normalizeUrl(script.src) === url);
+    const isSameFallback =
+      !!script.dataset.src &&
+      (script.dataset.src === url || normalizeUrl(script.dataset.src) === url);
+
+    return isSameScript || isSameFallback;
+  }, document.scripts);
 
 const findLoadingStyle = (url: string) =>
   find(

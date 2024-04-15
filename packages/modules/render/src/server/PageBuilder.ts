@@ -143,7 +143,7 @@ export class PageBuilder {
   }
 
   async fetchChunksInfo(extractor: ChunkExtractor) {
-    const { modern } = this;
+    const { modern, renderMode } = this;
     const { bundle, pageComponent } = this.pageService.getConfig();
 
     this.resourcesRegistry.register(
@@ -161,6 +161,7 @@ export class PageBuilder {
         condition: this.polyfillCondition,
         modern,
         fetchWebpackStats: this.fetchWebpackStats,
+        renderMode,
       })
     );
   }
