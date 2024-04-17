@@ -147,16 +147,28 @@ export class App {
   }
 }
 
+// About error handling:
+// - can't use LOGGER_TOKEN - circular dependency.
+// - can't use window.logger - remote reporter will be not ready at this moment.
+// - but we still can log app creation errors in inline scripts with global error interceptors.
+
 export function createApp(options: AppOptions) {
   let app: App;
   try {
     app = new App(options);
   } catch (error) {
-    // Флаг необходим чтобы среди логов найти те которые не дали трамваю стартануть
     (error as any).appCreationError = true;
-
     throw error;
   }
 
-  return app.initialization(typeof window === 'undefined' ? 'server' : 'client').then(() => app);
+  return app
+    .initialization(typeof window === 'undefined' ? 'server' : 'client')
+    .then(() => app)
+    .catch((error: any) => {
+      if (error instanceof Error) {
+        // eslint-disable-next-line no-param-reassign
+        (error as any).appCreationError = true;
+      }
+      throw error;
+    });
 }
