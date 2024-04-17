@@ -16,17 +16,14 @@ export const providers = [
         }
 
         return JSON.parse(initialState);
-      } catch (e: any) {
-        // Can't use LOGGER_TOKEN - circular dependency.
-        // Can't use window.logger - remote reporter will be not ready at this moment.
-        // But we still can log this error in inline scripts with error interceptors.
-        // Force unhandled promise reject, because we don't need to break application here with sync error.
-        // eslint-disable-next-line promise/catch-or-return
-        Promise.resolve().then(() => {
-          throw Object.assign(e, { initialState, event: 'initial-state-parse-error' });
-        });
+      } catch (error: any) {
+        // Enrich error information
+        if (error instanceof Error) {
+          (error as any).event = 'initial-state-parse-error';
+          (error as any).initialState = initialState;
+        }
 
-        return {};
+        throw error;
       }
     },
   }),
