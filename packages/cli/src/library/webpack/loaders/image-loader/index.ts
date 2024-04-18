@@ -13,12 +13,7 @@ export default async function (this: LoaderContext<{}>, content: Buffer) {
 
   const extension = interpolateName(this, '[ext]', options);
 
-  const dataURL = await getImageMiniatureDataURL(
-    content,
-    dimensions.width,
-    dimensions.height,
-    extension
-  );
+  const dataURL = await getImageMiniatureDataURL(content, extension);
 
   return result.replace(
     /^export default (__webpack_public_path__ \+ .+);$/,

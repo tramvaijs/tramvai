@@ -2,7 +2,7 @@ interface ImageObject {
   src: string;
   width: number;
   height: number;
-  blurDataURL: string;
+  blurDataURL: string | null;
 }
 
 declare module '*.css' {
