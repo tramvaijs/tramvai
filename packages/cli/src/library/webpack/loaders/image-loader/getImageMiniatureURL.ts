@@ -1,16 +1,16 @@
-import type Sharp from 'sharp';
+import { safeRequireResolve } from '../../../../utils/safeRequire';
 
 const BLUR_WIDTH = 10;
 const BLUR_HEIGHT = 10;
 
-export const getImageMiniatureDataURL = async (
-  content: Buffer,
-  width: number,
-  height: number,
-  extension: string
-) => {
+export const getImageMiniatureDataURL = async (content: Buffer, extension: string) => {
+  const isSharpInstalled = Boolean(safeRequireResolve('sharp'));
+  if (!isSharpInstalled) {
+    return null;
+  }
+
   try {
-    const sharp: typeof Sharp = require('sharp');
+    const sharp = require('sharp');
 
     const image = sharp(content, { sequentialRead: true });
     // https://sharp.pixelplumbing.com/api-resize#resize
@@ -30,5 +30,6 @@ export const getImageMiniatureDataURL = async (
     return dataURL;
   } catch (e) {
     console.error('image placeholder generation error: ', e);
+    return null;
   }
 };
