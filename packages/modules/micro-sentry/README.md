@@ -91,6 +91,11 @@ export default declareAction({
 });
 ```
 
+## Environment variables
+
+- `SENTRY_RELEASE` - application release version. The value is inserted into the `release` field for all errors
+- `SENTRY_ENVIRONMENT` - the application environment where the error occurred. If the variable is not specified, then `process.env.NODE_ENV` is used
+
 ## Exported tokens
 
 #### `MICRO_SENTRY_INSTANCE_TOKEN`

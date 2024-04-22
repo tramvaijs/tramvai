@@ -15,7 +15,8 @@ export const TramvaiMicroSentryModule = declareModule({
       provide: MICRO_SENTRY_OPTIONS_TOKEN,
       useFactory: ({ envManager }) => {
         const defaultOptions: BrowserSentryClientOptions = {
-          environment: process.env.NODE_ENV,
+          environment: envManager.get('SENTRY_ENVIRONMENT') ?? process.env.NODE_ENV,
+          release: envManager.get('SENTRY_RELEASE'),
           dsn: envManager.get('SENTRY_DSN'),
         };
         return defaultOptions;
