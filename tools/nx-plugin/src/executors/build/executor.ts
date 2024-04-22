@@ -38,7 +38,8 @@ export default async function runExecutor(options: BuildExecutorSchema, context:
       !channel.stderr.includes('Generated an empty chunk') &&
       !channel.stderr.includes('ROLLUP_CHUNK_URL_') &&
       !channel.stderr.includes('DeprecationWarning') &&
-      !channel.stderr.includes('but never used')
+      !channel.stderr.includes('but never used') &&
+      !channel.stderr.includes('Browserslist: caniuse-lite is outdated')
     ) {
       console.error(`failed ${projectName} log:\n`);
       console.error(channel.stderr);
