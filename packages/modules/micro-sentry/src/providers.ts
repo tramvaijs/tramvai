@@ -1,5 +1,6 @@
 import { commandLineListTokens, provide, type Provider } from '@tramvai/core';
-import { ENV_USED_TOKEN } from '@tramvai/module-common';
+import { ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module-common';
+import type { BrowserSentryClientOptions } from '@micro-sentry/browser';
 import { BrowserMicroSentryClient } from '@micro-sentry/browser';
 import {
   MICRO_SENTRY_INLINE_ERROR_INTERCEPTOR_KEY_TOKEN,
@@ -18,15 +19,42 @@ export const browserProviders: Provider[] = [
   ...sharedProviders,
   provide({
     provide: ENV_USED_TOKEN,
-    useValue: [{ key: 'SENTRY_DSN' }],
+    useValue: [
+      { key: 'SENTRY_DSN' },
+      {
+        key: 'SENTRY_ENVIRONMENT',
+        optional: true,
+      },
+      {
+        key: 'SENTRY_RELEASE',
+        optional: true,
+      },
+    ],
   }),
   provide({
     provide: MICRO_SENTRY_INSTANCE_TOKEN,
-    useFactory: ({ microSentryOptions }) => {
-      return new BrowserMicroSentryClient(microSentryOptions);
+    useFactory: ({ microSentryOptions, envManager }) => {
+      const defaultOptions: BrowserSentryClientOptions = {
+        environment: envManager.get('SENTRY_ENVIRONMENT'),
+        release: envManager.get('SENTRY_RELEASE'),
+        dsn: envManager.get('SENTRY_DSN'),
+      };
+
+      const options = (microSentryOptions ?? []).reduce(
+        (previousOptions, microSentryOptionsItem) => {
+          return {
+            ...previousOptions,
+            ...microSentryOptionsItem,
+          };
+        },
+        defaultOptions
+      );
+
+      return new BrowserMicroSentryClient(options);
     },
     deps: {
-      microSentryOptions: MICRO_SENTRY_OPTIONS_TOKEN,
+      envManager: ENV_MANAGER_TOKEN,
+      microSentryOptions: { token: MICRO_SENTRY_OPTIONS_TOKEN, optional: true },
     },
   }),
   provide({
