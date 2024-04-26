@@ -24,10 +24,10 @@ export const build: Build = {
     const entryBrowserFilename = getBrowserEntryFilename(params);
 
     const input = createInputOptions(params, {
+      browser: true,
       entry: getBrowserSourceFilename(params),
       target: 'ES2019',
       resolveMainFields: ['browser', 'module', 'main'],
-      browser: true,
     });
     const output = createOutputOptions(params, {
       file: buildFileName(params),
