@@ -175,6 +175,7 @@ export const staticApp = async (
     message: `message: pages generated, close application server`,
   });
 
+  // TODO silent kill if serve flag enabled
   server.kill();
 
   context.logger.event({
