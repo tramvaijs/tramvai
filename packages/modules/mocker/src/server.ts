@@ -1,6 +1,11 @@
-import { Module, commandLineListTokens, Scope, provide } from '@tramvai/core';
+import { Module, commandLineListTokens, Scope, provide, DI_TOKEN } from '@tramvai/core';
 import { createPapiMethod } from '@tramvai/papi';
-import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
+import {
+  CLIENT_ENV_REPOSITORY_TOKEN,
+  CONTEXT_TOKEN,
+  ENV_MANAGER_TOKEN,
+  LOGGER_TOKEN,
+} from '@tramvai/tokens-common';
 import { FASTIFY_REQUEST, FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
 import {
   SERVER_MODULE_PAPI_PUBLIC_ROUTE,
@@ -27,7 +32,14 @@ const compatibilityReq = (req: typeof FASTIFY_REQUEST) => {
           provide({
             provide: commandLineListTokens.init,
             multi: true,
-            useFactory: ({ mocker, mockerConfigFactory, envManager, papiPublicUrl, logger }) => {
+            useFactory: ({
+              di,
+              mocker,
+              mockerConfigFactory,
+              envManager,
+              papiPublicUrl,
+              logger,
+            }) => {
               const log = logger('mocker');
 
               return async function mockerInit() {
@@ -67,9 +79,25 @@ const compatibilityReq = (req: typeof FASTIFY_REQUEST) => {
                   // заменяем env переменные, которые получит клиентский код
                   // важно! не сработает для случаев, когда env из серверного кода попадает
                   // в клиентский код через inline скрипт, например `FRONT_LOG_API`
+                  // for backward compatibility
                   envManager.updateClientUsed(clientMockedEnv);
                   // на всякий случай заменяем env переменные в process
                   process.env = Object.assign(process.env, serverMockedEnv);
+
+                  di.register({
+                    provide: commandLineListTokens.customerStart,
+                    useFactory: ({ context, clientEnvRepository }) => {
+                      return function mockerUpdateClientEnv() {
+                        clientEnvRepository.update(clientMockedEnv);
+                        // force client state update with fresh values
+                        context.getStore('environment').setState(clientEnvRepository.getAll());
+                      };
+                    },
+                    deps: {
+                      context: CONTEXT_TOKEN,
+                      clientEnvRepository: CLIENT_ENV_REPOSITORY_TOKEN,
+                    },
+                  });
                 });
 
                 mocker.setApis(apis);
@@ -78,6 +106,7 @@ const compatibilityReq = (req: typeof FASTIFY_REQUEST) => {
               };
             },
             deps: {
+              di: DI_TOKEN,
               mocker: MOCKER,
               logger: LOGGER_TOKEN,
               mockerConfigFactory: MOCKER_CONFIGURATION,

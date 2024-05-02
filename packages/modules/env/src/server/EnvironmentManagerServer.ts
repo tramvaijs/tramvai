@@ -1,6 +1,7 @@
 import noop from '@tinkoff/utils/function/noop';
 import type { EnvParameter } from '@tramvai/tokens-common';
 import { EnvironmentManager } from '../shared/EnvironmentManager';
+import { ClientEnvironmentRepository } from './ClientEnvironmentRepository';
 
 const readFileWithEnv = (path: string) => {
   try {
@@ -15,19 +16,27 @@ const readFileWithEnv = (path: string) => {
 };
 
 export class EnvironmentManagerServer extends EnvironmentManager {
-  private clientUsedList: Record<string, string> = {};
+  private clientEnvRepository: ClientEnvironmentRepository;
 
   constructor(private tokens: EnvParameter[]) {
     super();
     this.processing();
+    // for backward compatibility
+    this.clientEnvRepository = new ClientEnvironmentRepository(this, this.tokens);
   }
 
+  /**
+   * @deprecated use CLIENT_ENV_MANAGER_TOKEN
+   */
   clientUsed() {
-    return this.clientUsedList;
+    return this.clientEnvRepository.getAll();
   }
 
+  /**
+   * @deprecated use CLIENT_ENV_MANAGER_TOKEN
+   */
   updateClientUsed(result: Record<string, string>) {
-    this.clientUsedList = Object.assign(this.clientUsedList, result);
+    this.clientEnvRepository.update(result);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -65,7 +74,7 @@ export class EnvironmentManagerServer extends EnvironmentManager {
     const result: Record<string, string> = {};
     const envParameters = this.collectionEnv();
 
-    this.tokens.forEach(({ key, validator = noop, optional, dehydrate }) => {
+    this.tokens.forEach(({ key, validator = noop, optional }) => {
       const value = envParameters[key];
 
       if (typeof value === 'undefined' && !optional) {
@@ -83,13 +92,10 @@ export class EnvironmentManagerServer extends EnvironmentManager {
       }
 
       result[key] = value;
-
-      if (dehydrate !== false) {
-        this.clientUsedList[key] = value;
-      }
     });
 
-    process.env = envParameters; // Записываем в process.env итоговый результат. TODO убрать позже
+    // sync process.env
+    process.env = envParameters;
 
     this.update(result);
   }
