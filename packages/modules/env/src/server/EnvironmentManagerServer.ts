@@ -29,6 +29,12 @@ export class EnvironmentManagerServer extends EnvironmentManager {
    * @deprecated use CLIENT_ENV_MANAGER_TOKEN
    */
   clientUsed() {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Method ENV_MANAGER_TOKEN.clientUsed is deprecated, use CLIENT_ENV_MANAGER_TOKEN.getAll instead'
+      );
+    }
     return this.clientEnvRepository.getAll();
   }
 
@@ -36,6 +42,12 @@ export class EnvironmentManagerServer extends EnvironmentManager {
    * @deprecated use CLIENT_ENV_MANAGER_TOKEN
    */
   updateClientUsed(result: Record<string, string>) {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Method ENV_MANAGER_TOKEN.updateClientUsed is deprecated, use CLIENT_ENV_MANAGER_TOKEN.update instead'
+      );
+    }
     this.clientEnvRepository.update(result);
   }
 
