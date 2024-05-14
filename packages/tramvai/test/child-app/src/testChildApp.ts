@@ -60,6 +60,7 @@ This test wrapper supports only child-app with name "${childApp.name}"`);
           },
           async init(_) {},
           async load(_) {},
+          async waitFor(_) {},
         },
       }),
     ],

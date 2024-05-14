@@ -1,5 +1,5 @@
 import type { ChildApp } from '@tramvai/child-app-core';
-import { loadModule } from '@tinkoff/module-loader-client';
+import { loadModule, waitModule } from '@tinkoff/module-loader-client';
 import type { ChildAppFinalConfig } from '@tramvai/tokens-child-app';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { Loader } from '../shared/loader';
@@ -74,6 +74,11 @@ export class BrowserLoader extends Loader {
     const container = getModuleFromGlobal(config.client.entry);
 
     if (container) {
+      this.log.debug({
+        event: 'init',
+        moduleName: config.name,
+      });
+
       await initModuleFederation(container);
 
       const factory = (await getModuleFederation(
@@ -91,5 +96,15 @@ export class BrowserLoader extends Loader {
     const entry = container && this.initializedMap.get(container);
 
     return entry && this.resolve(entry);
+  }
+
+  async waitFor(config: ChildAppFinalConfig): Promise<void> {
+    this.log.debug({
+      event: 'wait-for',
+      moduleName: config.name,
+    });
+
+    // wait for entry chunk
+    await waitModule(config.client.entry);
   }
 }

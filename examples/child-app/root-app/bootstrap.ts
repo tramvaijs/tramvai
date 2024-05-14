@@ -53,6 +53,10 @@ createApp({
           key: 'FAKE_API',
           value: 'https://fake-api.com/',
         },
+        {
+          key: 'REACT_SERVER_RENDER_MODE',
+          value: 'sync',
+        },
       ],
     },
     {
@@ -68,6 +72,15 @@ createApp({
         envManager: ENV_MANAGER_TOKEN,
       },
     },
+    provide({
+      provide: 'reactServerRenderMode',
+      useFactory: ({ envManager }) => {
+        return envManager.get('REACT_SERVER_RENDER_MODE') as typeof REACT_SERVER_RENDER_MODE;
+      },
+      deps: {
+        envManager: ENV_MANAGER_TOKEN,
+      },
+    }),
     provide({
       provide: CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
       multi: true,

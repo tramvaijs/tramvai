@@ -9,6 +9,8 @@ export abstract class Loader implements ChildAppLoader {
 
   abstract init(config: ChildAppFinalConfig): Promise<void>;
 
+  abstract waitFor(config: ChildAppFinalConfig): Promise<void>;
+
   protected resolve(entry: ChildAppModuleWrapper) {
     return entry.default;
   }

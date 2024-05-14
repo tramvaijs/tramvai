@@ -3,6 +3,7 @@ import {
   type CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
   type CHILD_APP_PRELOAD_MANAGER_TOKEN,
 } from '@tramvai/tokens-child-app';
+import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import type { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 
 export const runCommand = async ({
@@ -12,6 +13,7 @@ export const runCommand = async ({
   preloader,
   diManager,
   pageService,
+  logger,
 }: {
   status: string;
   forcePreload: boolean;
@@ -19,6 +21,7 @@ export const runCommand = async ({
   preloader: typeof CHILD_APP_PRELOAD_MANAGER_TOKEN;
   diManager: typeof CHILD_APP_DI_MANAGER_TOKEN;
   pageService: typeof PAGE_SERVICE_TOKEN;
+  logger: typeof LOGGER_TOKEN;
 }) => {
   const childApps = preloader.getPreloadedList();
 
@@ -31,5 +34,12 @@ export const runCommand = async ({
 
       return runner.run('client', status, config);
     })
-  );
+  ).catch((error) => {
+    const log = logger('child-app:run-preloaded');
+
+    log.error({
+      event: 'spa-failed',
+      error,
+    });
+  });
 };

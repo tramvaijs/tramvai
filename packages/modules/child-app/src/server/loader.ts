@@ -137,4 +137,8 @@ export class ServerLoader extends Loader {
     }
     return this.loader.getByUrl<LoadableStats>(config.client.statsLoadable);
   }
+
+  async waitFor() {
+    throw Error('Method "waitFor" is not implemented for server loader');
+  }
 }

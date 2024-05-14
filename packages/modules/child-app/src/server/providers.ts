@@ -139,13 +139,21 @@ export const serverProviders: Provider[] = [
   provide({
     provide: commandLineListTokens.resolvePageDeps,
     multi: true,
-    useFactory: ({ preloader }) => {
+    useFactory: ({ preloader, logger }) => {
       return function childAppRunPreloaded() {
-        return preloader.runPreloaded();
+        return preloader.runPreloaded().catch((error) => {
+          const log = logger('child-app:run-preloaded');
+
+          log.error({
+            event: 'server-failed',
+            error,
+          });
+        });
       };
     },
     deps: {
       preloader: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+      logger: LOGGER_TOKEN,
     },
   }),
   provide({

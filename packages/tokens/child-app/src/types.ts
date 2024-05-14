@@ -87,6 +87,7 @@ export interface ChildAppLoader {
   load(config: ChildAppFinalConfig): Promise<ChildApp | void>;
   get(config: ChildAppFinalConfig): ChildApp | void;
   init(config: ChildAppFinalConfig): Promise<void>;
+  waitFor(config: ChildAppFinalConfig): Promise<void>;
 }
 
 export interface ChildAppStateManager {
