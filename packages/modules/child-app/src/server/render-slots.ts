@@ -34,6 +34,11 @@ const entryAttrs = {
   onload: `this.setAttribute('loaded', 'true')`,
   onerror: `this.setAttribute('loaded', 'false')`,
 };
+// for cases when preloaded chunk loading is failed before webpack add this script loading handlers,
+// we need to remove script and webpack will try to load it itself https://github.com/webpack/webpack/issues/14874
+const chunkAttrs = {
+  onerror: `this.remove()`,
+};
 
 export const registerChildAppRenderSlots =
   ({
@@ -77,7 +82,7 @@ export const registerChildAppRenderSlots =
             attrs: {
               'data-critical': 'true',
               ...scriptTypeAttr,
-              ...(isEntry ? entryAttrs : {}),
+              ...(isEntry ? entryAttrs : chunkAttrs),
             },
           });
           break;

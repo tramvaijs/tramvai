@@ -3,8 +3,6 @@ import { declareAction } from '@tramvai/core';
 import cn from './lazy-cmp-unused.module.css';
 import { testStore } from './stores';
 
-console.log(dateFns);
-
 const action = declareAction({
   name: 'action-lazy-unused',
   fn() {
@@ -28,5 +26,7 @@ export const LazyCmp = () => {
 };
 
 LazyCmp.actions = [action];
+
+LazyCmp.dateFns = dateFns;
 
 export default LazyCmp;

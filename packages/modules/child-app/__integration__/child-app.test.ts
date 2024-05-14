@@ -9,6 +9,7 @@ import type { PromiseType } from 'utility-types';
 import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
 import type { start } from '@tramvai/cli';
 import type { startCli } from '@tramvai/test-integration';
+import { waitHydrated } from '@tramvai/test-pw';
 import { testCasesConditions } from './test-cases';
 
 jest.setTimeout(3 * 60 * 1000);
@@ -230,6 +231,34 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
         await page.$eval('#cmp', (node) => (node as HTMLElement).innerText)
       ).toMatchInlineSnapshot(`"Cmp test: update"`);
     });
+
+    if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
+      it('client entry chunk should be loaded before hydration for preloaded', async () => {
+        const { page } = await getPageWrapper();
+
+        page.route('**/*', async (route) => {
+          if (route.request().url().includes('/base/base_client@0.0.0-stub.js')) {
+            // force client entry chunk to load after main application chunks
+            await sleep(200);
+          }
+          return route.continue();
+        });
+
+        const clientEntryPromise = page.waitForResponse((response) =>
+          response.url().includes('/base/base_client@0.0.0-stub.js')
+        );
+        const hydrationPromise = waitHydrated(page);
+
+        const hydrationOrClientChunkRace = Promise.race([
+          hydrationPromise.then(() => 'hydration_complete'),
+          clientEntryPromise.then(() => 'client_entry_loaded'),
+        ]);
+
+        await page.goto(`${rootApp.serverUrl}/base/`);
+
+        expect(await hydrationOrClientChunkRace).toBe('client_entry_loaded');
+      });
+    }
   });
 
   describe('base-not-preloaded', () => {
@@ -257,10 +286,40 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
 
       expect(await getActionCount()).toBe(1);
 
-      router.navigate('/base/');
+      const navigation = router.navigate('/base/');
 
       expect(await getActionCount()).toBe(1);
+
+      await navigation;
     });
+
+    if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
+      it('client entry chunk loaded should not block hydration if not preloaded', async () => {
+        const { page } = await getPageWrapper();
+
+        page.route('**/*', async (route) => {
+          if (route.request().url().includes('/base/base-not-preloaded_client@0.0.0-stub.js')) {
+            // force client entry chunk to load after main application chunks
+            await sleep(200);
+          }
+          return route.continue();
+        });
+
+        const clientEntryPromise = page.waitForResponse((response) =>
+          response.url().includes('/base/base-not-preloaded_client@0.0.0-stub.js')
+        );
+        const hydrationPromise = waitHydrated(page);
+
+        const hydrationOrClientChunkRace = Promise.race([
+          hydrationPromise.then(() => 'hydration_complete'),
+          clientEntryPromise.then(() => 'client_entry_loaded'),
+        ]);
+
+        await page.goto(`${rootApp.serverUrl}/base-not-preloaded/`);
+
+        expect(await hydrationOrClientChunkRace).toBe('hydration_complete');
+      });
+    }
   });
 
   describe('state', () => {
@@ -563,6 +622,32 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
           expect(await page.locator('.application').innerHTML()).toMatchInlineSnapshot(
             `"<!--$--><!--/$--><div>Error page still works</div><div id="error">Child App</div>"`
           );
+        });
+
+        it('client entry chunk should be loaded before hydration for failed preloaded', async () => {
+          const { page } = await getPageWrapper();
+
+          page.route('**/*', async (route) => {
+            if (route.request().url().includes('/error/error_client@0.0.0-stub.js')) {
+              // force client entry chunk to load after main application chunks
+              await sleep(200);
+            }
+            return route.continue();
+          });
+
+          const clientEntryPromise = page.waitForResponse((response) =>
+            response.url().includes('/error/error_client@0.0.0-stub.js')
+          );
+          const hydrationPromise = waitHydrated(page);
+
+          const hydrationOrClientChunkRace = Promise.race([
+            hydrationPromise.then(() => 'hydration_complete'),
+            clientEntryPromise.then(() => 'client_entry_loaded'),
+          ]);
+
+          await page.goto(`${rootApp.serverUrl}/error/?fallback=`);
+
+          expect(await hydrationOrClientChunkRace).toBe('client_entry_loaded');
         });
       });
 

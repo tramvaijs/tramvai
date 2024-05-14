@@ -61,17 +61,27 @@ export const browserProviders: Provider[] = [
   provide({
     provide: commandLineListTokens.resolvePageDeps,
     multi: true,
-    useFactory: ({ preloader }) => {
+    useFactory: ({ preloader, logger }) => {
       let isSpaNavigation = false;
+
       return function childAppRunPreloaded() {
         if (isSpaNavigation) return;
 
         isSpaNavigation = true;
-        return preloader.runPreloaded();
+
+        return preloader.runPreloaded().catch((error) => {
+          const log = logger('child-app:run-preloaded');
+
+          log.error({
+            event: 'client-failed',
+            error,
+          });
+        });
       };
     },
     deps: {
       preloader: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+      logger: LOGGER_TOKEN,
     },
   }),
   provide({
@@ -91,7 +101,7 @@ export const browserProviders: Provider[] = [
   provide({
     provide: commandLineListTokens.spaTransition,
     multi: true,
-    useFactory: ({ preloader, runner, diManager, pageService }) => {
+    useFactory: ({ preloader, runner, diManager, pageService, logger }) => {
       return async function childAppRunPreloaded() {
         await runCommand({
           preloader,
@@ -100,6 +110,7 @@ export const browserProviders: Provider[] = [
           pageService,
           status: 'spa',
           forcePreload: false,
+          logger,
         });
       };
     },
@@ -108,12 +119,13 @@ export const browserProviders: Provider[] = [
       runner: CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
       pageService: PAGE_SERVICE_TOKEN,
+      logger: LOGGER_TOKEN,
     },
   }),
   provide({
     provide: commandLineListTokens.afterSpaTransition,
     multi: true,
-    useFactory: ({ preloader, runner, diManager, pageService }) => {
+    useFactory: ({ preloader, runner, diManager, pageService, logger }) => {
       return async function childAppRunPreloaded() {
         await runCommand({
           preloader,
@@ -122,6 +134,7 @@ export const browserProviders: Provider[] = [
           pageService,
           status: 'afterSpa',
           forcePreload: true,
+          logger,
         });
       };
     },
@@ -130,6 +143,7 @@ export const browserProviders: Provider[] = [
       runner: CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
       pageService: PAGE_SERVICE_TOKEN,
+      logger: LOGGER_TOKEN,
     },
   }),
 ];

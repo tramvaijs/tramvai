@@ -131,6 +131,17 @@ export class PreloadManager implements ChildAppPreloadManager {
     this.currentlyPreloaded.forEach((config) => {
       promises.push(
         (async () => {
+          // double check that preloaded Child App entry chunk is already loaded on the client.
+          // in streaming mode with async scripts it may not be loaded yet, and we need to wait this script.
+          // we don't need to load this script, because for server preloaded Child Apps it already been in HTML,
+          // for not preloaded Child Apps we don't want to delay hydration
+          if (!getModuleFromGlobal(config.client.entry)) {
+            // TODO: current test cases work with `loader.load`, need to be sure that new `loader.waitFor` method is necessary
+            await this.loader.waitFor(config).catch((e) => {
+              // it is expected case if entry chunk is not existed or failed
+            });
+          }
+          // if entry chunk is already loaded, here other Child App chunks will be waited or loaded
           await this.loader.init(config);
           // case for client initialization of Child App
           await this.resolveComponent(config);
@@ -139,7 +150,7 @@ export class PreloadManager implements ChildAppPreloadManager {
       );
     });
 
-    await Promise.all(promises);
+    await Promise.allSettled(promises);
   }
 
   pageRender(): void {
@@ -179,13 +190,8 @@ export class PreloadManager implements ChildAppPreloadManager {
         const config = this.resolveExternalConfig(request);
 
         if (config) {
-          // double check that Child App script is already loaded.
-          // in streaming mode with async scripts it may not be loaded yet,
-          // and we will run client initialization flow for this Child App, like it was not preloaded
-          if (getModuleFromGlobal(config.client.entry)) {
-            this.currentlyPreloaded.set(config.key, config);
-            this.hasPreloadBefore.add(config.key);
-          }
+          this.currentlyPreloaded.set(config.key, config);
+          this.hasPreloadBefore.add(config.key);
         }
       });
 
@@ -195,7 +201,7 @@ export class PreloadManager implements ChildAppPreloadManager {
 
   private async init() {
     await this.resolutionConfigManager.init();
-    this.initServerPreloaded();
+    await this.initServerPreloaded();
   }
 
   private async run(status: string, config: ChildAppFinalConfig) {

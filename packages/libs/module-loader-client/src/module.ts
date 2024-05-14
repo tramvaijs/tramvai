@@ -59,3 +59,21 @@ export function loadModule(jsUrl: string, options: LoadModuleOptions = {}): Prom
       : Promise.resolve(),
   ]);
 }
+
+export function waitModule(jsUrl: string) {
+  const script = findLoadingScript(jsUrl);
+
+  if (script) {
+    const loadedAttr = script.getAttribute('loaded');
+    if (loadedAttr) {
+      return loadedAttr === 'true' ? Promise.resolve() : Promise.reject();
+    }
+
+    return new Promise((resolve, reject) => {
+      script.addEventListener('load', resolve);
+      script.addEventListener('error', reject);
+    });
+  }
+
+  return Promise.reject();
+}
