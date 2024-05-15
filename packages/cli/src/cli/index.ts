@@ -73,6 +73,7 @@ export async function cliInitialized(cliArgs = process.argv) {
     const analytic = new Analytics({
       packageInfo,
       trackingCode: 'UA-122261674-1',
+      enabled: process.env.TRAMVAI_ENABLE_ANALYTICS === 'true',
     });
 
     const configManager = new ConfigManager({ config, syncConfigFile: syncJsonFile });
