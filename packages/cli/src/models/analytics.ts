@@ -20,9 +20,15 @@ interface ErrorEvent extends Event {
 }
 
 export class Analytics {
+  private readonly enabled: boolean;
+
   private visitor: Visitor;
 
   private trackErrorInternal = ({ name, errorMessage, errorStatus }: ErrorEvent, resolve) => {
+    if (!this.enabled) {
+      return;
+    }
+
     this.visitor.event('error', name, errorMessage, errorStatus).send(resolve);
   };
 
@@ -30,6 +36,10 @@ export class Analytics {
     { name, executionTime, label, parameters, category }: ActionEvent,
     resolve
   ) => {
+    if (!this.enabled) {
+      return;
+    }
+
     const path = [category, name, label].join('/');
     const event = this.visitor
       .screenview({ cd: path })
@@ -42,24 +52,30 @@ export class Analytics {
   };
 
   private trackTimingInternal = ({ name, executionTime, category }: ActionEvent, resolve) => {
+    if (!this.enabled) {
+      return;
+    }
+
     this.visitor.timing(category, name, Math.floor(executionTime)).send(resolve);
   };
 
-  trackError = this.promisify(this.trackErrorInternal);
+  private readonly trackError = this.promisify(this.trackErrorInternal);
 
-  // tslint:disable-line member-ordering
-  track = this.promisify(this.trackCommandInternal);
+  private readonly track = this.promisify(this.trackCommandInternal);
 
-  // tslint:disable-line member-ordering
-  trackTiming = this.promisify(this.trackTimingInternal);
+  private readonly trackTiming = this.promisify(this.trackTimingInternal);
 
-  constructor({ trackingCode, packageInfo: { name, version } }) {
-    this.visitor = ua(trackingCode);
+  constructor({ trackingCode, packageInfo: { name, version }, enabled }) {
+    this.enabled = enabled ?? false;
 
-    this.visitor.set('ds', 'app');
-    this.visitor.set('an', name);
-    this.visitor.set('av', version);
-    this.visitor.set('aid', 'tramvai-cli');
+    if (this.enabled) {
+      this.visitor = ua(trackingCode);
+
+      this.visitor.set('ds', 'app');
+      this.visitor.set('an', name);
+      this.visitor.set('av', version);
+      this.visitor.set('aid', 'tramvai-cli');
+    }
   }
 
   trackAfter(actionEvent: ActionEvent) {
@@ -85,7 +101,7 @@ export class Analytics {
   }
 
   private promisify<TEvent>(func: (event: TEvent, resolve: any, ...args) => void) {
-    return function promisifed(event: TEvent, ...args): Promise<void> {
+    return function promisified(event: TEvent, ...args): Promise<void> {
       return new Promise((resolve) => func(event, resolve, ...args));
     };
   }
