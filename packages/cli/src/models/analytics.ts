@@ -26,6 +26,8 @@ export class Analytics {
 
   private trackErrorInternal = ({ name, errorMessage, errorStatus }: ErrorEvent, resolve) => {
     if (!this.enabled) {
+      resolve();
+
       return;
     }
 
@@ -37,6 +39,8 @@ export class Analytics {
     resolve
   ) => {
     if (!this.enabled) {
+      resolve();
+
       return;
     }
 
@@ -53,6 +57,8 @@ export class Analytics {
 
   private trackTimingInternal = ({ name, executionTime, category }: ActionEvent, resolve) => {
     if (!this.enabled) {
+      resolve();
+
       return;
     }
 
