@@ -342,8 +342,15 @@ export class Container {
 
     if (record.multi) {
       this.recordValues.set(record, CIRCULAR);
-      // мульти провайдеры не могут быть optional
-      value = record.multi.map((rec) => this.hydrate(rec, token, false));
+      try {
+        // мульти провайдеры не могут быть optional
+        value = record.multi.map((rec) => this.hydrate(rec, token, false));
+      } catch (e: any) {
+        // reset circular mark for broken multi provider,
+        // otherwise it will be cached and in subsequent calls we will get circular dependency error
+        this.recordValues.set(record, NOT_YET);
+        throw e;
+      }
     } else {
       /* Устаналиваем изначально value к CIRCULAR, для последующего нахождения цикла при резолве депенденси */
       this.recordValues.set(record, CIRCULAR);

@@ -479,6 +479,105 @@ describe('DI Container', () => {
 
       expect(container.get('A')).toBe('success');
     });
+
+    it('circular multi dependencies', () => {
+      const container = new Container();
+      container.register({
+        provide: 'A',
+        useFactory: (a) => {},
+        deps: { B: 'B' },
+      });
+      container.register({
+        provide: 'B',
+        multi: true,
+        useFactory: () => {},
+      });
+      container.register({
+        provide: 'B',
+        multi: true,
+        useFactory: (a) => {},
+        deps: { C: 'C' },
+      });
+      container.register({
+        provide: 'C',
+        useFactory: (a) => {},
+        deps: { A: 'A' },
+      });
+
+      try {
+        container.get('B');
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e.message).toBe('Circular dep for "B" at "A" < C < B');
+        expect(e.type).toBe('CircularDep');
+      }
+    });
+
+    it('error in dependency factory', () => {
+      const container = new Container();
+      container.register({
+        provide: 'A',
+        useFactory: (b) => {},
+        deps: { B: 'B' },
+      });
+      container.register({
+        provide: 'B',
+        useFactory: () => {
+          throw new Error('broken');
+        },
+      });
+
+      try {
+        container.get('B');
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e.message).toBe('broken at "B"');
+      }
+
+      // second call returns same error
+      try {
+        container.get('B');
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e.message).toBe('broken at "B"');
+      }
+    });
+
+    it('error in multi dependency factory, and second call', () => {
+      const container = new Container();
+      container.register({
+        provide: 'A',
+        useFactory: (a) => {},
+        deps: { B: 'B' },
+      });
+      container.register({
+        provide: 'B',
+        multi: true,
+        useFactory: () => {},
+      });
+      container.register({
+        provide: 'B',
+        multi: true,
+        useFactory: () => {
+          throw new Error('broken');
+        },
+      });
+
+      try {
+        container.get('B');
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e.message).toBe('broken at "B"');
+      }
+
+      // second call returns same error
+      try {
+        container.get('B');
+        expect(true).toBe(false);
+      } catch (e) {
+        expect(e.message).toBe('broken at "B"');
+      }
+    });
   });
 
   describe('get optional', () => {
