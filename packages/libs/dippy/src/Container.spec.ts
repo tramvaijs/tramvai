@@ -696,7 +696,87 @@ describe('DI Container', () => {
   });
 
   describe('borrowing tokens', () => {
-    it('base', () => {
+    it('prevent borrow if dependency exists', () => {
+      const from = new Container([
+        {
+          provide: 'dep',
+          useValue: 'from',
+        },
+      ]);
+
+      const container = new Container([
+        {
+          provide: 'dep',
+          useValue: 'container',
+        },
+      ]);
+
+      container.borrowToken(from, 'dep');
+
+      expect(container.get('dep')).toBe('container');
+    });
+
+    it('prevent borrow if fallback exists', () => {
+      const from = new Container([
+        {
+          provide: 'dep',
+          useValue: () => ({}),
+        },
+      ]);
+
+      const container = new Container([], from);
+
+      container.borrowToken(from, 'dep');
+
+      // "dep" exists and value is the same as from fallback
+      expect(container.get('dep')).toBe(from.get('dep'));
+    });
+
+    it('borrow dependency without transitive deps', () => {
+      const from = new Container([
+        {
+          provide: 'dep',
+          useFactory: () => ({}),
+        },
+      ]);
+
+      const container = new Container([]);
+
+      container.borrowToken(from, 'dep');
+
+      // "dep" exists and value is unique
+      expect(container.get('dep')).not.toBe(from.get('dep'));
+    });
+
+    it('borrow dependency with transitive deps, transitive dependency from current di', () => {
+      const from = new Container([
+        {
+          provide: 'dep',
+          useValue: 'from',
+        },
+        {
+          provide: 'test',
+          useFactory: ({ dep }) => {
+            return `test-${dep}`;
+          },
+          deps: {
+            dep: 'dep',
+          },
+        },
+      ]);
+      const container = new Container([
+        {
+          provide: 'dep',
+          useValue: 'container',
+        },
+      ]);
+
+      container.borrowToken(from, 'test');
+
+      expect(container.get('test')).toBe('test-container');
+    });
+
+    it('borrow dependency with transitive deps, transitive dependency from current di overwrite dependency from fallback', () => {
       const from = new Container([
         {
           provide: 'dep',
@@ -727,6 +807,104 @@ describe('DI Container', () => {
       container.borrowToken(from, 'test');
 
       expect(container.get('test')).toBe('test-container');
+    });
+
+    it('borrow dependency with transitive deps, transitive dependency also borrowed (for string token)', () => {
+      const from = new Container([
+        {
+          provide: 'dep',
+          useFactory: () => ({}),
+        },
+        {
+          provide: 'test',
+          useFactory: ({ dep }) => {
+            return 'test';
+          },
+          deps: {
+            dep: 'dep',
+          },
+        },
+      ]);
+      const container = new Container([]);
+
+      container.borrowToken(from, 'test');
+
+      // "dep" exists and value is unique
+      expect(container.get('dep')).not.toBe(from.get('dep'));
+    });
+
+    it('borrow dependency with transitive deps, transitive dependency also borrowed (for createToken)', () => {
+      const dep = createToken();
+
+      const from = new Container([
+        {
+          provide: dep,
+          useFactory: () => ({}),
+        },
+        {
+          provide: 'test',
+          useFactory: ({ dep }) => {
+            return 'test';
+          },
+          deps: {
+            dep,
+          },
+        },
+      ]);
+      const container = new Container([]);
+
+      container.borrowToken(from, 'test');
+
+      // "dep" exists and value is unique
+      expect(container.get(dep)).not.toBe(from.get(dep));
+    });
+
+    it('borrow dependency with transitive deps, transitive dependency also borrowed (for multi provider)', () => {
+      const from = new Container([
+        {
+          provide: 'dep',
+          multi: true,
+          useFactory: () => ({}),
+        },
+        {
+          provide: 'dep',
+          multi: true,
+          useFactory: () => ({}),
+        },
+        {
+          provide: 'dep',
+          multi: true,
+          useFactory: (foo) => ({}),
+          deps: {
+            foo: 'foo',
+          },
+        },
+        {
+          provide: 'foo',
+          useFactory: () => ({}),
+        },
+        {
+          provide: 'test',
+          useFactory: ({ dep }) => {
+            return 'test';
+          },
+          deps: {
+            dep: 'dep',
+          },
+        },
+      ]);
+      const container = new Container([]);
+
+      container.borrowToken(from, 'test');
+
+      // "dep" exists
+      expect(container.get('dep').length).toBe(3);
+      // and value is unique
+      expect(container.get('dep')[0]).not.toBe(from.get('dep')[0]);
+      // and defined
+      expect(container.get('dep')[0]).not.toBe(undefined);
+      // "foo" exists and value is unique
+      expect(container.get('foo')).not.toBe(from.get('foo'));
     });
   });
 });

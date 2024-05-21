@@ -14,7 +14,7 @@ import type {
   MultiTokenInterface,
   OptionalTokenDependency,
 } from './createToken/createToken';
-import { tokenToString } from './createToken/createToken';
+import { tokenToString, TokenClass } from './createToken/createToken';
 
 /**
  * Маркер, который указывает, что значение еще не создано. Для проверки по ссылке.
@@ -157,6 +157,14 @@ function providerToRecord<T>(provider: Provider): RecordProvide<T> {
     } else if (provider.provide.isModernToken && provider.provide.options.scope) {
       scope = provider.provide.options.scope;
     }
+  } else {
+    // this case required to be able to borrow tokens with useValue provider
+    factory = () => provider.useValue;
+    if (provider.scope) {
+      scope = provider.scope;
+    } else if (provider.provide.isModernToken && provider.provide.options.scope) {
+      scope = provider.provide.options.scope;
+    }
   }
   return makeRecord<T>(factory, resolvedDeps, scope, false, (provider as any).__stack);
 }
@@ -266,6 +274,41 @@ export class Container {
       const record = from.getRecord(tokenKey);
 
       if (record) {
+        // without fallback, we need all transitive dependencies to work properly
+        if (!this.fallback) {
+          if (record.resolvedDeps) {
+            for (const key in record.resolvedDeps) {
+              const tokenOrObj = record.resolvedDeps[key];
+
+              if (tokenOrObj instanceof TokenClass) {
+                this.borrowToken(from, tokenOrObj);
+              } else if (typeof tokenOrObj === 'object' && 'token' in tokenOrObj) {
+                this.borrowToken(from, (tokenOrObj as any).token);
+              } else if (typeof tokenOrObj === 'string') {
+                this.borrowToken(from, tokenOrObj);
+              }
+            }
+          }
+          if (record.multi) {
+            for (const multiRecord of record.multi) {
+              this.recordValues.set(multiRecord, NOT_YET);
+
+              if (multiRecord.resolvedDeps) {
+                for (const key in multiRecord.resolvedDeps) {
+                  const tokenOrObj = multiRecord.resolvedDeps[key];
+
+                  if (tokenOrObj instanceof TokenClass) {
+                    this.borrowToken(from, tokenOrObj);
+                  } else if (typeof tokenOrObj === 'object' && 'token' in tokenOrObj) {
+                    this.borrowToken(from, (tokenOrObj as any).token);
+                  } else if (typeof tokenOrObj === 'string') {
+                    this.borrowToken(from, tokenOrObj);
+                  }
+                }
+              }
+            }
+          }
+        }
         this.records.set(tokenKey, record);
         this.recordValues.set(record, NOT_YET);
       }
