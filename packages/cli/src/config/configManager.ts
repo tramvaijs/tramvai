@@ -119,9 +119,12 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
   const disableModernForCsrInDevMode =
     (process.env.TRAMVAI_FORCE_CLIENT_SIDE_RENDERING ||
       appEnv.TRAMVAI_FORCE_CLIENT_SIDE_RENDERING) === 'true' && env === 'development';
-  const modern = disableModernForCsrInDevMode
-    ? false
-    : getOption('modern', [settings, configEntry], true);
+  // For Child Apps and dynamic modules legacy build always used
+  const disableModernForMicrofrontends = type === 'child-app' || type === 'module';
+  const modern =
+    disableModernForCsrInDevMode || disableModernForMicrofrontends
+      ? false
+      : getOption('modern', [settings, configEntry], true);
   const buildType = settings.buildType ?? 'client';
   let target: Target = 'defaults';
 

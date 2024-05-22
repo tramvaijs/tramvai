@@ -2,6 +2,7 @@ import path from 'path';
 import type webpack from 'webpack';
 import type Config from 'webpack-chain';
 import crypto from 'crypto';
+import resolve from 'resolve';
 
 import type { ConfigManager } from '../../../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../../../typings/configEntry/application';
@@ -25,6 +26,10 @@ export const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]
       const packageJsonPath = require.resolve(`${packageName}/package.json`, {
         paths: [relativePath],
       });
+      const packageJsonPathPreservedSymlink = resolve.sync(`${packageName}/package.json`, {
+        basedir: relativePath,
+        preserveSymlinks: true,
+      });
 
       // Include a trailing slash so that a `.startsWith(packagePath)` check avoids false positives
       // when one package name starts with the full name of a different package.
@@ -32,10 +37,16 @@ export const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]
       //   "node_modules/react-slider".startsWith("node_modules/react")  // true
       //   "node_modules/react-slider".startsWith("node_modules/react/") // false
       const directory = path.join(packageJsonPath, '../');
+      // For cases when application built with "--resolveSymlinks false" CLI flag or "resolveSymlinks: false" JS API parameter
+      const directoryPreservedSymlink = path.join(packageJsonPathPreservedSymlink, '../');
 
       // Returning from the function in case the directory has already been added and traversed
       if (topLevelFrameworkPaths.includes(directory)) return;
       topLevelFrameworkPaths.push(directory);
+      // If symlinks are preserved, we need to get both the real path and symlink path
+      if (!topLevelFrameworkPaths.includes(directoryPreservedSymlink)) {
+        topLevelFrameworkPaths.push(directoryPreservedSymlink);
+      }
 
       const dependencies = require(packageJsonPath).dependencies || {};
 

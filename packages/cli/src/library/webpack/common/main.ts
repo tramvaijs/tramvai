@@ -22,6 +22,7 @@ const getConfigCacheNameAdditionalFlags = (configManager: ConfigManager<CliConfi
     configManager.buildType === 'client' && configManager.modern ? 'modern' : '',
     configManager.debug ? 'debug' : '',
     process.env.TRAMVAI_REACT_PROFILE ? 'tramvai_react_profile' : '',
+    configManager.resolveSymlinks ? '' : 'preserve_symlinks',
   ]
     .filter(Boolean)
     .join('-');
