@@ -74,11 +74,11 @@ export const sharedQueryProviders: Provider[] = [
   provide({
     provide: QUERY_DEHYDRATE_STATE_NAME_TOKEN,
     useFactory: ({ childAppConfig, appInfo }) => {
-      return `__REACT_QUERY_STATE__${childAppConfig?.key ?? appInfo.appName}`;
+      return `__REACT_QUERY_STATE__${childAppConfig?.key ?? appInfo?.appName}`;
     },
     deps: {
       childAppConfig: { token: CHILD_APP_INTERNAL_CONFIG_TOKEN, optional: true },
-      appInfo: APP_INFO_TOKEN,
+      appInfo: { token: APP_INFO_TOKEN, optional: true },
     },
   }),
 ];

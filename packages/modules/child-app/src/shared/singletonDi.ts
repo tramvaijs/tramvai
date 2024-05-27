@@ -1,7 +1,9 @@
 import flatten from '@tinkoff/utils/array/flatten';
+import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { Container } from '@tinkoff/dippy';
 import { getModuleParameters, walkOfModules } from '@tramvai/core';
 import type {
+  CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   ChildAppDiManager,
   ChildAppFinalConfig,
   ChildAppLoader,
@@ -14,24 +16,31 @@ import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { getChildProviders } from './child/singletonProviders';
 import { commonModuleStubs } from './child/stubs';
 import { validateChildAppProvider } from './child/validate';
+import { shouldIsolateDi } from './isolatedDi';
+
+type RootDiAccessMode = ExtractDependencyType<typeof CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN>;
 
 export class SingletonDiManager implements ChildAppDiManager {
   private readonly log: ReturnType<typeof LOGGER_TOKEN>;
   private appDi: Container;
   private loader: ChildAppLoader;
+  private rootDiAccessMode?: RootDiAccessMode | null;
   private cache = new Map<string, Container>();
   constructor({
     logger,
     appDi,
     loader,
+    rootDiAccessMode,
   }: {
     logger: typeof LOGGER_TOKEN;
     appDi: Container;
     loader: ChildAppLoader;
+    rootDiAccessMode?: RootDiAccessMode | null;
   }) {
     this.log = logger('child-app:singleton-di-manager');
     this.appDi = appDi;
     this.loader = loader;
+    this.rootDiAccessMode = rootDiAccessMode;
   }
 
   getChildDi(config: ChildAppFinalConfig) {
@@ -70,9 +79,14 @@ export class SingletonDiManager implements ChildAppDiManager {
     if (!children) {
       return;
     }
+    const { modules = [], providers = [], actions = [] } = children;
+    const isolateDi = this.rootDiAccessMode
+      ? shouldIsolateDi(config, this.rootDiAccessMode)
+      : false;
+    let di: Container;
 
-    const di = new Container(
-      [
+    if (isolateDi) {
+      di = new Container([
         {
           provide: CHILD_APP_INTERNAL_CONFIG_TOKEN,
           useValue: config,
@@ -81,11 +95,23 @@ export class SingletonDiManager implements ChildAppDiManager {
           provide: IS_CHILD_APP_DI_TOKEN,
           useValue: true,
         },
-      ],
-      this.appDi
-    );
+      ]);
+    } else {
+      di = new Container(
+        [
+          {
+            provide: CHILD_APP_INTERNAL_CONFIG_TOKEN,
+            useValue: config,
+          },
+          {
+            provide: IS_CHILD_APP_DI_TOKEN,
+            useValue: true,
+          },
+        ],
+        this.appDi
+      );
+    }
 
-    const { modules = [], providers = [], actions = [] } = children;
     // add providers on the Singleton Level to make it possible to reuse providers from the root-app Container
     const childProviders = getChildProviders(this.appDi);
 

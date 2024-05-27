@@ -256,3 +256,26 @@ export type ChildAppPageComponent = ComponentType<{}> & {
 export type ChildAppPageComponentDecl =
   | ChildAppPageComponent
   | LazyComponentWrapper<ChildAppPageComponent>;
+
+export type RootDiAccessMode =
+  | { mode: 'blacklist'; list: string[] }
+  | { mode: 'whitelist'; list: string[] };
+
+/**
+ * @public
+ *
+ * @description
+ * Allows to control access to root di for Child Apps. By default, all Child Apps have access to root di without any restrictions.
+ * Access modes overview:
+ * - `blacklist` - list of Child Apps that are not allowed to access root di as fallback
+ * - `whitelist` - list of Child Apps that are allowed to access root di as fallback
+ *
+ * @example
+ * - allow only for one "header" Child App - `{ mode: 'whitelist', list: ['header'] }`
+ * - allow for all except "header" Child App - `{ mode: 'blacklist', list: ['header'] }`
+ * - allow full access - `{ mode: 'blacklist', list: [] }`
+ * - block any access - `{ mode: 'whitelist', list: [] }`
+ */
+export const CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN = createToken<RootDiAccessMode>(
+  'child-app root di access mode'
+);

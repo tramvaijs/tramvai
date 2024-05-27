@@ -1,8 +1,11 @@
 import type { Provider } from '@tinkoff/dippy';
-import { Scope, DI_TOKEN } from '@tinkoff/dippy';
+import { Scope, DI_TOKEN, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, COMMAND_LINE_RUNNER_TOKEN, provide } from '@tramvai/core';
 import type { ChildAppRequestConfig } from '@tramvai/tokens-child-app';
-import { CHILD_APP_RESOLUTION_CONFIGS_TOKEN } from '@tramvai/tokens-child-app';
+import {
+  CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
+  CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+} from '@tramvai/tokens-child-app';
 import { CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RENDER_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RESOLVE_BASE_URL_TOKEN } from '@tramvai/tokens-child-app';
@@ -144,6 +147,7 @@ export const sharedProviders: Provider[] = [
       logger: LOGGER_TOKEN,
       appDi: DI_TOKEN,
       loader: CHILD_APP_LOADER_TOKEN,
+      rootDiAccessMode: optional(CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN),
     },
   }),
   provide({
@@ -153,6 +157,7 @@ export const sharedProviders: Provider[] = [
       appDi: DI_TOKEN,
       loader: CHILD_APP_LOADER_TOKEN,
       singletonDiManager: CHILD_APP_SINGLETON_DI_MANAGER_TOKEN,
+      rootDiAccessMode: optional(CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN),
     },
   }),
   provide({
