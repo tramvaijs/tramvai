@@ -1,6 +1,8 @@
+import { LEVELS } from '../constants';
+import type { LogObj } from '../logger.h';
 import { RemoteReporter } from './remote';
 
-describe('log/reporters/remote', () => {
+describe('@tinkoff/logger/reporters/remote', () => {
   it('test requestCount behavior', async () => {
     const res = [];
     const makeRequest = jest.fn(() => new Promise((resolve) => res.push(resolve)));
@@ -61,5 +63,46 @@ describe('log/reporters/remote', () => {
     expect(makeRequest).toHaveBeenCalledWith({ type: 'info', message: 'b' });
     await res.shift()();
     await Promise.resolve();
+  });
+
+  it('should log inner errors', async () => {
+    const res: Array<(value?: unknown) => void> = [];
+    const makeRequest = jest.fn(() => new Promise((resolve) => res.push(resolve)));
+
+    jest.runAllTimers();
+
+    const remote = new RemoteReporter({
+      makeRequest,
+    });
+
+    const error = new Error('outer error');
+    Object.assign(error, {
+      cause: new Error('inner error'),
+    });
+
+    const logObj: LogObj = {
+      level: LEVELS.error,
+      name: 'test error',
+      date: new Date(0),
+      type: 'error',
+      remote: true,
+      args: [error],
+    };
+
+    remote.log(logObj);
+
+    expect(res).toHaveLength(1);
+
+    res.shift()?.();
+
+    expect(makeRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.objectContaining({
+          cause: expect.objectContaining({
+            message: expect.stringContaining('inner error'),
+          }),
+        }),
+      })
+    );
   });
 });

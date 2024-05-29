@@ -1,6 +1,7 @@
+import { LEVELS } from '../../constants';
 import { formatError, formatJson } from './formatJson';
 
-describe('reporters/utils/formatJson', () => {
+describe('@tinkoff/logger/reporters/utils/formatJson', () => {
   it('should format errors', () => {
     const message = 'test Message';
     const stack = 'mockStack';
@@ -15,6 +16,64 @@ describe('reporters/utils/formatJson', () => {
       body: '{"biba":1}',
       code: '302',
     });
+  });
+
+  it('should format inner errors', () => {
+    const message = 'test Message';
+    const stack = 'mockStack';
+    const prop = 'prop';
+    const body = { biba: 1 };
+    const code = 302;
+
+    const cause = new Error('inner error');
+    Object.assign(cause, {
+      stack: 'inner error mockStack',
+      code: '301',
+    });
+
+    const error = Object.assign(new Error(message), { stack, prop, body, code, cause });
+
+    expect(formatError(error)).toEqual({
+      message,
+      stack,
+      prop,
+      body: '{"biba":1}',
+      code: '302',
+      cause,
+    });
+  });
+
+  it('should format json of inner errors', () => {
+    const message = 'test Message';
+    const stack = 'mockStack';
+    const prop = 'prop';
+    const body = { biba: 1 };
+    const code = 302;
+
+    const cause = new Error('inner error');
+    Object.assign(cause, {
+      stack: 'inner error mockStack',
+      code: '301',
+    });
+
+    const error = Object.assign(new Error(message), { stack, prop, body, code, cause });
+
+    expect(
+      formatJson({
+        name: 'error with cause',
+        level: LEVELS.error,
+        date: new Date(0),
+        args: [error],
+      })
+    ).toEqual(
+      expect.objectContaining({
+        error: expect.objectContaining({
+          cause: expect.objectContaining({
+            message: 'inner error',
+          }),
+        }),
+      })
+    );
   });
 
   it('should format errors if error is string', () => {

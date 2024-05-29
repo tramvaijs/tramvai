@@ -12,6 +12,32 @@ export const formatError = (error: Error | string) => {
     error = new Error(error);
   }
 
+  // поля message, stack на объекте Error не перечислимые по дефолту,
+  // поэтому явно указываем что они перечислимы,
+  // чтобы JSON.stringify сложил их в результирующую json строку
+  Object.defineProperties(error, {
+    message: {
+      enumerable: true,
+    },
+    stack: {
+      enumerable: true,
+    },
+    cause: {
+      enumerable: true,
+    },
+  });
+
+  if ('cause' in error && typeof error.cause === 'object') {
+    Object.defineProperties(error.cause, {
+      message: {
+        enumerable: true,
+      },
+      stack: {
+        enumerable: true,
+      },
+    });
+  }
+
   return {
     ...error,
     // @ts-ignore
@@ -21,8 +47,6 @@ export const formatError = (error: Error | string) => {
     // если code уже строка - то не делаем stringify т.к. получим экранирование кавычек. Например "\"ABORT_ERR\""
     // @ts-expect-error потому что в error нет поля code
     code: typeof error.code === 'string' ? error.code : safeStringifyJSON(error.code),
-    message: error.message,
-    stack: error.stack,
   };
 };
 

@@ -39,10 +39,33 @@ export class NodeBasicReporter implements Reporter {
     return `  ${parseStack(stack).join('\n  ')}`;
   }
 
+  formatErrorMessage(error: Error) {
+    return [
+      // get a reason string, preferring an error message
+      error.message ?? String(error),
+      this.formatStack(error.stack),
+    ].join('\n');
+  }
+
+  formatError(error: Error) {
+    // @ts-expect-error - typedefinition Error.cause in lib: ["es2022"]
+    if (typeof error.cause === 'object' && error.cause instanceof Error) {
+      return [
+        this.formatErrorMessage(error),
+        // внутренние ошибки добавляем в стектрейс
+        'Caused by:',
+        // @ts-expect-error - typedefinition Error.cause in lib: ["es2022"]
+        this.formatError(error.cause),
+      ].join('\n');
+    }
+
+    return this.formatErrorMessage(error);
+  }
+
   formatArgs(args) {
     const _args = args.map((arg) => {
       if (arg && typeof arg.stack === 'string') {
-        return `${arg.message}\n${this.formatStack(arg.stack)}`;
+        return this.formatError(arg);
       }
       return arg;
     });

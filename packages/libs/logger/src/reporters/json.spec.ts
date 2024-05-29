@@ -12,7 +12,7 @@ const logger = createLoggerFactory({
   reporters: [new JSONReporter({ stream: mockStream } as any)],
 });
 
-describe('log/reporters/json', () => {
+describe('@tinkoff/logger/reporters/json', () => {
   beforeEach(() => {
     mockStream.write.mockClear();
   });
@@ -57,22 +57,37 @@ describe('log/reporters/json', () => {
       ",
         ],
         [
-          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"error":{"message":"arg1","stack":"mockStack"},"message":"arg1"}
+          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"error":{"stack":"mockStack","message":"arg1"},"message":"arg1"}
       ",
         ],
         [
-          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"error":{"message":"arg2","stack":"mockStack"},"message":"custom message"}
+          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"error":{"stack":"mockStack","message":"arg2"},"message":"custom message"}
       ",
         ],
         [
-          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"args":[[1,2],{"a":3}],"error":{"message":"arg3","stack":"mockStack"},"message":"arg3"}
+          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"args":[[1,2],{"a":3}],"error":{"stack":"mockStack","message":"arg3"},"message":"arg3"}
       ",
         ],
         [
-          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"args":[2,{"error":{"message":"arg4","stack":"mockStack"}}],"message":1}
+          "{"date":"1970-01-01T00:00:00.000Z","name":"base test","type":"error","level":10,"args":[2,{"error":{"stack":"mockStack","message":"arg4"}}],"message":1}
       ",
         ],
       ]
     `);
+  });
+
+  it('should log inner errors', () => {
+    const log = logger('error logger');
+
+    logger.setLevel('error');
+
+    const error = new Error('outer error');
+    Object.assign(error, {
+      cause: new Error('inner error'),
+    });
+
+    log.error(error);
+
+    expect(mockStream.write).toBeCalledWith(expect.stringContaining('inner error'));
   });
 });

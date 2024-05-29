@@ -32,7 +32,7 @@ const sixthObjectDepth = {
   },
 };
 
-describe('log/server', () => {
+describe('@tinkoff/logger/reporters/nodeBasic', () => {
   it('default deep is 2', () => {
     const nodeBasicReporter = new NodeBasicReporter();
 
@@ -105,5 +105,18 @@ describe('log/server', () => {
         args: [sixthObjectDepth],
       })
     ).toEqual('{ a: { b: { c: { d: { e: { f: [Object] } } } } } }');
+  });
+
+  it('should log inner error', () => {
+    // @ts-expect-error - typedefinition Error.cause in lib: ["es2022"]
+    const error = new Error('outer error', { cause: new Error('inner error') });
+
+    const nodeBasicReporter = new NodeBasicReporter();
+
+    expect(
+      nodeBasicReporter.formatLogObj({
+        args: [error],
+      })
+    ).toEqual(expect.stringContaining('inner error'));
   });
 });
