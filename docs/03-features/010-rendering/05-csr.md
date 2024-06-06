@@ -5,7 +5,7 @@ title: Client-Side Rendering
 
 Full [Client-Side Rendering (CSR)](https://www.patterns.dev/posts/client-side-rendering/) is **not supported** by `tramvai` framework.
 
-For high load applications with static or closed by authorization pages, there is some good options to use, for example [client rendering mode](#client-mode) - limited ability to render page content only in browser, which can improve page rendering speed in 3-4 times.
+For high load applications with static or closed by authorization pages, there is some good options to use, for example [client rendering mode](03-features/010-rendering/02-page-render-mode.md#client-mode) - limited ability to render page content only in browser, which can improve page rendering speed in 3-4 times.
 
 In this mode, all requests to application server will be handled as usual, but instead of real pages content rendering, we can render only light-weight fallback (spinner, skeleton, etc.) on server. After page loading in browser, full page will be rendered. It is very useful to reduce the load on the application server.
 
