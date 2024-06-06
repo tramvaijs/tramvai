@@ -10,7 +10,7 @@ jobs:
   publish:
     runs-on: ubuntu-20.04
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: release
     steps:
       - uses: actions/checkout@v2
 

@@ -11,7 +11,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git@github.com:Tinkoff/tramvai.gitt"
+    "url": "git+ssh://git@github.com/tramvaijs/tramvai.gitt"
   },
   "scripts": {
     "build": "tramvai-build --forPublish --preserveModules",

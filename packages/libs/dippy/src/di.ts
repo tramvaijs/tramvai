@@ -8,8 +8,8 @@ export { createChildContainer } from './createChildContainer/createChildContaine
 export { Provider, ProviderDep, ProviderDeps, ProvideDepsIterator, OptionsType } from './Provider';
 
 export {
-  createToken,
   optional,
+  createToken,
   OptionalTokenDependency,
   TokenInterface,
   BaseTokenInterface,

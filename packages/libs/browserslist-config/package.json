@@ -12,7 +12,7 @@
   "homepage": "https://github.com/tramvaijs/tramvai",
   "repository": {
     "type": "git",
-    "url": "git@github.com:Tinkoff/tramvai.git"
+    "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
   },
   "sideEffects": false,
   "license": "Apache-2.0"

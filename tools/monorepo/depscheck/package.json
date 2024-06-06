@@ -4,7 +4,7 @@
   "description": "",
   "main": "lib/depscheck.js",
   "typings": "lib/depscheck.d.ts",
-  "repository": "git@github.com:Tinkoff/tramvai.git",
+  "repository": "git+ssh://git@github.com/tramvaijs/tramvai.git",
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

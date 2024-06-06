@@ -5,7 +5,7 @@
   "description": "",
   "repository": {
     "type": "git",
-    "url": "git@github.com:Tinkoff/tramvai.git"
+    "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
   },
   "scripts": {
     "start:root": "cross-env MOCKER_ENABLED=true tramvai start root-app --resolveSymlinks=false",
