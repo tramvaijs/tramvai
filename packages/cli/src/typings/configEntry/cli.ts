@@ -75,6 +75,11 @@ export interface Experiments {
    * @default "terser"
    */
   minifier: OverridableOption<Minifier>;
+  /**
+   * @title automatically resolve [requiredVersion](https://webpack.js.org/plugins/module-federation-plugin/#requiredversion) for shared dependencies
+   * @default false
+   */
+  autoResolveSharedRequiredVersions: boolean;
 }
 
 /**

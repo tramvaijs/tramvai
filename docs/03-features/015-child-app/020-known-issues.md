@@ -113,3 +113,36 @@ createApp({
 
   </TabItem>
 </Tabs>
+
+### No required version specified and unable to automatically determine one
+
+```
+No required version specified and unable to automatically determine one. Unable to find required version for "@tinkoff/dippy" in description file (/root/app/nested/package/package.json). It need to be in dependencies, devDependencies or peerDependencies.
+```
+
+#### Reason
+
+Module Federation always resolve shared dependency version relative to the closest `package.json` for current module.
+
+This error can be caused if:
+- one of shared dependencies, e.g. `@tramvai/core`, imported in application module, e.g. `src/features/package/index.ts`
+- this module has own `package.json` - `src/features/package/package.json` for [code separation between browser and server](guides/universal.md#packagejson)
+- `package.json` does not contain this dependency
+
+This is a valid warning and potentially can lead to unexpected behavior in runtime while dependency resolving.
+
+#### Solution
+
+One way to fix this issue is to specify required version in `package.json` dependencies. It is recommended for separated npm packages.
+
+But for other cases, it can be hard to manually support valid shared dependencies versions in all `package.json` files.
+
+Tramvai can resolve dependency version automatically with experimental parameter `experiments.autoResolveSharedRequiredVersions`:
+
+```json title="tramvai.json"
+{
+  "experiments": {
+    "autoResolveSharedRequiredVersions": true
+  }
+}
+```
