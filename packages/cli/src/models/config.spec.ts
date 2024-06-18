@@ -38,6 +38,7 @@ it('should populate defaults for config', () => {
           },
           "enableFillActionNamePlugin": false,
           "experiments": {
+            "autoResolveSharedRequiredVersions": false,
             "minicss": {
               "useImportModule": true,
             },
@@ -138,6 +139,7 @@ it('should populate defaults for config', () => {
           },
           "enableFillActionNamePlugin": false,
           "experiments": {
+            "autoResolveSharedRequiredVersions": false,
             "minicss": {
               "useImportModule": true,
             },
@@ -277,6 +279,7 @@ it('should populate defaults for overridable options', () => {
           },
           "enableFillActionNamePlugin": false,
           "experiments": {
+            "autoResolveSharedRequiredVersions": false,
             "minicss": {
               "useImportModule": true,
             },
@@ -395,6 +398,7 @@ it('should populate defaults for overridable options', () => {
           },
           "enableFillActionNamePlugin": false,
           "experiments": {
+            "autoResolveSharedRequiredVersions": false,
             "minicss": {
               "useImportModule": true,
             },
