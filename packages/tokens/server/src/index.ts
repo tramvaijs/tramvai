@@ -86,6 +86,7 @@ export const SERVER_TOKEN = createToken<Server>('server');
  */
 export const PROXY_CONFIG_TOKEN = createToken<ProxyConfig>('proxyConfigToken', {
   multi: true,
+  scope: Scope.SINGLETON,
 });
 
 /**
@@ -110,32 +111,40 @@ export const UTILITY_SERVER_PATHS = createToken<string>('server utility paths', 
  * @description
  * Defines port to listen for utility routes
  */
-export const UTILITY_SERVER_PORT_TOKEN = createToken<number>('server utility server port');
+export const UTILITY_SERVER_PORT_TOKEN = createToken<number>('server utility server port', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
  * Custom path for liveness probe
  */
-export const LIVENESS_PATH_TOKEN = createToken<string>('liveness path');
+export const LIVENESS_PATH_TOKEN = createToken<string>('liveness path', { scope: Scope.SINGLETON });
 
 /**
  * @description
  * Custom path for readiness probe
  */
-export const READINESS_PATH_TOKEN = createToken<string>('readiness path');
+export const READINESS_PATH_TOKEN = createToken<string>('readiness path', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description
  * Custom function for k8s readiness, you might want to wait for something before allowing traffic to your app\
  * https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
  */
-export const READINESS_PROBE_TOKEN = createToken<() => Promise<any>>('readiness-probe-fn');
+export const READINESS_PROBE_TOKEN = createToken<() => Promise<any>>('readiness-probe-fn', {
+  scope: Scope.SINGLETON,
+});
 /**
  * @description
  * Custom function for k8s liveness, a function accepting a state and returning a promise indicating service health\
  * https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
  */
-export const LIVENESS_PROBE_TOKEN = createToken<() => Promise<any>>('liveness-probe-fn');
+export const LIVENESS_PROBE_TOKEN = createToken<() => Promise<any>>('liveness-probe-fn', {
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description

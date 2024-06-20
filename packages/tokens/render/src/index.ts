@@ -177,8 +177,10 @@ type ResourceInlineOptions = {
  * * threshold Maximum value (in bytes) of the file which are getting inlined in HTML page
  * * types Types of resources which should be inlined
  */
-export const RESOURCE_INLINE_OPTIONS =
-  createToken<ResourceInlineOptions>('resourceInlineThreshold');
+export const RESOURCE_INLINE_OPTIONS = createToken<ResourceInlineOptions>(
+  'resourceInlineThreshold',
+  { scope: Scope.SINGLETON }
+);
 
 /**
  * @description

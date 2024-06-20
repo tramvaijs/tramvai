@@ -6,4 +6,5 @@ export interface RecordProvide<T> {
   resolvedDeps: Record<string, Provider>;
   scope: ScopeVariants;
   stack?: string;
+  staticValue?: boolean;
 }

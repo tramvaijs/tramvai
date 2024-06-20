@@ -17,7 +17,7 @@ export class ChildContainer extends Container {
     super(undefined, fallback);
     this.root = root;
 
-    this.register({ provide: DI_TOKEN, useValue: this });
+    this.register({ provide: DI_TOKEN, useValue: this, scope: Scope.REQUEST });
     this.register({ provide: IS_DI_CHILD_CONTAINER_TOKEN, useValue: true });
   }
 

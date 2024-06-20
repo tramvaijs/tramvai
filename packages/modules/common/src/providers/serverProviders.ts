@@ -7,6 +7,7 @@ type DiRecord = {
   multi?: any[];
   scope: 'request' | 'singleton';
   stack: string;
+  staticValue?: boolean;
 };
 
 type Node = {
@@ -105,7 +106,12 @@ function detectDiScopesCollisions({
     }
 
     function checkCollision(name: string, record: DiRecord) {
-      if (record.scope !== 'request' || !record.factory || collisions.has(name)) {
+      if (
+        record.scope !== 'request' ||
+        !record.factory ||
+        collisions.has(name) ||
+        record.staticValue
+      ) {
         return;
       }
 

@@ -19,7 +19,7 @@ const metaSpecial = (context, meta) => {
 const dynamicAction = declareAction({
   name: 'dynamicMeta',
   async fn() {
-    await new Promise((res) => setTimeout(res, 200));
+    await new Promise((res) => setTimeout(res, 400));
 
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',

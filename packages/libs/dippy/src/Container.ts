@@ -120,7 +120,8 @@ function makeRecord<T>(
   resolvedDeps: Record<string, Provider>,
   scope: ScopeVariants,
   multi: boolean,
-  stack?: string
+  stack?: string,
+  staticValue?: boolean
 ): RecordProvide<T> {
   return {
     factory,
@@ -128,6 +129,7 @@ function makeRecord<T>(
     scope,
     multi: multi ? [] : undefined,
     stack,
+    staticValue,
   };
 }
 
@@ -135,6 +137,7 @@ function providerToRecord<T>(provider: Provider): RecordProvide<T> {
   let factory;
   let resolvedDeps;
   let scope = (provider.provide.isModernToken && provider.provide.options.scope) ?? Scope.REQUEST;
+  let staticValue = false;
 
   if ('useFactory' in provider) {
     factory = (deps: ProvideDepsIterator<any>) => provider.useFactory(deps);
@@ -160,13 +163,15 @@ function providerToRecord<T>(provider: Provider): RecordProvide<T> {
   } else {
     // this case required to be able to borrow tokens with useValue provider
     factory = () => provider.useValue;
+    // mark record from useValue as static, useful if we need to find collisions only for dynamic dependencies
+    staticValue = true;
     if (provider.scope) {
       scope = provider.scope;
     } else if (provider.provide.isModernToken && provider.provide.options.scope) {
       scope = provider.provide.options.scope;
     }
   }
-  return makeRecord<T>(factory, resolvedDeps, scope, false, (provider as any).__stack);
+  return makeRecord<T>(factory, resolvedDeps, scope, false, (provider as any).__stack, staticValue);
 }
 
 function providerToValue<T>(provider: Provider): T | typeof NOT_YET {
@@ -193,7 +198,7 @@ export class Container {
 
     this.fallback = fallback;
 
-    this.register({ provide: DI_TOKEN, useValue: this });
+    this.register({ provide: DI_TOKEN, useValue: this, scope: Scope.SINGLETON });
   }
 
   get<T>(obj: { token: BaseTokenInterface<T>; optional: true; multi?: false }): T | null;

@@ -1,4 +1,4 @@
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 import type {
   DispatcherContext,
   Event,
@@ -23,7 +23,10 @@ export const DISPATCHER_CONTEXT_TOKEN = createToken<DispatcherContext<any>>('dis
  * @description
  * Token for adding stores that were created with createReducer
  */
-export const COMBINE_REDUCERS = createToken('combineReducers', { multi: true });
+export const COMBINE_REDUCERS = createToken('combineReducers', {
+  multi: true,
+  scope: Scope.SINGLETON,
+});
 
 /**
  * @description

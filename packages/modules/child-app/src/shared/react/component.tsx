@@ -126,15 +126,11 @@ const ChildAppWrapper = ({
 export const ChildApp = memo((config: ChildAppReactConfig) => {
   const { fallback } = config;
 
-  const result = (
-    <UniversalErrorBoundary fallback={fallback as any}>
-      <ChildAppWrapper {...config} />
-    </UniversalErrorBoundary>
-  );
+  let result = <ChildAppWrapper {...config} />;
 
   if (process.env.__TRAMVAI_CONCURRENT_FEATURES) {
-    return <Suspense fallback={<FailedChildAppFallback config={config} />}>{result}</Suspense>;
+    result = <Suspense fallback={<FailedChildAppFallback config={config} />}>{result}</Suspense>;
   }
 
-  return result;
+  return <UniversalErrorBoundary fallback={fallback as any}>{result}</UniversalErrorBoundary>;
 });
