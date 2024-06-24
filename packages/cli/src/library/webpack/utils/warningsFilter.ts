@@ -19,10 +19,14 @@ export const FAILED_TO_PARSE_SM = /Failed to parse source map/;
 export const ASSETS_TOO_BIG =
   /(combined asset size exceeds the recommended limit|exceed the recommended size limit)/;
 
+// Disables warnings for file-system cache, often they occur due to incorrect source-maps in project dependencies
+export const SKIPPED_NOT_SERIALIZABLE_CACHE = /Skipped not serializable cache item/;
+
 export const ignoreWarnings = [
   { message: REQUIRE_EXPRESSION },
   { message: REQUEST_DYNAMIC },
   { message: MODULE_NOT_FOUND },
   { message: FAILED_TO_PARSE_SM },
   { message: ASSETS_TOO_BIG },
+  { message: SKIPPED_NOT_SERIALIZABLE_CACHE },
 ];

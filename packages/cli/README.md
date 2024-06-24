@@ -150,7 +150,7 @@ It is possible to get verbose output almost on every cli command where it is usi
 To do this, you should pass `--verboseWebpack` option to command. Check availability of option with help command.
 
 It will pass `{ logging: 'verbose', loggingDebug: true }` to webpack stats config.  
-Also, it will turn on [infrastructureLogging](https://webpack.js.org/configuration/other-options/#infrastructurelogging) for webpack with options `{ level: 'verbose', debug: /webpack/ }`.
+Also, it will turn on [infrastructureLogging](https://webpack.js.org/configuration/other-options/#infrastructurelogging) for webpack with options `{ level: 'verbose', debug: true }`.
 
 #### Source Maps
 
