@@ -72,7 +72,11 @@ describe('testPageResources', () => {
       ],
     });
 
-    expect(render()!.body).toMatchInlineSnapshot(`""`);
+    expect(render()!.body).toMatchInlineSnapshot(`
+      "
+          <script id="__TRAMVAI_BODY_TAIL__"></script>
+        "
+  `);
 
     await runLine(commandLineListTokens.resolvePageDeps);
 
@@ -80,6 +84,7 @@ describe('testPageResources', () => {
       "
           <script defer="defer" charset="utf-8" crossorigin="anonymous" src="https://scripts.org/script.js"></script>
           <span>I\`m body!!!</span>
+          <script id="__TRAMVAI_BODY_TAIL__"></script>
         "
     `);
   });
