@@ -1,8 +1,9 @@
 import type { Provider } from '@tinkoff/dippy';
 import { isUrl, endsWith, combineValidators } from '@tinkoff/env-validators';
-import { Scope, optional } from '@tinkoff/dippy';
+import { DI_TOKEN, Scope, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import {
+  ASYNC_LOCAL_STORAGE_TOKEN,
   CREATE_CACHE_TOKEN,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
@@ -19,9 +20,11 @@ import {
   RENDER_FLOW_AFTER_TOKEN,
 } from '@tramvai/tokens-render';
 import {
+  CHILD_APP_CONTRACT_MANAGER,
   CHILD_APP_RENDER_MANAGER_TOKEN,
   CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   CHILD_APP_STATE_MANAGER_TOKEN,
+  HOST_PROVIDED_CONTRACTS,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
@@ -38,6 +41,7 @@ import { setPreloaded } from '../shared/store';
 import { RenderManager } from './render';
 import { registerChildAppRenderSlots } from './render-slots';
 import { GLOBAL_CHILD_STATE } from '../shared/constants';
+import { ChildAppContractManager } from '../contracts/contractManager.server';
 
 export const serverProviders: Provider[] = [
   provide({
@@ -166,6 +170,16 @@ export const serverProviders: Provider[] = [
     },
     deps: {
       renderManager: CHILD_APP_RENDER_MANAGER_TOKEN,
+    },
+  }),
+  provide({
+    provide: CHILD_APP_CONTRACT_MANAGER,
+    scope: Scope.SINGLETON,
+    useFactory: (deps) => new ChildAppContractManager(deps),
+    deps: {
+      appDi: DI_TOKEN,
+      asyncLocalStorage: ASYNC_LOCAL_STORAGE_TOKEN,
+      hostProvidedContracts: HOST_PROVIDED_CONTRACTS,
     },
   }),
 ];

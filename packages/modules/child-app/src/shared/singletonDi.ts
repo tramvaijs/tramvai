@@ -1,8 +1,9 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
-import { Container } from '@tinkoff/dippy';
+import { Container, Scope } from '@tinkoff/dippy';
 import { getModuleParameters, walkOfModules } from '@tramvai/core';
 import type {
+  CHILD_APP_CONTRACT_MANAGER,
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   ChildAppDiManager,
   ChildAppFinalConfig,
@@ -14,33 +15,37 @@ import { CHILD_APP_INTERNAL_ACTION_TOKEN } from '@tramvai/tokens-child-app';
 import { CHILD_APP_INTERNAL_CONFIG_TOKEN } from '@tramvai/tokens-child-app';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { getChildProviders } from './child/singletonProviders';
-import { commonModuleStubs } from './child/stubs';
 import { validateChildAppProvider } from './child/validate';
 import { shouldIsolateDi } from './isolatedDi';
 
 type RootDiAccessMode = ExtractDependencyType<typeof CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN>;
+type ContractManager = ExtractDependencyType<typeof CHILD_APP_CONTRACT_MANAGER>;
 
 export class SingletonDiManager implements ChildAppDiManager {
   private readonly log: ReturnType<typeof LOGGER_TOKEN>;
   private appDi: Container;
   private loader: ChildAppLoader;
   private rootDiAccessMode?: RootDiAccessMode | null;
+  private contractManager: ContractManager;
   private cache = new Map<string, Container>();
   constructor({
     logger,
     appDi,
     loader,
     rootDiAccessMode,
+    contractManager,
   }: {
     logger: typeof LOGGER_TOKEN;
     appDi: Container;
     loader: ChildAppLoader;
     rootDiAccessMode?: RootDiAccessMode | null;
+    contractManager: ContractManager;
   }) {
     this.log = logger('child-app:singleton-di-manager');
     this.appDi = appDi;
     this.loader = loader;
     this.rootDiAccessMode = rootDiAccessMode;
+    this.contractManager = contractManager;
   }
 
   getChildDi(config: ChildAppFinalConfig) {
@@ -112,8 +117,11 @@ export class SingletonDiManager implements ChildAppDiManager {
       );
     }
 
+    const statsLoadable =
+      'getLoadableStats' in this.loader ? (this.loader as any).getLoadableStats(config) : undefined;
+
     // add providers on the Singleton Level to make it possible to reuse providers from the root-app Container
-    const childProviders = getChildProviders(this.appDi);
+    const childProviders = getChildProviders(this.appDi, statsLoadable);
 
     childProviders.forEach((provider) => {
       di.register(provider);
@@ -142,6 +150,10 @@ export class SingletonDiManager implements ChildAppDiManager {
       useValue: actions,
     });
 
+    if (isolateDi) {
+      this.contractManager.registerChildContracts(di);
+    }
+
     const borrowTokens = di.get({ token: CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN, optional: true });
 
     if (borrowTokens) {
@@ -149,12 +161,6 @@ export class SingletonDiManager implements ChildAppDiManager {
         di.borrowToken(this.appDi, token);
       });
     }
-
-    commonModuleStubs.forEach((stub) => {
-      if (!di.has(stub.provide)) {
-        di.register(stub);
-      }
-    });
 
     return di;
   }

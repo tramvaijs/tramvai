@@ -279,39 +279,9 @@ export class Container {
       const record = from.getRecord(tokenKey);
 
       if (record) {
-        // without fallback, we need all transitive dependencies to work properly
-        if (!this.fallback) {
-          if (record.resolvedDeps) {
-            for (const key in record.resolvedDeps) {
-              const tokenOrObj = record.resolvedDeps[key];
-
-              if (tokenOrObj instanceof TokenClass) {
-                this.borrowToken(from, tokenOrObj);
-              } else if (typeof tokenOrObj === 'object' && 'token' in tokenOrObj) {
-                this.borrowToken(from, (tokenOrObj as any).token);
-              } else if (typeof tokenOrObj === 'string') {
-                this.borrowToken(from, tokenOrObj);
-              }
-            }
-          }
-          if (record.multi) {
-            for (const multiRecord of record.multi) {
-              this.recordValues.set(multiRecord, NOT_YET);
-
-              if (multiRecord.resolvedDeps) {
-                for (const key in multiRecord.resolvedDeps) {
-                  const tokenOrObj = multiRecord.resolvedDeps[key];
-
-                  if (tokenOrObj instanceof TokenClass) {
-                    this.borrowToken(from, tokenOrObj);
-                  } else if (typeof tokenOrObj === 'object' && 'token' in tokenOrObj) {
-                    this.borrowToken(from, (tokenOrObj as any).token);
-                  } else if (typeof tokenOrObj === 'string') {
-                    this.borrowToken(from, tokenOrObj);
-                  }
-                }
-              }
-            }
+        if (record.multi) {
+          for (const multiRecord of record.multi) {
+            this.recordValues.set(multiRecord, NOT_YET);
           }
         }
         this.records.set(tokenKey, record);

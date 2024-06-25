@@ -1,4 +1,4 @@
-import { DI_TOKEN, Module, provide } from '@tramvai/core';
+import { Module, provide } from '@tramvai/core';
 import { ROUTER_TOKEN } from '@tramvai/tokens-router';
 import { EXTEND_RENDER } from '@tramvai/tokens-render';
 import {

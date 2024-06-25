@@ -1,12 +1,14 @@
 import type { Provider } from '@tinkoff/dippy';
-import { Scope } from '@tinkoff/dippy';
+import { DI_TOKEN, Scope } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import {
+  CHILD_APP_CONTRACT_MANAGER,
   CHILD_APP_DI_MANAGER_TOKEN,
   CHILD_APP_PRELOAD_MANAGER_TOKEN,
   CHILD_APP_RENDER_MANAGER_TOKEN,
   CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
+  HOST_PROVIDED_CONTRACTS,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMON_INITIAL_STATE_TOKEN,
@@ -15,7 +17,7 @@ import {
 } from '@tramvai/tokens-child-app';
 import { LOGGER_TOKEN, STORE_TOKEN } from '@tramvai/tokens-common';
 import { PAGE_SERVICE_TOKEN, ROUTER_TOKEN } from '@tramvai/tokens-router';
-
+import { ChildAppContractManager } from '../contracts/contractManager.browser';
 import { BrowserLoader } from './loader';
 import { PreloadManager } from './preload';
 import { RenderManager } from './render';
@@ -144,6 +146,20 @@ export const browserProviders: Provider[] = [
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
       pageService: PAGE_SERVICE_TOKEN,
       logger: LOGGER_TOKEN,
+    },
+  }),
+  provide({
+    provide: CHILD_APP_CONTRACT_MANAGER,
+    useFactory: (deps) => new ChildAppContractManager(deps),
+    deps: {
+      appDi: DI_TOKEN,
+      hostProvidedContracts: HOST_PROVIDED_CONTRACTS,
+    },
+  }),
+  provide({
+    provide: HOST_PROVIDED_CONTRACTS,
+    useValue: {
+      providedContracts: [CHILD_APP_COMMON_INITIAL_STATE_TOKEN],
     },
   }),
 ];

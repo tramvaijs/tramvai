@@ -32,6 +32,12 @@ export const ACTION_CONDITIONALS = createToken<ActionCondition | ActionCondition
   }
 );
 
+/**
+ * @description
+ * Limit global and page actions execution time on server-side
+ */
+export const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeRun');
+
 export interface ActionsRegistry {
   add(type: string, actions: PageAction | PageAction[]): void;
 

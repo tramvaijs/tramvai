@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import type { Container } from '@tinkoff/dippy';
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 import type { Route } from '@tinkoff/router';
 import type { Command, PageAction } from '@tramvai/core';
 import type { ActionsRegistry, INITIAL_APP_STATE_TOKEN } from '@tramvai/tokens-common';
@@ -20,6 +20,9 @@ import type {
   ChildAppRenderManager,
   ChildAppResolutionConfig,
   ResolutionConfig,
+  HostProvidedContracts,
+  ChildRequiredContracts,
+  ChildAppContractManager,
 } from './types';
 
 export * from './types';
@@ -154,6 +157,14 @@ export const IS_CHILD_APP_DI_TOKEN = createToken<boolean>('child-app isChildApp 
 
 /**
  * @private
+ * @description boolean flag indicating that current child-app version support contracts
+ */
+export const IS_CHILD_APP_CONTRACTS_COMPATIBLE_TOKEN = createToken<boolean>(
+  'child-app contracts compatible'
+);
+
+/**
+ * @private
  * @description Manages Singleton-Scope DIs for every child app
  */
 export const CHILD_APP_SINGLETON_DI_MANAGER_TOKEN = createToken<ChildAppDiManager>(
@@ -277,5 +288,21 @@ export type RootDiAccessMode =
  * - block any access - `{ mode: 'whitelist', list: [] }`
  */
 export const CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN = createToken<RootDiAccessMode>(
-  'child-app root di access mode'
+  'child-app root di access mode',
+  { scope: Scope.SINGLETON }
+);
+
+export const CHILD_APP_CONTRACT_MANAGER = createToken<ChildAppContractManager>(
+  'child-app contract manager',
+  { scope: Scope.SINGLETON }
+);
+
+export const HOST_PROVIDED_CONTRACTS = createToken<HostProvidedContracts>(
+  'child-app host provided contracts',
+  { multi: true, scope: Scope.SINGLETON }
+);
+
+export const CHILD_REQUIRED_CONTRACTS = createToken<ChildRequiredContracts>(
+  'child-app child required contracts',
+  { multi: true, scope: Scope.SINGLETON }
 );

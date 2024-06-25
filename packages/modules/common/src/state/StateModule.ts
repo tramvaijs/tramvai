@@ -1,6 +1,5 @@
 import { Module, provide, Scope } from '@tramvai/core';
 import flatten from '@tinkoff/utils/array/flatten';
-import type { DispatcherContext, Event, Reducer } from '@tramvai/state';
 import { createDispatcher, devTools } from '@tramvai/state';
 import {
   STORE_MIDDLEWARE,
@@ -18,10 +17,7 @@ import {
       scope: Scope.SINGLETON,
       useFactory: ({ stores }) => createDispatcher({ stores: stores && flatten(stores) }),
       deps: {
-        stores: {
-          token: COMBINE_REDUCERS,
-          optional: true,
-        },
+        stores: COMBINE_REDUCERS,
       },
     }),
     provide({

@@ -1,12 +1,4 @@
-import {
-  Module,
-  Scope,
-  ACTIONS_LIST_TOKEN,
-  DI_TOKEN,
-  provide,
-  createToken,
-  optional,
-} from '@tramvai/core';
+import { Module, Scope, ACTIONS_LIST_TOKEN, DI_TOKEN, provide, optional } from '@tramvai/core';
 import {
   LOGGER_TOKEN,
   CONTEXT_TOKEN,
@@ -19,6 +11,7 @@ import {
   EXECUTION_CONTEXT_MANAGER_TOKEN,
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
+  LIMIT_ACTION_GLOBAL_TIME_RUN,
 } from '@tramvai/tokens-common';
 import {
   SERVER_RESPONSE_STREAM,
@@ -40,8 +33,6 @@ import { dynamicCondition } from './conditions/dynamic';
 import { providers as deferredProviders } from './deferred/providers';
 
 export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser, dynamicCondition };
-
-const LIMIT_ACTION_GLOBAL_TIME_RUN = createToken<number>('limitActionGlobalTimeRun');
 
 @Module({
   providers: [

@@ -23,6 +23,9 @@
         "transpilation": {
           "loader": "swc"
         }
+      },
+      "webpack": {
+        "devtool": "eval-cheap-module-source-map"
       }
     },
     "base": {

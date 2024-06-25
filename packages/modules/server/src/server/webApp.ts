@@ -1,7 +1,11 @@
 import fastify from 'fastify';
 import { fastifyCookie } from '@fastify/cookie';
 import fastifyFormBody from '@fastify/formbody';
-import type { EXECUTION_CONTEXT_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
+import type {
+  ASYNC_LOCAL_STORAGE_TOKEN,
+  EXECUTION_CONTEXT_MANAGER_TOKEN,
+  LOGGER_TOKEN,
+} from '@tramvai/tokens-common';
 import { ROOT_EXECUTION_CONTEXT_TOKEN, RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import type { COMMAND_LINE_RUNNER_TOKEN } from '@tramvai/core';
 import { Scope } from '@tramvai/core';
@@ -23,10 +27,16 @@ import type {
   WEB_FASTIFY_APP_METRICS_TOKEN,
 } from '@tramvai/tokens-server-private';
 import { REACT_SERVER_RENDER_MODE, type FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
-import type { ExtractDependencyType } from '@tinkoff/dippy';
+import type { DI_TOKEN, ExtractDependencyType } from '@tinkoff/dippy';
 import { optional, provide } from '@tinkoff/dippy';
 import type { STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN } from '@tramvai/tokens-server';
 import { errorHandler } from './error';
+
+declare module '@tramvai/tokens-common' {
+  export interface AsyncLocalStorageState {
+    tramvaiRequestDi?: ExtractDependencyType<typeof DI_TOKEN>;
+  }
+}
 
 export const webAppFactory = ({ server }: { server: typeof SERVER_TOKEN }) => {
   const app = fastify({
@@ -56,6 +66,8 @@ export const webAppInitCommand = ({
   afterError,
   fetchWebpackStats,
   staticRootErrorBoundaryError,
+  rootDi,
+  asyncLocalStorage,
 }: {
   app: ExtractDependencyType<typeof WEB_FASTIFY_APP_TOKEN>;
   logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
@@ -72,6 +84,8 @@ export const webAppInitCommand = ({
   staticRootErrorBoundaryError: ExtractDependencyType<
     typeof STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN
   >;
+  rootDi: ExtractDependencyType<typeof DI_TOKEN>;
+  asyncLocalStorage: ExtractDependencyType<typeof ASYNC_LOCAL_STORAGE_TOKEN>;
 }) => {
   const log = logger('server:webapp');
 
@@ -121,7 +135,7 @@ export const webAppInitCommand = ({
           });
 
           await executionContextManager.withContext(null, 'root', async (rootExecutionContext) => {
-            const di = await commandLineRunner.run('server', 'customer', [
+            const providers = [
               provide({
                 provide: ROOT_EXECUTION_CONTEXT_TOKEN,
                 useValue: rootExecutionContext,
@@ -136,7 +150,19 @@ export const webAppInitCommand = ({
                 scope: Scope.REQUEST,
                 useValue: reply,
               },
-            ]);
+            ];
+
+            const di = commandLineRunner.resolveDi('server', 'customer', rootDi, providers);
+            const storage = asyncLocalStorage.getStore();
+
+            if (storage) {
+              // save Request DI container to async local storage context for current request
+              // eslint-disable-next-line no-param-reassign
+              storage.tramvaiRequestDi = di;
+            }
+
+            await commandLineRunner.run('server', 'customer', [], di);
+
             const serverResponseStream = di.get(SERVER_RESPONSE_STREAM);
             const serverResponseTaskManager = di.get(SERVER_RESPONSE_TASK_MANAGER);
             const responseManager = di.get(RESPONSE_MANAGER_TOKEN);

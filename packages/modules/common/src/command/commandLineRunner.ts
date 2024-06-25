@@ -24,27 +24,6 @@ import type {
 } from '@tramvai/tokens-common';
 import { ROOT_EXECUTION_CONTEXT_TOKEN } from '@tramvai/tokens-common';
 
-const resolveDi = (
-  type: keyof CommandLines,
-  status: keyof CommandLineDescription,
-  diContainer: Container,
-  providers?: Provider[]
-): Container => {
-  let di = diContainer;
-
-  if (status === 'customer' && type !== 'client') {
-    di = createChildContainer(di);
-  }
-
-  if (providers) {
-    providers.forEach((item) => {
-      return di.register(item);
-    });
-  }
-
-  return di;
-};
-
 type Deps = {
   lines: CommandLines;
   rootDi: Container;
@@ -77,7 +56,7 @@ export class CommandLineRunner implements Interface {
     customDi?: Container,
     key?: string | number
   ) {
-    const di = customDi ?? resolveDi(type, status, this.rootDi, providers);
+    const di = customDi ?? this.resolveDi(type, status, this.rootDi, providers);
     const rootExecutionContext = di.get({ token: ROOT_EXECUTION_CONTEXT_TOKEN, optional: true });
 
     this.log.debug({
@@ -129,6 +108,27 @@ export class CommandLineRunner implements Interface {
         })
         .then(() => di)
     );
+  }
+
+  resolveDi(
+    type: keyof CommandLines,
+    status: keyof CommandLineDescription,
+    rootDi: Container,
+    providers?: Provider[]
+  ): Container {
+    let di = rootDi;
+
+    if (status === 'customer' && type !== 'client') {
+      di = createChildContainer(di);
+    }
+
+    if (providers) {
+      providers.forEach((item) => {
+        return di.register(item);
+      });
+    }
+
+    return di;
   }
 
   resolveExecutionContextFromDi(di: Container): ExecutionContext | null {

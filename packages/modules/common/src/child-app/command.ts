@@ -6,6 +6,10 @@ import {
   CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN,
   commandLineListTokens,
 } from '@tramvai/tokens-child-app';
+import {
+  COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
+  EXECUTION_CONTEXT_MANAGER_TOKEN,
+} from '@tramvai/tokens-common';
 
 const command = {
   customer: [
@@ -31,7 +35,11 @@ export const commandProviders: Provider[] = [
   provide({
     provide: CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN,
     multi: true,
-    useValue: COMMAND_LINE_RUNNER_TOKEN,
+    useValue: [
+      COMMAND_LINE_RUNNER_TOKEN,
+      EXECUTION_CONTEXT_MANAGER_TOKEN,
+      COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
+    ],
   }),
   provide({
     provide: COMMAND_LINES_TOKEN,

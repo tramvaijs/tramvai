@@ -1,10 +1,8 @@
 import flatten from '@tinkoff/utils/array/flatten';
-
 import type { Provider } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import type { NavigationHook, NavigationSyncHook, NavigationGuard } from '@tinkoff/router';
 import { setLogger } from '@tinkoff/router';
-
 import { COMBINE_REDUCERS, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import {
   ROUTER_TOKEN,
@@ -25,7 +23,6 @@ import {
   afterUpdateCurrentHooksToken,
   routeTransformToken,
 } from './tokens';
-
 import { RouterStore } from '../stores/RouterStore';
 import { commonGuards } from './guards/common';
 import { commonHooks } from './hooks/common';

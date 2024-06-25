@@ -10,6 +10,7 @@ import { waitHydrated } from '@tramvai/test-pw';
 
 jest.setTimeout(3 * 60 * 1000);
 
+// TODO: test matrix, run only for latest?
 describe(`Child Apps with streaming`, () => {
   let childAppBase: PromiseType<ReturnType<typeof start>>;
   let childAppError: PromiseType<ReturnType<typeof start>>;

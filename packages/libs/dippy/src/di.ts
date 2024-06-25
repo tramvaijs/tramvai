@@ -5,7 +5,14 @@ export { createContainer } from './createContainer/createContainer';
 export { initContainer } from './initContainer/initContainer';
 export { createChildContainer } from './createChildContainer/createChildContainer';
 
-export { Provider, ProviderDep, ProviderDeps, ProvideDepsIterator, OptionsType } from './Provider';
+export {
+  Provider,
+  ProviderDep,
+  ProviderDeps,
+  ProvideDepsIterator,
+  OptionsType,
+  ScopeVariants,
+} from './Provider';
 
 export {
   optional,

@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { Container, Provider } from '@tinkoff/dippy';
+import type { Container, Provider, TokenInterface, ScopeVariants } from '@tinkoff/dippy';
 import type {
   CommandLines,
   CommandLineDescription,
@@ -121,3 +121,19 @@ export interface RootStateSubscription {
   stores: Array<Store | OptionalStore>;
   listener: (state: Record<string, any>) => void;
 }
+
+export interface ChildAppContractManager {
+  registerChildContracts(childDi: Container): void;
+}
+
+// TODO: for now TokenInterface always resolved as any
+export type Contract = TokenInterface;
+
+export type Contracts = Contract[];
+
+export type ChildRequiredContracts = Contracts;
+
+export type HostProvidedContracts = {
+  childAppName?: string;
+  providedContracts: Contracts;
+};

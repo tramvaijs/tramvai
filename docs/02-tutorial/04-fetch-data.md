@@ -14,7 +14,7 @@ Thanks to this, the minimal possible response time from the server is achieved.
 :::info
 
 The limit of **500ms** is set in the `ActionModule`, and we do not recommend increasing this number.
-But if long responses from your API are the expected behavior, you can overwrite this value via the `limitActionGlobalTimeRun` string token.
+But if long responses from your API are the expected behavior, you can overwrite this value via the `LIMIT_ACTION_GLOBAL_TIME_RUN` string token from `@tramvai/tokens-common` package.
 
 :::
 

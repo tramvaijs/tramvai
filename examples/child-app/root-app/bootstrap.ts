@@ -1,7 +1,7 @@
 import { createApp, provide } from '@tramvai/core';
 import { CommonModule, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module-common';
 import { RenderModule } from '@tramvai/module-render';
-import { SpaRouterModule } from '@tramvai/module-router';
+import { ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
 import { ChildAppModule, CHILD_APP_RESOLUTION_CONFIGS_TOKEN } from '@tramvai/module-child-app';
 import { HTTP_CLIENT_FACTORY, HttpClientModule } from '@tramvai/module-http-client';
@@ -18,6 +18,12 @@ if (typeof window === 'undefined') {
     setDefaultResultOrder('ipv4first');
   }
 }
+
+// support v2.x.x root app version for integraton tests matrix
+const {
+  CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+  HOST_PROVIDED_CONTRACTS,
+} = require('@tramvai/module-child-app');
 
 createApp({
   name: 'root-app',
@@ -45,7 +51,7 @@ createApp({
     MockerModule,
   ],
   providers: [
-    {
+    provide({
       provide: ENV_USED_TOKEN,
       multi: true,
       useValue: [
@@ -57,8 +63,12 @@ createApp({
           key: 'REACT_SERVER_RENDER_MODE',
           value: 'sync',
         },
+        {
+          key: 'CHILD_APP_TEST_ISOLATE_DI',
+          optional: true,
+        },
       ],
-    },
+    }),
     {
       provide: FAKE_API_CLIENT,
       useFactory: ({ factory, envManager }) => {
@@ -81,6 +91,30 @@ createApp({
         envManager: ENV_MANAGER_TOKEN,
       },
     }),
+    ...(CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN && ENV_MANAGER_TOKEN
+      ? [
+          provide({
+            provide: CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+            useFactory: ({ envManager }) => {
+              return {
+                mode: envManager.get('CHILD_APP_TEST_ISOLATE_DI')
+                  ? ('whitelist' as const)
+                  : ('blacklist' as const),
+                list: [],
+              };
+            },
+            deps: {
+              envManager: ENV_MANAGER_TOKEN,
+            },
+          }),
+          provide({
+            provide: HOST_PROVIDED_CONTRACTS,
+            useValue: {
+              providedContracts: [FAKE_API_CLIENT, ROUTES_TOKEN],
+            },
+          }),
+        ]
+      : []),
     provide({
       provide: CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
       multi: true,

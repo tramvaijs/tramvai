@@ -1,12 +1,12 @@
 import type { Container, ExtractDependencyType } from '@tinkoff/dippy';
 import { ChildContainer } from '@tinkoff/dippy';
-import type {
-  ChildAppDiManager,
-  ChildAppLoader,
-  ChildAppFinalConfig,
-  CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+import {
+  type ChildAppDiManager,
+  type ChildAppLoader,
+  type ChildAppFinalConfig,
+  type CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+  type CHILD_APP_CONTRACT_MANAGER,
 } from '@tramvai/tokens-child-app';
-import { getChildProviders } from './child/providers';
 import { shouldIsolateDi } from './isolatedDi';
 
 type RootDiAccessMode = ExtractDependencyType<typeof CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN>;
@@ -67,6 +67,11 @@ export class DiManager implements ChildAppDiManager {
       return;
     }
 
+    // everything is Singleton on client-side, provide the same behaviour as for Root DI - only one container per Child App
+    if (typeof window !== 'undefined') {
+      return singletonDi;
+    }
+
     const isolateDi = this.rootDiAccessMode
       ? shouldIsolateDi(config, this.rootDiAccessMode)
       : false;
@@ -77,16 +82,6 @@ export class DiManager implements ChildAppDiManager {
     } else {
       di = new ChildContainer(singletonDi, this.appDi);
     }
-
-    const statsLoadable =
-      'getLoadableStats' in this.loader ? (this.loader as any).getLoadableStats(config) : undefined;
-
-    // add providers on the Request Level to make it possible to reuse providers from the root-app ChildContainer
-    const childProviders = getChildProviders(this.appDi, statsLoadable);
-
-    childProviders.forEach((provider) => {
-      di.register(provider);
-    });
 
     return di;
   }

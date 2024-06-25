@@ -51,10 +51,7 @@ export const spaHooks: Provider[] = [
       router: ROUTER_TOKEN,
       actionRegistry: ACTION_REGISTRY_TOKEN,
       actionPageRunner: ACTION_PAGE_RUNNER_TOKEN,
-      spaMode: {
-        token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
-        optional: true,
-      },
+      spaMode: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
       deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
       actionExecution: ACTION_EXECUTION_TOKEN,
     },
@@ -74,10 +71,7 @@ export const spaHooks: Provider[] = [
       router: ROUTER_TOKEN,
       actionRegistry: ACTION_REGISTRY_TOKEN,
       actionPageRunner: ACTION_PAGE_RUNNER_TOKEN,
-      spaMode: {
-        token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
-        optional: true,
-      },
+      spaMode: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
     },
   },
 ];

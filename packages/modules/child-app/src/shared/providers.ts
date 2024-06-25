@@ -3,8 +3,10 @@ import { Scope, DI_TOKEN, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, COMMAND_LINE_RUNNER_TOKEN, provide } from '@tramvai/core';
 import type { ChildAppRequestConfig } from '@tramvai/tokens-child-app';
 import {
+  CHILD_APP_CONTRACT_MANAGER,
   CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+  HOST_PROVIDED_CONTRACTS,
 } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RENDER_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
@@ -20,12 +22,20 @@ import {
 import {
   CLEAR_CACHE_TOKEN,
   COMBINE_REDUCERS,
+  COMPONENT_REGISTRY_TOKEN,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
   LOGGER_TOKEN,
   REGISTER_CLEAR_CACHE_TOKEN,
 } from '@tramvai/tokens-common';
 import { EXTEND_RENDER } from '@tramvai/tokens-render';
+import {
+  LINK_PREFETCH_MANAGER_TOKEN,
+  PAGE_SERVICE_TOKEN,
+  ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
+  ROUTER_TOKEN,
+} from '@tramvai/tokens-router';
+import { LIMIT_ACTION_GLOBAL_TIME_RUN } from '@tramvai/tokens-common';
 import { SingletonDiManager } from './singletonDi';
 import { DiManager } from './di';
 import { CommandLineRunner } from './command';
@@ -148,10 +158,12 @@ export const sharedProviders: Provider[] = [
       appDi: DI_TOKEN,
       loader: CHILD_APP_LOADER_TOKEN,
       rootDiAccessMode: optional(CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN),
+      contractManager: CHILD_APP_CONTRACT_MANAGER,
     },
   }),
   provide({
     provide: CHILD_APP_DI_MANAGER_TOKEN,
+    scope: Scope.REQUEST,
     useClass: DiManager,
     deps: {
       appDi: DI_TOKEN,
@@ -239,5 +251,18 @@ export const sharedProviders: Provider[] = [
         optional: true,
       },
     ],
+  }),
+  provide({
+    provide: HOST_PROVIDED_CONTRACTS,
+    useValue: {
+      providedContracts: [
+        ROUTER_TOKEN,
+        COMPONENT_REGISTRY_TOKEN,
+        PAGE_SERVICE_TOKEN,
+        LINK_PREFETCH_MANAGER_TOKEN,
+        ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
+        LIMIT_ACTION_GLOBAL_TIME_RUN,
+      ],
+    },
   }),
 ];

@@ -3,8 +3,10 @@ import type { Container } from '@tinkoff/dippy';
 import type { Provider } from '@tramvai/core';
 import { provide } from '@tramvai/core';
 import {
+  CHILD_APP_COMMON_INITIAL_STATE_TOKEN,
   CHILD_APP_INTERNAL_ROOT_STATE_SUBSCRIPTION_TOKEN,
   CHILD_APP_PAGE_SERVICE_TOKEN,
+  CHILD_REQUIRED_CONTRACTS,
   commandLineListTokens,
 } from '@tramvai/tokens-child-app';
 import { ACTION_PAGE_RUNNER_TOKEN, CONTEXT_TOKEN } from '@tramvai/tokens-common';
@@ -77,10 +79,7 @@ export const getChildProviders = (appDi: Container): Provider[] => {
       deps: {
         actionRunner: ACTION_PAGE_RUNNER_TOKEN,
         childAppPageService: CHILD_APP_PAGE_SERVICE_TOKEN,
-        spaMode: {
-          token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
-          optional: true,
-        },
+        spaMode: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
       },
     }),
     provide({
@@ -100,11 +99,12 @@ export const getChildProviders = (appDi: Container): Provider[] => {
       deps: {
         actionRunner: ACTION_PAGE_RUNNER_TOKEN,
         childAppPageService: CHILD_APP_PAGE_SERVICE_TOKEN,
-        spaMode: {
-          token: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
-          optional: true,
-        },
+        spaMode: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
       },
+    }),
+    provide({
+      provide: CHILD_REQUIRED_CONTRACTS,
+      useValue: [CHILD_APP_COMMON_INITIAL_STATE_TOKEN],
     }),
   ];
 };
