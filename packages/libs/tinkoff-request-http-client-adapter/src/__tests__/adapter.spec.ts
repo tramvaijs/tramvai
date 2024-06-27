@@ -366,6 +366,29 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await terminate();
     });
 
+    it('cached requests include response status code', async () => {
+      const STATUS = 204;
+      const handler: Handler = jest.fn((_, res) => {
+        res.status(STATUS).send();
+      });
+      const { port, terminate } = await startMockServer((app) => {
+        app.get('/json', handler);
+      });
+      const httpClient = createAdapter({
+        logger: loggerFactoryMock,
+        baseUrl: `http://localhost:${port}/`,
+      });
+
+      const { status: first } = await httpClient.request({ path: 'json' });
+      const { status: second } = await httpClient.request({ path: 'json' });
+
+      expect(handler).toBeCalledTimes(1);
+      expect(first).toBe(STATUS);
+      expect(first).toEqual(second);
+
+      await terminate();
+    });
+
     it('cache, disabled', async () => {
       const firstHandler = jest.fn(successHandler);
       const secondHandler = jest.fn(successHandler);
