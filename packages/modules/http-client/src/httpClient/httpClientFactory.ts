@@ -135,9 +135,13 @@ export const httpClientFactory = ({
       adapterOptions.enableCircuitBreaker = !forceDisabledCircuitBreaker;
     }
 
-    // кэшируем инстанс @tinkoff/request
+    // cache @tinkoff/request instance for performance reason
     if (!makeRequestRegistry.has(adapterOptions.name)) {
-      makeRequestRegistry.set(adapterOptions.name, createTinkoffRequest(adapterOptions));
+      const tRequestOptions = { ...adapterOptions };
+      // prevent memory leak, because COMMAND_LINE_EXECUTION_CONTEXT_TOKEN has Request scope and linked to ChildContainer
+      delete tRequestOptions.signal;
+
+      makeRequestRegistry.set(adapterOptions.name, createTinkoffRequest(tRequestOptions));
     }
 
     const makeRequest = makeRequestRegistry.get(adapterOptions.name)!;
