@@ -23,6 +23,7 @@ describe('ssr-async-components', () => {
 
           
           <script></script>
+          <script></script>
           
 
           

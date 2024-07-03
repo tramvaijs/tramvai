@@ -134,11 +134,23 @@ export class PageBuilder {
 
     this.resourcesRegistry.register({
       type: ResourceType.asIs,
+      slot: ResourceSlot.HEAD_PERFORMANCE,
+      payload: `<script>window.__TRAMVAI_HTML_READY_PROMISE__ = new Promise((resolve) => { window.__TRAMVAI_HTML_READY_RESOLVE__ = resolve; });</script>`,
+    });
+
+    this.resourcesRegistry.register({
+      type: ResourceType.asIs,
       slot,
       // String much better than big object, source https://v8.dev/blog/cost-of-javascript-2019#json
       payload: `<script id="__TRAMVAI_STATE__" type="application/json">${safeStringify(
         this.context.dehydrate().dispatcher
       )}</script>`,
+    });
+
+    this.resourcesRegistry.register({
+      type: ResourceType.asIs,
+      slot,
+      payload: `<script>window.__TRAMVAI_HTML_READY__ = true; window.__TRAMVAI_HTML_READY_RESOLVE__();</script>`,
     });
   }
 

@@ -93,6 +93,27 @@ export class App {
   }
 
   async initialization(env: 'server' | 'client', type = 'init' as const) {
+    if (
+      typeof window !== 'undefined' &&
+      !(window as any).__TRAMVAI_HTML_READY__ &&
+      (window as any).__TRAMVAI_HTML_READY_PROMISE__
+    ) {
+      await Promise.race([
+        (window as any).__TRAMVAI_HTML_READY_PROMISE__,
+        new Promise<void>((resolve) => {
+          if (document.readyState === 'complete') {
+            resolve();
+          } else {
+            document.addEventListener('readystatechange', () => {
+              if (document.readyState === 'complete') {
+                resolve();
+              }
+            });
+          }
+        }),
+      ]);
+    }
+
     const logger = this.di.get({ token: LOGGER_TOKEN, optional: true });
     const log = logger?.('tramvai-core');
     const commandLineRunner = this.di.get({ token: COMMAND_LINE_RUNNER_TOKEN, optional: true });
