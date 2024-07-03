@@ -22,7 +22,7 @@ export const providers = [
           (error as any).event = 'initial-state-parse-error';
           (error as any).initialState = initialState;
           (error as any).readyState = document.readyState;
-          (error as any).bodyComplete = !!document.getElementById('__TRAMVAI_BODY_TAIL__');
+          (error as any).bodyComplete = !!(window as any).__TRAMVAI_HTML_READY__;
         }
 
         throw error;

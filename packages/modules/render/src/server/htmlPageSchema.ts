@@ -44,7 +44,6 @@ export const htmlPageSchemaFactory = ({
     dynamicRender(BODY_END),
     dynamicRender(BODY_TAIL_ANALYTICS),
     dynamicRender(BODY_TAIL),
-    staticRender('<script id="__TRAMVAI_BODY_TAIL__"></script>'),
     staticRender('</body>'),
     staticRender('</html>'),
   ];

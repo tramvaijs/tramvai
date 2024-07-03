@@ -17,6 +17,7 @@ exports[`seo ssr test common meta 1`] = `
 
     
     <script></script>
+    <script></script>
     
 
     
@@ -73,6 +74,7 @@ exports[`seo ssr test default meta pack 1`] = `
     
 
     
+    <script></script>
     <script></script>
     
 
@@ -244,6 +246,7 @@ exports[`seo ssr test og meta 1`] = `
 
     
     <script></script>
+    <script></script>
     
 
     
@@ -307,6 +310,7 @@ exports[`seo ssr test twitter meta 1`] = `
     
 
     
+    <script></script>
     <script></script>
     
 
