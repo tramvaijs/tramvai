@@ -25,3 +25,7 @@ String encoding for HTML context - escapes all symbols with possible XSS attack 
 ### `encodeForJSContext`
 
 String encoding for JS context - escapes all symbols with possible XSS attack or breaking code - `<`, `>`, `/`, `\u2028`, `\u2029`
+
+### `encodeForURLContext`
+
+String encoding for URL context - escapes all symbols with possible XSS attack or breaking code, removes `javascript:alert('xss')` and other unsafe protocols (`data:`, `vbscript:`)
