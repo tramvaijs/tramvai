@@ -5,4 +5,5 @@ export * from './removeXss';
 export * from './encode';
 export * from './encodeForHTMLContext';
 export * from './encodeForJSContext';
+export * from './encodeForURLContext';
 export * from './error';

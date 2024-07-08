@@ -36,6 +36,7 @@ DANGEROUS_UNSAFE_ENV_FILES='true' DEV_STATIC='true' ASSETS_PREFIX='http://localh
 ```
 
 About env variables:
+
 - `DANGEROUS_UNSAFE_ENV_FILES` force server to read env variables from `env.development.js`
 - `DEV_STATIC` force server to run static server on `4000` port (all folders from current directory will be served)
 - `ASSETS_PREFIX` points to client code folder on static server
@@ -107,6 +108,22 @@ The DevTools tab will open:
 After all steps, you will see a **Chart** with this requests:
 
 ![DevTools](/img/guides/cpu-profiling/cpu-profile-3-result-chart-all.png)
+
+### How to inspect CPU profile files with CPUpro
+
+One more way to inspect CPU profile files is `cpupro` - a special tool for CPU analysis.
+
+After `.cpuprofile` file was generated, there are few possible ways to inspect it (more usage examples also available in [cpupro](https://github.com/lahmatiy/cpupro?tab=readme-ov-file#usage) official repo)
+
+1. Use [cpupro](https://www.npmjs.com/package/cpupro) npm package with npx to inspect `.cpuprofile` locally in browser, for example:
+
+```bash
+npx cpupro tramvai-cli.[timestamp].cpuprofile
+```
+
+This command will open a new window in your default browser, after this you can inspect your CPU profile. More options that you can use with `cpupro` npm package are described in official [cpupro](https://github.com/lahmatiy/cpupro?tab=readme-ov-file#scenario-2--cli) repository.
+
+2. Use a special viewer for CPU profiles - [https://lahmatiy.github.io/cpupro/](https://lahmatiy.github.io/cpupro/) and utilize a special drop zone to upload previously generated `.cpuprofile` file.
 
 ### Results interpretation
 
