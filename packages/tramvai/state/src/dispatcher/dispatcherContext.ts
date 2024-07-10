@@ -141,6 +141,12 @@ Have you forgot to register reducer or add event handler in existing reducer?
   }
 
   protected storeSubscribe(storeName: string, storeInstance: StoreInstance) {
+    // prevent multiple subscriptions in internal reducer event emitter,
+    // because only last will be saved here in dispatcher and can be unsubscribed
+    if (this.storeUnsubscribeCallbacks[storeName]) {
+      return;
+    }
+
     const subscribeHandler = () => {
       const newState = storeInstance.getState();
 
