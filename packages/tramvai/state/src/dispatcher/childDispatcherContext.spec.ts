@@ -377,6 +377,61 @@ describe('dispatcher/childDispatcherContext', () => {
         expect(listener).toHaveBeenCalledTimes(1);
         expect(listener).toHaveBeenCalledWith({ parent: true, value: 2 });
       });
+
+      it('store registration', async () => {
+        const dispatcher = createDispatcher({ stores: [] });
+        const parentDispatcherContext = new DispatcherContext(
+          createDispatcher({ stores: [parentStore1, parentStore2] }),
+          {},
+          {} as any
+        );
+
+        const context = {};
+        const initialState: any = {};
+        const dc = new ChildDispatcherContext({
+          dispatcher,
+          context,
+          initialState,
+          parentDispatcherContext,
+          parentAllowedStores: [parentStore1, parentStore2],
+        });
+
+        // auto subscription in ChildDispatcherContext constructor
+
+        expect(dc.getState(parentStore1)).toStrictEqual({ parent: true, value: 1 });
+
+        parentDispatcherContext.dispatch(parentEvent1(2));
+
+        expect(dc.getState(parentStore1)).toStrictEqual({ parent: true, value: 2 });
+
+        // manual unsubscription
+
+        dc.unregisterStore(parentStore1);
+
+        parentDispatcherContext.dispatch(parentEvent1(3));
+
+        expect(dc.getState(parentStore1)).toStrictEqual({ parent: true, value: 2 });
+
+        // manual subscription
+
+        dc.registerStore(parentStore1);
+        // emulate `useStore` behaviour in strict mode
+        dc.registerStore(parentStore1);
+
+        parentDispatcherContext.dispatch(parentEvent1(4));
+
+        expect(dc.getState(parentStore1)).toStrictEqual({ parent: true, value: 4 });
+
+        // manual unsubscription after multiple `registerStore` calls
+
+        dc.unregisterStore(parentStore1);
+        // emulate `useStore` behaviour in strict mode
+        expect(() => dc.unregisterStore(parentStore1)).not.toThrow();
+
+        parentDispatcherContext.dispatch(parentEvent1(5));
+
+        expect(dc.getState(parentStore1)).toStrictEqual({ parent: true, value: 4 });
+      });
     });
   });
 });

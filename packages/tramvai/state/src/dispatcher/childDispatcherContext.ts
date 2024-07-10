@@ -91,6 +91,24 @@ export class ChildDispatcherContext<TContext> extends DispatcherContext<TContext
     super.registerStore(store);
   }
 
+  unregisterStore(store: Reducer<any>) {
+    const { storeName } = store;
+
+    if (this.dispatcher.stores[storeName]) {
+      super.unregisterStore(store);
+
+      return;
+    }
+
+    if (this.allowedParentStores.has(storeName)) {
+      this._unsubscribeFromParentAllowedStore(storeName);
+
+      return;
+    }
+
+    super.unregisterStore(store);
+  }
+
   _getParentAllowedStore(storeName: string): InstanceType<StoreClass> | null {
     // use just storeName to prevent store initialization on the root-app side
     const storeInstance = this.parentDispatcherContext.getStore({
@@ -105,5 +123,19 @@ export class ChildDispatcherContext<TContext> extends DispatcherContext<TContext
     this.storeSubscribe(storeName, storeInstance);
 
     return storeInstance;
+  }
+
+  _unsubscribeFromParentAllowedStore(storeName: string) {
+    const storeInstance = this.parentDispatcherContext.getStore({
+      store: storeName,
+      optional: true,
+    });
+
+    if (storeInstance) {
+      // in strict mode, unsubscribe callback in `useStore` is fired twice, with same `addedReducerRef.current` value,
+      // and this callback already will be deleted in first call and throw error `is not a function`, so make it optional
+      this.storeUnsubscribeCallbacks[storeName]?.();
+      delete this.storeUnsubscribeCallbacks[storeName];
+    }
   }
 }
