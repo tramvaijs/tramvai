@@ -19,11 +19,12 @@ export interface CreateMutationOptions<
   Variables,
   Result,
   Deps extends ProviderDeps,
-  Key extends MutationKey<Options, Deps>
+  Key extends MutationKey<Options, Deps>,
+  Context = unknown
 > {
   key?: Key;
 
-  mutationOptions?: UseMutationOptions<Result, any, Variables>;
+  mutationOptions?: UseMutationOptions<Result, any, Variables, Context>;
 
   fn: (
     this: ReactQueryContext<Deps>,
@@ -45,17 +46,21 @@ export interface Mutation<
   Variables,
   Result,
   Deps extends ProviderDeps,
-  Key extends MutationKey<Options, Deps>
+  Key extends MutationKey<Options, Deps>,
+  Context = unknown
 > {
-  [MUTATION_PARAMETERS]: CreateMutationOptions<Options, Variables, Result, Deps, Key>;
+  [MUTATION_PARAMETERS]: CreateMutationOptions<Options, Variables, Result, Deps, Key, Context>;
   fork(
-    options: MutationOptions<Result, Error, Variables, any>
-  ): Mutation<Options, Variables, Result, Deps, Key>;
-  raw(di: Container, options?: Options): UseMutationOptions<Result, Error, Variables>;
+    options: MutationOptions<Result, Error, Variables, Context>
+  ): Mutation<Options, Variables, Result, Deps, Key, Context>;
+  raw(di: Container, options?: Options): UseMutationOptions<Result, Error, Variables, Context>;
   /**
    * @deprecated pass di as first parameter instead of context
    */
-  raw(context: ActionContext, options?: Options): UseMutationOptions<Result, Error, Variables>;
+  raw(
+    context: ActionContext,
+    options?: Options
+  ): UseMutationOptions<Result, Error, Variables, Context>;
 }
 
 export const isMutation = <
@@ -63,11 +68,12 @@ export const isMutation = <
   Variables,
   Result,
   Deps extends ProviderDeps,
-  Key extends MutationKey<Options, Deps>
+  Key extends MutationKey<Options, Deps>,
+  Context
 >(
   arg:
-    | Mutation<Options, Variables, Result, Deps, Key>
-    | MutationOptions<Result, any, Variables, any>
-): arg is Mutation<Options, Variables, Result, Deps, Key> => {
+    | Mutation<Options, Variables, Result, Deps, Key, Context>
+    | MutationOptions<Result, any, Variables, Context>
+): arg is Mutation<Options, Variables, Result, Deps, Key, Context> => {
   return MUTATION_PARAMETERS in arg;
 };

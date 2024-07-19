@@ -7,18 +7,32 @@ import type { Mutation, MutationKey } from './types';
 import { isMutation } from './types';
 
 interface UseMutation {
-  <Options, Variables, Result, Deps extends ProviderDeps, Key extends MutationKey<Options, Deps>>(
+  <
+    Options,
+    Variables,
+    Result,
+    Deps extends ProviderDeps,
+    Key extends MutationKey<Options, Deps>,
+    Context = unknown
+  >(
     Mutation:
-      | UseMutationOptions<Result, any, Variables>
-      | Mutation<Options, Variables, Result, Deps, Key>,
+      | UseMutationOptions<Result, any, Variables, Context>
+      | Mutation<Options, Variables, Result, Deps, Key, Context>,
     options: Options
-  ): UseMutationResult<Result, any, Variables>;
+  ): UseMutationResult<Result, any, Variables, Context>;
 
-  <Options, Variables, Result, Deps extends ProviderDeps, Key extends MutationKey<Options, Deps>>(
+  <
+    Options,
+    Variables,
+    Result,
+    Deps extends ProviderDeps,
+    Key extends MutationKey<Options, Deps>,
+    Context = unknown
+  >(
     Mutation:
-      | UseMutationOptions<Result, any, Variables>
-      | Mutation<Options, Variables, Result, Deps, Key>
-  ): UseMutationResult<Result, any, Variables>;
+      | UseMutationOptions<Result, any, Variables, Context>
+      | Mutation<Options, Variables, Result, Deps, Key, Context>
+  ): UseMutationResult<Result, any, Variables, Context>;
 }
 
 export const useMutation: UseMutation = <
@@ -26,11 +40,12 @@ export const useMutation: UseMutation = <
   Variables,
   Result,
   Deps extends ProviderDeps,
-  Key extends MutationKey<Options, Deps>
+  Key extends MutationKey<Options, Deps>,
+  Context = unknown
 >(
   mutation:
-    | UseMutationOptions<Result, any, Variables>
-    | Mutation<Options, Variables, Result, Deps, Key>,
+    | UseMutationOptions<Result, any, Variables, Context>
+    | Mutation<Options, Variables, Result, Deps, Key, Context>,
   options?: Options
 ) => {
   const di = useDiContainer();
@@ -42,5 +57,5 @@ export const useMutation: UseMutation = <
     return mutation;
   }, [mutation, di, options]);
 
-  return useOriginalMutation<Result, any, Variables>(resultMutation);
+  return useOriginalMutation<Result, any, Variables, Context>(resultMutation);
 };

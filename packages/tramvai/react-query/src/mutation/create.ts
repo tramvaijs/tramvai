@@ -15,12 +15,13 @@ const convertToRawMutation = <
   Variables,
   Result,
   Deps extends ProviderDeps,
-  Key extends MutationKey<Options, Deps>
+  Key extends MutationKey<Options, Deps>,
+  Context = unknown
 >(
-  mutation: Mutation<Options, Variables, Result, Deps, Key>,
+  mutation: Mutation<Options, Variables, Result, Deps, Key, Context>,
   di: Container,
   options?: Options
-): UseMutationOptions<Result, any, Variables> => {
+): UseMutationOptions<Result, any, Variables, Context> => {
   const {
     key = identity,
     fn,
@@ -59,15 +60,16 @@ export const createMutation = <
   Variables,
   Result,
   Deps extends ProviderDeps = {},
-  Key extends MutationKey<Options, Deps> = MutationKey<Options, Deps>
+  Key extends MutationKey<Options, Deps> = MutationKey<Options, Deps>,
+  Context = unknown
 >(
-  mutationParameters: CreateMutationOptions<Options, Variables, Result, Deps, Key>
-): Mutation<Options, Variables, Result, Deps, Key> => {
+  mutationParameters: CreateMutationOptions<Options, Variables, Result, Deps, Key, Context>
+): Mutation<Options, Variables, Result, Deps, Key, Context> => {
   const { mutationOptions } = mutationParameters;
 
-  const mutation: Mutation<Options, Variables, Result, Deps, Key> = {
+  const mutation: Mutation<Options, Variables, Result, Deps, Key, Context> = {
     [MUTATION_PARAMETERS]: mutationParameters,
-    fork: (options: UseMutationOptions<Result, any, Variables>) => {
+    fork: (options: UseMutationOptions<Result, any, Variables, Context>) => {
       return createMutation({
         ...mutationParameters,
         mutationOptions: {
