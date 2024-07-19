@@ -16,7 +16,7 @@ const defaults = [
   'OperaMobile >= 48',
   'FirefoxAndroid >= 119',
   'Samsung >= 7',
-  'Android >= 8',
+  'Android >= 9',
   'UCAndroid >= 13',
 ];
 

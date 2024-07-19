@@ -32,6 +32,21 @@ describe('parameters', () => {
 
     expectTypeOf(data).toEqualTypeOf<number | undefined>();
   });
+
+  it('context type inference', () => {
+    const mutation = createMutation({
+      key: 'test',
+      fn: async () => {},
+      mutationOptions: {
+        onMutate() {
+          return { foo: 'bar' };
+        },
+        onError(error, variables, context) {
+          expectTypeOf(context!.foo).toBeString();
+        },
+      },
+    });
+  });
 });
 
 describe('deps', () => {
