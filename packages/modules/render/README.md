@@ -125,6 +125,37 @@ provide({
 }),
 ```
 
+Under the hood resource inliner cached all fetched resources.
+
+By default cache size are:
+- 300 - for fetched content
+- 300 - for content sizes
+- 300 - for disabled urls of unavailable resources
+
+You can configure cache sizes with `cacheSize`:
+
+```js
+import { RESOURCE_INLINE_OPTIONS } from '@tramvai/tokens-render';
+import { ResourceType } from '@tramvai/tokens-render';
+import { provide } from '@tramvai/core';
+
+provide({
+  provide: RESOURCE_INLINE_OPTIONS,
+  useValue: {
+    types: [ResourceType.script, ResourceType.style], // Turn on for a CSS and JS files
+    threshold: 1024, // 1kb unzipped
+    cacheSize: {
+      files: 50,
+      size: 100,
+      disabledUrl: 150,
+    },
+  },
+}),
+```
+
+Be aware of memory consumption of resources - they are uncompressed. So with 5kb threshold and 1000 entities in cache
+you will get +5Mb on the heap.
+
 #### Peculiarities
 
 All scripts and styles (depending on the settings) registered through the `ResourcesRegistry` are inlined.

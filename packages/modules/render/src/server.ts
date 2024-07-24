@@ -49,6 +49,17 @@ export * from '@tramvai/tokens-render';
 
 const REQUEST_TTL = 5 * 60 * 1000;
 
+/**
+ * @description
+ * Default sizes for resource inliner cache
+ */
+const RESOURCES_REGISTRY_FILES_CACHE_SIZE = 300;
+const RESOURCES_REGISTRY_SIZE_CACHE_SIZE = 300;
+const RESOURCES_REGISTRY_DISABLED_URL_CACHE_SIZE = 300;
+
+const RESOURCES_REGISTRY_FILES_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+const RESOURCES_REGISTRY_SIZE_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+
 export const DEFAULT_POLYFILL_CONDITION =
   '!window.Promise.prototype.finally || !window.URL || !window.AbortController || !window.IntersectionObserver || !Object.fromEntries || !window.ResizeObserver';
 
@@ -66,15 +77,35 @@ export const DEFAULT_POLYFILL_CONDITION =
     provide({
       provide: RESOURCES_REGISTRY_CACHE,
       scope: Scope.SINGLETON,
-      useFactory: ({ createCache }) => {
+      useFactory: ({ createCache, resourceInlineOptions }) => {
+        let filesCacheSize = RESOURCES_REGISTRY_FILES_CACHE_SIZE;
+        let sizeCacheSize = RESOURCES_REGISTRY_SIZE_CACHE_SIZE;
+        let disabledUrlCacheSize = RESOURCES_REGISTRY_DISABLED_URL_CACHE_SIZE;
+
+        if (resourceInlineOptions && resourceInlineOptions.cacheSize) {
+          filesCacheSize = resourceInlineOptions.cacheSize.files;
+          sizeCacheSize = resourceInlineOptions.cacheSize.size;
+          disabledUrlCacheSize = resourceInlineOptions.cacheSize.disabledUrl;
+        }
+
         return {
-          filesCache: createCache('memory', { max: 50 }),
-          sizeCache: createCache('memory', { max: 100 }),
-          disabledUrlsCache: createCache('memory', { max: 150, ttl: REQUEST_TTL }),
+          filesCache: createCache('memory', {
+            max: filesCacheSize,
+            ttl: RESOURCES_REGISTRY_FILES_CACHE_TTL,
+          }),
+          sizeCache: createCache('memory', {
+            max: sizeCacheSize,
+            ttl: RESOURCES_REGISTRY_SIZE_CACHE_TTL,
+          }),
+          disabledUrlsCache: createCache('memory', {
+            max: disabledUrlCacheSize,
+            ttl: REQUEST_TTL,
+          }),
         };
       },
       deps: {
         createCache: CREATE_CACHE_TOKEN,
+        resourceInlineOptions: { token: RESOURCE_INLINE_OPTIONS, optional: true },
       },
     }),
     provide({
@@ -287,6 +318,11 @@ Page Error Boundary will be rendered for the client`,
       useValue: {
         threshold: 40960, // 40kb before gzip, +-10kb after gzip
         types: [ResourceType.style],
+        cacheSize: {
+          files: RESOURCES_REGISTRY_FILES_CACHE_SIZE,
+          size: RESOURCES_REGISTRY_SIZE_CACHE_SIZE,
+          disabledUrl: RESOURCES_REGISTRY_DISABLED_URL_CACHE_SIZE,
+        },
       },
     }),
     provide({

@@ -169,6 +169,23 @@ export type RenderMode = 'legacy' | 'strict' | 'blocking' | 'concurrent';
 type ResourceInlineOptions = {
   threshold: number;
   types: (keyof typeof StorageRecord)[];
+  cacheSize?: {
+    /**
+     * @description
+     * Cache size for fetched resources
+     */
+    files: number;
+    /**
+     * @description
+     * Cache size for fetched resource sizes
+     */
+    size: number;
+    /**
+     * @description
+     * Cache size for disabled urls of unavailable resources
+     */
+    disabledUrl: number;
+  };
 };
 
 /**
