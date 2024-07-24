@@ -73,6 +73,45 @@ We have an article about [streaming rendering](03-features/010-rendering/06-stre
 
 `hydrateRoot` wraps in `startTransition` on the client automatically. See [more](03-features/010-rendering/03-hydration.md).
 
+### SPA-navigations with startTransition
+
+We have experimental support for concurrent rendering with SPA-transitions - all navigations will be wrapped in `startTransition` automatically, and while rendering the next screen, the page will be responsive because the rendering process will be interruptible.
+
+To enable this feature, you need to provide `experiments.reactTransitions` to `tramvai.json` config:
+```json title="tramvai.json"
+{
+  "experiments": {
+    "reactTransitions": true
+  }
+}
+```
+
+:::warn
+
+`reactTransitions` is incompatible with direct [`router` store](03-features/07-routing/03-working-with-url.md#routerstore-reducer) usage in React components.
+
+Bad:
+
+```ts
+const route = useStore(RouterStore);
+```
+
+```ts
+const route = useSelector('router', (state) => state.router);
+```
+
+Good:
+
+```ts
+const route = useRoute();
+```
+
+```ts
+const route = pageService.getCurrentRoute();
+```
+
+:::
+
 ### Suspense in Child App
 
 Each Child App wraps into `Suspense` automatically.
