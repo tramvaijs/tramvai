@@ -34,6 +34,11 @@ interface TinkoffRequestOptions extends HttpClientRequest {
   errorValidator?: RequestValidator;
   // method allows you to modify the error object before sending logs from `@tinkoff/request-plugin-log`
   errorModificator?: RequestValidator;
+  // options for caching based on etag http-header, executes only on server!
+  etagCacheOptions?: {
+    enabled: boolean;
+    lruOptions?: { ttl: number; max: number };
+  };
 }
 ```
 
