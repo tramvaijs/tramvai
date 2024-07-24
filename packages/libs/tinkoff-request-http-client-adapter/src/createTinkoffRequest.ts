@@ -4,6 +4,7 @@ import type { ContextState, Plugin, MakeRequest, Request } from '@tinkoff/reques
 import request from '@tinkoff/request-core';
 import logPlugin from '@tinkoff/request-plugin-log';
 import deduplicateCache from '@tinkoff/request-plugin-cache-deduplicate';
+import etagCache from '@tinkoff/request-plugin-cache-etag';
 import memoryCache from '@tinkoff/request-plugin-cache-memory';
 import validate from '@tinkoff/request-plugin-validate';
 import http, { isNetworkFail, isServerError } from '@tinkoff/request-plugin-protocol-http';
@@ -44,6 +45,10 @@ export interface TinkoffRequestOptions extends HttpClientBaseOptions {
     retryDelay?: number | ((attempt: number) => number);
     maxTimeout?: number;
   };
+  etagCacheOptions?: {
+    enabled: boolean;
+    lruOptions?: { ttl: number; max: number };
+  };
   agent?: {
     http: Agent;
     https: Agent;
@@ -70,6 +75,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     agent,
     querySerializer,
     retryOptions,
+    etagCacheOptions,
     interceptors,
     ...defaults
   } = options;
@@ -187,6 +193,18 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
 
   if (retryOptions) {
     plugins.push(retry(retryOptions));
+  }
+
+  // Executes only on server
+  if (etagCacheOptions?.enabled) {
+    plugins.push(
+      etagCache({
+        shouldExecute: !disableCache,
+        getCacheKey,
+        memoryConstructor: createCache,
+        lruOptions: etagCacheOptions?.lruOptions || { max: 1000, ttl: 10 * 60 * 1000 },
+      })
+    );
   }
 
   plugins.push(

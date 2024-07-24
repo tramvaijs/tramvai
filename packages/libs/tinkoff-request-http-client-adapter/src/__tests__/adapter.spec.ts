@@ -11,6 +11,7 @@ import {
   createCacheMocks,
   mockCacheImplementation,
   clearCacheMocks,
+  createCacheMock,
 } from '../../../../../test/mocks/tramvai/cache';
 
 const { loggerMock, loggerFactoryMock } = createLoggerMocks();
@@ -560,6 +561,207 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       expect(payload).toEqual({ result: 'Not Found' });
 
       await terminate();
+    });
+
+    describe('etag cache', () => {
+      const successEtagHandler: Handler = async (req, res) => {
+        res
+          .header('Etag', `W/"5dca1bec61ab1517853fbbf5a7dd0acd"`)
+          .send({ content: 'any-file-content' });
+      };
+
+      const notModifiedEtagHandler: Handler = async (req, res) => {
+        res.status(304).send();
+      };
+
+      it('default implementation', async () => {
+        const staticFileHandler = jest.fn();
+
+        const applyMockHandlers = (app: Express) => {
+          app.get('/static-file', staticFileHandler);
+        };
+
+        const { port, terminate } = await startMockServer(applyMockHandlers);
+        const httpClient = createAdapter({
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${port}/`,
+          allowStale: false,
+          etagCacheOptions: {
+            enabled: true,
+          },
+        });
+
+        staticFileHandler.mockImplementationOnce(successEtagHandler);
+        const originalResponse = await httpClient.get('static-file');
+
+        // get from memory cache
+        await httpClient.get('static-file');
+
+        // wait until cached results become stale
+        jest.advanceTimersByTime(60 * 1000);
+
+        staticFileHandler.mockImplementationOnce(notModifiedEtagHandler);
+        // get from etag cache
+        const etagCacheResponse = await httpClient.get('static-file');
+
+        expect(etagCacheResponse.payload).toBe(originalResponse.payload);
+
+        // get from memory cache again
+        await httpClient.get('static-file');
+
+        expect(staticFileHandler).toHaveBeenCalledTimes(2);
+
+        await terminate();
+      });
+
+      it('custom implementation', async () => {
+        const memoryCacheMock = createCacheMock();
+        mockCacheImplementation(memoryCacheMock);
+
+        const etagCacheMock = createCacheMock();
+        mockCacheImplementation(etagCacheMock);
+
+        const createCustomCache = jest
+          .fn()
+          .mockReturnValueOnce(memoryCacheMock)
+          .mockReturnValueOnce(etagCacheMock);
+
+        const staticFileHandler = jest.fn();
+
+        const applyMockHandlers = (app: Express) => {
+          app.get('/static-file', staticFileHandler);
+        };
+
+        const { port, terminate } = await startMockServer(applyMockHandlers);
+        const httpClient = createAdapter({
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${port}/`,
+          createCache: createCustomCache,
+          allowStale: false,
+          etagCacheOptions: {
+            enabled: true,
+          },
+        });
+
+        expect(createCustomCache).toHaveBeenCalledTimes(2);
+
+        staticFileHandler.mockImplementationOnce(successEtagHandler);
+        await httpClient.get('static-file');
+
+        expect(memoryCacheMock.set).toHaveBeenCalled();
+        expect(etagCacheMock.set).toHaveBeenCalled();
+
+        await httpClient.get('static-file');
+
+        expect(memoryCacheMock.get).toHaveBeenCalled();
+        expect(etagCacheMock.get).not.toHaveBeenCalled();
+
+        // imitate a case when cached results become stale
+        memoryCacheMock.clear();
+
+        staticFileHandler.mockImplementationOnce(notModifiedEtagHandler);
+        await httpClient.get('static-file');
+
+        expect(etagCacheMock.get).toHaveBeenCalled();
+
+        expect(staticFileHandler).toHaveBeenCalledTimes(2);
+
+        await terminate();
+      });
+
+      it('disableCache disable Etag cache by default', async () => {
+        const staticFileHandler = jest.fn();
+
+        const applyMockHandlers = (app: Express) => {
+          app.get('/static-file', staticFileHandler);
+        };
+
+        const { port, terminate } = await startMockServer(applyMockHandlers);
+        const httpClient = createAdapter({
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${port}/`,
+          allowStale: false,
+          etagCacheOptions: {
+            enabled: true,
+          },
+          disableCache: true,
+        });
+
+        staticFileHandler.mockImplementationOnce(successEtagHandler);
+        await httpClient.get('static-file');
+
+        staticFileHandler.mockImplementationOnce(notModifiedEtagHandler);
+        const request = httpClient.get('static-file');
+
+        await expect(request).rejects.toEqual(expect.objectContaining({ status: 304 }));
+        expect(staticFileHandler).toHaveBeenCalledTimes(2);
+
+        await terminate();
+      });
+
+      it('disableCache allow cache by demand', async () => {
+        const staticFileHandler = jest.fn();
+
+        const applyMockHandlers = (app: Express) => {
+          app.get('/static-file', staticFileHandler);
+        };
+
+        const { port, terminate } = await startMockServer(applyMockHandlers);
+        const httpClient = createAdapter({
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${port}/`,
+          allowStale: false,
+          etagCacheOptions: {
+            enabled: true,
+          },
+          disableCache: true,
+        });
+
+        staticFileHandler.mockImplementationOnce(successEtagHandler);
+        const originalResponse = await httpClient.request({
+          path: 'static-file',
+          etagCache: true,
+        });
+
+        staticFileHandler.mockImplementationOnce(notModifiedEtagHandler);
+        const etagCacheResponse = await httpClient.request({
+          path: 'static-file',
+          etagCache: true,
+        });
+
+        expect(staticFileHandler).toHaveBeenCalledTimes(2);
+        expect(etagCacheResponse.payload).toBe(originalResponse.payload);
+
+        await terminate();
+      });
+
+      it('etagCache, disabled', async () => {
+        const staticFileHandler = jest.fn();
+
+        const applyMockHandlers = (app: Express) => {
+          app.get('/static-file', staticFileHandler);
+        };
+
+        const { port, terminate } = await startMockServer(applyMockHandlers);
+        const httpClient = createAdapter({
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${port}/`,
+          allowStale: false,
+          etagCacheOptions: {
+            enabled: true,
+          },
+        });
+
+        staticFileHandler.mockImplementationOnce(successEtagHandler);
+        await httpClient.request({ path: 'static-file', etagCache: false });
+
+        staticFileHandler.mockImplementationOnce(notModifiedEtagHandler);
+        await httpClient.request({ path: 'static-file', etagCache: false });
+
+        expect(staticFileHandler).toHaveBeenCalledTimes(1);
+
+        await terminate();
+      });
     });
   });
 
