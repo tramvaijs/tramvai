@@ -6,6 +6,12 @@ import { HeaderCmp } from './component';
 // support old Child Apps versions for integration tests matrix
 const { CHILD_REQUIRED_CONTRACTS } = require('@tramvai/child-app-core');
 
+declare module '@tramvai/module-child-app' {
+  export interface TypedContractsRequired {
+    ROUTES_TOKEN: typeof ROUTES_TOKEN;
+  }
+}
+
 // eslint-disable-next-line import/no-default-export
 export default createChildApp({
   name: 'header',

@@ -1,18 +1,22 @@
 import { createApp, provide } from '@tramvai/core';
 import { CommonModule, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module-common';
+import type { REACT_SERVER_RENDER_MODE } from '@tramvai/module-render';
 import { RenderModule } from '@tramvai/module-render';
 import { ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
+import type { TypedContracts, ContractsValidation } from '@tramvai/module-child-app';
 import {
   ChildAppModule,
   CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
   HOST_REQUIRED_CONTRACTS,
+  Assert,
 } from '@tramvai/module-child-app';
 import { HTTP_CLIENT_FACTORY, HttpClientModule } from '@tramvai/module-http-client';
 import { ReactQueryModule } from '@tramvai/module-react-query';
 import { MockerModule } from '@tramvai/module-mocker';
 import { ClientHintsModule } from '@tramvai/module-client-hints';
 import { routes } from './routes';
+import type { MISSED_CHILD_CONTRACT, MISSED_CHILD_CONTRACT_FALLBACK } from '../shared/tokens';
 import {
   FAKE_API_CLIENT,
   MISSED_HOST_CONTRACT,
@@ -34,6 +38,20 @@ const {
   HOST_PROVIDED_CONTRACTS,
   HOST_CONTRACTS_FALLBACK,
 } = require('@tramvai/module-child-app');
+
+declare module '@tramvai/module-child-app' {
+  export interface TypedContractsProvided {
+    FAKE_API_CLIENT: typeof FAKE_API_CLIENT;
+    ROUTES_TOKEN: typeof ROUTES_TOKEN;
+    MISSED_CHILD_CONTRACT: typeof MISSED_CHILD_CONTRACT;
+    MISSED_CHILD_CONTRACT_FALLBACK: typeof MISSED_CHILD_CONTRACT_FALLBACK;
+  }
+}
+
+// support for older root app version for integraton tests matrix
+if (typeof Assert === 'function') {
+  Assert({} as ContractsValidation);
+}
 
 createApp({
   name: 'root-app',

@@ -23,7 +23,8 @@
     "skipLibCheck": true,
     "noEmitOnError": true,
     "importHelpers": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "noErrorTruncation": true
   },
   "ts-node": {
     "transpileOnly": true,
