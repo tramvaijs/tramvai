@@ -1,5 +1,5 @@
 import type { Provider } from '@tinkoff/dippy';
-import { DI_TOKEN, Scope } from '@tinkoff/dippy';
+import { DI_TOKEN, Scope, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import {
   CHILD_APP_CONTRACT_MANAGER,
@@ -9,6 +9,7 @@ import {
   CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
   HOST_PROVIDED_CONTRACTS,
+  HOST_REQUIRED_CONTRACTS,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMON_INITIAL_STATE_TOKEN,
@@ -153,7 +154,9 @@ export const browserProviders: Provider[] = [
     useFactory: (deps) => new ChildAppContractManager(deps),
     deps: {
       appDi: DI_TOKEN,
-      hostProvidedContracts: HOST_PROVIDED_CONTRACTS,
+      hostProvidedContracts: optional(HOST_PROVIDED_CONTRACTS),
+      hostRequiredContracts: optional(HOST_REQUIRED_CONTRACTS),
+      logger: LOGGER_TOKEN,
     },
   }),
   provide({

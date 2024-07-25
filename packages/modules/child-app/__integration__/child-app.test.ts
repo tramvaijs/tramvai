@@ -60,6 +60,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
   let childAppReactQuery: PromiseType<ReturnType<typeof start>>;
   let childAppError: PromiseType<ReturnType<typeof start>> | null;
   let childAppLoadable: PromiseType<ReturnType<typeof start>> | null;
+  let childAppContracts: PromiseType<ReturnType<typeof start>> | null;
   let rootApp: PromiseType<ReturnType<typeof startCli>>;
 
   beforeAll(async () => {
@@ -74,6 +75,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       childAppReactQuery,
       childAppError,
       childAppLoadable,
+      childAppContracts,
     ] = await Promise.all([
       startChildApp('base'),
       startChildApp('state'),
@@ -86,6 +88,9 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       rootAppVersion !== 'v2.0.0' ? startChildApp('error') : null,
       rootAppVersion === 'latest' && childAppsVersion === 'latest'
         ? startChildApp('loadable')
+        : null,
+      rootAppVersion === 'latest' && childAppsVersion === 'latest'
+        ? startChildApp('contracts')
         : null,
     ]);
   });
@@ -135,6 +140,11 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
           return reply.from(
             `${childAppLoadable ? getStaticUrl(childAppLoadable) : 'FAKE'}/loadable/${filename}`
           );
+
+        case 'contracts':
+          return reply.from(
+            `${childAppContracts ? getStaticUrl(childAppContracts) : 'FAKE'}/contracts/${filename}`
+          );
       }
     });
 
@@ -181,6 +191,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       childAppReactQuery.close(),
       childAppError?.close(),
       childAppLoadable?.close(),
+      childAppContracts?.close(),
       rootApp.close(),
     ]);
   });
@@ -988,6 +999,41 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
         expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
           `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li><li>global-client</li><li>lazy-client</li>"`
         );
+      });
+    });
+  }
+
+  if (
+    rootAppVersion === 'latest' &&
+    childAppsVersion === 'latest' &&
+    process.env.CHILD_APP_TEST_ISOLATE_DI
+  ) {
+    describe('contracts', () => {
+      // eslint-disable-next-line jest/expect-expect
+      it('contracts and fallbacks works', async () => {
+        const { page } = await getPageWrapper('/contracts/');
+
+        await page.waitForFunction(() => (window as any).TEST_CHILD_CONTRACT === true);
+
+        const TEST_CHILD_CONTRACT = await page.evaluate(() => (window as any).TEST_CHILD_CONTRACT);
+        const MISSED_CHILD_CONTRACT = await page.evaluate(
+          () => (window as any).MISSED_CHILD_CONTRACT
+        );
+        const MISSED_CHILD_CONTRACT_FALLBACK = await page.evaluate(
+          () => (window as any).MISSED_CHILD_CONTRACT_FALLBACK
+        );
+        const MISSED_HOST_CONTRACT = await page.evaluate(
+          () => (window as any).MISSED_HOST_CONTRACT
+        );
+        const MISSED_HOST_CONTRACT_FALLBACK = await page.evaluate(
+          () => (window as any).MISSED_HOST_CONTRACT_FALLBACK
+        );
+
+        expect(TEST_CHILD_CONTRACT).toEqual(true);
+        expect(MISSED_CHILD_CONTRACT).toEqual(null);
+        expect(MISSED_CHILD_CONTRACT_FALLBACK).toEqual('this is child fallback');
+        expect(MISSED_HOST_CONTRACT).toEqual(null);
+        expect(MISSED_HOST_CONTRACT_FALLBACK).toEqual('this is host fallback');
       });
     });
   }

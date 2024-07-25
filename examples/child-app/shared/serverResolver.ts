@@ -13,6 +13,7 @@ const portMapping = {
   router: 4047,
   state: 4048,
   loadable: 4049,
+  contracts: 4050,
 };
 
 const cliStarts: Array<ReturnType<typeof start>> = [];

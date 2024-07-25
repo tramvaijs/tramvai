@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { Container, Provider, TokenInterface, ScopeVariants } from '@tinkoff/dippy';
+import type { Container, ExtractDependencyType, Provider, TokenInterface } from '@tinkoff/dippy';
 import type {
   CommandLines,
   CommandLineDescription,
@@ -124,6 +124,11 @@ export interface RootStateSubscription {
 
 export interface ChildAppContractManager {
   registerChildContracts(childDi: Container): void;
+  getChildProvidedContract<T extends TokenInterface<any>>(
+    childAppName: string,
+    contract: T
+  ): Promise<ExtractDependencyType<T> | null>;
+  validateChildProvidedContracts(childDi: Container): void;
 }
 
 // TODO: for now TokenInterface always resolved as any
@@ -133,7 +138,24 @@ export type Contracts = Contract[];
 
 export type ChildRequiredContracts = Contracts;
 
+export type ChildProvidedContracts = Contracts;
+
 export type HostProvidedContracts = {
   childAppName?: string;
   providedContracts: Contracts;
 };
+
+export type HostRequiredContracts = {
+  childAppName: string;
+  requiredContracts: Contracts;
+};
+
+export type ChildContractsFallback = (report: {
+  missedContracts: Contract[];
+  childDi: Container;
+}) => void;
+
+export type HostContractsFallback = (report: {
+  missedContracts: Contract[];
+  hostDi: Container;
+}) => void;

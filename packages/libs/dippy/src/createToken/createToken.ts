@@ -68,6 +68,10 @@ export function createToken<T = any>(name?: string, options?: TokenOptions): T {
 /**
  * Helper function to declare a optional token dependency
  */
+export function optional<Token extends MultiTokenInterface<any>>(
+  token: Token
+): { token: Token; optional: true; multi: true };
+
 export function optional<Token extends TokenInterface<any>>(
   token: Token
 ): { token: Token; optional: true } {

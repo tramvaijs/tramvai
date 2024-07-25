@@ -81,6 +81,11 @@
       "name": "loadable",
       "root": "child-apps/loadable",
       "type": "child-app"
+    },
+    "contracts": {
+      "name": "contracts",
+      "root": "child-apps/contracts",
+      "type": "child-app"
     }
   }
 }

@@ -14,7 +14,7 @@ import type {
   MultiTokenInterface,
   OptionalTokenDependency,
 } from './createToken/createToken';
-import { tokenToString, TokenClass } from './createToken/createToken';
+import { tokenToString } from './createToken/createToken';
 
 /**
  * Маркер, который указывает, что значение еще не создано. Для проверки по ссылке.

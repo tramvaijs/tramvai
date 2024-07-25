@@ -152,6 +152,7 @@ export class SingletonDiManager implements ChildAppDiManager {
 
     if (isolateDi) {
       this.contractManager.registerChildContracts(di);
+      this.contractManager.validateChildProvidedContracts(di);
     }
 
     const borrowTokens = di.get({ token: CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN, optional: true });

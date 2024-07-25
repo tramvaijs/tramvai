@@ -23,6 +23,10 @@ import type {
   HostProvidedContracts,
   ChildRequiredContracts,
   ChildAppContractManager,
+  ChildProvidedContracts,
+  HostRequiredContracts,
+  ChildContractsFallback,
+  HostContractsFallback,
 } from './types';
 
 export * from './types';
@@ -297,6 +301,11 @@ export const CHILD_APP_CONTRACT_MANAGER = createToken<ChildAppContractManager>(
   { scope: Scope.SINGLETON }
 );
 
+export const CHILD_PROVIDED_CONTRACTS = createToken<ChildProvidedContracts>(
+  'child-app child provided contracts',
+  { multi: true, scope: Scope.SINGLETON }
+);
+
 export const HOST_PROVIDED_CONTRACTS = createToken<HostProvidedContracts>(
   'child-app host provided contracts',
   { multi: true, scope: Scope.SINGLETON }
@@ -305,4 +314,23 @@ export const HOST_PROVIDED_CONTRACTS = createToken<HostProvidedContracts>(
 export const CHILD_REQUIRED_CONTRACTS = createToken<ChildRequiredContracts>(
   'child-app child required contracts',
   { multi: true, scope: Scope.SINGLETON }
+);
+
+export const HOST_REQUIRED_CONTRACTS = createToken<HostRequiredContracts>(
+  'child-app host required contracts',
+  { multi: true, scope: Scope.SINGLETON }
+);
+
+export const CHILD_CONTRACTS_FALLBACK = createToken<ChildContractsFallback>(
+  'child-app child contracts fallback',
+  {
+    multi: true,
+  }
+);
+
+export const HOST_CONTRACTS_FALLBACK = createToken<HostContractsFallback>(
+  'child-app host contracts fallback',
+  {
+    multi: true,
+  }
 );

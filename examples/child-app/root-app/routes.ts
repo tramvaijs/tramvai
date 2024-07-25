@@ -82,4 +82,11 @@ export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
       unstable_childAppPageComponent: 'BarCmp',
     },
   },
+  {
+    name: 'contracts',
+    path: '/contracts',
+    config: {
+      bundle: 'contracts',
+    },
+  },
 ];

@@ -3,13 +3,22 @@ import { CommonModule, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module
 import { RenderModule } from '@tramvai/module-render';
 import { ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
-import { ChildAppModule, CHILD_APP_RESOLUTION_CONFIGS_TOKEN } from '@tramvai/module-child-app';
+import {
+  ChildAppModule,
+  CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
+  HOST_REQUIRED_CONTRACTS,
+} from '@tramvai/module-child-app';
 import { HTTP_CLIENT_FACTORY, HttpClientModule } from '@tramvai/module-http-client';
 import { ReactQueryModule } from '@tramvai/module-react-query';
 import { MockerModule } from '@tramvai/module-mocker';
 import { ClientHintsModule } from '@tramvai/module-client-hints';
 import { routes } from './routes';
-import { FAKE_API_CLIENT } from '../shared/tokens';
+import {
+  FAKE_API_CLIENT,
+  MISSED_HOST_CONTRACT,
+  MISSED_HOST_CONTRACT_FALLBACK,
+  TEST_CHILD_CONTRACT,
+} from '../shared/tokens';
 
 if (typeof window === 'undefined') {
   const { setDefaultResultOrder } = require('dns');
@@ -23,6 +32,7 @@ if (typeof window === 'undefined') {
 const {
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   HOST_PROVIDED_CONTRACTS,
+  HOST_CONTRACTS_FALLBACK,
 } = require('@tramvai/module-child-app');
 
 createApp({
@@ -38,6 +48,7 @@ createApp({
     router: () => import(/* webpackChunkName: "router" */ './bundles/router'),
     state: () => import(/* webpackChunkName: "state" */ './bundles/state'),
     loadable: () => import(/* webpackChunkName: "loadable" */ './bundles/loadable'),
+    contracts: () => import(/* webpackChunkName: "contracts" */ './bundles/contracts'),
   },
   modules: [
     CommonModule,
@@ -111,6 +122,37 @@ createApp({
             provide: HOST_PROVIDED_CONTRACTS,
             useValue: {
               providedContracts: [FAKE_API_CLIENT, ROUTES_TOKEN],
+            },
+          }),
+          provide({
+            provide: HOST_REQUIRED_CONTRACTS,
+            useValue: {
+              childAppName: 'contracts',
+              requiredContracts: [
+                TEST_CHILD_CONTRACT,
+                MISSED_HOST_CONTRACT,
+                MISSED_HOST_CONTRACT_FALLBACK,
+              ],
+            },
+          }),
+          provide({
+            provide: HOST_CONTRACTS_FALLBACK,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+            useFactory: (): import('@tramvai/module-child-app').HostContractsFallback => {
+              return ({ hostDi, missedContracts }) => {
+                console.log('missed host contracts', missedContracts);
+
+                missedContracts.forEach((contract) => {
+                  if (contract === MISSED_HOST_CONTRACT_FALLBACK) {
+                    hostDi.register(
+                      provide({
+                        provide: MISSED_HOST_CONTRACT_FALLBACK,
+                        useValue: () => 'this is host fallback',
+                      })
+                    );
+                  }
+                });
+              };
             },
           }),
         ]
@@ -213,6 +255,15 @@ createApp({
           byTag: {
             latest: {
               version: '0.0.0-stub',
+            },
+          },
+        },
+        {
+          name: 'contracts',
+          byTag: {
+            latest: {
+              version: '0.0.0-stub',
+              withoutCss: true,
             },
           },
         },

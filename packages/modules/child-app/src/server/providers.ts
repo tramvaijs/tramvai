@@ -25,6 +25,7 @@ import {
   CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   CHILD_APP_STATE_MANAGER_TOKEN,
   HOST_PROVIDED_CONTRACTS,
+  HOST_REQUIRED_CONTRACTS,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
@@ -179,7 +180,9 @@ export const serverProviders: Provider[] = [
     deps: {
       appDi: DI_TOKEN,
       asyncLocalStorage: ASYNC_LOCAL_STORAGE_TOKEN,
-      hostProvidedContracts: HOST_PROVIDED_CONTRACTS,
+      hostProvidedContracts: optional(HOST_PROVIDED_CONTRACTS),
+      hostRequiredContracts: optional(HOST_REQUIRED_CONTRACTS),
+      logger: LOGGER_TOKEN,
     },
   }),
 ];
