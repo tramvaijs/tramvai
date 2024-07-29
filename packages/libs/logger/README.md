@@ -135,6 +135,25 @@ logger.addFilter(filter as Filter); // add new filter to list of previously adde
 logger.setFilters([filter1, filter2]); // replace current filters with passed list. that allows to override default settings
 ```
 
+Log object will be stored in `logObj.args` property, and reflect how it was called:
+
+```ts
+class MyFilter {
+  filter(logObj: LogObj): boolean {
+    // logger.error(error) - plain error as argument
+    const error = logObj.args[0];
+
+    // logger.error({ message, reason }) - custom object as argument
+    const { message, reason } = logObj.args[0];
+
+    // logger.error(foo, bar, baz) - multiple arguments
+    const [foo, bar, baz] = logObj.args;
+
+    return true;
+  }
+}
+```
+
 #### Extension
 
 Extensions can extend or override log object before making actual logging

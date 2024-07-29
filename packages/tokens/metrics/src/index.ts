@@ -32,7 +32,7 @@ export const METRICS_MODULE_TOKEN = createToken<Metrics>('metricsModule');
 export interface MetricsServicesRegistryInterface {
   register(url: string, serviceName: string): void;
   registerEnv(env: Record<string, unknown>): void;
-  getServiceName(url: string): string | void;
+  getServiceName(url: string, options?: Record<string, any>): string | void;
 }
 
 /**

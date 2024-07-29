@@ -79,6 +79,7 @@ export function createRequestsOptions(options: {
           headers: {
             'User-Agent': userAgent,
             'X-Real-IP': ip,
+            'x-tramvai-service-name': 'CACHE_WARMUP',
           },
         })
       )

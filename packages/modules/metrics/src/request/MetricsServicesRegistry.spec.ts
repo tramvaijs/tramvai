@@ -17,6 +17,20 @@ describe('initRequestsMetrics', () => {
     );
   });
 
+  it('Get service name from custom header', () => {
+    const metricsServicesRegistry = new MetricsServicesRegistry();
+
+    metricsServicesRegistry.registerEnv({
+      longServiceName: 'http://example.com/api',
+    });
+
+    expect(
+      metricsServicesRegistry.getServiceName('http://example.com/api/foo', {
+        headers: { 'x-tramvai-service-name': 'customServiceName' },
+      })
+    ).toBe('customServiceName');
+  });
+
   it('Correcty handle case when url passed wo protocol', () => {
     const metricsServicesRegistry = new MetricsServicesRegistry();
     metricsServicesRegistry.register('example.com/', 'SITE');
