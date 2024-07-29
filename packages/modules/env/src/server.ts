@@ -7,6 +7,7 @@ import {
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
   CLIENT_ENV_REPOSITORY_TOKEN,
+  ENV_TEMPLATE_TOKEN,
 } from '@tramvai/tokens-common';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
 import { createPapiMethod } from '@tramvai/papi';
@@ -22,12 +23,16 @@ export { ENV_MANAGER_TOKEN, ENV_USED_TOKEN };
     provide({
       provide: ENV_MANAGER_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ tokens }) => {
-        return new EnvironmentManagerServer(flatten<EnvParameter>(tokens ?? []));
+      useFactory: ({ tokens, templates }) => {
+        return new EnvironmentManagerServer(flatten<EnvParameter>(tokens ?? []), templates ?? []);
       },
       deps: {
         tokens: {
           token: ENV_USED_TOKEN,
+          optional: true,
+        },
+        templates: {
+          token: ENV_TEMPLATE_TOKEN,
           optional: true,
         },
       },

@@ -1,11 +1,12 @@
 import type {
   EnvParameter,
+  EnvTemplate,
   EnvironmentManager,
   ClientEnvironmentRepository as Interface,
 } from '@tramvai/tokens-common';
 
 export class ClientEnvironmentRepository implements Interface {
-  protected parameters: Record<string, string>;
+  protected parameters: Record<string, string | undefined>;
 
   constructor(private envManager: EnvironmentManager, private tokens: EnvParameter[]) {
     this.parameters = {};
@@ -16,7 +17,7 @@ export class ClientEnvironmentRepository implements Interface {
     return this.parameters[name];
   }
 
-  set(name: string, value: string): void {
+  set(name: string, value: string | undefined): void {
     this.parameters[name] = value;
   }
 
@@ -29,7 +30,7 @@ export class ClientEnvironmentRepository implements Interface {
   }
 
   private processing() {
-    const envParameters = this.envManager.getAll();
+    const envParameters = this.envManager.getAll() as Record<string, string | undefined>;
 
     this.tokens.forEach(({ key, dehydrate }) => {
       const value = envParameters[key];

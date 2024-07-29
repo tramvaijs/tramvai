@@ -1,7 +1,9 @@
 import noop from '@tinkoff/utils/function/noop';
-import type { EnvParameter } from '@tramvai/tokens-common';
+import type { EnvParameter, EnvTemplate } from '@tramvai/tokens-common';
 import { EnvironmentManager } from '../shared/EnvironmentManager';
 import { ClientEnvironmentRepository } from './ClientEnvironmentRepository';
+import type { Templates } from '../shared/template';
+import { interpolate } from '../shared/template';
 
 const readFileWithEnv = (path: string) => {
   try {
@@ -17,12 +19,37 @@ const readFileWithEnv = (path: string) => {
 
 export class EnvironmentManagerServer extends EnvironmentManager {
   private clientEnvRepository: ClientEnvironmentRepository;
+  private templates: Templates;
 
-  constructor(private tokens: EnvParameter[]) {
+  constructor(private tokens: EnvParameter[], templates: EnvTemplate[] = []) {
     super();
+
+    this.templates = templates.reduce((acc, { key, fn }) => {
+      // TODO: key duplicates?
+      acc[key] = fn;
+      return acc;
+    }, {} as Templates);
+
     this.processing();
-    // for backward compatibility
+    // for backward compatibility.
     this.clientEnvRepository = new ClientEnvironmentRepository(this, this.tokens);
+  }
+
+  get(name: string) {
+    const value = super.get(name);
+
+    return interpolate({ envKey: name, envValue: value, templates: this.templates });
+  }
+
+  getAll() {
+    const values = super.getAll();
+    const result: Record<string, string | undefined> = {};
+
+    for (const name in values) {
+      result[name] = this.get(name);
+    }
+
+    return result;
   }
 
   /**
@@ -83,7 +110,7 @@ export class EnvironmentManagerServer extends EnvironmentManager {
   }
 
   private processing() {
-    const result: Record<string, string> = {};
+    const result: Record<string, string | undefined> = {};
     const envParameters = this.collectionEnv();
 
     this.tokens.forEach(({ key, validator = noop, optional }) => {

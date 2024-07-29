@@ -1,7 +1,7 @@
 import type { EnvironmentManager as Interface } from '@tramvai/tokens-common';
 
 export class EnvironmentManager implements Interface {
-  protected parameters: Record<string, string>;
+  protected parameters: Record<string, string | undefined>;
 
   constructor() {
     this.parameters = {};
@@ -20,7 +20,7 @@ export class EnvironmentManager implements Interface {
     return this.parameters;
   }
 
-  update(result: Record<string, string>) {
+  update(result: Record<string, string | undefined>) {
     this.parameters = Object.assign(this.parameters, result);
   }
 

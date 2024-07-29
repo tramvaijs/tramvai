@@ -15,13 +15,15 @@ export const renderFactory =
     path: string,
     {
       method = 'get',
+      headers = {},
       parserOptions,
     }: {
       method?: 'get' | 'post' | 'put';
+      headers?: Record<string, string>;
       parserOptions?: ParseOptions;
     } = {}
   ) => {
-    const response = await request(path, { method });
+    const response = await request(path, { method, headers });
     let { text } = response;
 
     for (const key in replaceDynamicStrings) {

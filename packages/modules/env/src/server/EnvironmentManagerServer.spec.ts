@@ -1,4 +1,6 @@
 import path from 'path';
+import type { EnvTemplate } from '@tramvai/tokens-common';
+import { EnvParameter } from '@tramvai/tokens-common';
 import { EnvironmentManagerServer } from './EnvironmentManagerServer';
 
 const fileMock = ({ mockEnvJs = {}, mockEnv = {} }) => {
@@ -238,5 +240,91 @@ describe('EnvironmentManagerServer', () => {
     ).toThrow(
       'Env parameter CFG_API with value https://cfg.tinkoff.ru not valid, message: Нет слеша на конце'
     );
+  });
+
+  describe('should apply templates', () => {
+    const envTokens = [
+      {
+        key: 'ONE_KEY',
+        value: 'http://www.$[host].com/',
+        dehydrate: true,
+      },
+      {
+        key: 'MULTI_KEYS',
+        value: 'http://www.$[host].com/$[path]/',
+        dehydrate: true,
+      },
+      {
+        key: 'ONE_PARAM',
+        value: 'http://www.$[host:foo].com/',
+        dehydrate: true,
+      },
+      {
+        key: 'MULTI_PARAMS',
+        value: 'http://www.$[host:foo,bar].com/',
+        dehydrate: true,
+      },
+    ];
+    const templates: EnvTemplate[] = [
+      {
+        key: 'host',
+        fn: (...params: any[]) => {
+          if (params.length === 0) {
+            return 'test';
+          }
+          if (params.length === 1) {
+            return params[0];
+          }
+          if (params.length === 2) {
+            return params[1];
+          }
+        },
+      },
+      {
+        key: 'path',
+        fn: () => {
+          return 'path';
+        },
+      },
+    ];
+
+    let envManager: EnvironmentManagerServer;
+
+    beforeEach(() => {
+      envManager = new EnvironmentManagerServer(envTokens, templates);
+    });
+
+    it('one template in env string', () => {
+      expect(envManager.get('ONE_KEY')).toBe('http://www.test.com/');
+    });
+
+    it('multiple templates in env string', () => {
+      expect(envManager.get('MULTI_KEYS')).toBe('http://www.test.com/path/');
+    });
+
+    it('one parameter for template', () => {
+      expect(envManager.get('ONE_PARAM')).toBe('http://www.foo.com/');
+    });
+
+    it('multiple parameters for template', () => {
+      expect(envManager.get('MULTI_PARAMS')).toBe('http://www.bar.com/');
+    });
+  });
+
+  describe('should throw when template not found', () => {
+    const envTokens = [
+      {
+        key: 'API_URL',
+        value: 'http://www.$[unknown].com/',
+        dehydrate: true,
+      },
+    ];
+    const templates: EnvTemplate[] = [];
+
+    it('unknown template', () => {
+      expect(() => new EnvironmentManagerServer(envTokens, templates)).toThrowError(
+        'Problem with "API_URL=http://www.$[unknown].com/" env variable - template for $[unknown] not found.'
+      );
+    });
   });
 });

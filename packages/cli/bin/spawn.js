@@ -12,7 +12,7 @@ const paramsIndex = args.findIndex((x) => !x.startsWith('-'));
 const nodeArgs = paramsIndex > 0 ? args.slice(0, paramsIndex) : [];
 
 module.exports = function spawn(executePath) {
-  const { status, signal } = spawnSync(
+  const { status, signal, error, stderr } = spawnSync(
     'node',
     defaultArgs
       .concat(nodeArgs)
@@ -24,6 +24,13 @@ module.exports = function spawn(executePath) {
   );
 
   if (signal) {
+    if (error) {
+      console.error('[spawn:error]', error);
+    }
+    if (stderr) {
+      console.error('[spawn:stderr]', typeof stderr === 'string' ? stderr : stderr.toString());
+    }
+
     throw new Error(`Process was exited with signal "${signal}"
 It's unexpected, please check available/used memory and cpu while running last command`);
   }
