@@ -20,6 +20,11 @@ const removeExtension = (filename: string): string => {
   return path.join(parsed.dir, parsed.name);
 };
 
+// fixing issue with absolute path imports on Windows
+const normalizePath = (pathToNormalize: string) => {
+  return pathToNormalize.replace(/\\/g, '\\\\');
+};
+
 const readdirAsync = async (dir, prefix = '', filelist = [], filter = (file: string) => true) => {
   const files = await fs.promises.readdir(dir).catch(() => []);
 
@@ -78,7 +83,7 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
       if (test.test(normalizedFile)) {
         const name = normalizedFile.replace(new RegExp(`\\${extname}$`), '');
         const pageComponentName = `@/${pagesRootDirectory}/${name}`;
-        const pageComponentPath = path.resolve(pagesDir, name).replace(/\\/g, '\\\\');
+        const pageComponentPath = normalizePath(path.resolve(pagesDir, name));
         const chunkname = pageComponentName.replace(/\//g, '_');
 
         // @example '@/pages/MainPage': lazy(() => import(/* webpackChunkName: "@_pages_MainPage" */ '/tramvai-app/src/pages/MainPage'))
@@ -98,7 +103,7 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
           const wildcardPath = routeContent.find((item) => item.includes(WILDCARD_TOKEN));
 
           if (fs.existsSync(layoutPath)) {
-            const filename = removeExtension(layoutPath);
+            const filename = normalizePath(removeExtension(layoutPath));
             // @example '@/pages/MainPage': lazy(() => import(/* webpackChunkName: "@_pages_MainPage__layout" */ '/tramvai-app/src/pages/MainPage_layout'))
             fsLayouts.push(
               `'${pageComponentName}': lazy(() => import(/* webpackChunkName: "${chunkname}__layout" */ '${filename}'))`
@@ -106,7 +111,7 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
           }
 
           if (fs.existsSync(errorBoundaryPath)) {
-            const filename = removeExtension(errorBoundaryPath);
+            const filename = normalizePath(removeExtension(errorBoundaryPath));
 
             // @example '@/pages/MainPage': lazy(() => import(/* webpackChunkName: "@_pages_MainPage__errorBoundary" */ '/tramvai-app/src/pages/MainPage_errorBoundary'))
             fsErrorBoundaries.push(
@@ -116,7 +121,7 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
 
           if (wildcardPath !== undefined) {
             const componentName = `${pageComponentName}__wildcard`;
-            const filename = removeExtension(path.join(pageDirname, wildcardPath));
+            const filename = normalizePath(removeExtension(path.join(pageDirname, wildcardPath)));
 
             // @example '@/pages/MainPage': lazy(() => import(/* webpackChunkName: "@_pages_MainPage__wildcard" */ '/tramvai-app/src/pages/MainPage_wildcard'))
             fsWildcards.push(

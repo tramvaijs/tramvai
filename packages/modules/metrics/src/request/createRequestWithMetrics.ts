@@ -81,7 +81,7 @@ export const createRequestWithMetrics: CreateRequestWithMetrics = ({
 
   return function requestWithMetrics(originalRequest, ...args) {
     const [url, options] = getUrlAndOptions(args);
-    const serviceName = getServiceName(url);
+    const serviceName = getServiceName(url, options);
     const req = originalRequest.apply(this, args) as ClientRequest;
     const timerDone = requestsDuration.startTimer();
     const labelsValues = {

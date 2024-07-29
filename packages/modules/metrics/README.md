@@ -18,6 +18,8 @@ Next labels are added to metrics:
 
 Name of the service calculates by comparing request urls with values in `MetricsServicesRegistry`. Initially the register is bootstrapped with the inverted content of env variables, e.g. if some url from env is a substring of the request url, then the name of the env become the service name. If several envs matches this logic then the env with the longest url is used.
 
+If you need to customize the service name you can provide HTTP header to the request via `x-tramvai-service-name` header.
+
 ### Event Loop Lag
 
 This module has their own implementation of Event Loop Lag metric - `nodejs_eventloop_setinterval_lag_seconds` histogram, this metric implemented with `setTimeout`.

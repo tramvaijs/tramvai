@@ -4,6 +4,7 @@ import { PrefixTree } from './PrefixTree';
 
 const NO_PROTOCOL = 'NO PROTOCOL';
 const PROTOCOL_REGEX = /^([a-z0-9.+-]+:)/i;
+const SERVICE_NAME_HEADER = 'x-tramvai-service-name';
 
 const splitProtocolAndUrl = (url) => {
   // Регулярка используется потому что протокол обязателен и класс URL не распарсит такую строку
@@ -45,9 +46,25 @@ class MetricsServicesRegistry implements MetricsServicesRegistryInterface {
     }));
   }
 
-  getServiceName(url) {
+  getServiceName(url: string, options?: Record<string, any>) {
     if (!url) {
       return undefined;
+    }
+
+    const serviceFromHeaders =
+      typeof options?.headers?.get === 'function'
+        ? options.headers.get(SERVICE_NAME_HEADER)
+        : options?.headers?.[SERVICE_NAME_HEADER];
+
+    if (serviceFromHeaders) {
+      if (typeof options.headers.delete === 'function') {
+        options.headers.delete(SERVICE_NAME_HEADER);
+      } else {
+        // eslint-disable-next-line no-param-reassign
+        delete options?.headers?.[SERVICE_NAME_HEADER];
+      }
+
+      return serviceFromHeaders;
     }
 
     const [protocol, urlWOProtocol] = splitProtocolAndUrl(url);
