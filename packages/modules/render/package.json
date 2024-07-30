@@ -27,6 +27,8 @@
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/user-agent": "0.0.0-stub",
+    "@tinkoff/request-core": "^0.9.2",
+    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
     "@tramvai/module-client-hints": "0.0.0-stub",
     "@tramvai/module-router": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",

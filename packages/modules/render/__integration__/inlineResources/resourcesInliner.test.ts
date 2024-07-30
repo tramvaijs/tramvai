@@ -27,9 +27,16 @@ const getResourceFromMock = (teremockUrl: string, resourcePath: string) =>
 const resourcePath = '/123.css';
 
 describe('resources inliner', () => {
-  const { getApp, getMockerUrl } = testApp({
-    name: 'render-inline-resource',
-  });
+  const { getApp, getMockerUrl } = testApp(
+    {
+      name: 'render-inline-resource',
+    },
+    {
+      env: {
+        LOG_ENABLE: 'trace:resources-inliner',
+      },
+    }
+  );
   const { getPageWrapper } = testAppInBrowser(getApp);
 
   it('should not inline bad requests', async () => {
@@ -38,6 +45,9 @@ describe('resources inliner', () => {
       response: {
         body: 'some non-css stuff',
         status: 504,
+        headers: {
+          'content-type': 'application/json',
+        },
       },
     });
 
@@ -103,6 +113,9 @@ describe('resources inliner source-map', () => {
       response: {
         body: mockedResponse,
         status: 200,
+        headers: {
+          'content-type': 'text/css',
+        },
       },
     });
 
