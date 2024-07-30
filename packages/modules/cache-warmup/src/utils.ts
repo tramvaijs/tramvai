@@ -1,9 +1,21 @@
+import http from 'http';
+import https from 'https';
+import type { Agent, AgentOptions } from 'https';
 import { format } from '@tinkoff/url';
 import type { Request } from '@tinkoff/request-core';
 import requestFactory from '@tinkoff/request-core';
-import http from '@tinkoff/request-plugin-protocol-http';
+import httpPlugin from '@tinkoff/request-plugin-protocol-http';
 
-const request = requestFactory([http()]);
+const agentOptions: AgentOptions = {
+  keepAlive: true,
+  scheduling: 'lifo',
+};
+const agent = {
+  http: new http.Agent(agentOptions) as Agent,
+  https: new https.Agent(agentOptions),
+};
+
+const request = requestFactory([httpPlugin({ agent })]);
 
 type QueueReuestsOptions<T> = {
   requestsOptions: T[];
