@@ -1,5 +1,6 @@
 import { setDefaultResultOrder } from 'dns';
 import EventEmitter from 'events';
+import type { ExtractDependencyType } from '@tramvai/core';
 import {
   Module,
   Scope,
@@ -44,6 +45,12 @@ import * as modules from './modules';
 import { ServerResponseTaskManager } from './server/taskManager';
 
 export * from '@tramvai/tokens-server';
+
+declare module '@tramvai/tokens-common' {
+  export interface AsyncLocalStorageState {
+    tramvaiRequestDi?: ExtractDependencyType<typeof DI_TOKEN>;
+  }
+}
 
 if (typeof setDefaultResultOrder === 'function') {
   setDefaultResultOrder('ipv4first');
