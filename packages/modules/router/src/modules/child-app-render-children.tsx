@@ -1,9 +1,15 @@
+import type { FC } from 'react';
 import { Fragment } from 'react';
 import type { Container } from '@tinkoff/dippy';
 import { CHILD_APP_PAGE_SERVICE_TOKEN } from '@tramvai/tokens-child-app';
 import { useRoute } from '@tinkoff/router';
 
-export const ChildAppRenderChildren = ({ di }: { di: Container }) => {
+type Props = {
+  di: Container;
+  [key: string]: any;
+};
+
+export const ChildAppRenderChildren: FC<Props> = ({ di, ...props }) => {
   useRoute();
 
   const childAppPageService = di.get({
@@ -13,5 +19,5 @@ export const ChildAppRenderChildren = ({ di }: { di: Container }) => {
 
   const PageComponent = childAppPageService?.getComponent() || Fragment;
 
-  return <PageComponent />;
+  return <PageComponent {...props} />;
 };
