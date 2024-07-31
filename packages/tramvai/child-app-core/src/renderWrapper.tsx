@@ -24,7 +24,7 @@ export const renderWrapper = <T extends Record<string, any>>(Cmp: ComponentType<
 
       let Result = ChildCmp ? (
         <Cmp {...props}>
-          <ChildCmp di={di} />
+          <ChildCmp di={di} {...props} />
         </Cmp>
       ) : (
         <Cmp {...props} />
