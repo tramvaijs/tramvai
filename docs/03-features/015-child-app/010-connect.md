@@ -165,6 +165,15 @@ export default MainPage;
 
 ### Preload manually
 
+:::warning
+
+Use manual preload carefully:
+- Preloaded Child App will be treated as used on current page and lifecycle for this Child App will be triggered
+- Preloading will work properly in all cases (Child App actions, `spa` and `afterSpa` lines) only on `resolvePageDeps` command line, because internal `@tramvai/module-child-app` logic expect that all required Child Apps is already preloaded after
+- For future navigations prefer [`preloadManager.prefetch`](#prefetch-manually) method instead of `preloadManager.preload`
+
+:::
+
 You can preload any child-app manually with the help of `CHILD_APP_PRELOAD_MANAGER_TOKEN`:
 
 ```ts
@@ -176,6 +185,52 @@ const provider = provide({
   useFactory: ({ preloadManager }) => {
     return function preloadFancyChildApp() {
       return preloadManager.preload({ name: 'fancy-child' });
+    };
+  },
+  deps: {
+    preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+  },
+});
+```
+
+If [Multi-page Child Apps](03-features/015-child-app/08-routing.md#multi-page-child-apps) is used, you need to provide current route to `preload` method:
+
+```ts
+import { provide, commandLineListTokens } from '@tramvai/core';
+import { CHILD_APP_PRELOAD_MANAGER_TOKEN } from '@tramvai/module-child-app';
+import type { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
+
+const provider = provide({
+  provide: commandLineListTokens.resolvePageDeps,
+  useFactory: ({ preloadManager, pageService }) => {
+    return function preloadFancyChildApp() {
+      const route = pageService.getCurrentRoute();
+
+      return preloadManager.preload({ name: 'fancy-child' }, route);
+    };
+  },
+  deps: {
+    preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+    pageService: PAGE_SERVICE_TOKEN,
+  },
+});
+```
+
+### Prefetch manually
+
+For future navigations you don't need to run Child Apps lifecycle, only load and cache static assets.
+
+For that, you can reuse [`Link` component automatic prefetching](03-features/07-routing/04-links-and-navigation.md#page-resources-prefetch) with manually preloaded Child Apps:
+
+```ts
+import { CHILD_APP_PRELOAD_MANAGER_TOKEN } from '@tramvai/module-child-app';
+import { LINK_PREFETCH_HANDLER_TOKEN } from '@tramvai/tokens-router';
+
+const provider = provide({
+  provide: LINK_PREFETCH_HANDLER_TOKEN,
+  useFactory: ({ preloadManager }) => {
+    return function preloadFancyChildApp(route) {
+      return preloadManager.prefetch({ name: 'fancy-child' }, route);
     };
   },
   deps: {

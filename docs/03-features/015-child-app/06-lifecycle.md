@@ -43,14 +43,22 @@ If specific child-app was not preloaded on server but used on current page then 
 
 Used on client for subsequent navigations without page reloading.
 
-- `spa` command line: [`resolveUserDeps` -> `resolvePageDeps` -> `spaTransition`]
-- `afterSpa` command line: [`afterSpaTransition`]
+Child App is considered not preloaded on SPA-navigation for next page, when:
+- it is not [automatically preloaded](03-features/015-child-app/010-connect.md#preload-automatically-for-page-or-layout)
+- it is not [manually preloaded](03-features/015-child-app/010-connect.md#preload-manually)
+- or it is preloaded first time at client-side (or you can [force Child App loading before navigation](#how-to-preload-child-app-before-spa-navigation))
 
 If specific child-app was preloaded before and was preloaded for the next page:
 
+- `spa` command line: [`resolveUserDeps` -> `resolvePageDeps` -> `spaTransition`]
+- `afterSpa` command line: [`afterSpaTransition`]
+
 ![command-line-runner](/img/child-app/command-line-runner-spa-loaded.drawio.svg)
 
-If specific child-app was not preloaded before and was preloaded for the next page:
+If specific child-app was not preloaded before or was preloaded for the next page first time:
+
+- `customer` command line: [`customerStart` -> `resolveUserDeps` -> `resolvePageDeps`]
+- `clear` command line: [`clear`]
 
 ![command-line-runner](/img/child-app/command-line-runner-spa-not-loaded.drawio.svg)
 
@@ -134,3 +142,41 @@ export default createChildApp({
 ```
 
 You can see this log both on server-side and client-side, when page with `fancy-child` Child App will be rendered.
+
+## How to
+
+### How to preload Child App before SPA-navigation?
+
+By default, when specific Child App is used first time on next page on SPA transition, his preloading will not block this transition and new screen from rendering.
+
+You can change this behaviour with [manual preloading](03-features/015-child-app/010-connect.md#preload-manually):
+
+```ts
+import { provide, commandLineListTokens } from '@tramvai/core';
+import { CHILD_APP_PRELOAD_MANAGER_TOKEN } from '@tramvai/module-child-app';
+import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
+
+const provider = provide({
+  provide: commandLineListTokens.resolvePageDeps,
+  useFactory: ({ preloadManager, pageService }) => {
+    let isSpaNavigation = false;
+
+    return function preloadFancyChildApp() {
+      // for SPA-navigation to specific page with this Child App
+      if (isSpaNavigation && pageService.getCurrentUrl().pathname === '/fancy-child/') {
+        // wait for preloading
+        return preloadManager.preload({ name: 'fancy-child' });
+      }
+
+      // second call of `resolvePageDeps` command means that it is SPA-navigation
+      if (!isSpaNavigation) {
+        isSpaNavigation = true;
+      }
+    };
+  },
+  deps: {
+    preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+    pageService: PAGE_SERVICE_TOKEN,
+  },
+});
+```

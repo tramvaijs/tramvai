@@ -27,6 +27,7 @@ export class PreloadManager implements ChildAppPreloadManager {
   private pageHasLoaded = false;
   private currentlyPreloaded = new Map<string, ChildAppFinalConfig>();
   private hasPreloadBefore = new Set<string>();
+  private notPreloadedForCurrentSpaNavigation = new Set<string>();
   private hasInitialized = false;
   private map = new Map<string, Promise<void>>();
 
@@ -53,11 +54,7 @@ export class PreloadManager implements ChildAppPreloadManager {
     this.diManager = diManager;
   }
 
-  async preload(
-    request: ChildAppRequestConfig,
-    route?: Route,
-    onlyPrefetch = false
-  ): Promise<void> {
+  async preload(request: ChildAppRequestConfig, route?: Route): Promise<void> {
     await this.init();
 
     const config = this.resolveExternalConfig(request);
@@ -86,10 +83,8 @@ export class PreloadManager implements ChildAppPreloadManager {
             await this.loader.load(config);
             await this.resolveComponent(config, route);
 
-            if (!onlyPrefetch) {
-              await this.run('customer', config);
-              await this.run('clear', config);
-            }
+            await this.run('customer', config);
+            await this.run('clear', config);
           } catch (error) {
             if (process.env.NODE_ENV === 'development') {
               console.error('Child App loading error', error);
@@ -110,7 +105,24 @@ export class PreloadManager implements ChildAppPreloadManager {
   }
 
   async prefetch(request: ChildAppRequestConfig, route?: Route): Promise<void> {
-    return this.preload(request, route, true);
+    await this.init();
+
+    const config = this.resolveExternalConfig(request);
+
+    if (!config) {
+      return;
+    }
+
+    if (!this.isPreloaded(config)) {
+      try {
+        await this.loader.load(config);
+        await this.resolveComponent(config, route);
+      } catch (error) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Child App prefetch error', error);
+        }
+      }
+    }
   }
 
   isPreloaded(request: ChildAppRequestConfig): boolean {
@@ -160,6 +172,7 @@ export class PreloadManager implements ChildAppPreloadManager {
   async clearPreloaded(): Promise<void> {
     if (this.pageHasLoaded) {
       this.currentlyPreloaded.clear();
+      this.notPreloadedForCurrentSpaNavigation.clear();
       this.map.clear();
       return;
     }
@@ -173,6 +186,7 @@ export class PreloadManager implements ChildAppPreloadManager {
     });
 
     this.currentlyPreloaded.clear();
+    this.notPreloadedForCurrentSpaNavigation.clear();
     this.map.clear();
 
     await Promise.all(promises);
@@ -180,6 +194,26 @@ export class PreloadManager implements ChildAppPreloadManager {
 
   getPreloadedList(): ChildAppFinalConfig[] {
     return Array.from(this.currentlyPreloaded.values());
+  }
+
+  saveNotPreloadedForSpaNavigation(request: ChildAppRequestConfig): void {
+    const config = this.resolveExternalConfig(request);
+
+    if (!config) {
+      return;
+    }
+
+    this.notPreloadedForCurrentSpaNavigation.add(config.key);
+  }
+
+  isNotPreloadedForSpaNavigation(request: ChildAppRequestConfig): boolean {
+    const config = this.resolveExternalConfig(request);
+
+    if (!config) {
+      return false;
+    }
+
+    return this.notPreloadedForCurrentSpaNavigation.has(config.key);
   }
 
   private initServerPreloaded() {

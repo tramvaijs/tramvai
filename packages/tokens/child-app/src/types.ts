@@ -74,6 +74,8 @@ export interface ChildAppPreloadManager {
   pageRender(): void;
   clearPreloaded(): Promise<void>;
   getPreloadedList(): ChildAppFinalConfig[];
+  saveNotPreloadedForSpaNavigation(config: ChildAppRequestConfig): void;
+  isNotPreloadedForSpaNavigation(config: ChildAppRequestConfig): boolean;
 }
 
 export interface ChildAppRenderManager {
