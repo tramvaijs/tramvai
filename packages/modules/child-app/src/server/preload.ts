@@ -93,7 +93,7 @@ export class PreloadManager implements ChildAppPreloadManager {
   }
 
   async prefetch(request: ChildAppRequestConfig, route?: Route): Promise<void> {
-    return this.preload(request, route);
+    // do nothing at server-side
   }
 
   isPreloaded(request: ChildAppRequestConfig): boolean {
@@ -144,5 +144,14 @@ export class PreloadManager implements ChildAppPreloadManager {
 
     await this.runner.run('server', status, config);
     await this.stateManager.registerChildApp(config);
+  }
+
+  saveNotPreloadedForSpaNavigation(request: ChildAppRequestConfig): void {
+    // do nothing at server-side
+  }
+
+  isNotPreloadedForSpaNavigation(request: ChildAppRequestConfig): boolean {
+    // do nothing at server-side
+    return false;
   }
 }

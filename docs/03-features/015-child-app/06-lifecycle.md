@@ -46,13 +46,13 @@ Used on client for subsequent navigations without page reloading.
 - `spa` command line: [`resolveUserDeps` -> `resolvePageDeps` -> `spaTransition`]
 - `afterSpa` command line: [`afterSpaTransition`]
 
-If specific child-app was preloaded before and was preloaded for the next page:
-
-![command-line-runner](/img/child-app/command-line-runner-spa-loaded.drawio.svg)
-
-If specific child-app was not preloaded before and was preloaded for the next page:
+If specific child-app was not preloaded before and was preloaded for the next page (if Child App is preloaded first time on SPA-navigation, it still considered not preloaded, since loading the Child App does not block the rendering of the next page):
 
 ![command-line-runner](/img/child-app/command-line-runner-spa-not-loaded.drawio.svg)
+
+If specific child-app was preloaded before and was preloaded for the next page (in most cases, it's a case of going back to a page where the Child App has already been loaded.):
+
+![command-line-runner](/img/child-app/command-line-runner-spa-loaded.drawio.svg)
 
 ## Usage
 

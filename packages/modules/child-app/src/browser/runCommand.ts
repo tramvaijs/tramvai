@@ -32,6 +32,12 @@ export const runCommand = async ({
         await preloader.preload(config, pageService.getCurrentRoute());
       }
 
+      // if Child Apps was not preloaded, prevent running `spa` and `afterSpa` lines for it,
+      // because it trigger actions or resolveUserDeps/resolvePageDeps commands second execution on the same navigation
+      if (preloader.isNotPreloadedForSpaNavigation(config)) {
+        return;
+      }
+
       return runner.run('client', status, config);
     })
   ).catch((error) => {
