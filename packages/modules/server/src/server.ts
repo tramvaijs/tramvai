@@ -1,4 +1,5 @@
 import { setDefaultResultOrder } from 'dns';
+import { setDefaultAutoSelectFamily } from 'net';
 import EventEmitter from 'events';
 import {
   Module,
@@ -45,6 +46,10 @@ export * from '@tramvai/tokens-server';
 
 if (typeof setDefaultResultOrder === 'function') {
   setDefaultResultOrder('ipv4first');
+}
+
+if (typeof setDefaultAutoSelectFamily === 'function') {
+  setDefaultAutoSelectFamily(false);
 }
 
 // tramvai add a lot of "abort" event listeners to AbortSignal, but we can't configure only AbortSignal max listeners,
