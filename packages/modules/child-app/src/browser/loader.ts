@@ -7,7 +7,7 @@ import type { ModuleFederationContainer } from '../shared/webpack/moduleFederati
 import { getModuleFederation, initModuleFederation } from '../shared/webpack/moduleFederation';
 import type { ChildAppModuleWrapper } from '../shared/types/module';
 
-export const getModuleFromGlobal = (entry: string): ModuleFederationContainer | void => {
+export const getModuleFromGlobal = (entry: string): ModuleFederationContainer | undefined => {
   return (window as any)[`child-app__${entry}`];
 };
 
@@ -15,13 +15,16 @@ export class BrowserLoader extends Loader {
   private readonly log: ReturnType<typeof LOGGER_TOKEN>;
   private readonly initializedMap = new WeakMap<ModuleFederationContainer, ChildAppModuleWrapper>();
 
+  private map = new Map<string, Promise<ChildApp | undefined>>();
+
   constructor({ logger }: { logger: typeof LOGGER_TOKEN }) {
     super();
 
     this.log = logger('child-app:loader');
   }
 
-  async load(config: ChildAppFinalConfig): Promise<ChildApp | void> {
+  // eslint-disable-next-line max-statements
+  async load(config: ChildAppFinalConfig): Promise<ChildApp | undefined> {
     const moduleName = config.name;
     const childApp = await this.get(config);
 
@@ -36,30 +39,48 @@ export class BrowserLoader extends Loader {
 
     let container = getModuleFromGlobal(config.client.entry);
 
+    // case when Child App is loaded, but not initialized.
+    // can be caused when initalization is failed, or still in process.
+    // for second case, we can try to wait initialization.
+    if (container && !childApp && this.map.has(config.key)) {
+      return this.map.get(config.key);
+    }
+
     if (!container) {
       this.log.debug({
         event: 'load-fetch',
         moduleName,
       });
 
-      // `resolveOnCssFailed: true` - allow to load module without server preloading on the client-side
-      await loadModule(config.client.entry, {
-        cssUrl: config.css?.entry,
-        resolveOnCssFailed: true,
-      });
-
-      container = getModuleFromGlobal(config.client.entry);
-
-      if (container) {
-        this.log.debug({
-          event: 'load-success',
-          moduleName,
+      const promise = (async () => {
+        // `resolveOnCssFailed: true` - allow to load module without server preloading on the client-side
+        await loadModule(config.client.entry, {
+          cssUrl: config.css?.entry,
+          resolveOnCssFailed: true,
         });
 
-        await this.init(config);
+        container = getModuleFromGlobal(config.client.entry);
 
-        return this.get(config);
-      }
+        if (container) {
+          this.log.debug({
+            event: 'load-success',
+            moduleName,
+          });
+
+          await this.init(config);
+
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          const childApp = this.get(config);
+
+          this.map.delete(config.key);
+
+          return childApp;
+        }
+      })();
+
+      this.map.set(config.key, promise);
+
+      return promise;
     }
 
     this.log.error({
@@ -91,7 +112,7 @@ export class BrowserLoader extends Loader {
     }
   }
 
-  get(config: ChildAppFinalConfig): ChildApp | void {
+  get(config: ChildAppFinalConfig): ChildApp | undefined {
     const container = getModuleFromGlobal(config.client.entry);
     const entry = container && this.initializedMap.get(container);
 
