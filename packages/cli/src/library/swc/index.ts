@@ -101,7 +101,9 @@ Having swc config may conflict with @tramvai/cli configuration`
   return {
     env: {
       targets,
-      coreJs: '3',
+      // Use relevant core-js version, because it affects which polyfills are included
+      // https://github.com/swc-project/swc/blob/main/crates/swc_ecma_preset_env/data/core-js-compat/modules-by-versions.json
+      coreJs: require('core-js/package.json').version,
       loose: true,
       mode: 'entry',
     },

@@ -115,6 +115,11 @@ export class EnvironmentManagerServer extends EnvironmentManager {
 
     this.tokens.forEach(({ key, validator = noop, optional }) => {
       const value = envParameters[key];
+      const interpolatedValue = interpolate({
+        envKey: key,
+        envValue: value,
+        templates: this.templates,
+      });
 
       if (typeof value === 'undefined' && !optional) {
         throw new Error(
@@ -123,7 +128,8 @@ export class EnvironmentManagerServer extends EnvironmentManager {
       }
 
       // Not calling validation on empty values.
-      const validation = typeof value !== 'undefined' && validator(value);
+      const validation = typeof interpolatedValue !== 'undefined' && validator(interpolatedValue);
+
       if (typeof validation === 'string') {
         throw new Error(
           `Env parameter ${key} with value ${value} not valid, message: ${validation}`
