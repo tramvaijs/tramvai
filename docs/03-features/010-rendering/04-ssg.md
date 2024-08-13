@@ -17,9 +17,9 @@ This feature is suitable for applications where all pages are independent of dyn
 
 1. Run development build as usual:
 
-    ```bash
-    tramvai start <appName>
-    ```
+   ```bash
+   tramvai start <appName>
+   ```
 
 1. Open server with exported pages at http://localhost:3000/
 
@@ -27,9 +27,9 @@ This feature is suitable for applications where all pages are independent of dyn
 
 1. Run SSG command:
 
-    ```bash
-    tramvai static <appName>
-    ```
+   ```bash
+   tramvai static <appName>
+   ```
 
 1. Deploy HTML pages to your server and static assets to your CDN
 
@@ -37,9 +37,9 @@ This feature is suitable for applications where all pages are independent of dyn
 
 1. Run SSG command with `--serve` flag:
 
-    ```bash
-    tramvai static <appName> --serve
-    ```
+   ```bash
+   tramvai static <appName> --serve
+   ```
 
 1. Open server with exported pages at http://localhost:3000/
 
@@ -48,6 +48,14 @@ This feature is suitable for applications where all pages are independent of dyn
 All static resources (js, css files) will be loaded according to the url specified in `ASSETS_PREFIX` env variable.
 
 If you build HTML pages with static prefix, for example `ASSETS_PREFIX=https://your.cdn.com/`, this variable injecting in HTML in build time, and you can't change `ASSETS_PREFIX` in deploy time.
+
+### Select pages to build
+
+You can specify the comma separated paths list for static HTML generation with `--onlyPages` flag:
+
+```bash
+tramvai static <appName> --onlyPages=/about,/blog
+```
 
 ## Limitations
 
