@@ -4,7 +4,7 @@ import { PrefixTree } from './PrefixTree';
 
 const NO_PROTOCOL = 'NO PROTOCOL';
 const PROTOCOL_REGEX = /^([a-z0-9.+-]+:)/i;
-const SERVICE_NAME_HEADER = 'x-tramvai-service-name';
+export const SERVICE_NAME_HEADER = 'x-tramvai-service-name';
 
 const splitProtocolAndUrl = (url) => {
   // Регулярка используется потому что протокол обязателен и класс URL не распарсит такую строку

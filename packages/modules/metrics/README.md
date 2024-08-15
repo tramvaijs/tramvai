@@ -16,9 +16,16 @@ Next labels are added to metrics:
 - http response code
 - service name
 
-Name of the service calculates by comparing request urls with values in `MetricsServicesRegistry`. Initially the register is bootstrapped with the inverted content of env variables, e.g. if some url from env is a substring of the request url, then the name of the env become the service name. If several envs matches this logic then the env with the longest url is used.
+#### Make service names showed in metrics instead of hostnames
 
-If you need to customize the service name you can provide HTTP header to the request via `x-tramvai-service-name` header.
+Name of the service calculates by comparing request urls with values in `MetricsServicesRegistry`. Initially the register is bootstrapped with the inverted content of env variables. For example if some url from env is a substring of the request url, then the name of the env become the service name. If several envs matches this logic then the env with the longest url is used. If none of envs matches then **domain** used as service name label.
+
+It is possible to give a hint to module about the service name in case url is dynamic. To do that:
+
+- use token `METRICS_SERVICES_REGISTRY_TOKEN`;
+- call `metricsServicesRegistry.register("Part of the url or the whole url", "Name of service")`
+
+To explicitly associate the service name label with request, you should provide the `x-tramvai-service-name` header. This header will be consumed by the metrics module and then removed.
 
 ### Event Loop Lag
 
@@ -143,13 +150,6 @@ export const SOME_MODULE = createToken<SomeModule>('someModule');
 })
 export class SomeModuleContainer {}
 ```
-
-### Make service names showed in metrics instead of hostnames
-
-It is possible to give a hint to module about the service name in case url is dynamic. To do that:
-
-- use token `METRICS_SERVICES_REGISTRY_TOKEN`;
-- call `metricsServicesRegistry.register("Part of the url or the whole url", "Name of service")`
 
 ### Use metrics to profile performance in browser
 

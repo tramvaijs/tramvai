@@ -11,13 +11,16 @@ import { METRICS_MODULE_TOKEN, METRICS_MODULE_CONFIG_TOKEN } from '@tramvai/toke
 import { fastifyMeasureRequests } from '@tinkoff/measure-fastify-requests';
 import { Registry, Counter, Gauge, Histogram, Summary, collectDefaultMetrics } from 'prom-client';
 import flatten from '@tinkoff/utils/array/flatten';
+
 import { RequestModule } from './request';
 import { InstantMetricsModule } from './instantMetrics/server';
 import { eventLoopMetrics } from './metrics/eventLoop';
 import { commandLineMetrics } from './metrics/commandLine';
+import { METRICS_DEFAULT_REGISTRY } from './tokens';
 
 export { getUrlAndOptions } from './request/createRequestWithMetrics';
-
+export { SERVICE_NAME_HEADER } from './request/MetricsServicesRegistry';
+export { METRICS_DEFAULT_REGISTRY } from './tokens';
 export * from '@tramvai/tokens-metrics';
 
 @Module({
@@ -30,7 +33,7 @@ export * from '@tramvai/tokens-metrics';
       },
     }),
     provide({
-      provide: 'metricsDefaultRegistry',
+      provide: METRICS_DEFAULT_REGISTRY,
       scope: Scope.SINGLETON,
       useClass: Registry,
     }),
@@ -48,7 +51,7 @@ export * from '@tramvai/tokens-metrics';
       },
       scope: Scope.SINGLETON,
       deps: {
-        registry: 'metricsDefaultRegistry',
+        registry: METRICS_DEFAULT_REGISTRY,
       },
     }),
     provide({
@@ -64,7 +67,7 @@ export * from '@tramvai/tokens-metrics';
       },
       deps: {
         app: UTILITY_WEB_FASTIFY_APP_TOKEN,
-        registry: 'metricsDefaultRegistry',
+        registry: METRICS_DEFAULT_REGISTRY,
       },
       multi: true,
     }),
