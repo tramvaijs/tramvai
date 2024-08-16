@@ -8,6 +8,7 @@ import {
   COMMAND_LINE_RUNNER_TOKEN,
   APP_INFO_TOKEN,
   provide,
+  DI_TOKEN,
 } from '@tramvai/core';
 import { STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN, SERVER_TOKEN } from '@tramvai/tokens-server';
 import { FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
@@ -26,6 +27,7 @@ import {
   SERVER_RESPONSE_TASK_MANAGER,
 } from '@tramvai/tokens-server-private';
 import {
+  ASYNC_LOCAL_STORAGE_TOKEN,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
@@ -122,6 +124,8 @@ EventEmitter.defaultMaxListeners = 50;
           token: STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN,
           optional: true,
         },
+        rootDi: DI_TOKEN,
+        asyncLocalStorage: ASYNC_LOCAL_STORAGE_TOKEN,
       },
     },
     provide({

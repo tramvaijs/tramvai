@@ -1,6 +1,9 @@
 import noop from '@tinkoff/utils/function/noop';
-import type { EnvParameter } from '@tramvai/tokens-common';
+import type { EnvParameter, EnvTemplate } from '@tramvai/tokens-common';
 import { EnvironmentManager } from '../shared/EnvironmentManager';
+import { ClientEnvironmentRepository } from './ClientEnvironmentRepository';
+import type { Templates } from '../shared/template';
+import { interpolate } from '../shared/template';
 
 const readFileWithEnv = (path: string) => {
   try {
@@ -15,19 +18,52 @@ const readFileWithEnv = (path: string) => {
 };
 
 export class EnvironmentManagerServer extends EnvironmentManager {
-  private clientUsedList: Record<string, string> = {};
+  private clientEnvRepository: ClientEnvironmentRepository;
+  private templates: Templates;
 
-  constructor(private tokens: EnvParameter[]) {
+  constructor(private tokens: EnvParameter[], templates: EnvTemplate[] = []) {
     super();
+
+    this.templates = templates.reduce((acc, { key, fn }) => {
+      // TODO: key duplicates?
+      acc[key] = fn;
+      return acc;
+    }, {} as Templates);
+
     this.processing();
+    // for backward compatibility.
+    this.clientEnvRepository = new ClientEnvironmentRepository(this, this.tokens);
   }
 
+  get(name: string) {
+    const value = super.get(name);
+
+    return interpolate({ envKey: name, envValue: value, templates: this.templates });
+  }
+
+  getAll() {
+    const values = super.getAll();
+    const result: Record<string, string | undefined> = {};
+
+    for (const name in values) {
+      result[name] = this.get(name);
+    }
+
+    return result;
+  }
+
+  /**
+   * @deprecated use CLIENT_ENV_MANAGER_TOKEN
+   */
   clientUsed() {
-    return this.clientUsedList;
+    return this.clientEnvRepository.getAll();
   }
 
+  /**
+   * @deprecated use CLIENT_ENV_MANAGER_TOKEN
+   */
   updateClientUsed(result: Record<string, string>) {
-    this.clientUsedList = Object.assign(this.clientUsedList, result);
+    this.clientEnvRepository.update(result);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -62,11 +98,16 @@ export class EnvironmentManagerServer extends EnvironmentManager {
   }
 
   private processing() {
-    const result: Record<string, string> = {};
+    const result: Record<string, string | undefined> = {};
     const envParameters = this.collectionEnv();
 
-    this.tokens.forEach(({ key, validator = noop, optional, dehydrate }) => {
+    this.tokens.forEach(({ key, validator = noop, optional }) => {
       const value = envParameters[key];
+      const interpolatedValue = interpolate({
+        envKey: key,
+        envValue: value,
+        templates: this.templates,
+      });
 
       if (typeof value === 'undefined' && !optional) {
         throw new Error(
@@ -75,7 +116,8 @@ export class EnvironmentManagerServer extends EnvironmentManager {
       }
 
       // Not calling validation on empty values.
-      const validation = typeof value !== 'undefined' && validator(value);
+      const validation = typeof interpolatedValue !== 'undefined' && validator(interpolatedValue);
+
       if (typeof validation === 'string') {
         throw new Error(
           `Env parameter ${key} with value ${value} not valid, message: ${validation}`
@@ -83,13 +125,10 @@ export class EnvironmentManagerServer extends EnvironmentManager {
       }
 
       result[key] = value;
-
-      if (dehydrate !== false) {
-        this.clientUsedList[key] = value;
-      }
     });
 
-    process.env = envParameters; // Записываем в process.env итоговый результат. TODO убрать позже
+    // sync process.env
+    process.env = envParameters;
 
     this.update(result);
   }

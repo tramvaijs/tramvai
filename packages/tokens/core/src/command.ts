@@ -15,6 +15,13 @@ export interface CommandLineRunner {
     customDi?: Container,
     key?: string | number
   ): Promise<Container>;
+
+  resolveDi(
+    type: keyof CommandLines,
+    status: keyof CommandLineDescription,
+    rootDi: Container,
+    providers?: Provider[]
+  ): Container;
 }
 
 export type CommandLineDescription = Record<string, MultiTokenInterface<Command>[]>;

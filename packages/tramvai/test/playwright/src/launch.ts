@@ -58,8 +58,8 @@ export const initPlaywright = async (
 
   return {
     browser,
-    getPageWrapper: async (url?: string) => {
-      const page = await browser.newPage();
+    getPageWrapper: async (url?: string, pageOptions?: Parameters<typeof browser.newPage>[0]) => {
+      const page = await browser.newPage(pageOptions);
 
       await page.setDefaultNavigationTimeout(60000);
 

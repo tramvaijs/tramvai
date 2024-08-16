@@ -1,19 +1,46 @@
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 
 export interface EnvironmentManager {
   get(name: string): string | undefined;
   getInt(name: string, def: number): number;
-  getAll(): Record<string, string>;
+  getAll(): Record<string, string | undefined>;
   update(result: Record<string, string>): void;
-  clientUsed(): Record<string, string>;
+  /**
+   * @deprecated use CLIENT_ENV_MANAGER_TOKEN
+   */
+  clientUsed(): Record<string, string | undefined>;
+  /**
+   * @deprecated use CLIENT_ENV_MANAGER_TOKEN
+   */
   updateClientUsed(result: Record<string, string>): void;
+}
+
+export interface ClientEnvironmentRepository {
+  get(name: string): string | undefined;
+  set(name: string, value: string): void;
+  getAll(): Record<string, string | undefined>;
+  update(result: Record<string, string>): void;
 }
 
 /**
  * @description
- * Instance that used for managing env data on the server and on the client
+ * Instance that used for managing environment variables
  */
-export const ENV_MANAGER_TOKEN = createToken<EnvironmentManager>('environmentManager');
+export const ENV_MANAGER_TOKEN = createToken<EnvironmentManager>('environmentManager', {
+  scope: Scope.SINGLETON,
+});
+
+/**
+ * @description
+ * Instance that used for store and manage environment variables map, which are passed to the client.
+ * Use only server-side for client env values modification depending on the specific request conditions.
+ */
+export const CLIENT_ENV_REPOSITORY_TOKEN = createToken<ClientEnvironmentRepository>(
+  'clientEnvironmentManager',
+  {
+    scope: Scope.REQUEST,
+  }
+);
 
 /**
  * @description
@@ -46,3 +73,13 @@ export interface EnvParameter {
 }
 
 export const ENV_USED_TOKEN = createToken<EnvParameter[]>('envUsed', { multi: true });
+
+export type EnvTemplate = {
+  key: string;
+  fn: (...args: any[]) => string;
+};
+
+export const ENV_TEMPLATE_TOKEN = createToken<EnvTemplate>('env template token', {
+  multi: true,
+  scope: Scope.SINGLETON,
+});
