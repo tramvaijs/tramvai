@@ -7,6 +7,7 @@ import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { InstantMetricsModule } from './instantMetrics/browser';
 import { PerfGauge, PerfSummary, PerfHistogram } from './performance-devtools/PerfMetrics';
 
+export { SERVICE_NAME_HEADER } from './request/MetricsServicesRegistry';
 export * from '@tramvai/tokens-metrics';
 
 @Module({
