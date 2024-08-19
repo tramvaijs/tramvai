@@ -32,12 +32,6 @@ import { optional, provide } from '@tinkoff/dippy';
 import type { STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN } from '@tramvai/tokens-server';
 import { errorHandler } from './error';
 
-declare module '@tramvai/tokens-common' {
-  export interface AsyncLocalStorageState {
-    tramvaiRequestDi?: ExtractDependencyType<typeof DI_TOKEN>;
-  }
-}
-
 export const webAppFactory = ({ server }: { server: typeof SERVER_TOKEN }) => {
   const app = fastify({
     ignoreTrailingSlash: true,
