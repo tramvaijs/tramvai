@@ -41,7 +41,7 @@ export class ActionPageRunner {
           'beforeNavigate',
           function abortPageActionsOnNavigation() {
             unregisterAbortPageActionsHookOnNavigate();
-            abortController.abort('pageActions are aborted because of route changing');
+            abortController.abort('Page actions were aborted because of route changing');
             return Promise.resolve();
           }
         );
@@ -63,7 +63,9 @@ export class ActionPageRunner {
                 this.log.error({
                   error,
                   event: `action-execution-error`,
-                  message: `${parameters?.name ?? 'uknown'} execution error`,
+                  message: `An error occurred during "${
+                    parameters?.name ?? 'unknown'
+                  }" action execution`,
                 });
               }
 

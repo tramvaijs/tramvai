@@ -1,4 +1,4 @@
-import { createEvent, createReducer } from '@tramvai/state';
+import { createReducer } from '@tramvai/state';
 
 export enum ActionStatus {
   notInitialized = 'notInitialized',

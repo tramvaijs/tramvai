@@ -38,6 +38,13 @@ createApp({
           pageComponent: 'actionExecutionOnServer',
         },
       },
+      {
+        name: 'preserve-abort-reason',
+        path: '/preserve-abort-reason/',
+        config: {
+          pageComponent: 'preserveAbortReason',
+        },
+      },
     ]),
   ],
   providers: [

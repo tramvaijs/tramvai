@@ -1,4 +1,4 @@
-import { createAction, declareAction } from '@tramvai/core';
+import { declareAction } from '@tramvai/core';
 import { useStore } from '@tramvai/state';
 import {
   actionsReducer,
