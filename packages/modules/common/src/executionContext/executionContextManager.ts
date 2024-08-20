@@ -28,12 +28,13 @@ export class ExecutionContextManager implements Interface {
     if (parentContext?.abortSignal.aborted) {
       throw new ExecutionAbortError({
         message: `Execution aborted in context "${contextName}"`,
+        reason: parentContext.abortSignal.reason,
         contextName,
       });
     }
 
     const abortController = new NodeAbortController() as AbortController;
-    let abortListener: () => void;
+    let abortListener: ((event: any) => void) | undefined;
 
     let values = selfValues;
 
@@ -42,10 +43,15 @@ export class ExecutionContextManager implements Interface {
         ...parentContext.values,
         ...selfValues,
       };
-      abortListener = () => {
-        abortController.abort();
+
+      // In fact, type of event will be the `Event` from `lib.dom.d.ts`
+      // but for the same reason, described in `node-abort-controller`,
+      // we do not use it here
+      abortListener = (event: any) => {
+        abortController.abort(event.target.reason);
       };
-      // abort child context AbortController if parent AbortController was aborted
+
+      // Abort child context `AbortController` if parent `AbortController` was aborted
       parentContext.abortSignal.addEventListener('abort', abortListener);
     }
 
@@ -56,9 +62,7 @@ export class ExecutionContextManager implements Interface {
     };
 
     try {
-      const result = await cb(context, abortController);
-
-      return result;
+      return await cb(context, abortController);
     } catch (error: any) {
       if (typeof error === 'object' && !error.executionContextName) {
         error.executionContextName = context.name;
@@ -66,8 +70,7 @@ export class ExecutionContextManager implements Interface {
 
       throw error;
     } finally {
-      // @ts-expect-error
-      if (abortListener && parentContext) {
+      if (abortListener !== undefined && parentContext) {
         parentContext.abortSignal.removeEventListener('abort', abortListener);
       }
     }

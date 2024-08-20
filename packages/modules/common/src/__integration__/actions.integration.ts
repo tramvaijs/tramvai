@@ -1,4 +1,5 @@
 /* eslint-disable max-nested-callbacks */
+import type { ConsoleMessage } from '@playwright/test';
 import { expect } from '@playwright/test';
 import { test } from './test-fixture';
 import { ActionStatus } from './stores/actionTestReducer';
@@ -132,6 +133,24 @@ import { ActionStatus } from './stores/actionTestReducer';
         ActionStatus.endPagePending,
         ActionStatus.endPageResolved,
       ]);
+    });
+
+    test('action should preserve abort reason', async ({ I, app, page, actionPages }) => {
+      await I.gotoPage(`${app.serverUrl}/preserve-abort-reason/`);
+
+      const errors: Array<ConsoleMessage> = [];
+      page.on('console', (message) => {
+        if (message.type() === 'error') errors.push(message);
+      });
+
+      // Waiting for actions
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      expect(errors.length).toBe(1);
+
+      const reason = await actionPages.getReasonFrom(errors[0]);
+
+      expect(reason).toBe('Page actions were aborted because of route changing');
     });
   });
 });

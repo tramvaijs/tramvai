@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Page, ConsoleMessage } from '@playwright/test';
 import type { StartCliResult } from '@tramvai/test-integration';
 import type { TestFixture } from '@playwright/test';
 import type { ModuleTramvai } from '@tramvai/internal-test-utils/fixtures/tramvai';
@@ -80,6 +80,14 @@ export class ActionPagesCO {
         status.join(',')
       );
     });
+  }
+
+  public getReasonFrom(message: ConsoleMessage): Promise<string> {
+    return message
+      .args()[2]
+      .getProperty('error')
+      .then((result) => result.getProperty('reason'))
+      .then((result) => result.jsonValue());
   }
 }
 
