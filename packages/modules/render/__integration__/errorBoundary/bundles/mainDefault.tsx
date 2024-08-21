@@ -1,8 +1,8 @@
-import React from 'react';
 import { declareAction, createBundle } from '@tramvai/core';
 import { HttpError } from '@tinkoff/errors';
 import { setPageErrorEvent } from '@tramvai/module-router';
 import { ErrorPageComponentSSR } from '../components/ErrorPageComponentSSR';
+import { ErrorPageComponentClient } from '../components/ErrorPageComponentClient';
 
 const PageComponent = () => {
   return (
@@ -94,6 +94,7 @@ export default createBundle({
   components: {
     pageComponent: PageComponent,
     errorPageComponent: ErrorPageComponentSSR,
+    clientErrorPageComponent: ErrorPageComponentClient,
     errorBoundaryDefault: DefaultErrorBoundary,
     pageErrorBoundaryComponent: PageErrorBoundary,
     pageActionErrorComponent: PageActionErrorComponent,

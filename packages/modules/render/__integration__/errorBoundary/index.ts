@@ -10,7 +10,7 @@ import {
 } from '@tramvai/module-router';
 import { EXTEND_RENDER, RenderModule } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
-import { ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN } from '@tramvai/react';
+import { ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN, ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
 import { HttpError, throwHttpError } from '@tinkoff/errors';
 import { parse } from '@tinkoff/url';
 import { DEFAULT_ERROR_BOUNDARY_COMPONENT } from '@tramvai/tokens-render';
@@ -40,6 +40,13 @@ createApp({
         path: '/page-error-default-fallback/',
         config: {
           pageComponent: 'errorPageComponent',
+        },
+      },
+      {
+        name: 'client-page-error-default-fallback',
+        path: '/client-page-error-default-fallback/',
+        config: {
+          pageComponent: 'clientErrorPageComponent',
         },
       },
       {
@@ -156,6 +163,16 @@ createApp({
     error: () => import(/* webpackChunkName: 'error' */ './bundles/error'),
   },
   providers: [
+    provide({
+      provide: ERROR_BOUNDARY_TOKEN,
+      useValue: (error: Error) => {
+        if (typeof window !== 'undefined') {
+          if (!(window as any).__errorBoundaryError) {
+            (window as any).__errorBoundaryError = error;
+          }
+        }
+      },
+    }),
     provide({
       provide: ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN,
       useValue: React.createElement(LegacyErrorBoundary),

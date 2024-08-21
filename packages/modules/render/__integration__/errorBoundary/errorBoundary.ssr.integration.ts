@@ -322,4 +322,26 @@ ssrTest.describe('errorBoundary SSR', () => {
     await pageContent.navigate('/');
     await pageContent.toHaveTitle('Page Component');
   });
+
+  ssrTest(
+    'Root client component error boundary call ERROR_BOUNDARY_TOKEN callbacks on catch',
+    async ({ I, app, page, pageContent }) => {
+      await I.gotoPage(`${app.serverUrl}/csr-extend-render-error/`);
+
+      await pageContent.toHaveTitle('Token Default Error Boundary');
+
+      await page.waitForFunction('Boolean(window.__errorBoundaryError)', { timeout: 5000 });
+    }
+  );
+
+  ssrTest(
+    'Page client component error boundary call ERROR_BOUNDARY_TOKEN callbacks on catch',
+    async ({ I, app, page, pageContent }) => {
+      await I.gotoPage(`${app.serverUrl}/error-on-client-in-layout/`);
+
+      await pageContent.toHaveTitle('Token Default Error Boundary');
+
+      await page.waitForFunction('Boolean(window.__errorBoundaryError)', { timeout: 5000 });
+    }
+  );
 });

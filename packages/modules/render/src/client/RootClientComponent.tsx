@@ -1,5 +1,9 @@
 import { createElement, StrictMode } from 'react';
-import { UniversalErrorBoundary } from '@tramvai/react';
+import {
+  ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN,
+  ERROR_BOUNDARY_TOKEN,
+  UniversalErrorBoundary,
+} from '@tramvai/react';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import type {
   DEFAULT_ERROR_BOUNDARY_COMPONENT,
@@ -64,9 +68,15 @@ const RootClientComponentWithBoundary = ({
     customRender,
     useStrictMode,
   };
+  const errorHandlers = di.get({ token: ERROR_BOUNDARY_TOKEN, optional: true });
+  const fallbackFromDi = di.get({ token: ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN, optional: true });
 
   return (
-    <UniversalErrorBoundary fallback={defaultErrorBoundary}>
+    <UniversalErrorBoundary
+      fallback={defaultErrorBoundary}
+      errorHandlers={errorHandlers}
+      fallbackFromDi={fallbackFromDi}
+    >
       <RootClientComponent {...rootClientComponentProps} />
     </UniversalErrorBoundary>
   );
