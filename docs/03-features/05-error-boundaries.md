@@ -22,7 +22,7 @@ This guide will be focused how to customize and show error pages for the users i
 
 If the first rendering of the page on the server fails, `tramvai` will try to render the page a second time, but already using the Error Boundary with fallback component. Also, we use [React Error Boundaries](https://reactjs.org/docs/error-boundaries.html) under the hood, so the error fallback will render in case of any rendering errors in the browser.
 
-Error Boundary only wrap Page Component, and Nested Layout with Root Layout will be rendered as usual.
+Page Error Boundary only wrap Page Component, and Nested Layout with Root Layout will be rendered as usual.
 
 Here is a list of cases when Page Error Boundary will be rendered with priority over [Root Error Boundary](#root-error-boundary):
 
@@ -64,7 +64,7 @@ const provider = {
 };
 ```
 
-This error boundary is also used by client render/hydration in cases where an error happens before the page is being rehydrated or rendered. The boundary wouldn't work if you're providing `CUSTOM_RENDER` token for your client rendering process; you should handle it yourself.
+This error boundary is also used by client render/hydration in cases where an error happens before the page is being rehydrated or rendered, or when Nested Layout or Root Layout fails. The boundary wouldn't work if you're providing `CUSTOM_RENDER` token for your client rendering process; you should handle it yourself.
 
 ### Specific fallback
 
@@ -269,6 +269,36 @@ const provider = {
     store: STORE_TOKEN,
   },
 };
+```
+
+### Page Error Boundary errors monitoring
+
+Server-side errors can be found in application logs by event `send-server-error`.
+
+Client-side error can be found in application logs by event `component-did-catch`.
+
+If you need custom monitoring of client-side errors, you can provide `ERROR_BOUNDARY_TOKEN` handler, e.g.:
+
+```ts
+import { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
+
+const provider = provide({
+  provide: ERROR_BOUNDARY_TOKEN,
+  useFactory: () => {
+    const log = logger('error-boundary');
+
+    return function logErrorBoundary(error, info) {
+      log.error({
+        event: 'component-did-catch',
+        error,
+        info,
+      });
+    };
+  },
+  deps: {
+    logger: LOGGER_TOKEN,
+  },
+});
 ```
 
 ## Known Issues
