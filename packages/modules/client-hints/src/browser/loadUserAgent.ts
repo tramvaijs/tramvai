@@ -3,6 +3,7 @@ import { parseClientHintsUserAgentData, parse } from '@tinkoff/user-agent';
 
 const getFromUserAgentData = (): UserAgent | null => {
   try {
+    // eslint-disable-next-line compat/compat
     const values = window.__TRAMVAI_USER_AGENT_DATA ?? window.navigator.userAgentData;
 
     if (values === undefined) {
