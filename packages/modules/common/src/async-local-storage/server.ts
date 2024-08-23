@@ -21,6 +21,17 @@ import { ASYNC_LOCAL_STORAGE_TOKEN } from '@tramvai/tokens-common';
           app.addHook('onRequest', (req, reply, done) => {
             storage.run({}, done);
           });
+
+          // prevent memory leaks
+          app.addHook('onResponse', () => {
+            const store = storage.getStore();
+
+            if (store) {
+              for (const key in store) {
+                delete store[key as keyof typeof store];
+              }
+            }
+          });
         };
       },
       deps: {
