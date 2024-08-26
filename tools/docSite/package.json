@@ -31,5 +31,8 @@
     "indent-string": "^4.0.0",
     "unist-util-visit": "^2.0.3"
   },
+  "browserslist": [
+    "defaults"
+  ],
   "license": "Apache-2.0"
 }

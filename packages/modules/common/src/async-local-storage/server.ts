@@ -22,7 +22,8 @@ import { ASYNC_LOCAL_STORAGE_TOKEN } from '@tramvai/tokens-common';
             storage.run({}, done);
           });
 
-          // prevent memory leaks
+          // prevent memory leaks, because async context can be destroyed after response,
+          // all stored resources will be accumulated in memory, and peak memory allocation will be high
           app.addHook('onResponse', () => {
             const store = storage.getStore();
 
