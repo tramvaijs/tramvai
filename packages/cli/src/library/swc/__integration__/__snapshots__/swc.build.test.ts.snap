@@ -437,7 +437,7 @@ exports[`server: node-env.ts 1`] = `
                       /* binding */ return func;
                   }
                   /* harmony export */              }), internalFunc = () => "Nice production ;-)";
-              const func = () => "Nice production ;-)";
+              const func = () => internalFunc();
               "
 `;
 
@@ -496,6 +496,6 @@ exports[`server: typeof-window.ts 1`] = `
                       /* binding */ return func;
                   }
                   /* harmony export */              }), internalFunc = () => "I'm a big server";
-              const func = () => "I'm a big server";
+              const func = () => internalFunc();
               "
 `;

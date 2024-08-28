@@ -90,9 +90,12 @@ export const httpClientFactory = ({
           agent,
           querySerializer,
           method: 'GET',
+          // don't create function here to prevent leak `commandLineExecutionContext` (which refer to Child DI) into the new function closure
           createCache: createCache
-            ? (cacheOptions: CacheOptionsByType<any>['memory'][0]): Cache =>
-                createCache('memory', cacheOptions)
+            ? createCache.bind<null, ['memory'], [CacheOptionsByType<any>['memory'][0]], Cache>(
+                null,
+                'memory'
+              )
             : undefined,
           modifyRequest: compose(
             fillHeaderIp({ requestManager }),
