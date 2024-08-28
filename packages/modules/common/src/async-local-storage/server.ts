@@ -20,18 +20,20 @@ import { ASYNC_LOCAL_STORAGE_TOKEN } from '@tramvai/tokens-common';
         return () => {
           app.addHook('onRequest', (req, reply, done) => {
             storage.run({}, done);
-          });
 
-          // prevent memory leaks, because async context can be destroyed after response,
-          // all stored resources will be accumulated in memory, and peak memory allocation will be high
-          app.addHook('onResponse', () => {
-            const store = storage.getStore();
+            // prevent memory leaks, because async context can be destroyed after response,
+            // all stored resources will be accumulated in memory, and peak memory allocation will be high
+            // `onResponse` is not used because is not fired when request was aborted by user (https://fastify.dev/docs/latest/Guides/Detecting-When-Clients-Abort/)
+            // TODO: can lead to errors because store will be cleared before reply, but maybe it's ok because response will be ignored?
+            reply.raw.once('close', () => {
+              const store = storage.getStore();
 
-            if (store) {
-              for (const key in store) {
-                delete store[key as keyof typeof store];
+              if (store) {
+                for (const key in store) {
+                  delete store[key as keyof typeof store];
+                }
               }
-            }
+            });
           });
         };
       },

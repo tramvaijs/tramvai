@@ -47,6 +47,10 @@ export const webpackServerConfig = ({
             passes: 2,
             drop_debugger: !debug,
             dead_code: true,
+            // function inlining can lead to memory leak in closures
+            inline: false,
+            reduce_funcs: false,
+            hoist_funs: false,
           },
           output: {
             comments: true,
@@ -76,6 +80,10 @@ export const webpackServerConfig = ({
             passes: 2,
             drop_debugger: !debug,
             dead_code: true,
+            // function inlining can lead to memory leak in closures
+            inline: false,
+            reduce_funcs: false,
+            hoist_funs: false,
           },
           output: {
             comments: false,
