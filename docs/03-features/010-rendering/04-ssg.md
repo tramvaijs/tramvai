@@ -57,6 +57,22 @@ You can specify the comma separated paths list for static HTML generation with `
 tramvai static <appName> --onlyPages=/about,/blog
 ```
 
+### Custom page request headers
+
+You can specify HTTP headers for pages requests with `--headers` flag, for example if you need generate different HTML for devices with mobile User-Agent:
+
+```bash
+tramvai static <appName> --header "User-Agent: ..."
+```
+
+This can be combined with `--folder` flag, which allows to generate different HTML files in subfolder and prevent conflicts:
+
+```bash
+tramvai static <appName> --header "User-Agent: ..." --folder "mobile"
+```
+
+HTML pages will be generated in `dist/static/mobile` folder.
+
 ## Limitations
 
 Dynamic pages (routes like `/foo/bar/:id`) is not supported, `tramvai static` command only show warnings for this pages. For now you can use only `query` parameters for this case.

@@ -2,8 +2,9 @@ import type { Context } from '../../models/context';
 import { staticApp } from './application';
 import type { CommandResult } from '../../models/command';
 import type { ApplicationConfigEntry } from '../../typings/configEntry/application';
+import type { Params } from './command';
 
-export default async (context: Context, parameters): Promise<CommandResult> => {
+export default async (context: Context, parameters: Params): Promise<CommandResult> => {
   const { target } = parameters;
   const configEntry = context.config.getProject(target);
 
