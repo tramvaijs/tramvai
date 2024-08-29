@@ -8,6 +8,8 @@ export type Params = {
   serve?: boolean;
   buildType: 'all' | 'none';
   onlyPages?: string[];
+  header?: string[];
+  folder?: string;
 };
 
 export class StaticCommand extends CLICommand<Params> {
@@ -39,6 +41,16 @@ export class StaticCommand extends CLICommand<Params> {
       value: '[onlyPages]',
       transformer: (value: string) => value.split(','),
       description: 'Specify the comma separated paths list for static HTML generation',
+    },
+    {
+      name: '--header',
+      value: '[header...]',
+      description: 'Add extra headers, which will be added to request for application pages',
+    },
+    {
+      name: '--folder',
+      value: '[folder]',
+      description: 'Subfolder, when generated pages will be placed',
     },
     {
       name: '--fileCache',

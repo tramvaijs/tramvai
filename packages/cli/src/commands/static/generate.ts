@@ -5,20 +5,31 @@ import type { Context } from '../../models/context';
 import type { ConfigManager } from '../../config/configManager';
 import type { ApplicationConfigEntry } from '../../typings/configEntry/application';
 import { appRequest } from '../../utils/dev-app/request';
+import type { Params } from './command';
 
 const MAX_CONCURRENT = 10;
 const DYNAMIC_PAGE_REGEX = /\/:.+\//g;
 
 export const generateStatic = async (
   context: Context,
+  params: Params,
   configManager: ConfigManager<ApplicationConfigEntry>,
   paths: string[]
 ) => {
+  const { header = [], folder = '' } = params;
   const q = new PQueue(MAX_CONCURRENT);
   const promises = [];
+  const headers = header.reduce((result, item) => {
+    const [key, value] = item.split(':');
+
+    // eslint-disable-next-line no-param-reassign
+    result[key.trim()] = value.trim();
+
+    return result;
+  }, {} as Record<string, string>);
 
   const { rootDir, output } = configManager;
-  const staticPath = resolve(rootDir, output.static);
+  const staticPath = resolve(rootDir, output.static, folder);
 
   for (const path of paths) {
     promises.push(
@@ -40,7 +51,7 @@ export const generateStatic = async (
             message: `path: ${path}, message: start fetching page`,
           });
 
-          const html = await appRequest(configManager, path);
+          const html = await appRequest(configManager, path, { headers });
 
           await outputFile(join(staticPath, path, 'index.html'), html);
 

@@ -167,7 +167,7 @@ export const staticApp = async (
     message: `message: routes fetched, generate pages`,
   });
 
-  await generateStatic(context, serverConfigManager, paths);
+  await generateStatic(context, options, serverConfigManager, paths);
 
   context.logger.event({
     type: 'debug',
