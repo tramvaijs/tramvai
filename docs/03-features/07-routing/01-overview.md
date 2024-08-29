@@ -47,6 +47,29 @@ Information about navigation lifecycle is available on [Navigation Flow page](03
 
 Information about Route and Url is available on [Working with Url page](03-features/07-routing/03-working-with-url.md)
 
+:::note
+
+Worth noting, that `tramvai` router doesn't have the concept of [Base Name](https://reactrouter.com/en/main/router-components/memory-router#basename), [Base Path](https://nextjs.org/docs/app/api-reference/next-config-js/basePath) or similar.
+
+That's why you need to always set up paths for your routes as they presented on the balancer. For instance, if your app was hosted to `https://some-company.com/some-app` all of your routes must reflect it on their paths:
+
+```typescript
+[
+  {
+    path: '/some-app/',
+    name: 'root',
+  },
+  {
+    path: '/some-app/login/',
+    name: 'login',
+  },
+  {
+    path: '/some-app/dashboard/',
+    name: 'dashboard',
+  },
+];
+```
+
 ### Trailing Slash
 
 Router will force all urls to end with slash, e.g. `/foo` path will be redirected to `/foo/`.
