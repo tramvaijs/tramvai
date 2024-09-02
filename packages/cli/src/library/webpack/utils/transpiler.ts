@@ -14,6 +14,7 @@ export type TranspilerConfig = {
   isServer: boolean;
   generateDataQaTag: boolean;
   enableFillActionNamePlugin: boolean;
+  enableFillDeclareActionNamePlugin: boolean;
   typescript: boolean;
   modules: 'es6' | 'commonjs' | false;
   loader: boolean;
@@ -50,7 +51,13 @@ export const getTranspilerConfig = (
   configManager: ConfigManager<CliConfigEntry>,
   overrideOptions: Partial<TranspilerConfig> = {}
 ): TranspilerConfig => {
-  const { generateDataQaTag, alias, enableFillActionNamePlugin, excludesPresetEnv } = configManager;
+  const {
+    generateDataQaTag,
+    alias,
+    enableFillActionNamePlugin,
+    excludesPresetEnv,
+    experiments: { enableFillDeclareActionNamePlugin },
+  } = configManager;
   const { env, modern } = configManager;
 
   if (alias) {
@@ -74,5 +81,6 @@ Just check or add configuration to your tsconfig file and remove alias from tram
     modules: false,
     typescript: false,
     ...overrideOptions,
+    enableFillDeclareActionNamePlugin,
   };
 };

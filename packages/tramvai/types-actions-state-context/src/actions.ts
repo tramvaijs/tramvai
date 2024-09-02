@@ -75,7 +75,7 @@ export interface TramvaiActionContext<CurrentDeps> {
 
 export interface TramvaiActionDefinition<Params extends any[], Result, Deps> {
   // TODO: maybe generate name automatically?
-  name: string;
+  name?: string;
   fn: (this: TramvaiActionContext<Deps>, ...params: Params) => Result;
   deps?: Deps;
   conditions?: ActionConditionsParameters;
@@ -86,6 +86,7 @@ export interface TramvaiActionDefinition<Params extends any[], Result, Deps> {
 export interface TramvaiAction<Params extends any[], Result, Deps>
   extends TramvaiActionDefinition<Params, Result, Deps> {
   tramvaiActionVersion: number;
+  name: string;
 }
 
 export type UnknownAction<Result = any> = (...args: any[]) => Result;

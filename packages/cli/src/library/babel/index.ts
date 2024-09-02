@@ -36,6 +36,7 @@ export const babelConfigFactory = ({
   modules = false,
   generateDataQaTag = true,
   enableFillActionNamePlugin = false,
+  enableFillDeclareActionNamePlugin = false,
   // for testing only!
   // @ts-expect-error
   markCreateTokenAsPure = true,
@@ -120,6 +121,8 @@ export const babelConfigFactory = ({
       ['@babel/transform-runtime', { useESModules: !(isServer && env === 'development') }],
       path.resolve(__dirname, './plugins/lazy-component/legacy-universal-replace'), // TODO: удалить плагин после того как отпадёт необходимость поддерживать легаси
       path.resolve(__dirname, './plugins/lazy-component/lazy-component'),
+      enableFillDeclareActionNamePlugin &&
+        path.resolve(__dirname, './plugins/fill-declare-action-name'),
       generateDataQaTag && path.resolve(__dirname, './plugins/react-element-info-unique'), // Собственный плагин. Необходимо удалить в будущем
       enableFillActionNamePlugin && path.resolve(__dirname, './plugins/fill-action-name'), // Собственный плагин. Необходимо удалить в будущем
       markCreateTokenAsPure && path.resolve(__dirname, './plugins/create-token-pure'),

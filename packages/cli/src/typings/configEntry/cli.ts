@@ -80,6 +80,11 @@ export interface Experiments {
    * @default false
    */
   autoResolveSharedRequiredVersions: boolean;
+  /**
+   * @title Включает использование плагина fill-declare-action-name
+   * @default false
+   */
+  enableFillDeclareActionNamePlugin: boolean;
 }
 
 /**

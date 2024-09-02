@@ -5,6 +5,14 @@ import { AbortController as NodeAbortController } from 'node-abort-controller';
 export function declareAction<Params extends any[], Result, Deps = {}>(
   action: TramvaiActionDefinition<Params, Result, Deps>
 ): TramvaiAction<Params, Result, Deps> {
+  if (process.env.NODE_ENV !== 'production') {
+    if (!action.name) {
+      throw new Error(
+        '"name" attribute must be provided. Provide name manually or use babel plugin for autogeneration (enable "experiments.enableFillDeclareActionNamePlugin" option in tramvai.json configuration file).'
+      );
+    }
+  }
+
   // fallback to support compatibility with createAction
   const fn = (context: any, payload: any, deps: any) => {
     const abortController = new NodeAbortController() as AbortController;

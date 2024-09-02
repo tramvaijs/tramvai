@@ -1,8 +1,8 @@
-import type { PluginObj, template, types } from '@babel/core';
+import type { PluginObj, PluginPass, template, types } from '@babel/core';
 
 export interface Babel {
   types: typeof types;
   template: typeof template;
 }
 
-export type Plugin<PluginOptions = void> = (babel: Babel) => PluginObj<PluginOptions>;
+export type Plugin<PluginOptions = void> = (babel: Babel) => PluginObj<PluginPass & PluginOptions>;

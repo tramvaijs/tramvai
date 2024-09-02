@@ -935,6 +935,11 @@
               "title": "automatically resolve [requiredVersion](https://webpack.js.org/plugins/module-federation-plugin/#requiredversion) for shared dependencies",
               "default": false,
               "type": "boolean"
+            },
+            "enableFillDeclareActionNamePlugin": {
+              "title": "Включает использование плагина fill-declare-action-name",
+              "default": false,
+              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -1186,23 +1191,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6870": {
+                        "__@match@6871": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6872": {
+                        "__@replace@6873": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6875": {
+                        "__@search@6876": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6877": {
+                        "__@split@6878": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6879": {
+                        "__@matchAll@6880": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1708,6 +1713,11 @@
               "title": "automatically resolve [requiredVersion](https://webpack.js.org/plugins/module-federation-plugin/#requiredversion) for shared dependencies",
               "default": false,
               "type": "boolean"
+            },
+            "enableFillDeclareActionNamePlugin": {
+              "title": "Включает использование плагина fill-declare-action-name",
+              "default": false,
+              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -1897,23 +1907,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6870": {
+                        "__@match@6871": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6872": {
+                        "__@replace@6873": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6875": {
+                        "__@search@6876": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6877": {
+                        "__@split@6878": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6879": {
+                        "__@matchAll@6880": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2419,6 +2429,11 @@
               "title": "automatically resolve [requiredVersion](https://webpack.js.org/plugins/module-federation-plugin/#requiredversion) for shared dependencies",
               "default": false,
               "type": "boolean"
+            },
+            "enableFillDeclareActionNamePlugin": {
+              "title": "Включает использование плагина fill-declare-action-name",
+              "default": false,
+              "type": "boolean"
             }
           },
           "additionalProperties": false
@@ -2608,23 +2623,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6870": {
+                        "__@match@6871": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6872": {
+                        "__@replace@6873": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6875": {
+                        "__@search@6876": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6877": {
+                        "__@split@6878": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6879": {
+                        "__@matchAll@6880": {
                           "type": "object",
                           "additionalProperties": false
                         }

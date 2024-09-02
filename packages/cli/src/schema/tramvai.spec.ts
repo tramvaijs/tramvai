@@ -68,6 +68,7 @@ describe('JSON schema для tramvai.json', () => {
             "enableFillActionNamePlugin": false,
             "experiments": {
               "autoResolveSharedRequiredVersions": false,
+              "enableFillDeclareActionNamePlugin": false,
               "minicss": {
                 "useImportModule": true,
               },
@@ -169,6 +170,7 @@ describe('JSON schema для tramvai.json', () => {
             "enableFillActionNamePlugin": false,
             "experiments": {
               "autoResolveSharedRequiredVersions": false,
+              "enableFillDeclareActionNamePlugin": false,
               "minicss": {
                 "useImportModule": true,
               },

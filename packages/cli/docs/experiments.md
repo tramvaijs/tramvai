@@ -89,3 +89,10 @@ Settings for the minification process
 ### Defaults
 
 - `minifier="terser"` - terser is default minifier for terser plugin
+
+## Auto generation declareAction's `name` attribute
+
+As you know `name` attribute should be unique across your application. You can auto generate them by opting-in this feature
+
+- `"enableFillDeclareActionNamePlugin": true` - to turn auto generating on. Right now it works only when `loader="babel"`
+
