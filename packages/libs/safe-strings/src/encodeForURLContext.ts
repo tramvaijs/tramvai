@@ -7,8 +7,8 @@ const relativeFirstCharacters = ['.', '/'];
 // eslint-disable-next-line no-control-regex
 export const ctrlCharactersRegex = /[\u0000-\u001F\u007F-\u009F\u2000-\u200D\uFEFF]/gim;
 
-function isRelativeUrlWithoutProtocol(url: string): boolean {
-  return relativeFirstCharacters.indexOf(url[0]) > -1;
+export function isRelativeUrlWithoutProtocol(url: string): boolean {
+  return relativeFirstCharacters.includes(url[0]);
 }
 
 function decodeControlCharacters(str: string) {
