@@ -31,6 +31,9 @@
     "indent-string": "^4.0.0",
     "unist-util-visit": "^2.0.3"
   },
+  "resolutions": {
+    "@docusaurus/react-loadable": "5.5.2"
+  },
   "browserslist": [
     "defaults"
   ],
