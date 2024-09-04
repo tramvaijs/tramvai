@@ -78,6 +78,9 @@
         },
         {
             "path": "../../tokens/router"
+        },
+        {
+            "path": "../../tokens/metrics"
         }
     ]
 }

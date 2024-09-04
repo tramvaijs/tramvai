@@ -1,59 +1,59 @@
-import { createToken } from '@tinkoff/dippy';
-import { Module, Scope, IS_DI_CHILD_CONTAINER_TOKEN } from '@tramvai/core';
-import type { Cache, CacheFactory } from '@tramvai/tokens-common';
+import { provide } from '@tinkoff/dippy';
+import { Module, Scope } from '@tramvai/core';
+import type { Cache } from '@tramvai/tokens-common';
 import {
+  CACHE_METRICS_SERVER_TOKEN,
   CLEAR_CACHE_TOKEN,
   CREATE_CACHE_TOKEN,
   REGISTER_CLEAR_CACHE_TOKEN,
 } from '@tramvai/tokens-common';
-import { cacheFactory } from './cacheFactory';
 import { providers } from './serverProviders';
-
-export const cachesToken = createToken<Cache[]>('_cachesList');
+import { cacheRegistry } from './cacheRegistry';
+import { CACHES_LIST_TOKEN, CACHE_NAMES_LIST_TOKEN } from './tokens';
 
 @Module({
   providers: [
     ...providers,
     {
-      provide: cachesToken,
+      provide: CACHES_LIST_TOKEN,
       scope: Scope.SINGLETON,
       useValue: [],
     },
-    {
+    provide({
       provide: CREATE_CACHE_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ caches }): CacheFactory => {
-        return (type?, ...args) => {
-          const cache = cacheFactory(type, ...args);
-
-          caches.push(cache);
-
-          return cache;
-        };
-      },
+      useFactory: cacheRegistry,
       deps: {
-        caches: cachesToken,
+        caches: CACHES_LIST_TOKEN,
+        cacheNames: {
+          token: CACHE_NAMES_LIST_TOKEN,
+          optional: true,
+        },
+        metrics: {
+          token: CACHE_METRICS_SERVER_TOKEN,
+          optional: true,
+        },
       },
-    },
-    {
+    }),
+    provide({
       provide: CLEAR_CACHE_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ caches, cachesClear }) => {
-        return (type?: string) => {
+      useFactory: ({ caches, onCacheClear }) => {
+        return (type?) => {
           caches.forEach((cache: Cache) => cache.clear());
 
-          if (cachesClear) {
-            return Promise.all(cachesClear.map((clear: (type?: string) => void) => clear(type)));
+          if (onCacheClear) {
+            return Promise.all(onCacheClear.map((clear) => clear(type)));
           }
 
           return Promise.resolve();
         };
       },
       deps: {
-        caches: cachesToken,
-        cachesClear: { token: REGISTER_CLEAR_CACHE_TOKEN, optional: true },
+        caches: CACHES_LIST_TOKEN,
+        onCacheClear: { token: REGISTER_CLEAR_CACHE_TOKEN, optional: true },
       },
-    },
+    }),
   ],
 })
 export class CacheModule {}

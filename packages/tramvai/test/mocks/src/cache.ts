@@ -5,14 +5,17 @@ export const createMockCache = <T = any>(entries: Record<string, T> = {}): Cache
   return {
     has: (key: string) => !!cache[key],
     get: (key: string) => cache[key],
+    peek: (key: string) => cache[key],
     set: (key: string, value: T) => {
       cache[key] = value;
     },
     clear: () => {
       cache = {};
     },
-    // TODO: в @tinkoff/request- используются методы из lru-cache которых нету в Cache
-    // @ts-ignore
-    peek: (key: string) => cache[key],
+    delete: (key: string) => delete cache[key],
+    load: (values: Array<[string, { value: T }]>) =>
+      values.forEach(([key, { value }]) => (cache[key] = value)),
+    dump: () => Object.entries(cache).map(([key, value]) => [key, { value }]),
+    size: Object.keys(cache).length,
   };
 };

@@ -18,7 +18,6 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/lru-cache-nano": "^7.9.0",
     "@tinkoff/url": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/tokens-core": "0.0.0-stub"

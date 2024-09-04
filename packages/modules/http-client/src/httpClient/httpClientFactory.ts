@@ -26,7 +26,7 @@ import type {
   Cache,
   ENV_MANAGER_TOKEN,
   REQUEST_MANAGER_TOKEN,
-  CacheOptionsByType,
+  CacheFactoryOptions,
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
 } from '@tramvai/tokens-common';
 import type { QuerySerializer } from '@tinkoff/request-plugin-protocol-http';
@@ -92,7 +92,7 @@ export const httpClientFactory = ({
           method: 'GET',
           // don't create function here to prevent leak `commandLineExecutionContext` (which refer to Child DI) into the new function closure
           createCache: createCache
-            ? createCache.bind<null, ['memory'], [CacheOptionsByType<any>['memory'][0]], Cache>(
+            ? createCache.bind<null, ['memory'], [CacheFactoryOptions<'memory'>], Cache>(
                 null,
                 'memory'
               )

@@ -19,6 +19,7 @@ import {
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
   CHILD_APP_SINGLETON_DI_MANAGER_TOKEN,
 } from '@tramvai/tokens-child-app';
+import type { CacheType } from '@tramvai/tokens-common';
 import {
   CLEAR_CACHE_TOKEN,
   COMBINE_REDUCERS,
@@ -210,7 +211,7 @@ export const sharedProviders: Provider[] = [
     multi: true,
     scope: Scope.SINGLETON,
     useFactory: ({ diManager }) => {
-      return (type: string) => {
+      return (type?: CacheType) => {
         diManager.forEachChildDi((di) => {
           const clearCache = di.get({ token: CLEAR_CACHE_TOKEN, optional: true });
 

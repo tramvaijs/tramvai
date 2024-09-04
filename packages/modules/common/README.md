@@ -65,12 +65,89 @@ Module that implements caches.
 
 It provides next functionality:
 
-- create new cache instance (currently it will be instance of lru-cache)
+- create new cache instance (instance of lru-cache by default)
 - clear all of the previously create caches
 - subscribe on cache clearance event to execute own cache clearance actions
 - adds papi-route `/clear-cache` that will trigger caches clear event
 
-This modules logs wit id `cache:papi-clear-cache`
+This modules logs with id `cache:papi-clear-cache`
+
+##### Cache types
+
+You can create different cache types with `CREATE_CACHE_TOKEN` factory:
+
+- LRU - [@tinkoff/lru-cache-nano](https://github.com/tramvaijs/lru-cache-nano)
+
+  This type of cache is created by default. To create it explicitly you must pass `'memory'` as the first argument, and options as the second.
+
+  ```typescript
+  provide({
+    provide: CACHE_TOKEN,
+    scope: Scope.SINGLETON,
+    useFactory: ({ createCache }) =>
+      createCache('memory', {
+        max: 100,
+        ttl: 24 * 60 * 60 * 1000, // 1 day
+        ttlResolution: 60 * 1000, // 1 minute
+        allowStale: true,
+        updateAgeOnGet: true,
+      }),
+    deps: {
+      createCache: CREATE_CACHE_TOKEN,
+    },
+  });
+  ```
+
+- LFU - [@akashbabu/lfu-cache](https://github.com/AkashBabu/lfu-cache)
+
+  To create it you must pass `'memory-lfu'` as the first argument, cache options - as second.
+
+  ```typescript
+  provide({
+    provide: CACHE_TOKEN,
+    scope: Scope.SINGLETON,
+    useFactory: ({ createCache }) =>
+      createCache('memory-lfu', {
+        max: 20,
+        evictCount: 5,
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      }),
+    deps: {
+      createCache: CREATE_CACHE_TOKEN,
+    },
+  });
+  ```
+
+##### Cache metrics
+
+To turn cache hit/miss rate monitoring, cache size, you need to provide cache name in options:
+
+```typescript
+provide({
+  provide: CACHE_TOKEN,
+  scope: Scope.SINGLETON,
+  useFactory: ({ createCache }) =>
+    createCache('memory', {
+      name: 'cache-name',
+    }),
+  deps: {
+    createCache: CREATE_CACHE_TOKEN,
+  },
+});
+```
+
+Cache name have to be unique, factory will throw exception in case of cache name duplication.
+
+[Metric module](references/modules/metrics.md) should be provided in your application.
+
+Server cache metrics:
+
+- cache_hit{name, method} counter
+- cache_miss{name, method} counter
+- cache_max{name} gauge
+- cache_size{name} gauge
+
+By default hit/miss rate is computed as a sum of all data access attempts (methods `has`, `peek`, `get`).
 
 #### RequestManagerModule
 

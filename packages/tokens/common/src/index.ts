@@ -3,6 +3,7 @@ export * from './context';
 export * from './action';
 export * from './hook';
 export * from './pubsub';
+export * from './cacheMetrics';
 export * from './cache';
 export * from './componentRegistry';
 export * from './state';
