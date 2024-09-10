@@ -18,11 +18,11 @@ type TestFixture = {
 type WorkerFixture = {
   settingApp: CreateApp.SettingApp;
   optionsApp: CreateApp.OptionsApp | undefined;
-  targetApp: CreateApp.TargerApp;
+  targetApp: CreateApp.TargetApp;
   createApp: CreateApp.App;
 };
 
-const targetApp: CreateApp.TargerApp = {
+const targetApp: CreateApp.TargetApp = {
   name: 'client-hints',
   cwd: dirname(resolve(module.parent!.filename, './')),
 };

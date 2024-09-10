@@ -18,7 +18,7 @@ type AppFixtures = {
 };
 
 type WorkerFixture = {
-  targetApp: CreateApp.TargerApp;
+  targetApp: CreateApp.TargetApp;
   optionsApp: CreateApp.OptionsApp;
   settingApp: CreateApp.SettingApp;
   createApp: CreateApp.CreateCustomApp;

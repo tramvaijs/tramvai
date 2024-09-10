@@ -5,3 +5,4 @@ export { wrapPlaywrightPage } from './wrapper';
 export * from './utils';
 export { createPlaywrightConfig } from './config';
 export { startAppFixture, StartAppTypes } from './fixtures/start-app';
+export { buildAppFixture, appServerFixture, BuildAppTypes } from './fixtures/build-app';

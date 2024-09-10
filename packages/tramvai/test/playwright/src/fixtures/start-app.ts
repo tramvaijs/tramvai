@@ -3,20 +3,12 @@ import path from 'path';
 import type { WorkerFixture } from '@playwright/test';
 import type { StartCliOptions, StartCliResult } from '@tramvai/test-integration';
 import { startCli } from '@tramvai/test-integration';
-import type { ApplicationConfigEntry, ConvertToSchema } from '@tramvai/cli';
+import type { AppTarget as _AppTarget } from './types';
 
 export namespace StartAppTypes {
   export type TestApp = StartCliResult;
-
-  export type AppTarget =
-    | {
-        name: string;
-        cwd: string;
-        config?: Partial<ConvertToSchema<ApplicationConfigEntry>>;
-      }
-    | { target: string; cwd: string; name?: string };
-
   export type StartOptions = StartCliOptions;
+  export type AppTarget = _AppTarget;
 }
 
 /**

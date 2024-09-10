@@ -18,12 +18,12 @@ type TestFixture = {
 
 type WorkerFixture = {
   settingApp: CreateApp.SettingApp;
-  targetApp: CreateApp.TargerApp;
+  targetApp: CreateApp.TargetApp;
   createApp: CreateApp.App;
   optionsApp: CreateApp.OptionsApp | undefined;
 };
 
-const targetApp: CreateApp.TargerApp = {
+const targetApp: CreateApp.TargetApp = {
   name: 'view-transitions',
   cwd: resolve(module.path, '..', 'src'),
   config: {

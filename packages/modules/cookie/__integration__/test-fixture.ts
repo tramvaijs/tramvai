@@ -23,7 +23,7 @@ type TestFixture = {
 type WorkerFixture = {
   settingApp: CreateApp.SettingApp;
   optionsApp: CreateApp.OptionsApp | undefined;
-  targetApp: CreateApp.TargerApp;
+  targetApp: CreateApp.TargetApp;
   createApp: CreateApp.App;
   proxyServer: ProxyServer | undefined;
   proxyStaticServer: {} | undefined;
