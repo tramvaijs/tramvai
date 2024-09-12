@@ -1,5 +1,6 @@
 import { declareModule, provide, Scope } from '@tramvai/core';
 import { PROXY_CONFIG_TOKEN } from '@tramvai/tokens-server';
+import { ASSETS_PREFIX_TOKEN } from '@tramvai/tokens-render';
 import { appConfig } from '@tramvai/cli/lib/external/config';
 import { PWA_MANIFEST_URL_TOKEN, PWA_SW_SCOPE_TOKEN } from '../tokens';
 import { registerWebManifestProvider, validateRelativeUrlProvider } from './shared/providers';
@@ -10,11 +11,11 @@ export const TramvaiPwaManifestModule = declareModule({
     provide({
       provide: PROXY_CONFIG_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ manifestUrl, swScope }) => {
+      useFactory: ({ manifestUrl, swScope, assetsPrefixFactory }) => {
         return {
           context: [manifestUrl],
           // appConfig.assetsPrefix available in 'development' mode
-          target: appConfig.assetsPrefix ?? process.env.ASSETS_PREFIX ?? '',
+          target: appConfig.assetsPrefix ?? assetsPrefixFactory() ?? '',
           pathRewrite: (path: string) => {
             return path.replace(swScope, '/');
           },
@@ -23,6 +24,7 @@ export const TramvaiPwaManifestModule = declareModule({
       deps: {
         manifestUrl: PWA_MANIFEST_URL_TOKEN,
         swScope: PWA_SW_SCOPE_TOKEN,
+        assetsPrefixFactory: ASSETS_PREFIX_TOKEN,
       },
     }),
     provide({

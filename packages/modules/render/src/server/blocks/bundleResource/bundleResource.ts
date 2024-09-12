@@ -5,9 +5,11 @@ import type {
   PageResource,
   FETCH_WEBPACK_STATS_TOKEN,
   REACT_SERVER_RENDER_MODE,
+  ASSETS_PREFIX_TOKEN,
 } from '@tramvai/tokens-render';
 import { ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 import { isFileSystemPageComponent, fileSystemPageToWebpackChunkName } from '@tramvai/experiments';
+import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { PRELOAD_JS } from '../../constants/performance';
 import { flushFiles } from '../utils/flushFiles';
 
@@ -34,6 +36,7 @@ export const bundleResource = async ({
   pageComponent,
   fetchWebpackStats,
   renderMode,
+  assetsPrefixFactory,
 }: {
   bundle: string;
   modern: boolean;
@@ -41,6 +44,7 @@ export const bundleResource = async ({
   pageComponent?: string;
   fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
   renderMode: typeof REACT_SERVER_RENDER_MODE | null;
+  assetsPrefixFactory: ExtractDependencyType<typeof ASSETS_PREFIX_TOKEN>;
 }) => {
   // for file-system pages preload page chunk against bundle chunk
   const chunkNameFromBundle = isFileSystemPageComponent(pageComponent)
@@ -66,15 +70,13 @@ export const bundleResource = async ({
   const genHref = (href) => `${publicPath}${href}`;
 
   const result: PageResource[] = [];
+  const assetsPrefix = assetsPrefixFactory();
 
-  if (
-    process.env.NODE_ENV === 'production' ||
-    (process.env.ASSETS_PREFIX && process.env.ASSETS_PREFIX !== 'static')
-  ) {
+  if (process.env.NODE_ENV === 'production' || (assetsPrefix && assetsPrefix !== 'static')) {
     result.push({
       type: ResourceType.inlineScript,
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
-      payload: `window.ap = ${`"${process.env.ASSETS_PREFIX}"`};`,
+      payload: `window.ap = ${`"${assetsPrefix}"`};`,
     });
   }
 

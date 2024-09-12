@@ -24,6 +24,8 @@ import {
   REACT_SERVER_RENDER_MODE,
   FETCH_WEBPACK_STATS_TOKEN,
   REACT_STREAMING_RENDER_TIMEOUT,
+  ASSETS_PREFIX_TOKEN,
+  DEFAULT_ASSETS_PREFIX_TOKEN,
 } from '@tramvai/tokens-render';
 import { Scope, optional } from '@tinkoff/dippy';
 import { satisfies } from '@tinkoff/user-agent';
@@ -116,6 +118,7 @@ export const DEFAULT_POLYFILL_CONDITION =
         resourcesRegistryCache: RESOURCES_REGISTRY_CACHE,
         resourceInlineThreshold: { token: RESOURCE_INLINE_OPTIONS, optional: true },
         logger: LOGGER_TOKEN,
+        assetsPrefixFactory: ASSETS_PREFIX_TOKEN,
       },
     }),
     provide({
@@ -262,6 +265,7 @@ Page Error Boundary will be rendered for the client`,
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
         di: DI_TOKEN,
         renderMode: optional(REACT_SERVER_RENDER_MODE),
+        assetsPrefixFactory: ASSETS_PREFIX_TOKEN,
       },
     }),
     provide({
@@ -360,8 +364,26 @@ Page Error Boundary will be rendered for the client`,
       },
     }),
     provide({
+      provide: ASSETS_PREFIX_TOKEN,
+      useFactory: ({ defaultAssetsPrefix }) => {
+        return () => defaultAssetsPrefix;
+      },
+      deps: {
+        defaultAssetsPrefix: DEFAULT_ASSETS_PREFIX_TOKEN,
+      },
+    }),
+    provide({
+      provide: DEFAULT_ASSETS_PREFIX_TOKEN,
+      useValue: process.env.ASSETS_PREFIX ?? null,
+    }),
+    provide({
       provide: FETCH_WEBPACK_STATS_TOKEN,
-      useValue: fetchWebpackStats,
+      useFactory: (deps) => {
+        return fetchWebpackStats(deps);
+      },
+      deps: {
+        assetsPrefixFactory: ASSETS_PREFIX_TOKEN,
+      },
     }),
     provide({
       provide: BACK_FORWARD_CACHE_ENABLED,
