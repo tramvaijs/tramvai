@@ -23,14 +23,16 @@
     "@types/supertest": "^2.0.11",
     "fastify": "^4.6.0",
     "node-html-parser": "^3.0.4",
-    "prettier": "^2.0.0",
+    "prettier": "*",
     "supertest": "^6.1.3"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",
     "tslib": "^2.4.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier": "^2.0.0"
+  },
   "license": "Apache-2.0",
   "module": "lib/index.es.js"
 }
