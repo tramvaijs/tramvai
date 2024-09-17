@@ -8,7 +8,7 @@ const relativeFirstCharacters = ['.', '/'];
 export const ctrlCharactersRegex = /[\u0000-\u001F\u007F-\u009F\u2000-\u200D\uFEFF]/gim;
 
 export function isRelativeUrlWithoutProtocol(url: string): boolean {
-  return relativeFirstCharacters.includes(url[0]);
+  return !url.startsWith('//') && relativeFirstCharacters.includes(url[0]);
 }
 
 function decodeControlCharacters(str: string) {
