@@ -11,7 +11,8 @@
         "types": [
             "node",
             "jest",
-            "webpack-env"
+            "webpack-env",
+            "@types/tramvai-monorepo"
         ]
     },
     "references": [

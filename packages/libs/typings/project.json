@@ -1,0 +1,7 @@
+{
+  "name": "@types/tramvai-monorepo",
+  "root": "packages/libs/typings",
+  "sourceRoot": "packages/libs/typings",
+  "projectType": "library",
+  "targets": {}
+}

@@ -1,0 +1,8 @@
+{
+  "name": "@types/tramvai-monorepo",
+  "version": "0.0.0-stub",
+  "private": true,
+  "description": "Simple way to provide global types for TS monorepo, reference - https://github.com/microsoft/TypeScript/issues/30855#issuecomment-1432931820",
+  "main": "index.d.ts",
+  "types": "index.d.ts"
+}
