@@ -19,6 +19,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@tinkoff/env-validators": "0.0.0-stub",
     "@micro-sentry/browser": "^7.0.1"
   },
   "peerDependencies": {

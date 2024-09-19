@@ -97,6 +97,22 @@ describe('encodeForURLContext', () => {
     });
   });
 
+  it('backslash prefixed attack vectors', () => {
+    const attackVectors = [
+      '\fjavascript:alert()',
+      '\vjavascript:alert()',
+      '\tjavascript:alert()',
+      '\njavascript:alert()',
+      '\rjavascript:alert()',
+      '\u0000javascript:alert()',
+      '\u0001javascript:alert()',
+    ];
+
+    attackVectors.forEach((vector) => {
+      expect(encodeForURLContext(vector)).toBe(blankUrl);
+    });
+  });
+
   describe('invalid protocols', () => {
     describe.each(['javascript', 'data', 'vbscript'])('%s', (protocol) => {
       it(`should replace ${protocol} urls with ${blankUrl}`, () => {

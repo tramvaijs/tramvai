@@ -2,6 +2,7 @@ import { commandLineListTokens, provide, type Provider } from '@tramvai/core';
 import { ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module-common';
 import type { BrowserSentryClientOptions } from '@micro-sentry/browser';
 import { BrowserMicroSentryClient } from '@micro-sentry/browser';
+import { isUrl } from '@tinkoff/env-validators';
 import {
   MICRO_SENTRY_INLINE_ERROR_INTERCEPTOR_KEY_TOKEN,
   MICRO_SENTRY_INSTANCE_TOKEN,
@@ -20,7 +21,7 @@ export const browserProviders: Provider[] = [
   provide({
     provide: ENV_USED_TOKEN,
     useValue: [
-      { key: 'SENTRY_DSN' },
+      { key: 'SENTRY_DSN', validator: isUrl },
       {
         key: 'SENTRY_ENVIRONMENT',
         optional: true,

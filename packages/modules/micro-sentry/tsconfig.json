@@ -17,6 +17,9 @@
         },
         {
             "path": "../../tokens/render"
+        },
+        {
+            "path": "../../libs/env-validators"
         }
     ]
 }
