@@ -235,4 +235,15 @@ export interface WebpackStats {
 
 type FetchWebpackStatsFn = (payload?: { modern?: boolean }) => Promise<WebpackStats>;
 
-export const FETCH_WEBPACK_STATS_TOKEN = createToken<FetchWebpackStatsFn>('fetchWebpackStatsFn');
+export const FETCH_WEBPACK_STATS_TOKEN = createToken<FetchWebpackStatsFn>('fetchWebpackStatsFn', {
+  scope: Scope.SINGLETON,
+});
+
+export const ASSETS_PREFIX_TOKEN = createToken<() => string | null>('tramvai assets prefix', {
+  scope: Scope.SINGLETON,
+});
+
+export const DEFAULT_ASSETS_PREFIX_TOKEN = createToken<string | null>(
+  'tramvai default assets prefix',
+  { scope: Scope.SINGLETON }
+);

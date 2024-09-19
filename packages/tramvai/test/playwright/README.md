@@ -95,3 +95,60 @@ test.describe('examples/app', async () => {
 ```
 
 You can find more info about `app` object in our [Testing Guide](guides/testing.md#integration-tests)
+
+### Production build testing
+
+If you need to test production build, `@tramvai/test-pw` provide a few fixtures for it:
+- `appServerFixture` to run compiled application server
+- `buildAppFixture` to run production build of the application (will be called implicitly for `appServerFixture`)
+
+First, configure fixtures:
+
+```ts title="__integration__/test-fixture.ts"
+import path from 'path';
+import { test as base } from '@playwright/test';
+import type { BuildAppTypes } from '@tramvai/test-pw';
+import { appServerFixture } from '@tramvai/test-pw';
+
+type TestFixture = {};
+
+type WorkerFixture = {
+  app: BuildAppTypes.TestApp;
+  appTarget: BuildAppTypes.AppTarget;
+  buildOptions: BuildAppTypes.StartOptions;
+};
+
+export const test = base.extend<TestFixture, WorkerFixture>({
+  appTarget: [
+    // provide application name and directory
+    {
+      target: 'appName',
+      cwd: path.resolve(__dirname, '..'),
+    },
+    { scope: 'worker', auto: true, option: true },
+  ],
+  // any `buildCli` parameters
+  buildOptions: [{
+    env: {
+      SOME_MOCKED_API: 'xxx'
+    },
+  }, { scope: 'worker', auto: true, option: true }],
+
+  appServer: appServerFixture,
+});
+```
+
+Then, use the `appServer` object in integration tests:
+
+```ts title="__integration__/appName.integration.ts"
+import { expect } from '@playwright/test';
+import { test } from './test-fixture';
+
+test.describe('examples/app', async () => {
+  test('Navigation is visible', async ({ appServer, page }) => {
+    await page.goto(`http://localhost:${appServer.port}/`);
+
+    expect(page.getByRole('navigation')).toBeVisible();
+  });
+});
+```

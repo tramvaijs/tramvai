@@ -12,12 +12,6 @@ const INTERNAL_CACHE_SIZE = 50;
 
 const TRAMVAI_CLI_ASSETS_PREFIX = `${process.env.TRAMVAI_CLI_ASSETS_PREFIX}`;
 
-const ASSETS_PREFIX =
-  process.env.NODE_ENV === 'development' &&
-  (process.env.ASSETS_PREFIX === 'static' || !process.env.ASSETS_PREFIX)
-    ? TRAMVAI_CLI_ASSETS_PREFIX
-    : process.env.ASSETS_PREFIX;
-
 const getInlineType = (type: PageResource['type']) => {
   switch (type) {
     case ResourceType.style:
@@ -29,15 +23,15 @@ const getInlineType = (type: PageResource['type']) => {
   }
 };
 
-const getResourceUrl = (resource: PageResource) => {
+const getResourceUrl = (resource: PageResource, assetsPrefix: string | null) => {
   if (isEmpty(resource.payload) || !isAbsoluteUrl(resource.payload)) {
     return undefined;
   }
 
   let result = resource.payload.startsWith('//') ? `https:${resource.payload}` : resource.payload;
 
-  if (process.env.TRAMVAI_CLI_COMMAND === 'static' && result.startsWith(ASSETS_PREFIX)) {
-    result = result.replace(ASSETS_PREFIX, TRAMVAI_CLI_ASSETS_PREFIX);
+  if (process.env.TRAMVAI_CLI_COMMAND === 'static' && result.startsWith(assetsPrefix)) {
+    result = result.replace(assetsPrefix, TRAMVAI_CLI_ASSETS_PREFIX);
   }
 
   return result;
@@ -61,9 +55,10 @@ export class ResourcesInliner implements ResourcesInlinerType {
   private resourcesRegistryCache: typeof RESOURCES_REGISTRY_CACHE;
   private log: ReturnType<typeof LOGGER_TOKEN>;
   private runningRequests = new Set<string>();
+  private assetsPrefix: string | null;
 
   private scheduleFileLoad = async (resource: PageResource, resourceInlineThreshold: number) => {
-    const url = getResourceUrl(resource);
+    const url = getResourceUrl(resource, this.assetsPrefix);
     const requestKey = `file${url}`;
 
     const filesCache = this.getFilesCache(url);
@@ -108,7 +103,7 @@ export class ResourcesInliner implements ResourcesInlinerType {
     resourceInlineThreshold: number,
     waitForFileLoad?: boolean
   ) => {
-    const url = getResourceUrl(resource);
+    const url = getResourceUrl(resource, this.assetsPrefix);
     const requestKey = `size${url}`;
 
     const result = this.resourcesRegistryCache.sizeCache.get(url);
@@ -151,15 +146,22 @@ export class ResourcesInliner implements ResourcesInlinerType {
     }
   };
 
-  constructor({ resourcesRegistryCache, resourceInlineThreshold, logger }) {
+  constructor({ resourcesRegistryCache, resourceInlineThreshold, logger, assetsPrefixFactory }) {
     this.resourcesRegistryCache = resourcesRegistryCache;
     this.resourceInlineThreshold = resourceInlineThreshold;
     this.log = logger('resources-inliner');
+
+    const assetsPrefix = assetsPrefixFactory();
+
+    this.assetsPrefix =
+      process.env.NODE_ENV === 'development' && (assetsPrefix === 'static' || !assetsPrefix)
+        ? TRAMVAI_CLI_ASSETS_PREFIX
+        : assetsPrefix;
   }
 
   private getFilesCache(url: string) {
     if (
-      url.startsWith(ASSETS_PREFIX) ||
+      url.startsWith(this.assetsPrefix) ||
       // reverse logic for `static` command in `getResourceUrl` method
       (process.env.TRAMVAI_CLI_COMMAND === 'static' && url.startsWith(TRAMVAI_CLI_ASSETS_PREFIX))
     ) {
@@ -179,7 +181,7 @@ export class ResourcesInliner implements ResourcesInlinerType {
       return true;
     }
 
-    const url = getResourceUrl(resource);
+    const url = getResourceUrl(resource, this.assetsPrefix);
 
     if (isUndefined(url)) {
       // if url is undefined that file is not in cache
@@ -201,7 +203,7 @@ export class ResourcesInliner implements ResourcesInlinerType {
       return false;
     }
 
-    const url = getResourceUrl(resource);
+    const url = getResourceUrl(resource, this.assetsPrefix);
 
     if (isUndefined(url) || this.resourcesRegistryCache.disabledUrlsCache.has(url)) {
       return false;
@@ -245,7 +247,7 @@ export class ResourcesInliner implements ResourcesInlinerType {
   }
 
   inlineResource(resource: PageResource): PageResource[] {
-    const url = getResourceUrl(resource);
+    const url = getResourceUrl(resource, this.assetsPrefix);
     if (isUndefined(url)) {
       // usually, it should not happen but anyway check it for safety
       return [resource];
@@ -288,7 +290,7 @@ export class ResourcesInliner implements ResourcesInlinerType {
   }
 
   async prefetchResource(resource: PageResource): Promise<void> {
-    const url = getResourceUrl(resource);
+    const url = getResourceUrl(resource, this.assetsPrefix);
     const resourceInlineThreshold = this.resourceInlineThreshold.threshold;
 
     if (

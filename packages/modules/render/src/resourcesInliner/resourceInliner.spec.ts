@@ -19,6 +19,7 @@ describe('ResourceInliner', () => {
         threshold: 10000,
       },
       logger,
+      assetsPrefixFactory: () => null,
     });
 
     resourcesRegistryCache.filesCache.set(

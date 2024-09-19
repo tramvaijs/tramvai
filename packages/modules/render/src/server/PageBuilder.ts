@@ -12,6 +12,7 @@ import type {
   FETCH_WEBPACK_STATS_TOKEN,
   REACT_SERVER_RENDER_MODE,
   WebpackStats,
+  ASSETS_PREFIX_TOKEN,
 } from '@tramvai/tokens-render';
 import { ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import { safeStringify } from '@tramvai/safe-strings';
@@ -65,6 +66,8 @@ export class PageBuilder {
 
   private renderMode: typeof REACT_SERVER_RENDER_MODE | null;
 
+  private assetsPrefixFactory: ExtractDependencyType<typeof ASSETS_PREFIX_TOKEN>;
+
   constructor({
     renderSlots,
     pageService,
@@ -80,6 +83,7 @@ export class PageBuilder {
     fetchWebpackStats,
     di,
     renderMode,
+    assetsPrefixFactory,
   }) {
     this.htmlAttrs = htmlAttrs;
     this.renderSlots = flatten(renderSlots || []);
@@ -95,6 +99,7 @@ export class PageBuilder {
     this.fetchWebpackStats = fetchWebpackStats;
     this.di = di;
     this.renderMode = renderMode;
+    this.assetsPrefixFactory = assetsPrefixFactory;
   }
 
   async flow(): Promise<string> {
@@ -166,6 +171,7 @@ export class PageBuilder {
         pageComponent,
         fetchWebpackStats: this.fetchWebpackStats,
         renderMode: this.renderMode,
+        assetsPrefixFactory: this.assetsPrefixFactory,
       })
     );
     this.resourcesRegistry.register(
