@@ -1,0 +1,53 @@
+name: Smoke test
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  bootstrap:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Setup Git
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install playwright
+        run: npx playwright install --with-deps
+
+      - name: Build
+        run: yarn build
+
+      - name: Bootstrap application
+        run: ./node_modules/.bin/tramvai new smoke-bootstrap --type=app --template=multirepo --packageManager=npm --testingFramework=jest
+
+      - name: Build application
+        working-directory: smoke-bootstrap
+        run: yarn build
+
+      - name: Test:unit application
+        working-directory: smoke-bootstrap
+        run: yarn test
+
+      - name: Test:integration application
+        working-directory: smoke-bootstrap
+        run: yarn test:integration
