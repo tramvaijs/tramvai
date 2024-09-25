@@ -6,12 +6,11 @@ import type { TestingFrameworks } from '../questions/testingFramework';
 import type { Type } from '../questions/type';
 
 const COMMON_JEST_DEPENDENCIES = [
+  '@playwright/test',
   '@testing-library/react',
   '@tramvai/test-unit',
   '@tramvai/test-react',
-  '@tramvai/test-integration',
   '@tramvai/test-unit-jest',
-  '@tramvai/test-integration-jest',
   '@types/jest@^29.0.0',
   'jest@^29.0.0',
   'jest-circus@^29.0.0',

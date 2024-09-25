@@ -15,16 +15,17 @@
     "noEmitOnError": true,
     "importHelpers": true,
     "skipLibCheck": true,
-    "baseUrl": "src",
+    "baseUrl": "./",
     "paths": {
-      "~shared/*": ["shared/*"],
-      "~entities/*": ["entities/*"],
-      "~features/*": ["features/*"],
-      "~widgets/*": ["widgets/*"],
-      "~pages/*": ["pages/*"],
-      "~processes/*": ["processes/*"],
-      "~app/*": ["app/*"]
-    }
+      "~shared/*": ["src/shared/*"],
+      "~entities/*": ["src/entities/*"],
+      "~features/*": ["src/features/*"],
+      "~widgets/*": ["src/widgets/*"],
+      "~pages/*": ["src/pages/*"],
+      "~processes/*": ["src/processes/*"],
+      "~app/*": ["src/app/*"],
+      "~test/*": ["test/*"]
+  }
   }{{#if isJest}},
   "ts-node": {
     "transpileOnly": true,
