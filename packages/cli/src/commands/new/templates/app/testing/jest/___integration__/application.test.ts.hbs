@@ -1,18 +1,8 @@
-import type { StartCliResult } from '@tramvai/test-integration';
-import { startCli } from '@tramvai/test-integration';
+import { expect } from '@playwright/test';
+import { test } from '~test/base-test';
 
-describe('{{configEntry.name}}', () => {
-  let app: StartCliResult;
+test('should navigate to main page', async ({ application, page }) => {
+  await application.goto((pages) => pages.main);
 
-  beforeAll(async () => {
-    app = await startCli('{{configEntry.name}}');
-  }, 80000);
-
-  afterAll(() => {
-    return app.close();
-  });
-
-  it('request to main page return status 200', async () => {
-    return app.request('/').expect(200);
-  });
+  expect(await page.content()).toContain('Welcome!');
 });

@@ -1,7 +1,7 @@
 import each from '@tinkoff/utils/array/each';
 import split from '@tinkoff/utils/string/split';
 import { hostname } from 'os';
-import env from 'std-env';
+import { env } from 'std-env';
 import type { ExtractDependencyType } from '@tramvai/core';
 import { Module, Scope, provide } from '@tramvai/core';
 import {

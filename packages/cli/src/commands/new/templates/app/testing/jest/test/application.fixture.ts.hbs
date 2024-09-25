@@ -1,0 +1,44 @@
+import type { Page, TestFixture } from '@playwright/test';
+import { test } from '@playwright/test';
+
+interface ConstructorPayload {
+  page: Page;
+  baseURL: string;
+}
+
+export const PAGES = {
+  main: '/',
+} as const;
+
+export class ApplicationComponentObject {
+  private page: Page;
+
+  private baseURL: string;
+
+  constructor(payload: ConstructorPayload) {
+    this.page = payload.page;
+    this.baseURL = payload.baseURL;
+  }
+
+  /**
+   * @example
+   * app.goto((pages) => pages.main)
+   */
+  async goto(selectPage: (pages: typeof PAGES) => string) {
+    const path = selectPage(PAGES);
+
+    await test.step(`Navigating to ${path}`, async () => {
+      await this.page.goto(`${this.baseURL}${path}`);
+    });
+  }
+}
+
+export const applicationFixture: TestFixture<
+  ApplicationComponentObject,
+  ConstructorPayload
+> = async ({ page, baseURL }, use) => {
+  const appCO = new ApplicationComponentObject({ page, baseURL });
+
+  await use(appCO);
+};
+

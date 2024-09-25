@@ -1,6 +1,6 @@
 import each from '@tinkoff/utils/array/each';
 import split from '@tinkoff/utils/string/split';
-import env from 'std-env';
+import { env } from 'std-env';
 import { hostname } from 'os';
 import { LEVELS } from './constants';
 import { Logger } from './logger';
