@@ -54,7 +54,7 @@ If you build HTML pages with static prefix, for example `ASSETS_PREFIX=https://y
 You can specify the comma separated paths list for static HTML generation with `--onlyPages` flag:
 
 ```bash
-tramvai static <appName> --onlyPages=/about,/blog
+tramvai static <appName> --onlyPages=/about/,/blog/
 ```
 
 ### Custom page request headers

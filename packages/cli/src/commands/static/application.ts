@@ -1,5 +1,4 @@
-import intersection from '@tinkoff/utils/array/intersection';
-
+import partition from '@tinkoff/utils/array/partition';
 import path from 'path';
 import { node } from 'execa';
 import waitOn from 'wait-on';
@@ -155,7 +154,23 @@ export const staticApp = async (
   }
 
   if (options.onlyPages) {
-    paths = intersection(paths, options.onlyPages);
+    const [existed, unknown] = partition((page) => {
+      return paths.includes(page);
+    }, options.onlyPages);
+
+    if (unknown.length) {
+      context.logger.event({
+        type: 'warning',
+        event: 'COMMAND:STATIC:UNKNOWN_PAGES',
+        message: `message: some of defined pages are not found`,
+        payload: {
+          unknownPages: unknown,
+          existedPages: paths,
+        },
+      });
+    }
+
+    paths = existed;
   } else if (process.env.TRAMVAI_FORCE_CLIENT_SIDE_RENDERING === 'true') {
     // implicit connection with packages/modules/page-render-mode/src/ForceCSRModule.ts
     paths = ['/__csr_fallback__/'];
