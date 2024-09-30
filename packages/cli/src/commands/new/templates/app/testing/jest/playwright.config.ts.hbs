@@ -6,10 +6,6 @@ Error.stackTraceLimit = Infinity;
 const PORT = Number(process.env.PORT) || 3000;
 const BASE_URL = `http://localhost:${PORT}`;
 
-const command = 'npm start';
-const timeout = 60 * 1000;
-const workers = 1;
-
 const projects: PlaywrightTestConfig['projects'] = [
   {
     name: 'chromium',
@@ -19,25 +15,24 @@ const projects: PlaywrightTestConfig['projects'] = [
 
 const config: PlaywrightTestConfig = {
   testMatch: '__integration__/**/*.test.ts',
-  expect: {
-    timeout: 1000,
-  },
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+  ],
   use: {
     testIdAttribute: 'data-qa-type',
     headless: true,
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',
     baseURL: BASE_URL,
-    navigationTimeout: 10000,
     trace: 'retain-on-failure',
   },
   webServer: {
-    command,
-    port: PORT,
-    timeout,
+    command: 'npm run start',
+    url: BASE_URL,
+    reuseExistingServer: !process.env.CI,
   },
   projects,
-  workers,
 };
 
 export default config;

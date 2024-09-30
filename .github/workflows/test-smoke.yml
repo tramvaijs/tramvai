@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+env:
+  CI: true
+
 jobs:
   bootstrap:
     strategy:
@@ -28,14 +31,15 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Install Playwright
-        run: npx playwright install --with-deps
-
       - name: Build
         run: yarn build
 
       - name: Bootstrap application
         run: ./node_modules/.bin/tramvai new smoke-bootstrap --type=app --template=multirepo --packageManager=npm --testingFramework=jest
+
+      - name: Install Playwright
+        working-directory: smoke-bootstrap
+        run: yarn playwright install --with-deps
 
       - name: Build application
         working-directory: smoke-bootstrap
