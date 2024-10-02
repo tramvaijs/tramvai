@@ -19,6 +19,8 @@ export const TramvaiPwaManifestModule = declareModule({
           pathRewrite: (path: string) => {
             return path.replace(swScope, '/');
           },
+          // support local proxy for `tramvai start --https`
+          secure: process.env.NODE_ENV !== 'development',
         };
       },
       deps: {
