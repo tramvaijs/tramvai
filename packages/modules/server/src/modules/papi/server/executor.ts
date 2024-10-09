@@ -2,6 +2,7 @@ import { DI_TOKEN, provide, Scope } from '@tinkoff/dippy';
 import type { PapiHandlerContext, PapiHandlerOptions } from '@tramvai/papi';
 import { getPapiParameters } from '@tramvai/papi';
 import {
+  ASYNC_LOCAL_STORAGE_TOKEN,
   LOGGER_TOKEN,
   REQUEST_MANAGER_TOKEN,
   RESPONSE_MANAGER_TOKEN,
@@ -11,7 +12,14 @@ import { FASTIFY_REQUEST, PAPI_EXECUTOR } from '@tramvai/tokens-server-private';
 export const papiExecutorProvider = provide({
   provide: PAPI_EXECUTOR,
   scope: Scope.REQUEST,
-  useFactory: ({ di, logger, fastifyRequest, requestManager, responseManager }) => {
+  useFactory: ({
+    di,
+    logger,
+    fastifyRequest,
+    requestManager,
+    responseManager,
+    asyncLocalStorage,
+  }) => {
     const papiLog = logger('papi');
 
     const papiOptions: PapiHandlerOptions = {
@@ -32,6 +40,14 @@ export const papiExecutorProvider = provide({
         log: papiLog.child(`${method}_${path}`),
       };
 
+      const storage = asyncLocalStorage.getStore();
+
+      if (storage) {
+        // save Request DI container to async local storage context for current request
+        // eslint-disable-next-line no-param-reassign
+        storage.tramvaiRequestDi = di;
+      }
+
       return handler.call(papiContext, papiOptions);
     };
   },
@@ -41,5 +57,6 @@ export const papiExecutorProvider = provide({
     fastifyRequest: FASTIFY_REQUEST,
     requestManager: REQUEST_MANAGER_TOKEN,
     responseManager: RESPONSE_MANAGER_TOKEN,
+    asyncLocalStorage: ASYNC_LOCAL_STORAGE_TOKEN,
   },
 });
