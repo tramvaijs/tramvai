@@ -177,6 +177,17 @@ type HistoryOptions = {
 
 `go(to)` method will go to the specified delta by history
 
+### Extract previous route url
+
+To extract information about the previous route, you can use `window.history.state.navigateState`. This object will always have information about the previous URL and the previous route's navigation state.
+
+```ts
+interface PreviousNavigateState {
+  previousRoute?: Route;
+  previousUrl?: Url;
+}
+```
+
 ### `NavigateOptions`
 
 Object that allows to specify transition options both to [navigate](#navigation) and [updateCurrentRoute](#route-update) transitions:
