@@ -36,4 +36,6 @@ export interface MockConfig {
   dynamicQueries?: Record<string, string>;
 }
 
+export type Query = Record<string, string | string[]>;
+
 export type Mock = MockHandler | MockConfig;

@@ -6,7 +6,7 @@ import querystring from 'querystring';
 import type { Request, IRouterMatcher, Express, RequestHandler } from 'express';
 import express, { Router } from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
-import type { Mock, MockConfig, MockerOptions, Logger, ApiConfig } from './mocker.h';
+import type { Mock, MockerOptions, Logger, ApiConfig, Query, MockConfig } from './mocker.h';
 import type { MockRepository } from './repositories/repository.h';
 
 export class Mocker {
@@ -145,26 +145,19 @@ export class Mocker {
 
       // key match pattern "METHOD /api/endpoint?some=queries"
       Object.keys(mocks).forEach((key) => {
-        const mock = mocks[key];
         const [method, url] = key.split(' ');
-        const [path, query] = url.split('?');
+        const [path] = url.split('?');
         const adoptedMethod = method.toLowerCase();
         const addRequestHandler = router[adoptedMethod];
 
         // add unique route for all mocks
         if (isRouterMethod(addRequestHandler)) {
           router[adoptedMethod](path, (req, res, next) => {
-            if (typeof mock === 'function') {
-              mock(req, res);
-            } else {
-              let parsedQuery: Record<string, string | string[]>;
-              if (query) {
-                parsedQuery = parseQuery(query);
-              }
-
-              const mockHandler = this.convertMockConfigToHandler(mock, proxy, parsedQuery);
-              mockHandler(req, res, next);
-            }
+            const mockHandler = this.convertMockConfigToHandler(
+              { api, query: req.query, path, method },
+              proxy
+            );
+            mockHandler(req, res, next);
           });
         }
       });
@@ -221,19 +214,24 @@ export class Mocker {
 
   // eslint-disable-next-line class-methods-use-this
   private convertMockConfigToHandler(
-    mockConfig: MockConfig,
-    proxy: RequestHandler,
-    query?: Record<string, string | string[]>
+    { api, query, path, method }: { api: string; query: Query; path: string; method: string },
+    proxy: RequestHandler
   ): RequestHandler {
-    const { payload, status, headers = {}, pass } = mockConfig;
+    const mock = extractCorrespondingMock(this.mocks, { api, method, path, query });
 
     return (req, res, next) => {
+      if (typeof mock === 'function') {
+        mock(req, res);
+        return;
+      }
+
       // proxy requests if mock has "pass" options
-      if (pass) {
+      if (!mock || mock?.pass || Object.keys(mock ?? {}).length === 0) {
         proxy(req, res, next);
         return;
       }
 
+      const { payload, status, headers = {} } = mock;
       // proxy requests if mock and request queries do not match, and "passUnhandledRequests" options is passed
       if (query && Object.keys(query).length > 0) {
         if (!isQueriesEqual(query, req)) {
@@ -265,12 +263,42 @@ export class Mocker {
   }
 }
 
+function buildMocksApiKey(path: string, query: Query | undefined, method: string): string {
+  if (Object.keys(query).length !== 0) {
+    return `${method} ${path}?${stringifyQuery(query)}`;
+  }
+  return `${method} ${path}`;
+}
+
+function extractCorrespondingMock(
+  allMocks: Record<string, Record<string, Mock>>,
+  params: { api: string; path: string; query: Query; method: string }
+): Mock | undefined | null {
+  const fullPath = buildMocksApiKey(params.path, params.query, params.method);
+  const pathname = buildMocksApiKey(params.path, {}, params.method);
+
+  const apiMocks = allMocks[params.api];
+
+  if (!apiMocks || Object.keys(apiMocks).length === 0) {
+    return null;
+  }
+
+  const mock = apiMocks[fullPath];
+
+  if (!mock) {
+    const fallbackMock = apiMocks[pathname];
+    return fallbackMock;
+  }
+
+  return mock;
+}
+
 function isQueriesEqual(query: Record<string, any>, req: Request): boolean {
   return shallowEqual(query, req.query);
 }
 
-function parseQuery(query: string): Record<string, string | string[]> {
-  return querystring.parse(query);
+function stringifyQuery(query: Query): string {
+  return querystring.stringify(query);
 }
 
 function isRouterMethod(routerMethod: any): routerMethod is IRouterMatcher<any> {

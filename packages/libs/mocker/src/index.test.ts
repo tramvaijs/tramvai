@@ -128,6 +128,104 @@ describe('Mocker', () => {
     expect(postPayload).toEqual({ real: 'true' });
   });
 
+  it('same endpoints with different queries', async () => {
+    const mocker = new Mocker({
+      logger: console,
+      passUnhandledRequests: true,
+      apis: {
+        'first-api': {
+          target: `${targetAddress}/`,
+        },
+      },
+      repositories: [
+        {
+          getAll: async (api: string) => {
+            return {
+              'first-api': {
+                'GET /query': (req: any, res: any) => {
+                  res.json({
+                    query: req.query,
+                  });
+                },
+                'GET /func': (_req: any, res: any) => {
+                  res.json({ func: true, withQuery: false });
+                },
+                'GET /func?func=true': (_req: any, res: any) => {
+                  res.json({ func: true, withQuery: true });
+                },
+                'GET /func?func=true&foo=bar': (_req: any, res: any) => {
+                  res.json({ func: true, withQuery: true, foo: 'bar' });
+                },
+                'GET /endpoint': {
+                  payload: {
+                    ok: true,
+                  },
+                },
+                'GET /endpoint?foo=bar': {
+                  payload: { foo: 'bar' },
+                },
+                'GET /endpoint?foo=baz': {
+                  payload: { foo: 'baz' },
+                },
+                'GET /endpoint?foo=bar&bar=foo': {
+                  payload: { foo: 'bar', bar: 'foo' },
+                },
+              },
+            };
+          },
+        } as any,
+      ],
+    });
+
+    await mocker.init();
+
+    mockerHandler.mockImplementation((req, res) => {
+      mocker.use(req, res);
+    });
+
+    const response1 = await fetch(`${mockerAddress}/first-api/endpoint?foo=baz`);
+    const payload1 = await response1.json();
+    expect(payload1).toEqual({ foo: 'baz' });
+
+    const response2 = await fetch(`${mockerAddress}/first-api/endpoint?foo=bar`);
+    const payload2 = await response2.json();
+    expect(payload2).toEqual({ foo: 'bar' });
+
+    const response3 = await fetch(`${mockerAddress}/first-api/endpoint?foo=bar&bar=foo`);
+    const payload3 = await response3.json();
+    expect(payload3).toEqual({ foo: 'bar', bar: 'foo' });
+
+    const response4 = await fetch(`${mockerAddress}/first-api/endpoint`);
+    const payload4 = await response4.json();
+    expect(payload4).toEqual({ ok: true });
+
+    const response5 = await fetch(`${mockerAddress}/first-api/func`);
+    const payload5 = await response5.json();
+    expect(payload5).toEqual({ func: true, withQuery: false });
+
+    const response6 = await fetch(`${mockerAddress}/first-api/func?func=true`);
+    const payload6 = await response6.json();
+    expect(payload6).toEqual({ func: true, withQuery: true });
+
+    const response7 = await fetch(`${mockerAddress}/first-api/query?func=true&foo=bar`);
+    const payload7 = await response7.json();
+
+    expect(payload7).toEqual({
+      query: {
+        func: 'true',
+        foo: 'bar',
+      },
+    });
+
+    const response8 = await fetch(`${mockerAddress}/first-api/query?another=true`);
+    const payload8 = await response8.json();
+    expect(payload8).toEqual({
+      query: {
+        another: 'true',
+      },
+    });
+  });
+
   // eslint-disable-next-line max-statements
   it('query', async () => {
     const mocker = new Mocker({
