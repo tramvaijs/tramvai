@@ -28,8 +28,26 @@ interface PreviousNavigateState {
   previousUrl?: Url;
 }
 
-const generatePreviousNavigateState = (navigation: Navigation): PreviousNavigateState => {
+const generatePreviousNavigateState = (
+  navigation: Navigation,
+  currentState?: HistoryState
+): PreviousNavigateState => {
   const state: PreviousNavigateState = {};
+
+  if (navigation.replace) {
+    const previousRoute = currentState?.navigateState.previousRoute;
+    const previousUrl = currentState?.navigateState.previousUrl;
+
+    if (previousRoute) {
+      state.previousRoute = previousRoute;
+    }
+
+    if (previousUrl) {
+      state.previousUrl = previousUrl;
+    }
+
+    return state;
+  }
 
   if (navigation.from) {
     state.previousRoute = navigation.from;
@@ -48,7 +66,8 @@ const generateState = (
   index: number = 0
 ): HistoryState => {
   const key = generateKey(navigation);
-  const previousNavigateState = generatePreviousNavigateState(navigation);
+
+  const previousNavigateState = generatePreviousNavigateState(navigation, currentState);
   let { type } = navigation;
 
   if (navigation.replace && currentState) {
