@@ -11,7 +11,7 @@ export const providers: Provider[] = [
   provide({
     provide: CACHE_NAMES_LIST_TOKEN,
     scope: Scope.SINGLETON,
-    useValue: new Set<string>(),
+    useFactory: () => new Set<string>(),
   }),
   provide({
     provide: SERVER_MODULE_PAPI_PRIVATE_ROUTE,

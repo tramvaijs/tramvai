@@ -113,7 +113,7 @@ export const TramvaiDnsCacheModule = declareModule({
         const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
         const ttl = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
 
-        const cache = createCache('memory', { max, ttl });
+        const cache = createCache('memory', { name: 'dns-lookup', max, ttl });
 
         const adapter: CacheInstance = {
           set: (hostname: string, entries: any[], ttl: number): any => {

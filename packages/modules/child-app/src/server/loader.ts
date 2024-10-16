@@ -34,6 +34,7 @@ export class ServerLoader extends Loader {
   }) {
     super();
     const cache = createCache('memory', {
+      name: 'child-app-loader',
       ttl: 1000 * 60 * 60 * 24 * 5,
       max: 20,
     });

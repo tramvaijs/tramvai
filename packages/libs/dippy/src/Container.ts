@@ -12,6 +12,8 @@ import { DI_TOKEN } from './tokens';
 import type {
   BaseTokenInterface,
   MultiTokenInterface,
+  BaseOptionalTokenDependency,
+  MultiOptionalTokenDependency,
   OptionalTokenDependency,
 } from './createToken/createToken';
 import { tokenToString } from './createToken/createToken';
@@ -207,14 +209,16 @@ export class Container {
   get<T>(obj: { token: MultiTokenInterface<T>; optional: true; multi?: true }): T[] | null;
   get<T>(obj: { token: MultiTokenInterface<T>; optional?: false; multi?: true }): T[];
 
+  get<T>(obj: BaseOptionalTokenDependency<T>): T | null;
+  get<T>(obj: MultiOptionalTokenDependency<T>): T[] | null;
+  get<T>(obj: OptionalTokenDependency<T>): T[] | T | null;
+
   get<T>(token: BaseTokenInterface<T>): T;
   get<T>(token: MultiTokenInterface<T>): T[];
 
-  get<T>(obj: OptionalTokenDependency<T>): T | null;
-
   get<T>(token: T): T;
 
-  get<T extends ProviderDep>(tokenORObject: T) {
+  get<T extends ProviderDep>(tokenORObject: T): T[] | T | null {
     let token;
     let optional = false;
     let multi = false;

@@ -36,6 +36,7 @@ export const serverUserAgentProviders: Provider[] = [
     scope: Scope.SINGLETON,
     useFactory: ({ createCache, envManager }) => {
       return createCache('memory', {
+        name: 'user-agent',
         max: Number(envManager.get('TRAMVAI_USER_AGENT_CACHE_MAX')),
       });
     },

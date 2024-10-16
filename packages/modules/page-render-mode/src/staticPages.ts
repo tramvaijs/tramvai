@@ -59,6 +59,7 @@ export const staticPagesProviders = [
     scope: Scope.SINGLETON,
     useFactory: ({ createCache, staticPagesOptions }) => {
       return createCache('memory', {
+        name: 'static-pages',
         max: staticPagesOptions.maxSize,
       });
     },

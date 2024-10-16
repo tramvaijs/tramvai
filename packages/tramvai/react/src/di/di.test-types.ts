@@ -1,20 +1,39 @@
-import { createToken } from '@tinkoff/dippy';
+import { expectTypeOf } from 'expect-type';
+import { createToken, optional } from '@tinkoff/dippy';
 import { useDi } from './hooks';
-
-const loggerToken = createToken<(message: string) => void>('logger');
 
 describe('react DI', () => {
   describe('useDi', () => {
-    it('optional tokens', () => {
-      const logger = useDi({ token: loggerToken, optional: true });
+    it('should resolve token', () => {
+      const TOKEN = createToken<number>('num');
 
-      // @ts-expect-error
-      logger('hello');
+      const resolved = useDi(TOKEN);
 
-      // @ts-expect-error
-      logger?.(21421);
+      expectTypeOf(resolved).toEqualTypeOf<number>();
+    });
 
-      logger?.('test');
+    it('should resolve optional token', () => {
+      const TOKEN = createToken<number>('num');
+
+      const resolved = useDi(optional(TOKEN));
+
+      expectTypeOf(resolved).toEqualTypeOf<number | null>();
+    });
+
+    it('should resolve multi token', () => {
+      const TOKEN = createToken<number>('num', { multi: true });
+
+      const resolved = useDi(TOKEN);
+
+      expectTypeOf(resolved).toEqualTypeOf<number[]>();
+    });
+
+    it('should resolve optional multi token', () => {
+      const TOKEN = createToken<number>('num', { multi: true });
+
+      const resolved = useDi(optional(TOKEN));
+
+      expectTypeOf(resolved).toEqualTypeOf<number[] | null>();
     });
   });
 });
