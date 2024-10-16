@@ -1,7 +1,7 @@
 import { expectTypeOf } from 'expect-type';
 import type { BaseTokenInterface, TokenInterface } from '../createToken/createToken';
 import { Container } from '../Container';
-import { createToken } from '../createToken/createToken';
+import { createToken, optional } from '../createToken/createToken';
 
 describe('Container types', () => {
   it('should correctly resolve generic types for token', () => {
@@ -20,7 +20,7 @@ describe('Container types', () => {
     function resolveDi<T>(
       di: Container,
       dep: { token: TokenInterface<T>; optional: boolean }
-    ): T | null {
+    ): T[] | T | null {
       return di.get(dep);
     }
 
@@ -29,7 +29,7 @@ describe('Container types', () => {
 
     const d = resolveDi(di, { token: TOKEN, optional: true });
 
-    expectTypeOf(d).toEqualTypeOf<number | null>();
+    expectTypeOf(d).toEqualTypeOf<number[] | number | null>();
   });
 
   it('should resolve multi token type', () => {
@@ -58,5 +58,23 @@ describe('Container types', () => {
 
     // @todo: should be any[] or not?
     expectTypeOf(resolved).toEqualTypeOf<any>();
+  });
+
+  it('should resolve optional token', () => {
+    const di = new Container();
+    const TOKEN = createToken<number>('num');
+
+    const resolved = di.get(optional(TOKEN));
+
+    expectTypeOf(resolved).toEqualTypeOf<number | null>();
+  });
+
+  it('should resolve optional multi token', () => {
+    const di = new Container();
+    const TOKEN = createToken<number>('num', { multi: true });
+
+    const resolved = di.get(optional(TOKEN));
+
+    expectTypeOf(resolved).toEqualTypeOf<number[] | null>();
   });
 });

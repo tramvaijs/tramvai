@@ -1,7 +1,6 @@
 import each from '@tinkoff/utils/array/each';
 import split from '@tinkoff/utils/string/split';
 import { hostname } from 'os';
-import { env } from 'std-env';
 import type { ExtractDependencyType } from '@tramvai/core';
 import { Module, Scope, provide } from '@tramvai/core';
 import {
@@ -27,6 +26,9 @@ export * from './LogStore';
 
 export { LOGGER_TOKEN };
 
+const stdEnv = require('std-env');
+
+const env = 'env' in stdEnv ? stdEnv.env : stdEnv;
 const DefaultReporter = env.ci || env.test ? NodeBasicReporter : NodeDevReporter;
 const reporter =
   process.env.DEBUG_PLAIN || process.env.NODE_ENV !== 'production'

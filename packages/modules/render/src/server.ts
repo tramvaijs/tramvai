@@ -92,14 +92,17 @@ export const DEFAULT_POLYFILL_CONDITION =
 
         return {
           filesCache: createCache('memory', {
+            name: 'resource-inliner-files',
             max: filesCacheSize,
             ttl: RESOURCES_REGISTRY_FILES_CACHE_TTL,
           }),
           sizeCache: createCache('memory', {
+            name: 'resource-inliner-sizes',
             max: sizeCacheSize,
             ttl: RESOURCES_REGISTRY_SIZE_CACHE_TTL,
           }),
           disabledUrlsCache: createCache('memory', {
+            name: 'resource-inliner-disabled-urls',
             max: disabledUrlCacheSize,
             ttl: REQUEST_TTL,
           }),
@@ -357,7 +360,7 @@ Page Error Boundary will be rendered for the client`,
       provide: 'modernSatisfiesMemoryCache',
       scope: Scope.SINGLETON,
       useFactory: ({ createCache }) => {
-        return createCache('memory', { max: 200 });
+        return createCache('memory', { name: 'modern-satisfies', max: 200 });
       },
       deps: {
         createCache: CREATE_CACHE_TOKEN,

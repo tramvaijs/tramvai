@@ -1,6 +1,5 @@
 import each from '@tinkoff/utils/array/each';
 import split from '@tinkoff/utils/string/split';
-import { env } from 'std-env';
 import { hostname } from 'os';
 import { LEVELS } from './constants';
 import { Logger } from './logger';
@@ -11,6 +10,9 @@ import { NodeBasicReporter } from './reporters/server/nodeBasic';
 import { NodeDevReporter } from './reporters/server/nodeDev';
 import { JSONReporter } from './reporters/json';
 
+const stdEnv = require('std-env');
+
+const env = 'env' in stdEnv ? stdEnv.env : stdEnv;
 const level = process.env.LOG_LEVEL ?? process.env.DEBUG_LEVEL;
 const enable = process.env.LOG_ENABLE ?? process.env.DEBUG_ENABLE;
 
