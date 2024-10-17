@@ -6,7 +6,7 @@ import type { ConfigManager } from '../../../config/configManager';
 import { extensions } from '../../../config/constants';
 
 export default (configManager: ConfigManager) => (config: Config) => {
-  const { rootDir, modern, buildType } = configManager;
+  const { rootDir, root, modern, buildType } = configManager;
 
   config.resolve.mainFields.merge(
     [
@@ -18,11 +18,14 @@ export default (configManager: ConfigManager) => (config: Config) => {
   );
 
   const tsconfigPath = path.resolve(rootDir, 'tsconfig.json');
+  const appTsconfigPath = path.resolve(rootDir, root, 'tsconfig.json');
+  const tsconfigPathExists = existsSync(tsconfigPath);
+  const appTsconfigPathExists = existsSync(appTsconfigPath);
 
-  if (existsSync(tsconfigPath)) {
+  if (tsconfigPathExists || appTsconfigPathExists) {
     config.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin, [
       {
-        configFile: tsconfigPath,
+        configFile: appTsconfigPathExists ? appTsconfigPath : tsconfigPath,
         extensions,
         mainFields: config.resolve.mainFields.values(),
         silent: true,
