@@ -37,6 +37,14 @@ const childRoute: NavigationRoute = {
 };
 const childUrl = parse('http://localhost/child');
 
+const lastRoute: NavigationRoute = {
+  name: 'last',
+  path: '/last/',
+  actualPath: '/last',
+  params: {},
+};
+const lastUrl = parse('http://localhost/last');
+
 /**
  * Test scenarious
  */
@@ -130,6 +138,136 @@ describe('router/history client', () => {
         }),
       }),
       ''
+    );
+  });
+
+  it('should set previousRoute as a current route from which the normal transition occurred', () => {
+    const history = new ClientHistory();
+
+    const navigation: Navigation = {
+      type: 'navigate',
+      from: rootRoute,
+      fromUrl: rootUrl,
+      to: childRoute,
+      url: childUrl,
+    };
+
+    history.init(navigation);
+
+    history.save({
+      type: 'navigate',
+      from: childRoute,
+      fromUrl: childUrl,
+      to: lastRoute,
+      url: lastUrl,
+    });
+
+    expect(pushStateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        navigateState: expect.objectContaining({
+          previousRoute: childRoute,
+        }),
+      }),
+      '',
+      lastRoute.actualPath
+    );
+  });
+
+  it('should set previousUrl as a current route from which the normal transition occurred', () => {
+    const history = new ClientHistory();
+
+    const navigation: Navigation = {
+      type: 'navigate',
+      from: rootRoute,
+      fromUrl: rootUrl,
+      to: childRoute,
+      url: childUrl,
+    };
+
+    history.init(navigation);
+
+    history.save({
+      type: 'navigate',
+      from: childRoute,
+      fromUrl: childUrl,
+      to: lastRoute,
+      url: lastUrl,
+    });
+
+    expect(pushStateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        navigateState: expect.objectContaining({
+          previousUrl: childUrl,
+        }),
+      }),
+      '',
+      lastRoute.actualPath
+    );
+  });
+
+  it('should set previousRoute from a current route from which the replace transition occurred', () => {
+    const history = new ClientHistory();
+
+    const navigation: Navigation = {
+      type: 'navigate',
+      from: rootRoute,
+      fromUrl: rootUrl,
+      to: childRoute,
+      url: childUrl,
+    };
+
+    history.init(navigation);
+
+    history.save({
+      type: 'navigate',
+      from: childRoute,
+      fromUrl: childUrl,
+      to: lastRoute,
+      url: lastUrl,
+      replace: true,
+    });
+
+    expect(replaceStateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        navigateState: expect.objectContaining({
+          previousRoute: rootRoute,
+        }),
+      }),
+      '',
+      lastRoute.actualPath
+    );
+  });
+
+  it('should set previousUrl from a current route from which the replace transition occurred', () => {
+    const history = new ClientHistory();
+
+    const navigation: Navigation = {
+      type: 'navigate',
+      from: rootRoute,
+      fromUrl: rootUrl,
+      to: childRoute,
+      url: childUrl,
+    };
+
+    history.init(navigation);
+
+    history.save({
+      type: 'navigate',
+      from: childRoute,
+      fromUrl: childUrl,
+      to: lastRoute,
+      url: lastUrl,
+      replace: true,
+    });
+
+    expect(replaceStateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        navigateState: expect.objectContaining({
+          previousUrl: rootUrl,
+        }),
+      }),
+      '',
+      lastRoute.actualPath
     );
   });
 });
