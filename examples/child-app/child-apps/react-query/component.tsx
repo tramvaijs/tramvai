@@ -4,5 +4,5 @@ import { query } from './query';
 export const Cmp = () => {
   const { data, isLoading } = useQuery(query);
 
-  return <div>{isLoading ? 'loading...' : data}</div>;
+  return <div id="child-react-query">{isLoading ? 'loading...' : data}</div>;
 };

@@ -84,7 +84,16 @@ export class PreloadManager implements ChildAppPreloadManager {
             await this.resolveComponent(config, route);
 
             await this.run('customer', config);
-            await this.run('clear', config);
+
+            // do not block Child App preloading by "clear" stage (where actions executed),
+            // because in will delay Child App rendering
+            // TODO: do we need to wait this Child App stage in "afterSpaTransition"?
+            // TODO: Can be a race condition between Child App render and actions?
+            this.run('clear', config).catch((error) => {
+              if (process.env.NODE_ENV === 'development') {
+                console.error('Child App command line error', error);
+              }
+            });
           } catch (error) {
             if (process.env.NODE_ENV === 'development') {
               console.error('Child App loading error', error);

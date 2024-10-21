@@ -24,6 +24,7 @@ export const runCommand = async ({
   logger: typeof LOGGER_TOKEN;
 }) => {
   const childApps = preloader.getPreloadedList();
+  const log = logger('child-app:run-preloaded');
 
   await Promise.all(
     childApps.map(async (config) => {
@@ -35,14 +36,19 @@ export const runCommand = async ({
       // if Child Apps was not preloaded, prevent running `spa` and `afterSpa` lines for it,
       // because it trigger actions or resolveUserDeps/resolvePageDeps commands second execution on the same navigation
       if (preloader.isNotPreloadedForSpaNavigation(config)) {
+        if (status === 'spa') {
+          log.info({
+            message:
+              'Child App has been preloaded first time, current SPA-transition will not be blocked, Child App `spa` and `afterSpa` lines will be skipped',
+            config,
+          });
+        }
         return;
       }
 
       return runner.run('client', status, config);
     })
   ).catch((error) => {
-    const log = logger('child-app:run-preloaded');
-
     log.error({
       event: 'spa-failed',
       error,
