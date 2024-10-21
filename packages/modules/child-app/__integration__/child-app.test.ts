@@ -473,7 +473,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
                         Content from root:
                         <!-- -->test
                       </div>
-                      <div>Hello, Mock!</div>
+                      <div id="child-react-query">Hello, Mock!</div>
                     "
             `);
     });
@@ -999,6 +999,27 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
         expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
           `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li><li>global-client</li><li>lazy-client</li>"`
         );
+      });
+    });
+
+    describe('lifecycle', () => {
+      it('should run actions after render with child-app preload on SPA-navigation', async () => {
+        const { page, router } = await getPageWrapper('/base');
+
+        const navigatePromise = router.navigate('/react-query');
+
+        await page.waitForSelector('#child-react-query');
+
+        expect(await page.innerText('#child-react-query')).toBe('loading...');
+
+        await navigatePromise;
+
+        await page.waitForFunction(() => {
+          return (
+            document.querySelector<HTMLDivElement>('#child-react-query')?.innerText ===
+            'Hello, Mock!'
+          );
+        });
       });
     });
   }

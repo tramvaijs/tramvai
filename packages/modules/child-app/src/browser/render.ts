@@ -44,10 +44,13 @@ export class RenderManager implements ChildAppRenderManager {
       return [this.diManager.getChildDi(config), undefined];
     }
 
-    this.log.warn({
-      message: 'Child-app has been used but not preloaded before React render',
-      request,
-    });
+    // for SPA-navigation, if Child App is preloaded first time, it is valid case
+    if (!this.preloadManager.isNotPreloadedForSpaNavigation(request)) {
+      this.log.warn({
+        message: 'Child-app has been used but not preloaded before React render',
+        request,
+      });
+    }
 
     const promiseDi = this.preloadManager.preload(request).then(() => {
       return this.diManager.getChildDi(config);
