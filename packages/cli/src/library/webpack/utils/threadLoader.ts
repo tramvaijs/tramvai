@@ -53,7 +53,7 @@ export const warmupWorkerPool = (configManager: ConfigManager<CliConfigEntry>) =
     '@babel/preset-typescript',
     '@babel/preset-react',
     '@babel/plugin-transform-runtime',
-    'babel-plugin-lodash',
+    '@tinkoff/babel-plugin-lodash/cjs',
   ]);
 };
 

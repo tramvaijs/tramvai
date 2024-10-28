@@ -1,5 +1,5 @@
 {
-  "name": "unused-deps",
+  "name": "unused-deps-and-dev-deps",
   "version": "1.2.3",
   "dependencies": {
     "pkg-b": "^1.0.0"

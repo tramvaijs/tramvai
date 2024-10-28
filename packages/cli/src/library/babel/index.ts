@@ -93,7 +93,7 @@ export const babelConfigFactory = ({
         {
           modules,
           useBuiltIns: 'entry',
-          // from core-js version depends what polyfills will be included with `useBuiltIns: 'entry'` option
+          // from core-js version depends on what polyfills will be included with `useBuiltIns: 'entry'` option
           // this logic is here - https://github.com/zloirock/core-js/blob/master/packages/core-js-compat/src/modules-by-versions.mjs
           corejs: require('core-js/package.json').version,
           loose: true,
@@ -126,7 +126,7 @@ export const babelConfigFactory = ({
       generateDataQaTag && path.resolve(__dirname, './plugins/react-element-info-unique'), // Собственный плагин. Необходимо удалить в будущем
       enableFillActionNamePlugin && path.resolve(__dirname, './plugins/fill-action-name'), // Собственный плагин. Необходимо удалить в будущем
       markCreateTokenAsPure && path.resolve(__dirname, './plugins/create-token-pure'),
-      ['lodash', { id: ['ramda'] }],
+      '@tinkoff/babel-plugin-lodash/cjs',
       isServer && 'babel-plugin-dynamic-import-node',
       [
         '@babel/plugin-proposal-decorators',

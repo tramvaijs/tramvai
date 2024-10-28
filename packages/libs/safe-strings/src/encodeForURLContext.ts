@@ -3,7 +3,7 @@
 const invalidProtocolRegex = /^([^\w]*)(javascript|data|vbscript)/im;
 const urlSchemeRegex = /^.+(:)/gim;
 export const whitespaceEscapeCharsRegex = /(\\|%5[cC])((%(6[eE]|72|74))|[nrt])/g;
-const relativePathPrefixRegex = /^((\.\.?)|(\/)(?!\\*\/)+)/;
+const relativePathPrefixRegex = /^((\.\.?)|(\\?\/)(?!(\\.?)*\/)+)/;
 // eslint-disable-next-line no-control-regex
 export const ctrlCharactersRegex = /[\u0000-\u001F\u007F-\u009F\u2000-\u200D\uFEFF]/gim;
 
