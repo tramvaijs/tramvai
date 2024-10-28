@@ -11,10 +11,10 @@ describe('pkgs-collector-dir', () => {
     expect(allPkgs.length).toBe(1);
     expect(affectedPkgs.length).toBe(1);
     expect(allPkgs[0]).toMatchObject({
-      name: 'a',
+      name: 'pkgs-collector-workspaces-monorepo-pkg-a',
     });
     expect(affectedPkgs[0]).toMatchObject({
-      name: 'a',
+      name: 'pkgs-collector-workspaces-monorepo-pkg-a',
     });
   });
 
@@ -24,10 +24,10 @@ describe('pkgs-collector-dir', () => {
     expect(allPkgs.length).toBe(1);
     expect(affectedPkgs.length).toBe(1);
     expect(allPkgs[0]).toMatchObject({
-      name: 'a',
+      name: 'pkgs-collector-workspaces-monorepo-packages-syntax-pkg-a',
     });
     expect(affectedPkgs[0]).toMatchObject({
-      name: 'a',
+      name: 'pkgs-collector-workspaces-monorepo-packages-syntax-pkg-a',
     });
   });
 

@@ -1,5 +1,5 @@
 {
-  "name": "library-browser-object",
+  "name": "library-browser-object-entry",
   "version": "0.1.0",
   "main": "lib/server.js",
   "module": "lib/server.es.js",

@@ -1,5 +1,5 @@
 {
-  "name": "with-peer-deps",
+  "name": "mismatch-peer-deps",
   "version": "2.3.3",
   "dependencies": {
     "pkg-gk": "^1.2.3",

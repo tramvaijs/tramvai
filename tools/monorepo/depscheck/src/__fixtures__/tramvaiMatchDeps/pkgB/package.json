@@ -1,5 +1,5 @@
 {
-  "name": "pkg-b",
+  "name": "tramvai-match-deps-pkg-b",
   "version": "0.2.3",
   "dependencies": {
     "pkg-a": "^1.2.3"

@@ -1,5 +1,5 @@
 {
-  "name": "library-browser-string",
+  "name": "library-browser-string-index",
   "version": "0.1.0",
   "main": "lib/index.js",
   "module": "lib/index.es.js",

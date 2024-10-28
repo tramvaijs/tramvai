@@ -24,7 +24,7 @@ describe('depscheck cli', () => {
   it('should work by default without config', async () => {
     const fixtureDirPath = getFixtureDirPath('workspacesWithoutConfig');
     process.chdir(fixtureDirPath);
-    expect(run()).toMatch(/Processing a[\s\S]*Deps are correct/);
+    expect(run()).toMatch(/Processing workspaces-no-config-pkg-a[\s\S]*Deps are correct/);
   });
 
   it("should handle `cliOpts` and `collect` fn's from `collector`", () => {

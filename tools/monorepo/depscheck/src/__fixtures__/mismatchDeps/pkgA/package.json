@@ -1,5 +1,5 @@
 {
-  "name": "pkg-a",
+  "name": "mismatch-deps-pkg-a",
   "version": "2.3.3",
   "dependencies": {
     "pkg-b": "^1.1.1"
