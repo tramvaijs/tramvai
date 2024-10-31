@@ -17,7 +17,14 @@ export const ChildAppRenderChildren: FC<Props> = ({ di, ...props }) => {
     optional: true,
   });
 
-  const PageComponent = childAppPageService?.getComponent() || Fragment;
+  const PageComponent = childAppPageService?.getComponent();
 
-  return <PageComponent {...props} />;
+  if (PageComponent) {
+    return <PageComponent {...props} />;
+  }
+
+  // Only `children` and `key` are allowed as props for Fragment
+  return <>{props.children}</>;
 };
+
+ChildAppRenderChildren.displayName = 'ChildAppChildren';

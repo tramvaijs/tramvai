@@ -15,7 +15,13 @@ const Cmp = () => {
       <div>Content from root</div>
       <div id="root-route">Current route: {route.actualPath}</div>
       <div id="router">
-        <ChildApp name="router" fallback={FallbackCmp} />
+        <ChildApp
+          name="router"
+          fallback={FallbackCmp}
+          props={{
+            children: <p>Amazing children</p>,
+          }}
+        />
       </div>
     </>
   );
