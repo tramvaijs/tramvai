@@ -105,12 +105,12 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
   beforeAll(async () => {
     await mockerApp.register(fastifyReplyFrom);
 
-    await mockerApp.addHook('onRequest', async (req, reply) => {
+    mockerApp.addHook('onRequest', async (req, reply) => {
       reply.header('Access-Control-Allow-Origin', '*');
     });
-    await mockerApp.addHook('preHandler', async (...args) => mockerHandlerMock(...args));
+    mockerApp.addHook('preHandler', async (...args) => mockerHandlerMock(...args));
 
-    await mockerApp.get('/*', async (request, reply) => {
+    mockerApp.get('/*', async (request, reply) => {
       const [_, childAppName, filename] = request.url.split('/');
 
       switch (childAppName) {
@@ -456,6 +456,9 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
         expect(await page.innerText('#root-route')).toBe('Current route: /router/');
         expect(await page.innerText('#router')).toMatchInlineSnapshot(`
             "Actual Path: /router/
+
+            Amazing children
+
             Link to /react-query"
           `);
       });

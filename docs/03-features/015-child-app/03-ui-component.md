@@ -41,10 +41,8 @@ const Page = () => {
   // always memoize props to avoid unnecessary re-renders and hydration problems
   const props = useMemo(() => ({ counter }), [counter]);
 
-  return (
-    <ChildApp name="fancy-child" props={props} />
-  );
-}
+  return <ChildApp name="fancy-child" props={props} />;
+};
 ```
 
 And you will receive this props in root Child App component, also in `props` property:
@@ -56,6 +54,12 @@ export const RootCmp = ({ props }) => {
   return <div>Counter from Root App: {counter}</div>;
 };
 ```
+
+:::note
+
+You can pass children to Child App, using `children` property. But if you are using `RouterChildAppModule`, e.g. for [Multi-page Child Apps](03-features/015-child-app/08-routing.md#multi-page-child-apps), keep in mind, that passed children will not be rendered in Child App component directly, but one level deeper, in `ChildAppChildren` component.
+
+:::
 
 ## Component fallback
 
@@ -74,10 +78,8 @@ const FallbackCmp = ({ error }: { error?: Error }) => {
 const Page = () => {
   const counter = useStore(CounterStore);
 
-  return (
-    <ChildApp name="fancy-child" fallback={FallbackCmp} />
-  );
-}
+  return <ChildApp name="fancy-child" fallback={FallbackCmp} />;
+};
 ```
 
 ## How to

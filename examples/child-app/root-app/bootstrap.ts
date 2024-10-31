@@ -32,7 +32,7 @@ if (typeof window === 'undefined') {
   }
 }
 
-// support v2.x.x root app version for integraton tests matrix
+// support v2.x.x root app version for integration tests matrix
 const {
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   HOST_PROVIDED_CONTRACTS,

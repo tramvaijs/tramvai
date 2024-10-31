@@ -10,27 +10,30 @@ export interface WrapperProps<T extends Record<string, any>> {
   props: T;
 }
 
-export const renderWrapper = <T extends Record<string, any>>(Cmp: ComponentType<T>) => {
+export const renderWrapper = <T extends Record<string, any>>(
+  ChildAppComponent: ComponentType<T>
+) => {
   return ({ di, props }: WrapperProps<T>) => {
     const Wrapper = useMemo(() => {
       const wrappers = di.get({
         token: EXTEND_RENDER,
         optional: true,
       });
-      const ChildCmp = di.get({
+
+      const ChildAppChildren = di.get({
         token: CHILD_APP_RENDER_CHILDREN_TOKEN,
         optional: true,
       });
 
-      let Result = ChildCmp ? (
-        <Cmp {...props}>
-          <ChildCmp di={di} {...props} />
-        </Cmp>
+      let Result = ChildAppChildren ? (
+        <ChildAppComponent {...props}>
+          <ChildAppChildren di={di} {...props} />
+        </ChildAppComponent>
       ) : (
-        <Cmp {...props} />
+        <ChildAppComponent {...props} />
       );
 
-      if (wrappers) {
+      if (wrappers !== null) {
         for (const wrapper of wrappers) {
           Result = wrapper(Result);
         }
