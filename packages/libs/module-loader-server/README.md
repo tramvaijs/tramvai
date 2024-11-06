@@ -28,13 +28,13 @@ loader.resolveByUrl('https://cdn.example.com/js/module.js').then((moduleExports)
 });
 ```
 
-В конструктор можно передать опции (см. интерфейс `LoaderDeps`), из важных это параметр `request` который по умлочанию определяется библиотекой [request](https://tinkoff.github.io/tinkoff-request/), и содержит только [deduplicate](https://tinkoff.github.io/tinkoff-request/docs/plugins/cache-deduplicate.html) плагин.
+В конструктор можно передать опции (см. интерфейс `LoaderDeps`), из важных это параметр `request` который по умолчанию определяется библиотекой [request](https://tinkoff.github.io/tinkoff-request/), и содержит только [deduplicate](https://tinkoff.github.io/tinkoff-request/docs/plugins/cache-deduplicate.html) плагин.
 
 Если вам нужны другие плагины или поведение при запросе на сервер, переопределите параметр `request` в конструкторе лоадера.
 
 ### Взаимодействие с кешем
 
-Допустим вам нужно сихронное апи для получения объекта, при условии что он есть в кэше. Тогда есть два способа.
+Допустим, вам нужно синхронное апи для получения объекта, при условии, что он есть в кэше. Тогда есть два способа.
 
 Первый, используем метод `loadByUrl<R>(url: string, options: LoadOptions)`, который возвращает `Promise<R>` если объекта нет в кеше, и `R` если он там есть:
 
@@ -60,9 +60,7 @@ if (result !== void 0) {
 
 ## Особенности
 
-- [Circuit Breaker](https://tinkoff.github.io/tinkoff-request/docs/plugins/circuit-breaker.html) для запросов.
-  На каждый урл будет создан отдельный Circuit Breaker, который будет отслеживать падения именно этого JS файла.
-  Это нужно для быстрой отдачи ошибки вместо завершения запроса по таймаутам, что может ухудшить общее время ответа приложения.
+- [Circuit Breaker](https://tinkoff.github.io/tinkoff-request/docs/plugins/circuit-breaker.html) для запросов. На каждый урл будет создан отдельный Circuit Breaker, который будет отслеживать падения именно этого JS файла. Это нужно для быстрой отдачи ошибки вместо завершения запроса по таймаутам, что может ухудшить общее время ответа приложения.
 
 ## Интерфейс и типы
 
