@@ -88,6 +88,8 @@ export class ServerLoader extends Loader {
     if (config.tag === 'debug') {
       setTimeout(() => {
         this.internalLoadCache.set(config.server.entry, null);
+        this.internalLoadCache.set(config.client.stats, null);
+        this.internalLoadCache.set(config.client.statsLoadable, null);
       }, 10000);
     }
 
