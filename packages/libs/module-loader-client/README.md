@@ -44,7 +44,7 @@ loadModule('https://cdn.example.com/js/module.js', {
 
 ### `addScript`
 
-Вставляет тег `script` без какой-либо допольнительной логике по дедубликации:
+Вставляет тег `script` без какой-либо дополнительной логики по дедубликации:
 
 ```javascript
 import { addScript } from '@tinkoff/module-loader-client';
@@ -52,11 +52,11 @@ import { addScript } from '@tinkoff/module-loader-client';
 addScript(src, maybeAttrs, maybeScriptHandler).then(() => something());
 ```
 
-Коллбэк вызывается сихронно, в который передается непосредственно script элемент.
+Коллбэк вызывается синхронно и принимает непосредственно script элемент.
 
 ### `addLink`
 
-Вставляет тег `link` без какой-либо допольнительной логике по дедубликации:
+Вставляет тег `link` без какой-либо дополнительной логики по дедубликации:
 
 ```javascript
 import { addLink } from '@tinkoff/module-loader-client';
