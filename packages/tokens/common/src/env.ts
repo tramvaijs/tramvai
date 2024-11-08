@@ -77,6 +77,7 @@ export const ENV_USED_TOKEN = createToken<EnvParameter[]>('envUsed', { multi: tr
 export type EnvTemplate = {
   key: string;
   fn: (...args: any[]) => string;
+  validator?: (key: string, value: string) => void;
 };
 
 export const ENV_TEMPLATE_TOKEN = createToken<EnvTemplate>('env template token', {

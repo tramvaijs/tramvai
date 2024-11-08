@@ -24,9 +24,9 @@ export class EnvironmentManagerServer extends EnvironmentManager {
   constructor(private tokens: EnvParameter[], templates: EnvTemplate[] = []) {
     super();
 
-    this.templates = templates.reduce((acc, { key, fn }) => {
+    this.templates = templates.reduce((acc, { key, fn, validator }) => {
       // TODO: key duplicates?
-      acc[key] = fn;
+      acc[key] = { fn, validator };
       return acc;
     }, {} as Templates);
 
