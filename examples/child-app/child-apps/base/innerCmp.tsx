@@ -1,3 +1,7 @@
 export const InnerCmp = () => {
-  return <div id="cmp">Cmp test: start</div>;
+  return (
+    <div id="cmp" suppressHydrationWarning>
+      Cmp test: start
+    </div>
+  );
 };

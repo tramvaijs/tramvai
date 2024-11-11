@@ -76,6 +76,9 @@ export const getChildProviders = (appDi: Container, loadableStats: LoadableStats
         LINK_PREFETCH_MANAGER_TOKEN,
         ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
         LIMIT_ACTION_GLOBAL_TIME_RUN,
+        // require host app `ACTION_CONDITIONALS` instances, because they can depend on host app reducers or other dependencies.
+        // this instances will be merged with custom Child App conditionals
+        ACTION_CONDITIONALS,
       ],
     }),
     // for backward compatibility, when:
@@ -88,7 +91,6 @@ export const getChildProviders = (appDi: Container, loadableStats: LoadableStats
       multi: true,
       useValue: [
         APP_INFO_TOKEN,
-        ACTION_CONDITIONALS,
         DEFERRED_ACTIONS_MAP_TOKEN,
         EXECUTION_CONTEXT_MANAGER_TOKEN,
         COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,

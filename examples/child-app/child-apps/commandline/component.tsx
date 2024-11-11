@@ -13,7 +13,9 @@ export const Cmp = ({ fromRoot }: { fromRoot: string }) => {
 
   return (
     <>
-      <div>List of last called commandLineListTokens: {JSON.stringify(lastLines)}</div>
+      <div suppressHydrationWarning>
+        List of last called commandLineListTokens: {JSON.stringify(lastLines)}
+      </div>
       <button type="button" onClick={navigate}>
         Generate Spa transition
       </button>

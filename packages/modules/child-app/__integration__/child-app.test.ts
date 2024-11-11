@@ -12,7 +12,7 @@ import type { startCli } from '@tramvai/test-integration';
 import { waitHydrated } from '@tramvai/test-pw';
 import { testCasesConditions } from './test-cases';
 
-jest.setTimeout(3 * 60 * 1000);
+jest.setTimeout(4 * 60 * 1000);
 
 const testCase =
   testCasesConditions[
@@ -44,18 +44,27 @@ const EXAMPLE_DIR = resolve(__dirname, '..', '..', '..', '..', 'examples', 'chil
 const REFRESH_CMP_PATH = resolve(EXAMPLE_DIR, 'child-apps', 'base', 'innerCmp.tsx');
 
 const REFRESH_CMP_CONTENT_START = `export const InnerCmp = () => {
-  return <div id="cmp">Cmp test: start</div>;
+  return (
+    <div id="cmp" suppressHydrationWarning>
+      Cmp test: start
+    </div>
+  );
 };
 `;
 
 const REFRESH_CMP_CONTENT_UPDATE = `export const InnerCmp = () => {
-  return <div id="cmp">Cmp test: update</div>;
+  return (
+    <div id="cmp" suppressHydrationWarning>
+      Cmp test: update
+    </div>
+  );
 };
 `;
 
 describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVersion: ${childAppsVersion} }`, () => {
   let childAppBase: PromiseType<ReturnType<typeof start>>;
   let childAppState: PromiseType<ReturnType<typeof start>>;
+  let childAppCommandline: PromiseType<ReturnType<typeof start>>;
   let childAppRouter: PromiseType<ReturnType<typeof start>>;
   let childAppReactQuery: PromiseType<ReturnType<typeof start>>;
   let childAppError: PromiseType<ReturnType<typeof start>> | null;
@@ -71,6 +80,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
     [
       childAppBase,
       childAppState,
+      childAppCommandline,
       childAppRouter,
       childAppReactQuery,
       childAppError,
@@ -79,6 +89,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
     ] = await Promise.all([
       startChildApp('base'),
       startChildApp('state'),
+      startChildApp('commandline'),
       startChildApp('router'),
       startChildApp('react-query', {
         shared: {
@@ -122,6 +133,9 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
 
         case 'state':
           return reply.from(`${getStaticUrl(childAppState)}/state/${filename}`);
+
+        case 'commandline':
+          return reply.from(`${getStaticUrl(childAppCommandline)}/commandline/${filename}`);
 
         case 'router':
           // imitate long loading for child-app files
@@ -187,6 +201,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       mockerApp.close(),
       childAppBase.close(),
       childAppState.close(),
+      childAppCommandline.close(),
       childAppRouter.close(),
       childAppReactQuery.close(),
       childAppError?.close(),
@@ -241,6 +256,15 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       expect(
         await page.$eval('#cmp', (node) => (node as HTMLElement).innerText)
       ).toMatchInlineSnapshot(`"Cmp test: update"`);
+    });
+
+    it('should use host app ACTION_CONDITIONALS', async () => {
+      const { page } = await getPageWrapper('/base/');
+
+      const getActionCount = () =>
+        page.evaluate(() => (window as any).TRAMVAI_TEST_CHILD_APP_FACTORY_CONDITION);
+
+      expect(await getActionCount()).toBe(1);
     });
 
     if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
@@ -399,10 +423,15 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
     });
 
     it('should execute action for every transition', async () => {
-      const { page, router } = await getPageWrapper('/state/');
+      const { page, router } = await getPageWrapper('/commandline/');
 
       const getActionCount = () =>
         page.evaluate(() => (window as any).TRAMVAI_TEST_CHILD_APP_ACTION_CALLED_TIMES);
+
+      await page.waitForFunction(
+        () => !!(window as any).TRAMVAI_TEST_CHILD_APP_ACTION_CALLED_TIMES,
+        { timeout: 15000 }
+      );
 
       expect(await getActionCount()).toBe(1);
 
@@ -410,10 +439,36 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
 
       expect(await getActionCount()).toBe(1);
 
-      await router.navigate('/state/');
+      await router.navigate('/commandline/');
 
       expect(await getActionCount()).toBe(2);
     });
+
+    if (rootAppVersion === 'latest' && process.env.CHILD_APP_TEST_ISOLATE_DI) {
+      it('should merge child and host app ACTION_CONDITIONALS', async () => {
+        const { page } = await getPageWrapper('/state/');
+
+        const getCustomActionCount = () =>
+          page.evaluate(() => (window as any).TRAMVAI_TEST_CHILD_APP_CUSTOM_CONDITION);
+        const getMixedActionCount = () =>
+          page.evaluate(() => (window as any).TRAMVAI_TEST_CHILD_APP_MIXED_CONDITION);
+
+        expect(await getCustomActionCount()).toBe(1);
+        expect(await getMixedActionCount()).toBe(1);
+      });
+    } else {
+      it('should resolve child app ACTION_CONDITIONALS', async () => {
+        const { page } = await getPageWrapper('/state/');
+
+        const getCustomActionCount = () =>
+          page.evaluate(() => (window as any).TRAMVAI_TEST_CHILD_APP_CUSTOM_CONDITION);
+        const getMixedActionCount = () =>
+          page.evaluate(() => (window as any).TRAMVAI_TEST_CHILD_APP_MIXED_CONDITION);
+
+        expect(await getCustomActionCount()).toBe(1);
+        expect(await getMixedActionCount()).toBe(0);
+      });
+    }
   });
 
   describe('router', () => {
