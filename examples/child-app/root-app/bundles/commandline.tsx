@@ -19,6 +19,6 @@ export default createBundle({
   name: 'commandline',
   components: {
     pageDefault: Cmp,
-    layoutDefault: LayoutComponent,
+    // layoutDefault: LayoutComponent,
   },
 });

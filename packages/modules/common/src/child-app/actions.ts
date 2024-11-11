@@ -16,15 +16,7 @@ export const actionsProviders: Provider[] = [
   provide({
     provide: CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN,
     multi: true,
-    useValue: [
-      ACTION_EXECUTION_TOKEN,
-      ACTION_PAGE_RUNNER_TOKEN,
-      // borrow for multi token with useValue is not working properly for v2.0.0 tramvai, not backward compatible.
-      // for legacy CA + modern host this token will be borrowed in `packages/modules/child-app/src/shared/child/singletonProviders.ts`
-      // for modern CA + legacy host this token will not be borrowed, but it is okay - there is full DI access.
-      // ACTION_CONDITIONALS,
-      DEFERRED_ACTIONS_MAP_TOKEN,
-    ],
+    useValue: [ACTION_EXECUTION_TOKEN, ACTION_PAGE_RUNNER_TOKEN, DEFERRED_ACTIONS_MAP_TOKEN],
   }),
   provide({
     provide: COMBINE_REDUCERS,

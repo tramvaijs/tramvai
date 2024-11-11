@@ -21,6 +21,7 @@ import {
 } from '@tramvai/tokens-child-app';
 import type { CacheType } from '@tramvai/tokens-common';
 import {
+  ACTION_CONDITIONALS,
   CLEAR_CACHE_TOKEN,
   COMBINE_REDUCERS,
   COMPONENT_REGISTRY_TOKEN,
@@ -263,6 +264,8 @@ export const sharedProviders: Provider[] = [
         LINK_PREFETCH_MANAGER_TOKEN,
         ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
         LIMIT_ACTION_GLOBAL_TIME_RUN,
+        // provide host app `ACTION_CONDITIONALS` instances, because they can depend on host app reducers or other dependencies
+        ACTION_CONDITIONALS,
       ],
     },
   }),

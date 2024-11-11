@@ -1,5 +1,13 @@
 import { createApp, provide } from '@tramvai/core';
-import { CommonModule, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module-common';
+import type { ActionCondition } from '@tramvai/module-common';
+import {
+  ACTION_CONDITIONALS,
+  COMBINE_REDUCERS,
+  CommonModule,
+  CONTEXT_TOKEN,
+  ENV_MANAGER_TOKEN,
+  ENV_USED_TOKEN,
+} from '@tramvai/module-common';
 import type { REACT_SERVER_RENDER_MODE } from '@tramvai/module-render';
 import { RenderModule } from '@tramvai/module-render';
 import { ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
@@ -23,6 +31,7 @@ import {
   MISSED_HOST_CONTRACT_FALLBACK,
   TEST_CHILD_CONTRACT,
 } from '../shared/tokens';
+import { globalStore } from './stores/global';
 
 if (typeof window === 'undefined') {
   const { setDefaultResultOrder } = require('dns');
@@ -118,6 +127,33 @@ createApp({
       },
       deps: {
         envManager: ENV_MANAGER_TOKEN,
+      },
+    }),
+    provide({
+      provide: COMBINE_REDUCERS,
+      multi: true,
+      useValue: [globalStore],
+    }),
+    provide({
+      provide: ACTION_CONDITIONALS,
+      multi: true,
+      useFactory: ({ context }): ActionCondition => ({
+        key: 'factory',
+        fn: (checker) => {
+          const { factory } = checker.conditions;
+
+          if (factory) {
+            const state = context.getState(globalStore);
+
+            if (!state) {
+              return checker.forbid();
+            }
+            checker.allow();
+          }
+        },
+      }),
+      deps: {
+        context: CONTEXT_TOKEN,
       },
     }),
     ...(CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN && ENV_MANAGER_TOKEN
