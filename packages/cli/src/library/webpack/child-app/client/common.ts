@@ -38,6 +38,8 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
     {
       writeToDisk: true,
       filename: `${name}_stats_loadable@${version}.json`,
+      // to prevent webpack modules with same id collision, because Child Apps builds are independent of each other
+      chunkLoadingGlobal: `__LOADABLE_LOADED_CHUNKS__child_${name}_${version}__`,
     },
   ]);
 
