@@ -10,6 +10,16 @@ import nodeClient from '../../blocks/nodeClient';
 import postcssAssets from '../../blocks/postcssAssets';
 import type { ChildAppConfigEntry } from '../../../../typings/configEntry/child-app';
 
+const IDENTIFIER_NAME_REPLACE_REGEX = /^([^a-zA-Z$_])/;
+const IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX = /[^a-zA-Z0-9$]+/g;
+
+// https://github.com/webpack/webpack/blob/da41ad1845947139375fb557107fa8bd2f6f8f27/lib/Template.js#L108
+function toIdentifier(str: string) {
+  return str
+    .replace(IDENTIFIER_NAME_REPLACE_REGEX, '_$1')
+    .replace(IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX, '_');
+}
+
 export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: Config) => {
   const { name, version } = configManager;
   config.name('client');
@@ -39,7 +49,7 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
       writeToDisk: true,
       filename: `${name}_stats_loadable@${version}.json`,
       // to prevent webpack modules with same id collision, because Child Apps builds are independent of each other
-      chunkLoadingGlobal: `__LOADABLE_LOADED_CHUNKS__child_${name}_${version}__`,
+      chunkLoadingGlobal: toIdentifier(`__LOADABLE_LOADED_CHUNKS__child_app_${name}_${version}__`),
     },
   ]);
 
