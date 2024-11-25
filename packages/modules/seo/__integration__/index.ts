@@ -3,6 +3,8 @@ import { SeoModule, META_WALK_TOKEN, META_DEFAULT_TOKEN } from '@tramvai/module-
 import { PAGE_SERVICE_TOKEN, ROUTES_TOKEN } from '@tramvai/tokens-router';
 import { modules, bundles } from '../../../../test/shared/common';
 import { jsonLd } from './data/jsonLd';
+import { Button } from './Button';
+import { APPLY_META_TOKEN } from '../src/tokens';
 
 const metaSpecial = (context, meta) => {
   meta.updateMeta(10, {
@@ -27,6 +29,26 @@ const dynamicAction = declareAction({
   },
   deps: {
     meta: META_WALK_TOKEN,
+  },
+  conditions: {
+    always: true,
+  },
+});
+
+export const applyMetaAction = declareAction({
+  name: 'applyMeta',
+  async fn() {
+    await new Promise((res) => setTimeout(res, 200));
+
+    this.deps.applyMeta({
+      metaObj: {
+        title: 'WoW, meta was applied!',
+        twitterCard: 'twitter card',
+      },
+    });
+  },
+  deps: {
+    applyMeta: APPLY_META_TOKEN,
   },
   conditions: {
     always: true,
@@ -99,6 +121,14 @@ const dynamicServerAndClientBundle = createBundle({
   actions: [dynamicServerAction, dynamicClientAction],
 });
 
+const applyMetaBundle = createBundle({
+  name: 'apply-meta',
+  components: {
+    page: () => Button(),
+    layout: ({ children }) => children,
+  },
+});
+
 createApp({
   name: 'seo',
   modules: [...modules, SeoModule.forRoot([metaSpecial] as any)],
@@ -109,6 +139,7 @@ createApp({
     'dynamic-server': () => Promise.resolve({ default: dynamicServerBundle }),
     'dynamic-server-and-dynamic-client': () =>
       Promise.resolve({ default: dynamicServerAndClientBundle }),
+    'apply-meta': () => Promise.resolve({ default: applyMetaBundle }),
   },
   providers: [
     {
@@ -239,6 +270,27 @@ createApp({
             bundle: 'dynamic-server-and-dynamic-client',
             pageComponent: 'page',
             layoutComponent: 'layout',
+          },
+        },
+        {
+          name: 'seo-apply-meta',
+          path: '/seo/apply-meta',
+          config: {
+            bundle: 'apply-meta',
+            pageComponent: 'page',
+            layoutComponent: 'layout',
+            meta: {
+              seo: {
+                metaTags: {
+                  canonical: 'test-canonical',
+                  descriptions: 'my test description',
+                  keywords: 'test,common,seo',
+                  robots: 'none',
+                  title: 'common seo',
+                  viewport: 'test viewport seo',
+                },
+              },
+            },
           },
         },
       ].map((route) => ({

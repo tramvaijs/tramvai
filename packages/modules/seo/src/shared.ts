@@ -10,6 +10,7 @@ import { metaDefaultPack, defaultPack } from './metaDefaultPack';
 import { META_PRIORITY_ROUTE } from './constants';
 import { META_DEFAULT_TOKEN, META_WALK_TOKEN, META_UPDATER_TOKEN } from './tokens';
 import { metaStore } from './store/metaStore';
+import { ApplyMetaProvider } from './ApplyMetaProvider';
 
 const capitalize = (str) => {
   return `${str.charAt(0).toUpperCase()}${str.slice(1)}`;
@@ -26,6 +27,7 @@ const convertWithPrefix = (key, record = {}) => {
 };
 
 export const sharedProviders: Provider[] = [
+  ApplyMetaProvider,
   {
     provide: META_WALK_TOKEN,
     useClass: MetaWalk,

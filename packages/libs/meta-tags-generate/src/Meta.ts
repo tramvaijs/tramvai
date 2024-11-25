@@ -51,8 +51,6 @@ export class Meta {
       }
     });
 
-    this.metaWalk.reset();
-
     return result;
   }
 }

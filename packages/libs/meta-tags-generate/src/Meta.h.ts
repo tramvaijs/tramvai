@@ -7,3 +7,9 @@ export type TagRecord = { tag: string; attributes?: Record<string, string>; inne
 export type Converter = (value: string | TagRecord | null) => TagRecord | TagRecord[] | null;
 
 export type SerializableMetaWalkState = [string, WalkItem][];
+
+export type PatchMeta = {
+  head: HTMLHeadElement;
+  addTags: HTMLElement[];
+  removeTagsArray: Element[];
+};

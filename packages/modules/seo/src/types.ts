@@ -1,5 +1,5 @@
+import type { MetaWalk, TagRecord } from '@tinkoff/meta-tags-generate';
 import type { META_UPDATER_TOKEN, META_DEFAULT_TOKEN } from './tokens';
-import { META_WALK_TOKEN } from './tokens';
 
 export type SeoModuleOptions =
   | {
@@ -24,3 +24,9 @@ export type MetaRouteConfig = {
 };
 
 export type PageSeoProperty = MetaRouteConfig['seo'];
+
+export type ApplyMeta = ({
+  metaObj,
+}?: {
+  metaObj?: Record<string, string | TagRecord | null>;
+}) => void;
