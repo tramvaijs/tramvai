@@ -9,6 +9,10 @@ export interface Browser {
    */
   major: string | undefined;
   browserEngine: string;
+  /**
+   * Custom ua-parser-js extension can return `type: 'bot'` for known bots User-Agent's
+   */
+  type?: string;
 }
 
 export interface Engine {
