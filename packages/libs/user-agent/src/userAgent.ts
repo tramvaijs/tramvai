@@ -14,6 +14,10 @@ const uaParserExtensions = [
   // это позволит для них получить отдельное имя браузера и обработать специальным образом
   // https://github.com/faisalman/ua-parser-js/issues/227
 
+  // google page preloading agent
+  [/developers\.google\.com\/\+\/web\/snippet/i],
+  [UAParser.BROWSER.NAME, UAParser.BROWSER.VERSION, ['type', 'bot']],
+
   // google, bing, msn
   [/((?:\S+)bot(?:-[imagevdo]{5})?)\/([\w.]+)/i],
   [UAParser.BROWSER.NAME, UAParser.BROWSER.VERSION, ['type', 'bot']],

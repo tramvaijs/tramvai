@@ -5,7 +5,7 @@ import type { UserAgent } from './types';
 type ParserResult = ReturnType<UAParser['getResult']>;
 
 interface PreviousUserAgent extends Omit<ParserResult, 'ua'> {
-  browser: ParserResult['browser'] & { browserEngine: string };
+  browser: ParserResult['browser'] & { browserEngine: string; type?: string };
   mobileOS?: string;
   sameSiteNoneCompatible: boolean;
 }
