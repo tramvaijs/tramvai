@@ -34,7 +34,32 @@ Errors that happens inside child-app's render function
 
 If render has failed on server side it will render fallback if provided or null otherwise. It may then proper rehydrated on client side.
 
-If render has failed on client side it will render fallback with error if provided or default errorBoundary component
+If render has failed on client side it will render fallback with error if provided or default errorBoundary component.
+
+Render errors that were occured on client side will be logged as errors under `child-app:render` key and can be found in application logs by event `component-did-catch`. If you need custom monitoring, you can provide `CHILD_APP_ERROR_BOUNDARY_TOKEN` handler, e.g.:
+
+```ts
+import { CHILD_APP_ERROR_BOUNDARY_TOKEN } from '@tramvai/tokens-child-app';
+
+const provider = provide({
+  provide: CHILD_APP_ERROR_BOUNDARY_TOKEN,
+  useFactory: () => {
+    const log = logger('child-app-error-boundary');
+
+    return function logErrorBoundary(error: Error, info: React.ErrorInfo, config: ChildAppRequestConfig) {
+      log.error({
+        event: 'component-did-catch',
+        error,
+        info,
+        childApp: config,
+      });
+    };
+  },
+  deps: {
+    logger: LOGGER_TOKEN,
+  },
+});
+```
 
 ### Error in commandLine handler
 
