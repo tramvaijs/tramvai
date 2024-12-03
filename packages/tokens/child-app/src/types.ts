@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, ErrorInfo } from 'react';
 import type { Container, ExtractDependencyType, Provider, TokenInterface } from '@tinkoff/dippy';
 import type {
   CommandLines,
@@ -161,3 +161,9 @@ export type HostContractsFallback = (report: {
   missedContracts: Contract[];
   hostDi: Container;
 }) => void;
+
+export type ChildAppErrorBoundaryHandler = (
+  error: Error,
+  errorInfo: ErrorInfo,
+  config: ChildAppRequestConfig
+) => void;

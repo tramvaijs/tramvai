@@ -7,6 +7,7 @@ import {
   CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   HOST_PROVIDED_CONTRACTS,
+  CHILD_APP_ERROR_BOUNDARY_TOKEN,
 } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RENDER_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
@@ -268,5 +269,25 @@ export const sharedProviders: Provider[] = [
         ACTION_CONDITIONALS,
       ],
     },
+  }),
+  provide({
+    provide: CHILD_APP_ERROR_BOUNDARY_TOKEN,
+    useFactory: ({ logger }) => {
+      const log = logger('child-app:render');
+
+      return function logErrorBoundary(error, info, config) {
+        log.error({
+          event: 'component-did-catch',
+          message: 'An unexpected error occured during rendering',
+          error,
+          info,
+          childApp: config,
+        });
+      };
+    },
+    deps: {
+      logger: LOGGER_TOKEN,
+    },
+    multi: true,
   }),
 ];

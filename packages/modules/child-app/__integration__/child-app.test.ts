@@ -920,6 +920,40 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
             `"<div>Error page still works</div><div id="fallback">Error fallback</div>"`
           );
         });
+
+        if (rootAppVersion === 'latest') {
+          it('should log render error', async () => {
+            const { serverUrl } = rootApp;
+            const errors: any[] = [];
+
+            const { page } = await getPageWrapper();
+
+            page.on('console', async (msg) => {
+              if (msg.type() === 'error' && msg.args()[2] !== undefined) {
+                const error = await msg.args()[2].jsonValue();
+                if (error?.event === 'component-did-catch') {
+                  errors.push(error);
+                }
+              }
+            });
+
+            await page.goto(`${serverUrl}/error/?renderError=client`);
+            await waitHydrated(page);
+
+            expect(errors.length).toBe(1);
+            expect(errors[0]).toStrictEqual({
+              event: 'component-did-catch',
+              message: 'An unexpected error occured during rendering',
+              error: expect.any(String),
+              info: expect.any(Object),
+              childApp: {
+                name: 'error',
+                tag: undefined,
+                version: undefined,
+              },
+            });
+          });
+        }
       });
     });
   }

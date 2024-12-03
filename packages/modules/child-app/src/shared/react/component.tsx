@@ -3,9 +3,10 @@ import { useMemo, useContext, useState, useEffect, Suspense, memo } from 'react'
 import type { ChildAppReactConfig } from '@tramvai/tokens-child-app';
 import { CHILD_APP_INTERNAL_RENDER_TOKEN } from '@tramvai/tokens-child-app';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
-import { useDi, UniversalErrorBoundary } from '@tramvai/react';
+import { useDi } from '@tramvai/react';
 import { RenderContext } from './render-context';
 import { Extractor } from './extractor';
+import { ChildAppErrorBoundary } from './childAppErrorBoundary';
 
 const FailedChildAppFallback = ({
   config: { name, version, tag, fallback: Fallback },
@@ -124,13 +125,11 @@ const ChildAppWrapper = ({
 };
 
 export const ChildApp = memo((config: ChildAppReactConfig) => {
-  const { fallback } = config;
-
   let result = <ChildAppWrapper {...config} />;
 
   if (process.env.__TRAMVAI_CONCURRENT_FEATURES) {
     result = <Suspense fallback={<FailedChildAppFallback config={config} />}>{result}</Suspense>;
   }
 
-  return <UniversalErrorBoundary fallback={fallback as any}>{result}</UniversalErrorBoundary>;
+  return <ChildAppErrorBoundary config={config}>{result}</ChildAppErrorBoundary>;
 });

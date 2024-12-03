@@ -27,6 +27,7 @@ import type {
   HostRequiredContracts,
   ChildContractsFallback,
   HostContractsFallback,
+  ChildAppErrorBoundaryHandler,
 } from './types';
 
 export * from './types';
@@ -330,6 +331,13 @@ export const CHILD_CONTRACTS_FALLBACK = createToken<ChildContractsFallback>(
 
 export const HOST_CONTRACTS_FALLBACK = createToken<HostContractsFallback>(
   'child-app host contracts fallback',
+  {
+    multi: true,
+  }
+);
+
+export const CHILD_APP_ERROR_BOUNDARY_TOKEN = createToken<ChildAppErrorBoundaryHandler>(
+  'child-app reactErrorBoundaryHandlers',
   {
     multi: true,
   }
