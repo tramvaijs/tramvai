@@ -2,10 +2,16 @@ import flatten from '@tinkoff/utils/array/flatten';
 import { provide } from '@tramvai/core';
 import { getDiWrapper } from '@tramvai/test-helpers';
 import { Meta, MetaWalk, Render } from '@tinkoff/meta-tags-generate';
-import { META_DEFAULT_TOKEN, META_UPDATER_TOKEN, META_WALK_TOKEN } from '../../tokens';
+import {
+  APPLY_META_TOKEN,
+  META_DEFAULT_TOKEN,
+  META_UPDATER_TOKEN,
+  META_WALK_TOKEN,
+} from '../../tokens';
 import { transformValue } from '../../transformValue';
 import { converters } from '../../converters/converters';
 import { defaultPack, metaDefaultPack } from '../../metaDefaultPack';
+import { ApplyMetaProvider } from '../../ApplyMetaProvider';
 
 type Options = Parameters<typeof getDiWrapper>[0];
 
@@ -32,6 +38,7 @@ export const testMetaUpdater = (options: Options) => {
         provide: META_WALK_TOKEN,
         useClass: MetaWalk,
       }),
+      ApplyMetaProvider,
     ],
   });
 
@@ -39,6 +46,7 @@ export const testMetaUpdater = (options: Options) => {
     di,
     renderMeta: () => {
       const metaWalk = di.get(META_WALK_TOKEN);
+      const applyMeta = di.get(APPLY_META_TOKEN);
       const metaUpdaters = di.get({ token: META_UPDATER_TOKEN, multi: true });
       const meta = new Meta({
         list: flatten(metaUpdaters || []),
@@ -51,6 +59,7 @@ export const testMetaUpdater = (options: Options) => {
       return {
         metaWalk,
         render,
+        applyMeta,
       };
     },
   };

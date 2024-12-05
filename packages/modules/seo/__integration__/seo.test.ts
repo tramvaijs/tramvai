@@ -93,5 +93,20 @@ describe('seo', () => {
         'WoW, such dynamic!'
       );
     });
+
+    it('после захода на страницу, ручное обновление через APPLY_META_TOKEN - старая мета обновилась если была изменена, мета из админки не пропала, если не была изменена, новая мета добавилась', async () => {
+      const { page } = await getPageWrapper('/seo/apply-meta');
+
+      const button = page.getByTestId('apply-new-meta-button');
+      await button.click();
+
+      await sleep(300);
+      // старый тайтл обновился
+      expect(await page.title()).toBe('WoW, meta was applied!');
+      // тэги из админки не пропали
+      expect(await page.getAttribute('meta[name="viewport"]', 'content')).toBe('test viewport seo');
+      // новый мета тэг добавился
+      expect(await page.getAttribute('meta[name="twitter:card"]', 'content')).toBe('twitter card');
+    });
   });
 });

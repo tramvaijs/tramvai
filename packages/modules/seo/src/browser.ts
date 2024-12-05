@@ -1,13 +1,14 @@
-import flatten from '@tinkoff/utils/array/flatten';
 import isArray from '@tinkoff/utils/is/array';
 import { Module, Scope, provide } from '@tramvai/core';
-import { Meta, Update } from '@tinkoff/meta-tags-generate';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { INITIAL_APP_STATE_TOKEN } from '@tramvai/module-common';
-import { transformValue } from './transformValue';
 import { sharedProviders } from './shared';
-import { converters } from './converters/converters';
-import { META_UPDATER_TOKEN, META_DEFAULT_TOKEN, META_WALK_TOKEN } from './tokens';
+import {
+  META_UPDATER_TOKEN,
+  META_DEFAULT_TOKEN,
+  META_WALK_TOKEN,
+  APPLY_META_TOKEN,
+} from './tokens';
 import type { MetaRouteConfig, SeoModuleOptions, PageSeoProperty } from './types';
 
 export * from './constants';
@@ -29,11 +30,24 @@ declare module '@tinkoff/router' {
   providers: [
     ...sharedProviders,
     provide({
+      provide: 'router beforeNavigateHooks',
+      multi: true,
+      useFactory: ({ metaWalk }) => {
+        return () => {
+          // clear meta state before SPA-navigation
+          metaWalk.reset();
+        };
+      },
+      deps: {
+        metaWalk: META_WALK_TOKEN,
+      },
+    }),
+    provide({
       // Update meta only when all actions were completed.
       provide: COMMAND_LINE_EXECUTION_END_TOKEN,
       scope: Scope.SINGLETON,
       multi: true,
-      useFactory: () => {
+      useFactory: ({ applyMeta }) => {
         return function updateMeta(di, type, status) {
           if (type === 'client' && (status === 'afterSpa' || status === 'customer')) {
             const metaWalk = di.get(META_WALK_TOKEN);
@@ -48,20 +62,12 @@ declare module '@tinkoff/router' {
               );
             }
 
-            // We can't use dependencies below as factory provider dependencies
-            // due to dependency cycle when using `@tramvai-tinkoff/module-router`.
-            const meta = new Meta({
-              list: flatten(
-                di.get({ token: META_UPDATER_TOKEN, optional: true, multi: true }) || []
-              ),
-              metaWalk,
-              transformValue,
-              converters,
-            });
-
-            new Update(meta).update();
+            applyMeta();
           }
         };
+      },
+      deps: {
+        applyMeta: APPLY_META_TOKEN,
       },
     }),
   ],
