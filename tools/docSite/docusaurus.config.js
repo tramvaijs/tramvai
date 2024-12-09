@@ -57,6 +57,19 @@ const docusaurusConfig = {
       },
     ],
   ],
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {
+            from: '/docs/features/logging',
+            to: '/docs/features/monitoring/logging',
+          },
+        ],
+      },
+    ],
+  ],
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'throw',

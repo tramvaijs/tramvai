@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-opentelemetry",
+  "sourceRoot": "packages/modules/opentelemetry/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/opentelemetry/package.json",
+        "packages/modules/opentelemetry/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

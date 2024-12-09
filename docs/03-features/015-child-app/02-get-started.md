@@ -71,4 +71,4 @@ Child-app is built ignoring `modern` option in tramvai config. This is because w
 If your are facing any problems while developing or using Child App use next instructions first.
 
 1. Check the logs with key `child-app` that may lead to source of problems
-2. If there is not enough logs enable all `child-app` logs - [how to display logs](03-features/014-logging.md#display-logs)
+2. If there is not enough logs enable all `child-app` logs - [how to display logs](03-features/014-monitoring/01-logging.md#display-logs)

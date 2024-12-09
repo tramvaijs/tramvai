@@ -86,6 +86,7 @@ export class HttpClientAdapter extends BaseHttpClient implements HttpClient {
 
     try {
       const payload = await res;
+      const meta = res.getExternalMeta();
       const status = getStatus(res);
       const headers = getHeaders(res);
 
@@ -94,6 +95,11 @@ export class HttpClientAdapter extends BaseHttpClient implements HttpClient {
         status,
         headers,
       };
+
+      Object.defineProperty(resToModify, '__meta', {
+        value: meta,
+        enumerable: false,
+      });
 
       return modifyResponse ? modifyResponse(resToModify) : resToModify;
     } catch (error) {

@@ -1213,7 +1213,7 @@
     "@docsearch/css" "3.3.0"
     algoliasearch "^4.0.0"
 
-"@docusaurus/core@2.3.1", "@docusaurus/core@^2.3.1":
+"@docusaurus/core@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@docusaurus/core/-/core-2.3.1.tgz#32849f2ffd2f086a4e55739af8c4195c5eb386f2"
   integrity sha512-0Jd4jtizqnRAr7svWaBbbrCCN8mzBNd2xFLoT/IM7bGfFie5y58oz97KzXliwiLY3zWjqMXjQcuP1a5VgCv2JA==
@@ -1345,6 +1345,21 @@
     react-helmet-async "*"
     react-loadable "npm:@docusaurus/react-loadable@5.5.2"
 
+"@docusaurus/plugin-client-redirects@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.npmjs.org/@docusaurus/plugin-client-redirects/-/plugin-client-redirects-2.3.1.tgz#e75f373ef19032b0d059c0298f86d6cb18575ef6"
+  integrity sha512-Ye0z36/L8685ni0DIxHqPPaHIXFXiSF90QYiYfpODBX6NxvvveUTyylsDBU1GQhPXPn1bd39QgaOuZ+j9gfaog==
+  dependencies:
+    "@docusaurus/core" "2.3.1"
+    "@docusaurus/logger" "2.3.1"
+    "@docusaurus/utils" "2.3.1"
+    "@docusaurus/utils-common" "2.3.1"
+    "@docusaurus/utils-validation" "2.3.1"
+    eta "^2.0.0"
+    fs-extra "^10.1.0"
+    lodash "^4.17.21"
+    tslib "^2.4.0"
+
 "@docusaurus/plugin-content-blog@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@docusaurus/plugin-content-blog/-/plugin-content-blog-2.3.1.tgz#236b8ee4f20f7047aa9c285ae77ae36683ad48a3"
@@ -1415,7 +1430,7 @@
     react-json-view "^1.21.3"
     tslib "^2.4.0"
 
-"@docusaurus/plugin-google-analytics@2.3.1", "@docusaurus/plugin-google-analytics@^2.3.1":
+"@docusaurus/plugin-google-analytics@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@docusaurus/plugin-google-analytics/-/plugin-google-analytics-2.3.1.tgz#e2e7db4cf6a7063e8ba5e128d4e413f4d6a0c862"
   integrity sha512-OHip0GQxKOFU8n7gkt3TM4HOYTXPCFDjqKbMClDD3KaDnyTuMp/Zvd9HSr770lLEscgPWIvzhJByRAClqsUWiQ==
@@ -1460,7 +1475,7 @@
     sitemap "^7.1.1"
     tslib "^2.4.0"
 
-"@docusaurus/preset-classic@^2.3.1":
+"@docusaurus/preset-classic@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@docusaurus/preset-classic/-/preset-classic-2.3.1.tgz#f0193f06093eb55cafef66bd1ad9e0d33198bf95"
   integrity sha512-OQ5W0AHyfdUk0IldwJ3BlnZ1EqoJuu2L2BMhqLbqwNWdkmzmSUvlFLH1Pe7CZSQgB2YUUC/DnmjbPKk/qQD0lQ==
@@ -1487,7 +1502,7 @@
     "@types/react" "*"
     prop-types "^15.6.2"
 
-"@docusaurus/remark-plugin-npm2yarn@^2.3.1":
+"@docusaurus/remark-plugin-npm2yarn@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@docusaurus/remark-plugin-npm2yarn/-/remark-plugin-npm2yarn-2.3.1.tgz#5f16300c2eaec8f9223a09c548245ab1644b842b"
   integrity sha512-eN3P9/J8tzD5ERWiaG+nFcd5KpfSmb35mOxnI4vQEmAufovQZyZnf5KAmracPTUJfm3p9OH5EnbzfVFT9e48Pw==
@@ -1527,7 +1542,7 @@
     tslib "^2.4.0"
     utility-types "^3.10.0"
 
-"@docusaurus/theme-common@2.3.1", "@docusaurus/theme-common@^2.3.1":
+"@docusaurus/theme-common@2.3.1":
   version "2.3.1"
   resolved "https://registry.npmjs.org/@docusaurus/theme-common/-/theme-common-2.3.1.tgz#82f52d80226efef8c4418c4eacfc5051aa215f7f"
   integrity sha512-RYmYl2OR2biO+yhmW1aS5FyEvnrItPINa+0U2dMxcHpah8reSCjQ9eJGRmAgkZFchV1+aIQzXOI1K7LCW38O0g==

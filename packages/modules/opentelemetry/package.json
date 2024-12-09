@@ -1,0 +1,45 @@
+{
+  "name": "@tramvai/module-opentelemetry",
+  "version": "0.0.0-stub",
+  "description": "Интеграция OpenTelemetry",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "module": "lib/server.es.js",
+  "typings": "src/server.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/resources": "^1.28.0",
+    "@opentelemetry/sdk-trace-node": "^1.28.0",
+    "@opentelemetry/semantic-conventions": "^1.28.0",
+    "path-to-regexp": "0.1.7",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-metrics": "0.0.0-stub",
+    "@tramvai/tokens-http-client": "0.0.0-stub",
+    "@tramvai/tokens-server": "0.0.0-stub",
+    "@tramvai/tokens-server-private": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.2",
+    "@tinkoff/errors": "0.0.0-stub"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  }
+}
