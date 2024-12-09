@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import { createToken } from '@tinkoff/dippy';
+import { createToken, Scope } from '@tinkoff/dippy';
 import type { TramvaiRenderMode } from '@tramvai/tokens-render';
 import type { Cache, ResponseManager } from '@tramvai/tokens-common';
 import type { commandLineListTokens } from '@tramvai/tokens-core';
@@ -20,7 +20,8 @@ export const PAGE_RENDER_WRAPPER_TYPE = createToken<'layout' | 'content' | 'page
 );
 
 export const PAGE_RENDER_DEFAULT_FALLBACK_COMPONENT = createToken<ComponentType<any>>(
-  'pageRenderDefaultFallbackComponent'
+  'pageRenderDefaultFallbackComponent',
+  { scope: Scope.SINGLETON }
 );
 
 export interface StaticPagesCacheEntry {
