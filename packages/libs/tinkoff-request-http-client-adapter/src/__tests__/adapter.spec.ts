@@ -614,6 +614,26 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         await terminate();
       });
 
+      it('different name with memory cache', async () => {
+        const createCacheMock = jest.fn();
+
+        createAdapter({
+          name: 'api',
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${1234}/`,
+          allowStale: false,
+          createCache: createCacheMock,
+          etagCacheOptions: {
+            enabled: true,
+          },
+        });
+
+        expect(createCacheMock.mock.calls.map((call) => call[0].name)).toEqual([
+          'http-client-api',
+          'http-client-etag-api',
+        ]);
+      });
+
       it('custom implementation', async () => {
         const memoryCacheMock = createCacheMock();
         mockCacheImplementation(memoryCacheMock);
