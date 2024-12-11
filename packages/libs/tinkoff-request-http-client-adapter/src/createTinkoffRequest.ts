@@ -81,9 +81,11 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
   } = options;
 
   const log = logger && logger(`${name}:initialization`);
-  const createNamedCache =
+  const createNamedCache = (type?: string) =>
     typeof createCache === 'function'
-      ? (cacheOptions: any) => createCache({ name: `http-client-${name}`, ...cacheOptions })
+      ? // when memory and etag caches are used simultaneously, the cache name must be different
+        (cacheOptions: any) =>
+          createCache({ name: `http-client${type ? `-${type}` : ''}-${name}`, ...cacheOptions })
       : undefined;
   const plugins: Plugin[] = [];
 
@@ -150,7 +152,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
       lruOptions,
       allowStale,
       getCacheKey,
-      memoryConstructor: createNamedCache,
+      memoryConstructor: createNamedCache(),
     })
   );
 
@@ -205,7 +207,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
       etagCache({
         shouldExecute: !disableCache,
         getCacheKey,
-        memoryConstructor: createNamedCache,
+        memoryConstructor: createNamedCache('etag'),
         lruOptions: etagCacheOptions?.lruOptions || { max: 1000, ttl: 10 * 60 * 1000 },
       })
     );
