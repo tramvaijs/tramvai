@@ -6,9 +6,9 @@ sidebar_position: 4
 
 Command `tramvai build` can build libraries to separate bundles for various environments:
 
-- CommonJS modules + ES2019 code (for nodejs without ESM support) - it uses field `main` in `package.json`
-- ES modules + ES2019 code (for nodejs with ESM support) - it uses filed `module` in `package.json`
-- ES modules + ES2019 code (for browsers) - it uses field `browser` in `package.json`
+- CommonJS modules + ES2020 code (for nodejs without ESM support) - it uses field `main` in `package.json`
+- ES modules + ES2020 code (for nodejs with ESM support) - it uses filed `module` in `package.json`
+- ES modules + ES2020 code (for browsers) - it uses field `browser` in `package.json`
 
 `@tramvai/cli` use [@tramvai/build](references/tools/build.md) package under the hood for bundling packages.
 

@@ -36,8 +36,7 @@ const modern = [
   'Samsung >= 8.2',
 ];
 
-// TODO: replace but more sane version based on TCORE-4597 investigation
-const node = ['Node >= 14'];
+const node = ['Node >= 18'];
 
 module.exports = {
   defaults,

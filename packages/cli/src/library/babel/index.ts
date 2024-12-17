@@ -28,6 +28,7 @@ function hasJsxRuntime() {
   }
 }
 
+// eslint-disable-next-line complexity
 export const babelConfigFactory = ({
   env = 'development',
   target,
@@ -136,6 +137,12 @@ export const babelConfigFactory = ({
       ],
       [
         '@babel/plugin-proposal-class-properties',
+        {
+          loose: true,
+        },
+      ],
+      isServer && [
+        '@babel/plugin-transform-private-methods',
         {
           loose: true,
         },

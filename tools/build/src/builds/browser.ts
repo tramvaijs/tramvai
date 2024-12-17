@@ -25,7 +25,7 @@ export const build: Build = {
 
     const input = createInputOptions(params, {
       entry: getBrowserSourceFilename(params),
-      target: 'ES2019',
+      target: 'ES2020',
       resolveMainFields: ['browser', 'module', 'main'],
       browser: true,
     });

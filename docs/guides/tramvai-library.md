@@ -182,7 +182,7 @@ Reference articles:
 - ["Serve modern code to modern browsers"](https://web.dev/codelab-serve-modern-code/)
 - ["Bringing Modern JavaScript to Libraries"](https://dev.to/garylchew/bringing-modern-javascript-to-libraries-432c)
 
-Transpiling the source code into **ES2019** for the browser build will help deliver significantly less code to the client.
+Transpiling the source code into **ES2020** for the browser build will help deliver significantly less code to the client.
 For backward compatibility with older browsers, you need to transpile `node_modules` with modern code via `Babel`, when building your application to production.
 `@tramvai/cli` will do this transpilation automatically for `tramvai` applications.
 

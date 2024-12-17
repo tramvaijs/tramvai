@@ -13,7 +13,7 @@ export const testsBuild: Build = {
   async getOptions(params) {
     const input = createInputOptions(params, {
       entry: './tests.ts',
-      target: ScriptTarget.ES2019,
+      target: ScriptTarget.ES2020,
       newTsPlugin: true,
       typescriptConfig: {
         // сбрасываем указание declarationDir чтобы d.ts файл оказался в корне пакета

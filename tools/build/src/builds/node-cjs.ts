@@ -17,7 +17,7 @@ export const build: Build = {
   async getOptions(params) {
     const input = createInputOptions(params, {
       entry: getSourceFilename(params),
-      target: 'ES2019',
+      target: 'ES2020',
     });
     const output = createOutputOptions(params, {
       file: buildFileName(params),
