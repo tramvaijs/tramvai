@@ -2,16 +2,17 @@ import { useEffect, useRef } from 'react';
 import { useRoute, useUrl } from '@tramvai/module-router';
 import { optional } from '@tinkoff/dippy';
 import { useDi } from '@tramvai/react';
-import { AUTOSCROLL_BEHAVIOR_MODE_TOKEN } from '../tokens';
+import { AUTOSCROLL_BEHAVIOR_MODE_TOKEN, AUTOSCROLL_SCROLL_TOP_TOKEN } from '../tokens';
 
 const DEFAULT_AUTOSCROLL_BEHAVIOR = 'smooth';
+const DEFAULT_AUTOSCROLL_SCROLL_TOP = 0;
 
-const scrollToTop = (behavior: ScrollBehavior) => {
+const scrollToTop = (behavior: ScrollBehavior, top: number) => {
   // В некоторых браузерах не поддерживается scrollTo с одним параметром
   try {
-    window.scrollTo({ top: 0, left: 0, behavior });
+    window.scrollTo({ top, left: 0, behavior });
   } catch (error) {
-    window.scrollTo(0, 0);
+    window.scrollTo(0, top);
   }
 };
 
@@ -37,6 +38,7 @@ const scrollToAnchor = (anchor: string, behavior: ScrollBehavior): boolean => {
 export function Autoscroll() {
   const globalScrollBehavior =
     useDi(optional(AUTOSCROLL_BEHAVIOR_MODE_TOKEN)) || DEFAULT_AUTOSCROLL_BEHAVIOR;
+  const scrollTop = useDi(optional(AUTOSCROLL_SCROLL_TOP_TOKEN)) ?? DEFAULT_AUTOSCROLL_SCROLL_TOP;
   const route = useRoute();
   const url = useUrl();
   const routeRef = useRef(url);
@@ -56,7 +58,7 @@ export function Autoscroll() {
     const scrollBehavior = route?.navigateState?.autoscrollBehavior || globalScrollBehavior;
 
     if (!url.hash) {
-      scrollToTop(scrollBehavior);
+      scrollToTop(scrollBehavior, scrollTop);
       shouldScroll.current = false;
     } else {
       shouldScroll.current = !scrollToAnchor(url.hash, scrollBehavior);
