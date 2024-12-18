@@ -80,3 +80,20 @@ function Component() {
   return <Button onClick={navigateToWithAutoBehavior} />;
 }
 ```
+
+### ScrollTo top change
+
+#### Global
+
+```tsx
+import { AUTOSCROLL_SCROLL_TOP_TOKEN } from '@tramvai/module-autoscroll';
+import { provide } from '@tramvai/core';
+
+const providers = [
+  // ...,
+  provide({
+    provide: AUTOSCROLL_SCROLL_TOP_TOKEN,
+    useValue: -1, // default is 0
+  }),
+];
+```
