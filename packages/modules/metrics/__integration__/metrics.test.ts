@@ -1,4 +1,4 @@
-import type { Page } from 'playwright-core';
+import type { Page } from '@playwright/test';
 import { testApp } from '@tramvai/internal-test-utils/testApp';
 import { testAppInBrowser } from '@tramvai/internal-test-utils/browser';
 

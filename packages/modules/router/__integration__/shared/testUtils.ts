@@ -1,4 +1,4 @@
-import type { Page } from 'playwright-core';
+import type { Page } from '@playwright/test';
 
 export const getRouteName = (page: Page) => {
   return page.evaluate(() => {
