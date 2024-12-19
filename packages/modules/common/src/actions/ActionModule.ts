@@ -18,6 +18,7 @@ import {
   SERVER_RESPONSE_TASK_MANAGER,
 } from '@tramvai/tokens-server-private';
 import { ROUTER_TOKEN } from '@tramvai/tokens-router';
+import { IS_CHILD_APP_DI_TOKEN } from '@tramvai/tokens-child-app';
 import { actionTramvaiReducer } from './actionTramvaiReducer';
 import { ActionExecution } from './actionExecution';
 import { ActionRegistry } from './actionRegistry';
@@ -80,6 +81,7 @@ export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser, dyna
         responseTaskManager: optional(SERVER_RESPONSE_TASK_MANAGER),
         serverResponseStream: optional(SERVER_RESPONSE_STREAM),
         router: ROUTER_TOKEN,
+        isChildAppRunner: optional(IS_CHILD_APP_DI_TOKEN),
       },
     }),
     provide({

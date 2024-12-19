@@ -31,6 +31,7 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
   private deferredMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
   private responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
   private serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
+  private isChildAppRunner: boolean;
 
   constructor(
     private deps: {
@@ -45,12 +46,14 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
       deferredMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
       responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
       serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
+      isChildAppRunner: boolean | null;
     }
   ) {
     this.log = deps.logger('action:action-page-runner');
     this.deferredMap = deps.deferredMap;
     this.responseTaskManager = deps.responseTaskManager;
     this.serverResponseStream = deps.serverResponseStream;
+    this.isChildAppRunner = deps.isChildAppRunner ?? false;
   }
 
   // TODO stopRunAtError нужен только для редиректов на стороне сервера в экшенах. И нужно пересмотреть реализацию редиректов
@@ -170,6 +173,14 @@ Also, the necessary network accesses may not be present.`,
               })
               .catch((error) => {
                 const isCriticalError = stopRunAtError(error);
+
+                if (process.env.NODE_ENV === 'development') {
+                  if (isCriticalError && this.isChildAppRunner) {
+                    console.error(
+                      `Throwing error ${error.errorName} is not supported in Child Apps, host application command line will not be aborted!`
+                    );
+                  }
+                }
 
                 if (!isSilentError(error)) {
                   const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];

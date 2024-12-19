@@ -86,7 +86,7 @@ To enable this feature, you need to provide `experiments.reactTransitions` to `t
 }
 ```
 
-:::warn
+:::warning
 
 `reactTransitions` is incompatible with direct [`router` store](03-features/07-routing/03-working-with-url.md#routerstore-reducer) usage in React components.
 
