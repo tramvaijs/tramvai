@@ -87,6 +87,12 @@ export default ProductErrorBoundary;
 
 :::
 
+:::info
+
+Not working in Child Apps!
+
+:::
+
 ```tsx title="routes/products/[id]/index.tsx"
 import { NotFoundError } from '@tinkoff/errors';
 import { declareAction } from '@tramvai/core';

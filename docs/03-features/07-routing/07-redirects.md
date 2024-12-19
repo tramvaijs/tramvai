@@ -57,6 +57,22 @@ Use when redirect logic is complex and local for one or a few pages
 
 :::
 
+:::info
+
+Not working in Child Apps!
+
+Use `router.navigate` method for redirect:
+
+```ts
+router.navigate({
+  url,
+  code: 301,
+  replace: true,
+});
+```
+
+:::
+
 For example, you make a important request in action, and if this request fails, application need to redirect to another page. If you want to prevent page component rendering and force redirect, you can throw `RedirectFoundError` from `@tinkoff/errors` library:
 
 ```tsx

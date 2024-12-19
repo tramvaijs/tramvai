@@ -14,6 +14,7 @@ const DEFAULT_PAYLOAD = {};
 
 export class ActionPageRunner {
   log: ReturnType<ExtractDependencyType<typeof LOGGER_TOKEN>>;
+  private isChildAppRunner: boolean;
 
   constructor(
     private deps: {
@@ -24,9 +25,11 @@ export class ActionPageRunner {
       >;
       logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
       router: ExtractDependencyType<typeof ROUTER_TOKEN>;
+      isChildAppRunner: boolean | null;
     }
   ) {
     this.log = deps.logger('action:action-page-runner');
+    this.isChildAppRunner = deps.isChildAppRunner ?? false;
   }
 
   runActions(
@@ -70,6 +73,13 @@ export class ActionPageRunner {
               }
 
               if (stopRunAtError(error)) {
+                if (process.env.NODE_ENV === 'development') {
+                  if (this.isChildAppRunner) {
+                    console.error(
+                      `Throwing error ${error.errorName} is not supported in Child Apps, host application command line will not be aborted!`
+                    );
+                  }
+                }
                 throw error;
               }
             });
