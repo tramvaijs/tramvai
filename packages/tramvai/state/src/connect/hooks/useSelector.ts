@@ -88,6 +88,25 @@ export function useSelector<T, S extends StoreType | StoreType[]>(
   const serverState = useContext(ServerStateContext);
   const renderIsScheduled = useRef(false);
 
+  if (process.env.NODE_ENV === 'development') {
+    const storeItems = toArray(storesOrStore as StoreType[]);
+
+    storeItems.forEach((item) => {
+      // eslint-disable-next-line no-nested-ternary
+      const store = typeof item === 'string' ? item : 'store' in item ? item.store : item;
+      const storeName = typeof store === 'string' ? store : store.storeName;
+
+      const exists = context.hasStore(store);
+
+      if (!exists) {
+        console.warn(`
+The store "${storeName}" has been used, but not registered via COMBINE_REDUCERS token.
+Have you forgot to register it? Note, that we are registering it for you to make things just work.
+`);
+      }
+    });
+  }
+
   const storesRef = useShallowEqual(storesOrStore);
 
   const subscription = useMemo(

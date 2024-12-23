@@ -14,6 +14,13 @@ export function useStore<S>(reducer: Reducer<S>): S {
   // регистрируем его вручную, что бы гарантировать работоспособность `context.getState(reducer)`,
   // и сохраняем в `addedReducerRef`, что бы удалить при unmount
   if (!context.hasStore(reducer)) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn(`
+The store "${reducer.storeName}" has been used, but not registered via COMBINE_REDUCERS token.
+Have you forgot to register it? Note, that we are registering it for you to make things just work.
+`);
+    }
+
     context.registerStore(reducer);
     addedReducerRef.current = reducer.storeName;
   }

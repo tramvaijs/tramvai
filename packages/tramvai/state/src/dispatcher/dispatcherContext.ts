@@ -391,13 +391,17 @@ Have you forgot to register reducer or add event handler in existing reducer?
     return this.fullState;
   }
 
-  // Для отложенной инициализации контекста, в будующем нужно удалить
+  // Для отложенной инициализации контекста, в будущем нужно удалить
   setContext(context: TContext) {
     this.context = context;
   }
 
-  hasStore(store: Reducer<any>) {
-    return store.storeName in this.storeInstances && this.dispatcher.hasStore(store);
+  hasStore(store: Reducer<any> | string) {
+    const storeName = this.dispatcher.getStoreName(store);
+
+    return (
+      storeName in this.storeInstances && this.dispatcher.hasStore({ storeName } as Reducer<any>)
+    );
   }
 
   registerStore(store: Reducer<any>) {

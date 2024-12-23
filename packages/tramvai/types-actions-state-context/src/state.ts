@@ -130,7 +130,7 @@ export interface ConsumerContext {
   subscribe(callback: (state: Record<string, any>) => void): () => void;
   subscribe<S>(reducer: Reducer<S>, callback: (state: S) => void): () => void;
 
-  hasStore(store: Reducer<any>): boolean;
+  hasStore(store: Reducer<any> | BaseStoreConstructor<any> | string): boolean;
   registerStore(store: Reducer<any>): void;
   unregisterStore(store: Reducer<any>): void;
 }
