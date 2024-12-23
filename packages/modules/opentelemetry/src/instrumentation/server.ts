@@ -50,7 +50,7 @@ export const providers = [
 
           const httpMethod = req.method;
           // todo useful because always get `*`, rewrite with tramvai router route?
-          const httpRoute = req.routeOptions
+          const httpRoute = req.routeOptions?.url
             ? req.routeOptions.url // since fastify@4.10.0
             : req.routerPath;
           const parsedUrl = new URL(`http://localhost${req.url}`);
