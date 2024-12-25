@@ -8,11 +8,8 @@ import { RenderContext } from './render-context';
 import { Extractor } from './extractor';
 import { ChildAppErrorBoundary } from './childAppErrorBoundary';
 
-const FailedChildAppFallback = ({
-  config: { name, version, tag, fallback: Fallback },
-}: {
-  config: ChildAppReactConfig;
-}) => {
+const FailedChildAppFallback = ({ config }: { config: ChildAppReactConfig }) => {
+  const { name, version, tag, fallback: Fallback } = config;
   const logger = useDi(LOGGER_TOKEN);
 
   const log = logger('child-app:render');
@@ -28,9 +25,7 @@ const FailedChildAppFallback = ({
     log.error({
       event: 'failed-render',
       message: 'child-app failed to render, will try to recover during hydration',
-      name,
-      version,
-      tag,
+      childApp: { name, version, tag },
     });
   }
 
@@ -75,10 +70,8 @@ const ChildAppWrapper = ({
   if (!di) {
     log.error({
       event: 'not-found',
-      name,
-      version,
-      tag,
       message: 'child-app was not initialized',
+      childApp: { name, version, tag },
     });
 
     if (process.env.__TRAMVAI_CONCURRENT_FEATURES || typeof window !== 'undefined') {
@@ -97,9 +90,7 @@ const ChildAppWrapper = ({
       log.error({
         event: 'empty-render',
         message: 'Child-app does not provide render token',
-        name,
-        version,
-        tag,
+        childApp: { name, version, tag },
       });
 
       return null;
@@ -114,10 +105,12 @@ const ChildAppWrapper = ({
     log.error({
       event: 'get-render',
       message: 'Cannot get render token from child-app',
+      childApp: {
+        name,
+        version,
+        tag,
+      },
       error,
-      name,
-      version,
-      tag,
     });
 
     return null;

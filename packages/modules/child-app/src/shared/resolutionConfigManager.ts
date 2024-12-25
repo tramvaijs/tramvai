@@ -48,7 +48,11 @@ export class ChildAppResolutionConfigManager implements Interface {
               return applyOrReturn([], rawConfig);
             })
             .catch((error) => {
-              this.log.error(error, 'Failed while resolving resolution config');
+              this.log.error({
+                event: 'config-resolve-failed',
+                message: 'Failed while resolving resolution config',
+                error,
+              });
             });
         })
       );

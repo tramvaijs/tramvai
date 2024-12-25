@@ -1,50 +1,75 @@
 import type { Route } from '@tinkoff/router';
-import type { Provider } from '@tramvai/core';
+import type { ExtractDependencyType, Provider } from '@tramvai/core';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import { resolveLazyComponent } from '@tramvai/react';
-import { CHILD_APP_PRELOAD_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
+import type { ChildAppRequestConfig } from '@tramvai/tokens-child-app';
+import {
+  CHILD_APP_PRELOAD_MANAGER_TOKEN,
+  CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN,
+} from '@tramvai/tokens-child-app';
 import { LINK_PREFETCH_HANDLER_TOKEN, PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 
 const pagePreload = async (
   {
-    pageService,
     preloadManager,
+    preloadSourceList,
   }: {
-    pageService: typeof PAGE_SERVICE_TOKEN;
     preloadManager: typeof CHILD_APP_PRELOAD_MANAGER_TOKEN;
+    preloadSourceList: ExtractDependencyType<typeof CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN>;
   },
   mode: 'prefetch' | 'preload',
   isSpaNavigation = false,
   route?: Route
 ): Promise<void> => {
-  const components = await Promise.all([
-    resolveLazyComponent(pageService.resolveComponentFromConfig('layout', route)),
-    resolveLazyComponent(pageService.resolveComponentFromConfig('nestedLayout', route)),
-    resolveLazyComponent(pageService.resolveComponentFromConfig('page', route)),
-  ]);
+  const childApps: ChildAppRequestConfig[] = (
+    await Promise.all(
+      preloadSourceList.map((source) => {
+        return source({ route });
+      })
+    )
+  ).reduce((acc, source) => acc.concat(source), []);
 
   await Promise.all(
-    components.map(async (component) => {
-      if (component?.childApps) {
-        await Promise.all(
-          component.childApps.map((request) => {
-            // for first preload on SPA-navigation, we need to prevent double action execution,
-            // and need to mark this Child App as not preloaded, to prevent running `spa` and `afterSpa` commands for it
-            if (mode === 'preload' && isSpaNavigation && !preloadManager.isPreloaded(request)) {
-              preloadManager.saveNotPreloadedForSpaNavigation(request);
-            }
-
-            return preloadManager[mode](request, route).catch(() => {
-              // actual error will be logged internally
-            });
-          })
-        );
+    childApps.map((request) => {
+      // for first preload on SPA-navigation, we need to prevent double action execution,
+      // and need to mark this Child App as not preloaded, to prevent running `spa` and `afterSpa` commands for it
+      if (mode === 'preload' && isSpaNavigation && !preloadManager.isPreloaded(request)) {
+        preloadManager.saveNotPreloadedForSpaNavigation(request);
       }
+
+      return preloadManager[mode](request, route).catch(() => {
+        // actual error will be logged internally
+      });
     })
   );
 };
 
 export const pagePreloadProviders: Provider[] = [
+  provide({
+    provide: CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN,
+    useFactory: ({ pageService }) => {
+      return async function resolveChildAppsFromRouteComponents({ route }: { route?: Route }) {
+        const childApps: ChildAppRequestConfig[] = [];
+
+        const components = await Promise.all([
+          resolveLazyComponent(pageService.resolveComponentFromConfig('layout', route)),
+          resolveLazyComponent(pageService.resolveComponentFromConfig('nestedLayout', route)),
+          resolveLazyComponent(pageService.resolveComponentFromConfig('page', route)),
+        ]);
+
+        components.forEach((component) => {
+          if (component?.childApps) {
+            childApps.push(...component.childApps);
+          }
+        });
+
+        return childApps;
+      };
+    },
+    deps: {
+      pageService: PAGE_SERVICE_TOKEN,
+    },
+  }),
   provide({
     provide: LINK_PREFETCH_HANDLER_TOKEN,
     useFactory: (deps) => {
@@ -54,8 +79,8 @@ export const pagePreloadProviders: Provider[] = [
     },
     multi: true,
     deps: {
-      pageService: PAGE_SERVICE_TOKEN,
       preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+      preloadSourceList: CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN,
     },
   }),
   provide({
@@ -73,8 +98,8 @@ export const pagePreloadProviders: Provider[] = [
     },
     multi: true,
     deps: {
-      pageService: PAGE_SERVICE_TOKEN,
       preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
+      preloadSourceList: CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN,
     },
   }),
 ];

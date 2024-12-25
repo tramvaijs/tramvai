@@ -40,7 +40,7 @@ export const runCommand = async ({
           log.info({
             message:
               'Child App has been preloaded first time, current SPA-transition will not be blocked, Child App `spa` and `afterSpa` lines will be skipped',
-            config,
+            childApp: config,
           });
         }
         return;

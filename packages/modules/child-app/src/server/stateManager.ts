@@ -66,7 +66,7 @@ export class StateManager implements ChildAppStateManager {
       this.log.error({
         event: 'get-state-failed',
         error,
-        config,
+        childApp: { name: config.name, version: config.version, tag: config.tag },
       });
     }
   }

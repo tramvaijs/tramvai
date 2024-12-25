@@ -257,6 +257,13 @@ export const CHILD_APP_PAGE_COMPONENTS_TOKEN = createToken<Record<string, ChildA
 export const CHILD_APP_RENDER_CHILDREN_TOKEN = createToken<ComponentType<{ di: Container }>>(
   'child-app render children'
 );
+/**
+ * @public
+ * @description List of sources to get Child Apps list for preload
+ */
+export const CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN = createToken<
+  (options: { route?: Route }) => ChildAppRequestConfig[] | Promise<ChildAppRequestConfig[]>
+>('child-app preload source list', { multi: true });
 
 export interface ChildAppPageService {
   resolveComponent(route?: Route): Promise<void>;

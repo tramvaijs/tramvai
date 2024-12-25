@@ -211,7 +211,11 @@ export const registerChildAppRenderSlots =
       } catch (error) {
         log.error({
           event: 'get-slots-failed',
-          config: requestConfig,
+          childApp: {
+            name: requestConfig.name,
+            version: requestConfig.version,
+            tag: requestConfig.tag,
+          },
         });
       }
     });

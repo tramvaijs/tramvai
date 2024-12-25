@@ -67,7 +67,7 @@ export class SingletonDiManager implements ChildAppDiManager {
       this.log.error({
         event: 'resolve-di-fail',
         error,
-        config,
+        childApp: { name: config.name, version: config.version, tag: config.tag },
       });
     }
   }

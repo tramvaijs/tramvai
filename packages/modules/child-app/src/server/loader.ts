@@ -117,9 +117,14 @@ export class ServerLoader extends Loader {
       const entry = factory();
 
       this.initializedMap.set(container, entry);
-    } catch (err: any) {
-      this.log.error(err);
-      throw err;
+    } catch (error: any) {
+      this.log.error({
+        event: 'init-mf-failed',
+        error,
+        childApp: { name: config.name, version: config.version, tag: config.tag },
+      });
+
+      throw error;
     }
   }
 

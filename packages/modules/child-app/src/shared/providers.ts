@@ -99,7 +99,11 @@ export const sharedProviders: Provider[] = [
         const config = resolutionConfigManager.resolve(req);
 
         if (!config) {
-          log.error(`Child-app "${name}" with tag "${tag}" has not found`);
+          log.error({
+            event: 'config-not-found',
+            message: `Child-app "${name}" with tag "${tag}" has not found`,
+            childApp: req,
+          });
           return;
         }
 

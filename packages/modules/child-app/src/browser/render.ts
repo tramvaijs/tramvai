@@ -47,8 +47,9 @@ export class RenderManager implements ChildAppRenderManager {
     // for SPA-navigation, if Child App is preloaded first time, it is valid case
     if (!this.preloadManager.isNotPreloadedForSpaNavigation(request)) {
       this.log.warn({
+        event: 'not-preloaded',
         message: 'Child-app has been used but not preloaded before React render',
-        request,
+        childApp: request,
       });
     }
 

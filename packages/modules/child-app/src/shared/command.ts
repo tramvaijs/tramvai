@@ -53,7 +53,7 @@ export class CommandLineRunner implements ChildAppCommandLineRunner {
           error,
           type,
           status,
-          config,
+          childApp: { name: config.name, version: config.version, tag: config.tag },
         });
       }
     }

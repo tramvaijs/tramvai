@@ -103,9 +103,10 @@ export class ServerLoader {
       })
       .catch((err) => {
         this.log.error({
+          event: 'load-module-failed',
           error: err,
           url,
-          name: displayName,
+          module: displayName,
         });
         throw new Error(`Error resolving ${displayName} from ${url}`);
       });

@@ -47,8 +47,9 @@ export class RenderManager implements ChildAppRenderManager {
     }
 
     this.log.warn({
+      event: 'not-preloaded',
       message: 'Child-app has been used but not preloaded before React render',
-      request,
+      childApp: request,
     });
 
     return [undefined, undefined];
