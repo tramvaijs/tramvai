@@ -163,6 +163,46 @@ MainPage.childApps = [{ name: 'fancy-child' }];
 export default MainPage;
 ```
 
+### Extend preload source list
+
+You can provide additional source for Child Apps list, for example, to get it from some remote configuration.
+
+Use token `CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN`:
+
+```ts
+import { provide } from '@tramvai/core';
+import { CHILD_APP_PRELOAD_MANAGER_TOKEN } from '@tramvai/module-child-app';
+
+const providers = [
+  // hardcoded list of Child Apps
+  provide({
+    provide: CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN,
+    useValue: ({ route }) => {
+      if (route.path !== '/fancy-child/') {
+        return [];
+      }
+      return [
+        { name: 'fancy-child' },
+      ];
+    },
+  }),
+  // remote source of Child Apps
+  provide({
+    provide: CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN,
+    useFactory: ({ httpClient }) => {
+      return async () => {
+        const { payload } = await httpClient.get(`/some-child-app-list.json`);
+
+        return payload;
+      };
+    },
+    deps: {
+      httpClient: HTTP_CLIENT_TOKEN,
+    },
+  }),
+];
+```
+
 ### Preload manually
 
 :::warning

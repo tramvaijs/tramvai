@@ -159,13 +159,19 @@ import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 const provider = provide({
   provide: commandLineListTokens.resolvePageDeps,
   useFactory: ({ preloadManager, pageService }) => {
+    const config = { name: 'fancy-child' };
     let isSpaNavigation = false;
 
     return function preloadFancyChildApp() {
+
       // for SPA-navigation to specific page with this Child App
       if (isSpaNavigation && pageService.getCurrentUrl().pathname === '/fancy-child/') {
+        if (!preloadManager.isPreloaded(config)) {
+          // workaround for correct Child App initialization lifecycle
+          preloadManager.saveNotPreloadedForSpaNavigation(config);
+        }
         // wait for preloading
-        return preloadManager.preload({ name: 'fancy-child' });
+        return preloadManager.preload(config);
       }
 
       // second call of `resolvePageDeps` command means that it is SPA-navigation
