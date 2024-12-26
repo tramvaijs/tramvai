@@ -11,6 +11,8 @@
     "@docusaurus/remark-plugin-npm2yarn": "2.3.1",
     "@docusaurus/theme-common": "2.3.1",
     "@easyops-cn/docusaurus-search-local": "^0.21.4",
+    
+    "@tinkoff/pvm": "^1.22.0",
     "@tinkoff/utils": "^2.1.2",
     "clsx": "^1.1.1",
     "directory-tree": "^2.2.4",
@@ -33,7 +35,7 @@
     "unist-util-visit": "^2.0.3"
   },
   "browserslist": [
-    "defaults"
+    "last 2 Chrome versions"
   ],
   "license": "Apache-2.0"
 }
