@@ -21,8 +21,6 @@ const metaSpecial = (context, meta) => {
 const dynamicAction = declareAction({
   name: 'dynamicMeta',
   async fn() {
-    await new Promise((res) => setTimeout(res, 400));
-
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',
     });
@@ -38,8 +36,6 @@ const dynamicAction = declareAction({
 export const applyMetaAction = declareAction({
   name: 'applyMeta',
   async fn() {
-    await new Promise((res) => setTimeout(res, 200));
-
     this.deps.applyMeta({
       metaObj: {
         title: 'WoW, meta was applied!',
@@ -58,7 +54,7 @@ export const applyMetaAction = declareAction({
 const dynamicClientAction = declareAction({
   name: 'dynamicMeta',
   async fn() {
-    await new Promise((res) => setTimeout(res, 200));
+    await new Promise((res) => setTimeout(res, 1000));
 
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',

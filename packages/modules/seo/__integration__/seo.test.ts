@@ -1,6 +1,5 @@
 import { testApp } from '@tramvai/internal-test-utils/testApp';
 import { testAppInBrowser } from '@tramvai/internal-test-utils/browser';
-import { sleep } from '@tramvai/test-integration';
 
 describe('seo', () => {
   const { getApp } = testApp({
@@ -59,22 +58,31 @@ describe('seo', () => {
       await router.navigate('../common/');
       expect(await page.title()).toBe('common seo');
       await router.navigate('../dynamic/');
-      await sleep(300);
-      expect(await page.title()).toBe('WoW, such dynamic!');
+
+      await page.waitForFunction(() => {
+        return document.title === 'WoW, such dynamic!';
+      });
     });
 
+    // eslint-disable-next-line jest/expect-expect
     it('should allow to update meta in browser page actions on first render', async () => {
       const { page, router } = await getPageWrapper('/seo/dynamic-client/');
 
-      await sleep(300);
-      expect(await page.title()).toBe('WoW, such dynamic!');
+      await page.waitForFunction(() => {
+        return document.title === 'WoW, such dynamic!';
+      });
 
       await router.navigate('../common/');
-      expect(await page.title()).toBe('common seo');
+
+      await page.waitForFunction(() => {
+        return document.title === 'common seo';
+      });
 
       await router.navigate('../dynamic-client/');
-      await sleep(300);
-      expect(await page.title()).toBe('WoW, such dynamic!');
+
+      await page.waitForFunction(() => {
+        return document.title === 'WoW, such dynamic!';
+      });
     });
 
     it('should have title which is came from the server action', async () => {
@@ -100,7 +108,6 @@ describe('seo', () => {
       const button = page.getByTestId('apply-new-meta-button');
       await button.click();
 
-      await sleep(300);
       // старый тайтл обновился
       expect(await page.title()).toBe('WoW, meta was applied!');
       // тэги из админки не пропали
