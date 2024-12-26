@@ -73,6 +73,7 @@ How does it work when we trying to get provider from DI in Child App:
    2. Throw error otherwise
 
 There is a list of providers - exceptions, for which only factories will be borrowed, not instances, and new instances will be created in current Child-App DI:
+
 - `COMMAND_LINE_RUNNER_TOKEN`
 - `ACTION_EXECUTION_TOKEN`
 - `ACTION_PAGE_RUNNER_TOKEN`
@@ -81,6 +82,31 @@ There is a list of providers - exceptions, for which only factories will be borr
 - `CONTEXT_TOKEN`
 - `CREATE_CACHE_TOKEN`
 - `CLEAR_CACHE_TOKEN`
+- `APP_INFO_TOKEN`
+- `DEFERRED_ACTIONS_MAP_TOKEN`
+- `EXECUTION_CONTEXT_MANAGER_TOKEN`
+- `COMMAND_LINE_EXECUTION_CONTEXT_TOKEN`
+- `PUBSUB_TOKEN`
+- `PUBSUB_FACTORY_TOKEN`
+
+Root app provider instance can be accessed using a custom wrapper:
+
+```ts
+export const HOST_PUBSUB_TOKEN = createToken<PubSub>('HOST_PUBSUB_TOKEN');
+
+createApp({
+  name: 'root-app',
+  providers: [
+    provide({
+      provide: HOST_PUBSUB_TOKEN,
+      useFactory: ({ pubsub }) => pubsub,
+      deps: { pubsub: PUBSUB_TOKEN },
+    }),
+  ],
+});
+```
+
+Then just use `HOST_PUBSUB_TOKEN` instead of `PUBSUB_TOKEN` in the Child App.
 
 ### CommandLineRunner
 
