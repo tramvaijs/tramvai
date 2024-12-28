@@ -63,7 +63,7 @@ const RESOURCES_REGISTRY_FILES_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 const RESOURCES_REGISTRY_SIZE_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 
 export const DEFAULT_POLYFILL_CONDITION =
-  '!window.Promise.prototype.finally || !window.URL || !window.AbortController || !window.IntersectionObserver || !Object.fromEntries || !window.ResizeObserver';
+  '!window.Promise.prototype.finally || !window.URL || !window.AbortController || !window.IntersectionObserver || !Object.fromEntries || !window.ResizeObserver || !window.queueMicrotask';
 
 @Module({
   imports: [ClientHintsModule, LayoutModule],
