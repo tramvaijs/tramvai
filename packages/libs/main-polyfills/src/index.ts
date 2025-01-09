@@ -10,6 +10,7 @@ import 'core-js/stable/promise';
 import 'core-js/stable/weak-map';
 import 'core-js/stable/weak-set';
 import 'core-js/stable/url';
+import 'core-js/stable/queue-microtask';
 
 import 'abort-controller/polyfill';
 
