@@ -1,5 +1,5 @@
 {
-  "name": "@tramvai-test-app/child-app",
+  "name": "test-app-child-app",
   "sourceRoot": "examples/child-app",
   "projectType": "app",
   "targets": {}

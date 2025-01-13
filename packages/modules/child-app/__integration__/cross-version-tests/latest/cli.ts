@@ -26,7 +26,11 @@ export const startRootApp = ({
     },
     {
       rootDir: EXAMPLE_DIR,
-      env,
+      env: {
+        LOG_ENABLE: 'warn:*',
+        LOG_LEVEL: 'warn',
+        ...env,
+      },
       resolveSymlinks: false,
       fileCache: true,
     }
@@ -58,5 +62,6 @@ export const startChildApp = async (
     staticPort,
     rootDir: EXAMPLE_DIR,
     resolveSymlinks: false,
+    fileCache: true,
   });
 };

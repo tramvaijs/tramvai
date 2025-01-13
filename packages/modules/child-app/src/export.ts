@@ -18,14 +18,14 @@ declare const errorTag: unique symbol;
 export type TypesError<T> = { [errorTag]: T };
 
 /**
- * expand generic types one level down (in error message)
- */
-type Prettify<T> = T extends Record<string, any> ? {} & { [P in keyof T]: T[P] } : {} & T;
-
-/**
  * exclude keys with `never` value from records
  */
 type OmitNever<T> = { [K in keyof T as T[K] extends never ? never : K]: T[K] };
+
+/**
+ * expand generic types one level down (in error message)
+ */
+type Prettify<T> = T extends Record<string, any> ? {} & { [P in keyof T]: T[P] } : {} & T;
 
 /**
  * validate required and provided contracts, `TypesError` returns on failure
