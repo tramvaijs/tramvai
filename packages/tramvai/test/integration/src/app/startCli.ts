@@ -67,6 +67,11 @@ export const startCli = async (
                 transpilation: {
                   loader: 'swc',
                 },
+                // Playwright Inspector collects a stack trace for the ability to show in which file or step of the test a transition occurred
+                // internak stack trace utility uses process.cwd() to correctly calculate the path to the files
+                // @tramvai/cli when using threads loader does process.chdir(rootDir) because workers don't allow to change cwd
+                // this breaks stack traces, there are now broken paths to files, the inspector works incorrectly
+                serverRunner: 'process',
               },
             },
             targetOrConfig

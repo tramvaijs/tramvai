@@ -5,4 +5,5 @@ export type Options = {
   forPublish?: boolean;
   preserveModules?: boolean;
   only?: 'migrations' | 'tests';
+  cwd?: string;
 };
