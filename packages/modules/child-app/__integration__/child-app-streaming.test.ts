@@ -7,167 +7,119 @@ import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
 import type { start } from '@tramvai/cli';
 import type { startCli } from '@tramvai/test-integration';
 import { waitHydrated } from '@tramvai/test-pw';
+import { testCasesConditions } from './test-cases';
 
 jest.setTimeout(3 * 60 * 1000);
 
-// TODO: test matrix, run only for latest?
-describe(`Child Apps with streaming`, () => {
-  let childAppBase: PromiseType<ReturnType<typeof start>>;
-  let childAppError: PromiseType<ReturnType<typeof start>>;
-  let rootApp: PromiseType<ReturnType<typeof startCli>>;
+const testCase =
+  testCasesConditions[
+    `${process.env.ROOT_APP_VERSION ?? 'latest'}-${process.env.CHILD_APP_VERSION ?? 'latest'}`
+  ];
 
-  beforeAll(async () => {
-    const { startChildApp } = await import(`./cross-version-tests/latest/cli`);
+if (!testCase) {
+  throw Error(
+    `Unsupported versions combination for cross version test suite: { rootAppVersion: ${process.env.ROOT_APP_VERSION}, childAppsVersion: ${process.env.CHILD_APP_VERSION} }`
+  );
+}
 
-    [childAppBase, childAppError] = await Promise.all([
-      startChildApp('base'),
-      startChildApp('error'),
-    ]);
-  });
+const { rootAppVersion, childAppsVersion } = testCase;
 
-  const mockerApp = fastify({
-    logger: true,
-  });
+if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
+  describe(`Child Apps with streaming`, () => {
+    let childAppBase: PromiseType<ReturnType<typeof start>>;
+    let childAppError: PromiseType<ReturnType<typeof start>>;
+    let rootApp: PromiseType<ReturnType<typeof startCli>>;
 
-  const mockerPort = getPort();
-  const mockerHandlerMock = jest.fn();
+    beforeAll(async () => {
+      const { startChildApp } = await import(`./cross-version-tests/latest/cli`);
 
-  beforeAll(async () => {
-    await mockerApp.register(fastifyReplyFrom);
-
-    await mockerApp.addHook('onRequest', async (req, reply) => {
-      reply.header('Access-Control-Allow-Origin', '*');
-    });
-    await mockerApp.addHook('preHandler', async (...args) => mockerHandlerMock(...args));
-
-    await mockerApp.get('/*', async (request, reply) => {
-      const [_, childAppName, filename] = request.url.split('/');
-
-      switch (childAppName) {
-        case 'base':
-        case 'base-not-preloaded':
-          return reply.from(
-            `${getStaticUrl(childAppBase)}/base/${filename.replace(/base-not-preloaded/, 'base')}`
-          );
-
-        case 'error':
-          return reply.from(`${getStaticUrl(childAppError)}/error/${filename}`);
-      }
+      [childAppBase, childAppError] = await Promise.all([
+        startChildApp('base'),
+        startChildApp('error'),
+      ]);
     });
 
-    await mockerApp.listen({ port: mockerPort });
-  });
+    const mockerApp = fastify({
+      logger: {
+        level: 'warn',
+      },
+    });
 
-  beforeAll(async () => {
-    const { startRootApp } = await import(`./cross-version-tests/latest/cli`);
+    const mockerPort = getPort();
+    const mockerHandlerMock = jest.fn();
 
-    rootApp = await startRootApp({
-      define: {
-        get 'process.env.CHILD_APP_BASE'() {
-          return `"${getStaticUrl(childAppBase)}/"`;
+    beforeAll(async () => {
+      await mockerApp.register(fastifyReplyFrom);
+
+      await mockerApp.addHook('onRequest', async (req, reply) => {
+        reply.header('Access-Control-Allow-Origin', '*');
+      });
+      await mockerApp.addHook('preHandler', async (...args) => mockerHandlerMock(...args));
+
+      await mockerApp.get('/*', async (request, reply) => {
+        const [_, childAppName, filename] = request.url.split('/');
+
+        switch (childAppName) {
+          case 'base':
+          case 'base-not-preloaded':
+            return reply.from(
+              `${getStaticUrl(childAppBase)}/base/${filename.replace(/base-not-preloaded/, 'base')}`
+            );
+
+          case 'error':
+            return reply.from(`${getStaticUrl(childAppError)}/error/${filename}`);
+        }
+      });
+
+      await mockerApp.listen({ port: mockerPort });
+    });
+
+    beforeAll(async () => {
+      const { startRootApp } = await import(`./cross-version-tests/latest/cli`);
+
+      rootApp = await startRootApp({
+        define: {
+          get 'process.env.CHILD_APP_BASE'() {
+            return `"${getStaticUrl(childAppBase)}/"`;
+          },
         },
-      },
-      env: {
-        CHILD_APP_EXTERNAL_URL: `http://localhost:${mockerPort}/`,
-        HTTP_CLIENT_CIRCUIT_BREAKER_DISABLED: 'true',
-        REACT_SERVER_RENDER_MODE: 'streaming',
-      },
-    });
-  });
-
-  const { getPageWrapper } = testAppInBrowser(() => rootApp);
-
-  afterAll(async () => {
-    await Promise.all([
-      mockerApp.close(),
-      childAppBase.close(),
-      childAppError?.close(),
-      rootApp.close(),
-    ]);
-  });
-
-  beforeEach(() => {
-    mockerHandlerMock.mockReset();
-  });
-
-  describe('base', () => {
-    it('client entry chunk should be loaded before hydration for preloaded', async () => {
-      const { page } = await getPageWrapper();
-
-      page.route('**/*', async (route) => {
-        if (route.request().url().includes('/base/base_client@0.0.0-stub.js')) {
-          // force client entry chunk to load after main application chunks
-          await sleep(200);
-        }
-        return route.continue();
+        env: {
+          CHILD_APP_EXTERNAL_URL: `http://localhost:${mockerPort}/`,
+          HTTP_CLIENT_CIRCUIT_BREAKER_DISABLED: 'true',
+          REACT_SERVER_RENDER_MODE: 'streaming',
+        },
       });
+    });
 
-      const clientEntryPromise = page.waitForResponse((response) =>
-        response.url().includes('/base/base_client@0.0.0-stub.js')
-      );
-      const hydrationPromise = waitHydrated(page);
+    const { getPageWrapper } = testAppInBrowser(() => rootApp);
 
-      const hydrationOrClientChunkRace = Promise.race([
-        hydrationPromise.then(() => 'hydration_complete'),
-        clientEntryPromise.then(() => 'client_entry_loaded'),
+    afterAll(async () => {
+      await Promise.all([
+        mockerApp.close(),
+        childAppBase.close(),
+        childAppError?.close(),
+        rootApp.close(),
       ]);
-
-      await page.goto(`${rootApp.serverUrl}/base/`);
-
-      expect(await hydrationOrClientChunkRace).toBe('client_entry_loaded');
     });
-  });
 
-  describe('base-not-preloaded', () => {
-    it('client entry chunk loaded should not block hydration if not preloaded', async () => {
-      const { page } = await getPageWrapper();
-
-      page.route('**/*', async (route) => {
-        if (route.request().url().includes('/base/base-not-preloaded_client@0.0.0-stub.js')) {
-          // force client entry chunk to load after main application chunks
-          await sleep(200);
-        }
-        return route.continue();
-      });
-
-      const clientEntryPromise = page.waitForResponse((response) =>
-        response.url().includes('/base/base-not-preloaded_client@0.0.0-stub.js')
-      );
-      const hydrationPromise = waitHydrated(page);
-
-      const hydrationOrClientChunkRace = Promise.race([
-        hydrationPromise.then(() => 'hydration_complete'),
-        clientEntryPromise.then(() => 'client_entry_loaded'),
-      ]);
-
-      await page.goto(`${rootApp.serverUrl}/base-not-preloaded/`);
-
-      expect(await hydrationOrClientChunkRace).toBe('hydration_complete');
+    beforeEach(() => {
+      mockerHandlerMock.mockReset();
     });
-  });
 
-  describe('errors', () => {
-    describe('error during loading child-app code on server side', () => {
-      beforeEach(() => {
-        mockerHandlerMock.mockImplementation((req) => {
-          if (req.url === '/error/error_server@0.0.0-stub.js') {
-            throw new Error('blocked');
-          }
-        });
-      });
-
-      it('client entry chunk should be loaded before hydration for failed preloaded', async () => {
+    describe('base', () => {
+      it('client entry chunk should be loaded before hydration for preloaded', async () => {
         const { page } = await getPageWrapper();
 
         page.route('**/*', async (route) => {
-          if (route.request().url().includes('/error/error_client@0.0.0-stub.js')) {
+          if (route.request().url().includes('/base/base_client@0.0.0-stub.js')) {
+            // force client entry chunk to load after main application chunks
             await sleep(200);
           }
           return route.continue();
         });
 
         const clientEntryPromise = page.waitForResponse((response) =>
-          response.url().includes('/error/error_client@0.0.0-stub.js')
+          response.url().includes('/base/base_client@0.0.0-stub.js')
         );
         const hydrationPromise = waitHydrated(page);
 
@@ -176,10 +128,80 @@ describe(`Child Apps with streaming`, () => {
           clientEntryPromise.then(() => 'client_entry_loaded'),
         ]);
 
-        await page.goto(`${rootApp.serverUrl}/error/?fallback=`);
+        await page.goto(`${rootApp.serverUrl}/base/`);
 
         expect(await hydrationOrClientChunkRace).toBe('client_entry_loaded');
       });
     });
+
+    describe('base-not-preloaded', () => {
+      it('client entry chunk loaded should not block hydration if not preloaded', async () => {
+        const { page } = await getPageWrapper();
+
+        page.route('**/*', async (route) => {
+          if (route.request().url().includes('/base/base-not-preloaded_client@0.0.0-stub.js')) {
+            // force client entry chunk to load after main application chunks
+            await sleep(200);
+          }
+          return route.continue();
+        });
+
+        const clientEntryPromise = page.waitForResponse((response) =>
+          response.url().includes('/base/base-not-preloaded_client@0.0.0-stub.js')
+        );
+        const hydrationPromise = waitHydrated(page);
+
+        const hydrationOrClientChunkRace = Promise.race([
+          hydrationPromise.then(() => 'hydration_complete'),
+          clientEntryPromise.then(() => 'client_entry_loaded'),
+        ]);
+
+        await page.goto(`${rootApp.serverUrl}/base-not-preloaded/`);
+
+        expect(await hydrationOrClientChunkRace).toBe('hydration_complete');
+      });
+    });
+
+    describe('errors', () => {
+      describe('error during loading child-app code on server side', () => {
+        beforeEach(() => {
+          mockerHandlerMock.mockImplementation((req) => {
+            if (req.url === '/error/error_server@0.0.0-stub.js') {
+              throw new Error('blocked');
+            }
+          });
+        });
+
+        it('client entry chunk should be loaded before hydration for failed preloaded', async () => {
+          const { page } = await getPageWrapper();
+
+          page.route('**/*', async (route) => {
+            if (route.request().url().includes('/error/error_client@0.0.0-stub.js')) {
+              await sleep(200);
+            }
+            return route.continue();
+          });
+
+          const clientEntryPromise = page.waitForResponse((response) =>
+            response.url().includes('/error/error_client@0.0.0-stub.js')
+          );
+          const hydrationPromise = waitHydrated(page);
+
+          const hydrationOrClientChunkRace = Promise.race([
+            hydrationPromise.then(() => 'hydration_complete'),
+            clientEntryPromise.then(() => 'client_entry_loaded'),
+          ]);
+
+          await page.goto(`${rootApp.serverUrl}/error/?fallback=`);
+
+          expect(await hydrationOrClientChunkRace).toBe('client_entry_loaded');
+        });
+      });
+    });
   });
-});
+} else {
+  describe('child-app-streaming', () => {
+    // eslint-disable-next-line jest/expect-expect
+    it('skipped', () => {});
+  });
+}
