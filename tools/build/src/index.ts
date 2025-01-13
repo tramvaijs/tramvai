@@ -38,7 +38,7 @@ export class TramvaiBuild {
     // список конфигураций rollup, на основе которых будут выполнены сборки
     builds?: Build[]
   ) {
-    this.cwd = process.cwd();
+    this.cwd = options.cwd ?? process.cwd();
     this.options = this.normalizeOptions(options);
     this.builds = builds ?? (options.only ? BUILDS[options.only] : undefined) ?? ALL_BUILDS;
 
