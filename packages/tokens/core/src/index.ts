@@ -4,6 +4,7 @@ import type { PageAction } from './action';
 export * from './action';
 export * from './command';
 export * from './bundle';
+export * from './hooks';
 
 export const BUNDLE_LIST_TOKEN = createToken('bundleList');
 export const ACTIONS_LIST_TOKEN = createToken<PageAction[]>('actionsList');

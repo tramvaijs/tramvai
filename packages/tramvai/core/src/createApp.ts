@@ -119,9 +119,21 @@ export class App {
     const commandLineRunner = this.di.get({ token: COMMAND_LINE_RUNNER_TOKEN, optional: true });
 
     if (!commandLineRunner) {
-      throw new Error(
+      const error = new Error(
         '`COMMAND_LINE_RUNNER_TOKEN` is not defined, have you added `@tramvai/module-common` to your dependency list?'
       );
+
+      if (process.env.NODE_ENV !== 'production') {
+        try {
+          this.di.get(COMMAND_LINE_RUNNER_TOKEN);
+        } catch (e: any) {
+          if (e?.message) {
+            error.message += `\n\nProvider resolve error:\n${e.message}`;
+          }
+        }
+      }
+
+      throw error;
     }
 
     log?.warn({

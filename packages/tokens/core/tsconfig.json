@@ -15,6 +15,9 @@
         },
         {
             "path": "../../tramvai/types-actions-state-context"
+        },
+        {
+            "path": "../../libs/hooks"
         }
     ]
 }

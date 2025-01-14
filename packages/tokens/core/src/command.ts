@@ -1,5 +1,6 @@
 import type { Container, MultiTokenInterface, Provider } from '@tinkoff/dippy';
 import { Scope, createToken } from '@tinkoff/dippy';
+import type { AsyncTapableHookInstance } from '@tinkoff/hook-runner';
 
 const multiOptions = { multi: true } as const;
 
@@ -7,6 +8,57 @@ export type Command = () => any;
 
 export interface CommandLineRunner {
   lines: CommandLines;
+
+  /**
+   * Hook for command line run, for example when `customer` line is executed like this:
+   *
+   * ```ts
+   * commandLineRunner.run('server', 'customer');
+   * ```
+   */
+  runLineHook: AsyncTapableHookInstance<
+    {
+      env: keyof CommandLines;
+      line: keyof CommandLineDescription;
+      di: Container;
+      key?: string | number;
+    },
+    void
+  >;
+
+  /**
+   * Hook for line commands run, for example when `customer` line is executed,
+   * this hook will be called sequentially for each command from this list:
+   * - `customerStart`
+   * - `resolveUserDeps`
+   * - `resolvePageDeps`
+   * - `generatePage`
+   * - `clear`
+   */
+  runCommandHook: AsyncTapableHookInstance<
+    {
+      env: keyof CommandLines;
+      line: keyof CommandLineDescription;
+      di: Container;
+      command: MultiTokenInterface<Command>;
+    },
+    void
+  >;
+
+  /**
+   * Hook for command function run, for example when `customerStart` command is executed,
+   * and you have a few `commandLineListTokens.customerStart` providers,
+   * this hook will be called sequentially for each provided function
+   */
+  runCommandFnHook: AsyncTapableHookInstance<
+    {
+      fn: Command;
+      line: keyof CommandLineDescription;
+      command: MultiTokenInterface<Command>;
+      di: Container;
+    },
+    void
+  >;
 
   run(
     type: keyof CommandLines,
@@ -100,3 +152,15 @@ export const commandLineListTokens = {
    */
   close: createToken<Command>('close', { multi: true, scope: Scope.SINGLETON }),
 };
+
+export type CommandLineRunnerPlugin = {
+  apply(commandLineRunner: CommandLineRunner): void;
+};
+
+export const COMMAND_LINE_RUNNER_PLUGIN = createToken<CommandLineRunnerPlugin>(
+  'tramvai commandLineRunner plugin',
+  {
+    multi: true,
+    scope: Scope.SINGLETON,
+  }
+);

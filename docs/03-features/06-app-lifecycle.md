@@ -198,3 +198,68 @@ _For what_: To update meta information on the current page
 When `spaMode` is `after`, page actions will be executed at this stage.
 
 _For what_: This is more of an internal stage and should not be used in ordinary cases.
+
+## CommandLineRunner Hooks
+
+CommandLineRunner provides a set of hooks to monitor or modify execution of commands:
+- `CommandLineRunner.runLineHook` - async hook for line execution, for example when `CommandLineRunner.run('server', 'customer')` or `CommandLineRunner.run('client', 'spa')` is called.
+- `CommandLineRunner.runCommandHook` - nested async hook for every command in the line, for example when `customer` line executed, `runCommandHook` will be called **in sequence** for every line command - `customerStart`, `resolveUserDeps`, `resolvePageDeps`, `generatePage` and `clear`.
+- `CommandLineRunner.runCommandFnHook` - nested async hook for all command functions, resolved from DI by specific `commandLineListTokens` token, will be called **in parallel** for all functions in this command.
+
+Hooks relations are as follows:
+
+![CommandLineRunner hooks](/img/commands/hooks.drawio.svg)
+
+### How to use hooks
+
+First, you need to create a CommandLineRunner Plugin and provide it with `COMMAND_LINE_RUNNER_PLUGIN` token:
+
+```ts
+import { COMMAND_LINE_RUNNER_PLUGIN } from '@tramvai/tokens-common';
+
+const provider = provide({
+  provide: COMMAND_LINE_RUNNER_PLUGIN,
+  useFactory: () => {
+    return {
+      apply(commandLineRunner) {},
+    };
+  },
+});
+```
+
+Method `apply` will be called right in the end of CommandLineRunner initialization.
+
+Then, you can use hooks, for example to monitor line and specific commands execution:
+
+```ts
+const plugin = {
+  apply(commandLineRunner) {
+    commandLineRunner.runLineHook.wrap(async (_, payload, next) => {
+      const { line } = payload;
+      let start = Date.now();
+
+      console.log(`line "${line}" is started`);
+
+      const result = await next(payload);
+
+      console.log(`Line "${line}" is finished, duration:`, Date.now() - start);
+
+      return result;
+    });
+
+    commandLineRunner.runCommandHook.wrap(async (_, payload, next) => {
+      const { command } = payload;
+      const commandName = command.toString();
+      let start = Date.now();
+
+      console.log(`Command "${commandName}" is started`);
+
+      const result = await next(payload);
+
+      console.log(`Command "${commandName}" is finished, duration:`, Date.now() - start);
+
+      return result;
+    });
+  },
+};
+```

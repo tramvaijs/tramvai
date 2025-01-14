@@ -32,6 +32,7 @@ type Deps = {
   executionEndHandlers: ExtractDependencyType<typeof COMMAND_LINE_EXECUTION_END_TOKEN> | null;
 };
 
+// @ts-expect-error
 export class CommandLineRunner implements Interface {
   lines: Deps['lines'];
   rootDi: Deps['rootDi'];

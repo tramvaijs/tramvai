@@ -19,6 +19,7 @@ import { TramvaiTracerImpl } from './tracer/tracer';
 import { providers as serverInstrumentationProviders } from './instrumentation/server';
 import { providers as httpClientInstrumentationProviders } from './instrumentation/httpClient';
 import { providers as logsIntegrationProviders } from './instrumentation/logs';
+import { providers as commandLineRunnerIntegrationProviders } from './instrumentation/commandLineRunner';
 
 export * from './tokens';
 
@@ -28,6 +29,7 @@ export * from './tokens';
     ...serverInstrumentationProviders,
     ...httpClientInstrumentationProviders,
     ...logsIntegrationProviders,
+    ...commandLineRunnerIntegrationProviders,
     provide({
       provide: commandLineListTokens.init,
       useFactory: ({ provider }) => {
