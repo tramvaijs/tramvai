@@ -4,7 +4,6 @@ import type {
   ExecutionContextOptions,
 } from '@tramvai/tokens-common';
 import { ExecutionAbortError } from '@tinkoff/errors';
-import { AbortController as NodeAbortController } from 'node-abort-controller';
 
 const EMPTY_VALUES = {};
 
@@ -33,7 +32,7 @@ export class ExecutionContextManager implements Interface {
       });
     }
 
-    const abortController = new NodeAbortController() as AbortController;
+    const abortController = new AbortController();
     let abortListener: ((event: any) => void) | undefined;
 
     let values = selfValues;

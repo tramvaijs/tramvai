@@ -82,7 +82,7 @@ You can find more detailed information from "action-execution-error" logs, and f
               unfinishedActions,
             });
 
-            abortController.abort();
+            abortController.abort('Page actions were aborted because of timeout');
 
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             endChecker();
@@ -160,6 +160,7 @@ You can find more detailed information from "action-execution-error" logs, and f
                     error: new ExecutionAbortError({
                       message: `Execution aborted in context "${contextName}"`,
                       contextName,
+                      reason: executionContext.abortSignal.reason,
                     }),
                     event: `action-execution-error`,
                     message: `${actionName} has exceeded timeout of ${this.deps.limitTime}ms, execution results will be ignored.

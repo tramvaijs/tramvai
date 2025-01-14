@@ -25,6 +25,7 @@ import {
   ACTION_CONDITIONALS,
   CLEAR_CACHE_TOKEN,
   COMBINE_REDUCERS,
+  COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   COMPONENT_REGISTRY_TOKEN,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
@@ -182,6 +183,7 @@ export const sharedProviders: Provider[] = [
       logger: LOGGER_TOKEN,
       rootCommandLineRunner: COMMAND_LINE_RUNNER_TOKEN,
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
+      commandLineExecutionContext: COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
     },
   }),
   provide({
