@@ -209,7 +209,7 @@ export class CommandLineRunner implements Interface {
         });
 
         // in case if any error happens during line execution results from other line handlers will not be used anyway
-        this.abortControllerByDi.get(di)?.abort();
+        this.abortControllerByDi.get(di)?.abort(err);
 
         this.throwError(err, di);
       });

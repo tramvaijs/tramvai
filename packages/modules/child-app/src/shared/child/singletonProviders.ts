@@ -105,11 +105,24 @@ export const getChildProviders = (appDi: Container, loadableStats: LoadableStats
       scope: Scope.REQUEST,
       useFactory: ({ dispatcher, middlewares, initialState, parentAllowedStores }) => {
         const parentDispatcherContext =
-          appDi
-            .get(optional(ASYNC_LOCAL_STORAGE_TOKEN))
-            ?.getStore()
-            ?.tramvaiRequestDi?.get(DISPATCHER_CONTEXT_TOKEN) ??
-          appDi.get(DISPATCHER_CONTEXT_TOKEN);
+          typeof window !== 'undefined'
+            ? // ALS is not existing on the client,
+              // also if we resolve `DISPATCHER_CONTEXT_TOKEN` from Root DI in the server-side,
+              // it will lead to memory leak (with circular dependency) because of reducers event handlers:
+              // RootDi.recordValues -> DispatcherContext.storeInstances -> ReducerStore.listeners -> listener.this -> ChildDispatcherContext.parentDispatcherContext -> DispatcherContext
+              appDi.get(DISPATCHER_CONTEXT_TOKEN)
+            : appDi
+                .get(optional(ASYNC_LOCAL_STORAGE_TOKEN))
+                ?.getStore()
+                ?.tramvaiRequestDi?.get(DISPATCHER_CONTEXT_TOKEN);
+
+        if (!parentDispatcherContext) {
+          // this should not happen because we add subscribtion to root execution context abortSignal
+          // for Child Apps command line runner, and this token will not be resolved
+          throw Error(
+            'Cannot find DispatcherContext for current request, unexpected critical error'
+          );
+        }
 
         return new ChildDispatcherContext({
           dispatcher,
