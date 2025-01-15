@@ -1,15 +1,10 @@
 import each from '@tinkoff/utils/object/each';
 import type { Bundle } from '@tramvai/core';
 import { Module, Scope, BUNDLE_LIST_TOKEN, DI_TOKEN, provide } from '@tramvai/core';
-
 import { EnvironmentModule } from '@tramvai/module-environment';
-
 import { CookieModule } from '@tramvai/module-cookie';
 import { LogModule } from '@tramvai/module-log';
-
-import { Hooks } from '@tinkoff/hook-runner';
 import {
-  HOOK_TOKEN,
   COMPONENT_REGISTRY_TOKEN,
   PUBSUB_TOKEN,
   BUNDLE_MANAGER_TOKEN,
@@ -33,9 +28,11 @@ import { ActionModule } from './actions/ActionModule';
 import { StateModule } from './state/StateModule';
 import { CacheModule } from './cache/CacheModule';
 import { ExecutionContextManager } from './executionContext/executionContextManager';
+import { TramvaiHookModule } from './hook/HookModule';
 
 @Module({
   imports: [
+    TramvaiHookModule,
     CommandModule,
     EnvironmentModule,
     PubSubModule,
@@ -50,13 +47,6 @@ import { ExecutionContextManager } from './executionContext/executionContextMana
   ],
   providers: [
     provide({
-      // Инстанс хук системы
-      provide: HOOK_TOKEN,
-      scope: Scope.SINGLETON,
-      useClass: Hooks,
-    }),
-    provide({
-      // Регистр ui компонентов
       provide: COMPONENT_REGISTRY_TOKEN,
       scope: Scope.SINGLETON,
       useClass: ComponentRegistry,
@@ -65,7 +55,6 @@ import { ExecutionContextManager } from './executionContext/executionContextMana
       },
     }),
     provide({
-      // Управление бандлами, хранение и получение
       provide: BUNDLE_MANAGER_TOKEN,
       scope: Scope.SINGLETON,
       useFactory: ({ additionalBundleList, ...bundleManagerDeps }) => {
@@ -90,7 +79,6 @@ import { ExecutionContextManager } from './executionContext/executionContextMana
       },
     }),
     provide({
-      //  Клиентский контекст исполнения
       provide: CONTEXT_TOKEN,
       scope: Scope.REQUEST,
       useFactory: createConsumerContext,
