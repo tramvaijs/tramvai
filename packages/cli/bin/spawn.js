@@ -4,8 +4,8 @@ const args = process.argv.slice(2);
 const maxMemory = process.env.MAX_USED_MEMORY || '3000';
 const maxSemiSpaceSize = process.env.MAX_SEMI_SPACE_SIZE || '128';
 const defaultArgs = [
-  `--max_old_space_size=${maxMemory}`,
-  `--max_semi_space_size=${maxSemiSpaceSize}`,
+  `--max-old-space-size=${maxMemory}`,
+  `--max-semi-space-size=${maxSemiSpaceSize}`,
 ];
 
 const paramsIndex = args.findIndex((x) => !x.startsWith('-'));

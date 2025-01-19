@@ -32,7 +32,7 @@ This guide will contain a set of recommended optimizations to make your applicat
 
 ### K8s limits
 
-**TL;DR**: provide **1000m - 1150m** CPU limit/request
+**TL;DR**: provide **1000m - 1150m** CPU limit/request, run Node.js with `--max-old-space-size=(0.75% * memory.limit)` parameter
 
 Low CPU limits can significantly slow down your application response time because of CPU throttling. More information why:
 - https://medium.com/pipedrive-engineering/how-we-choked-our-kubernetes-nodejs-services-932acc8cc2be
@@ -41,6 +41,24 @@ Low CPU limits can significantly slow down your application response time becaus
 Node.js is single-threaded, but can use multiple threads for Garbage Collector or DNS resolve. Because of that, optimal configuration is **1150m** CPU limit/request. Minimal recommended configuration is **1000m** CPU limit/request.
 
 There is a one disadvantage - with this CPU limits, if you maintain a sufficient number of instances with good latency and throughput, you may experience poor CPU utilization. Nevertheless, this represents a trade-off between effective CPU usage and low latency.
+
+With memory limits, to optimize memory optimization and prevent OOM failures, you need to pass [--max-old-space-size](https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-mib) parameter to Node.js options.
+
+As a start, you can calculate size by the following formula: `0.75 * memory.limit`, or 75% of current container memory limit. Then you can run benchmark and monitor application metrics for a long time, and try to find optimal value. This is recommendation from [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices/blob/master/sections/docker/memory-limit.md) guide.
+
+For setting this parameter you need to run `server.js` using the `node` command with the `--max-old-space-size` parameter. This command is typically located in the `Dockerfile`:
+
+```Dockerfile title="Dockerfile"
+FROM node:20-buster-slim
+WORKDIR /app
+COPY dist/server /app/
+COPY package.json /app/
+ENV NODE_ENV='production'
+
+EXPOSE 3000
+// highlight-next-line
+CMD [ "node", "--max-old-space-size=350", "/app/server.js" ]
+```
 
 ### Request Limiter
 
@@ -58,18 +76,25 @@ More information:
 
 ### Semi space size
 
-**TL;DR**: set Node.js `--max_semi_space_size` parameter to **64mb**
+**TL;DR**: set Node.js `--max-semi-space-size` parameter to **32mb** or **64mb**, run benchmarks, and choose the best balance for CPU usage and memory consumption.
+
+[--max-semi-space-size documentation](https://nodejs.org/api/cli.html#--max-semi-space-sizesize-in-mib)
+
+The default value depends on the memory limit. For example, on 64-bit systems
+with a memory limit of 512 MiB, the max size of a semi-space defaults to 1 MiB.
+On 64-bit systems with a memory limit of 2 GiB, the max size of a semi-space
+defaults to 16 MiB.
 
 During application performance profiling, you may observe that your code spends a significant amount of time on Garbage Collector (GC) work. By default, GC work too frequently, and we can reduce the number of GC runs by increasing the size of the semi space. This optimization will reduce the CPU workload and make your event loop less busy, resulting in faster response times, especially in the 95th and 99th percentiles.
 
 One disadvantage of this optimization is that it will increases the memory usage of your application. **For environments, where memory is limited, for example test deployments, prefer not to use this optimization**.
 
-A good balance between performance and memory usage is achieved with a semi space size of **64mb**. Another possible value for this parameter is **128mb**, but it may not provide a significant improvement in performance and will increase the memory usage of your application. It is recommended to test this parameter in your specific application.
+A good balance between performance and memory usage is achieved with a semi space size of **64mb**. It is possible to use event bigger value for this parameter, but it may not provide a significant improvement in performance and will highly increase the memory usage of your application. It is recommended to test this parameter in your specific application.
 
-For setting this parameter you need to run `server.js` using the `node` command with the `--max_semi_space_size` parameter. This command is typically located in the `Dockerfile`:
+For setting this parameter you need to run `server.js` using the `node` command with the `--max-semi-space-size` parameter. This command is typically located in the `Dockerfile`:
 
 ```Dockerfile title="Dockerfile"
-FROM node:18-buster-slim
+FROM node:20-buster-slim
 WORKDIR /app
 COPY dist/server /app/
 COPY package.json /app/
@@ -77,11 +102,12 @@ ENV NODE_ENV='production'
 
 EXPOSE 3000
 // highlight-next-line
-CMD [ "node", "--max_semi_space_size=64", "/app/server.js" ]
+CMD [ "node", "--max-semi-space-size=64", "/app/server.js" ]
 ```
 
 More information:
 - https://www.alibabacloud.com/blog/better-node-application-performance-through-gc-optimization_595119
+- https://blog.ztec.fr/en/2024/post/node.js-20-upgrade-journey-though-unexpected-heap-issues-with-kubernetes/
 - https://github.com/nodejs/node/issues/42511
 
 ### Agent keepAlive

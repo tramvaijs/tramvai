@@ -274,7 +274,7 @@ More details and examples you can find in typescript documentation:
 You can use `NODE_OPTIONS` env variable, e.g.:
 
 ```bash
-NODE_OPTIONS="--max_semi_space_size=64" tramvai start-prod {appName}
+NODE_OPTIONS="--max-semi-space-size=64" tramvai start-prod {appName}
 ```
 
 ### How to get CPU profile of @tramvai/cli work?
