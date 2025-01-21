@@ -17,9 +17,9 @@ export interface RequestManager {
 
   getMethod(): string;
 
-  getCookie(key: string): string;
+  getCookie(key: string): string | undefined;
 
-  getCookies(): Record<string, string>;
+  getCookies(): Record<string, string | undefined>;
 
   getHeader(key: string): string | string[] | undefined;
 

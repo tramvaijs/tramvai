@@ -5,7 +5,7 @@ import { prepareCookieOptions } from './utils';
 import type { CookieManager as Interface, CookieOptions, CookieSetOptions } from './tokens';
 
 export class CookieManager implements Interface {
-  private cookies: Record<string, string>;
+  private cookies: Record<string, string | undefined>;
 
   private requestManager: typeof REQUEST_MANAGER_TOKEN;
 
