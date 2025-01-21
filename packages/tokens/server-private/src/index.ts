@@ -1,17 +1,38 @@
 import type { Server } from 'http';
-import type {
-  FastifyError,
-  FastifyInstance,
-  FastifyReply,
-  FastifyRequest as OriginalFastifyRequest,
-} from 'fastify';
+import type { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { Scope, createToken } from '@tinkoff/dippy';
 import type { Papi } from '@tramvai/papi';
 import type { Duplex } from 'stream';
 
-type FastifyRequest = OriginalFastifyRequest & {
-  cookies: Record<string, string>;
-};
+// Use copy-paste typings `@fastify/cookie` instead of import '@fastify/cookie',
+// because in such case an error will occur during client build. The reason of this error
+// is that `@fastify/cookie` uses `node:crypto` under the hood, that requires polyfill for browsers.
+declare module 'fastify' {
+  interface FastifyInstance {
+    /**
+     * Manual cookie parsing method
+     * @docs https://github.com/fastify/fastify-cookie#manual-cookie-parsing
+     * @param cookieHeader Raw cookie header value
+     */
+    parseCookie(cookieHeader: string): {
+      [key: string]: string;
+    };
+  }
+
+  interface FastifyRequest {
+    /**
+     * Request cookies
+     */
+    cookies: { [cookieName: string]: string | undefined };
+  }
+
+  interface FastifyReply {
+    /**
+     * Request cookies
+     */
+    cookies: { [cookieName: string]: string | undefined };
+  }
+}
 
 /**
  * @description
