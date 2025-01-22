@@ -9,7 +9,7 @@ React Compiler (aka Forget) – is a tool developed by the React core team, that
 
 Essentially React Compiler is a Babel plugin, that transforms source code. Tramvai provides an integration with React Compiler out of the box.
 
-- :::note
+:::note
 
 Though we are observing up to 20% increased client render performance in some cases, React Compiler is still experimental tool, so use it carefully.
 
@@ -163,7 +163,7 @@ function SuspiciousComponent() {
 }
 ```
 
-::: note
+:::note
 
 It is not recommended to reach for this directive unless it’s strictly necessary. Once you opt-out a component or hook, it is opted-out forever until the directive is removed. This means that even if you fix the code, the compiler will still skip over compiling it unless you remove the directive.
 
