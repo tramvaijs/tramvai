@@ -71,6 +71,7 @@ it('should populate defaults for config', () => {
                 "enabled": false,
               },
             },
+            "reactCompiler": false,
             "reactTransitions": false,
             "serverRunner": "thread",
             "transpilation": {
@@ -146,6 +147,7 @@ it('should populate defaults for config', () => {
               "useImportModule": true,
             },
             "minifier": "terser",
+            "reactCompiler": false,
             "transpilation": {
               "loader": "babel",
             },
@@ -314,6 +316,7 @@ it('should populate defaults for overridable options', () => {
                 "enabled": false,
               },
             },
+            "reactCompiler": false,
             "reactTransitions": false,
             "serverRunner": "thread",
             "transpilation": {
@@ -407,6 +410,7 @@ it('should populate defaults for overridable options', () => {
               "useImportModule": true,
             },
             "minifier": "terser",
+            "reactCompiler": false,
             "transpilation": {
               "loader": {
                 "development": "babel",

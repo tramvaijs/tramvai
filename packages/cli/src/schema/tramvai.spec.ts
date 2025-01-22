@@ -100,6 +100,7 @@ describe('JSON schema для tramvai.json', () => {
                   "enabled": false,
                 },
               },
+              "reactCompiler": false,
               "reactTransitions": false,
               "serverRunner": "thread",
               "transpilation": {
@@ -175,6 +176,7 @@ describe('JSON schema для tramvai.json', () => {
                 "useImportModule": true,
               },
               "minifier": "terser",
+              "reactCompiler": false,
               "transpilation": {
                 "loader": "babel",
               },

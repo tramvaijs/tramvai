@@ -21,6 +21,21 @@ type Notifications = {
   activateTerminalOnError?: boolean;
 };
 
+export type ReactCompilerOptions = {
+  /*
+   * @title Array of paths which React compiler applies to. Ignore node_moduled by default
+   */
+  sources?: Array<string>;
+  /*
+   * @title Determines the strategy for determining which functions to compile
+   */
+  compilationMode?: 'infer' | 'annotation' | 'all';
+  /**
+   * @title Determines the point at which compiler should throw an error
+   */
+  panicThreshold?: 'ALL_ERRORS' | 'CRITICAL_ERRORS' | 'NONE';
+};
+
 export type WebpackExperiments = Omit<
   Configuration['experiments'],
   'buildHttp' | 'lazyCompilation' | 'css'
@@ -85,6 +100,14 @@ export interface Experiments {
    * @default false
    */
   enableFillDeclareActionNamePlugin: boolean;
+
+  /**
+   * https://github.com/facebook/react/blob/main/compiler/packages/babel-plugin-react-compiler/src/Entrypoint/Options.ts
+   *
+   * @title Enable React Compiler. You can pass some options, or use it with meaningful defaults.
+   * @default false
+   */
+  reactCompiler?: boolean | ReactCompilerOptions;
 }
 
 /**

@@ -4,6 +4,7 @@ import { checkApplication } from '../../validators/commands/checkBuild';
 import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigrationsAndCheckVersions';
 import { checkPwaDependencies } from '../../validators/commands/checkPwaDependencies';
 import { checkSwcDependencies } from '../../validators/commands/checkSwcDependencies';
+import { checkReactCompilerDependencies } from '../../validators/commands/checkReactCompilerDependencies';
 
 export interface Params {
   target: string;
@@ -111,6 +112,7 @@ export class StartProdCommand extends CLICommand<Params> {
     runMigrationsAndCheckVersions,
     checkPwaDependencies,
     checkSwcDependencies,
+    checkReactCompilerDependencies,
   ];
 
   action(parameters: Params) {

@@ -148,4 +148,13 @@ Check available render modes in tramvai`,
       return type === 'child-app' && shared.deps.length === 0;
     },
   },
+  {
+    text: `Optimize client render performance by enabling React compiler`,
+    docLink: 'guides/react-compiler',
+    isApplicable(di) {
+      const configManager = di.get(CONFIG_MANAGER_TOKEN);
+
+      return !configManager.experiments?.reactCompiler;
+    },
+  },
 ];

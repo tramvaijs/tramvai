@@ -3,6 +3,8 @@ import browserslist from 'browserslist';
 import envTargets from '@tinkoff/browserslist-config';
 import { sync as resolve } from 'resolve';
 import type { TransformOptions } from '@babel/core';
+
+import { getReactCompilerPlugin } from './plugins/react-compiler';
 import type { TranspilerConfig } from '../webpack/utils/transpiler';
 
 const envConfig = {
@@ -48,6 +50,7 @@ export const babelConfigFactory = ({
   hot = false,
   excludesPresetEnv,
   rootDir = process.cwd(),
+  reactCompiler = false,
 }: Partial<TranspilerConfig>) => {
   const cfg = envConfig[env] || {};
   let resultTarget = target;
@@ -118,6 +121,8 @@ export const babelConfigFactory = ({
       .filter(Boolean) as TransformOptions['presets'],
 
     plugins: [
+      // React compiler must be the first plugin in the chain
+      getReactCompilerPlugin({ isServer, options: reactCompiler }),
       // TODO: useESModules is deprecated and should work automatically - https://babeljs.io/docs/en/babel-plugin-transform-runtime#useesmodules
       ['@babel/transform-runtime', { useESModules: !(isServer && env === 'development') }],
       path.resolve(__dirname, './plugins/lazy-component/legacy-universal-replace'), // TODO: удалить плагин после того как отпадёт необходимость поддерживать легаси

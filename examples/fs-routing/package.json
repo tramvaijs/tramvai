@@ -18,6 +18,7 @@
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/test-integration": "0.0.0-stub",
     "@tramvai/test-integration-jest": "0.0.0-stub",
+    "babel-plugin-react-compiler": "^19.0.0-beta-decd7b8-20250118",
     "postcss-custom-media": "^8.0.0",
     "postcss-modules-values-replace": "^4.0.0",
     "postcss-custom-properties": "^11.0.0",
@@ -39,6 +40,7 @@
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
     "react": "18.2.0",
+    "react-compiler-runtime": "^19.0.0-beta-decd7b8-20250118",
     "react-dom": "18.2.0",
     "tslib": "^2.4.0"
   }

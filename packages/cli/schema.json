@@ -962,6 +962,45 @@
                     "title": "Включает использование плагина fill-declare-action-name",
                     "default": false,
                     "type": "boolean"
+                  },
+                  "reactCompiler": {
+                    "description": "https://github.com/facebook/react/blob/main/compiler/packages/babel-plugin-react-compiler/src/Entrypoint/Options.ts",
+                    "title": "Enable React Compiler. You can pass some options, or use it with meaningful defaults.",
+                    "default": false,
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "sources": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "compilationMode": {
+                            "enum": [
+                              "all",
+                              "annotation",
+                              "infer"
+                            ],
+                            "type": "string"
+                          },
+                          "panicThreshold": {
+                            "title": "Determines the point at which compiler should throw an error",
+                            "enum": [
+                              "ALL_ERRORS",
+                              "CRITICAL_ERRORS",
+                              "NONE"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
                   }
                 },
                 "additionalProperties": false
@@ -1213,23 +1252,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6871": {
+                              "__@match@6877": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6873": {
+                              "__@replace@6879": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6876": {
+                              "__@search@6882": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6878": {
+                              "__@split@6884": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6880": {
+                              "__@matchAll@6886": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1749,6 +1788,45 @@
                       "title": "Включает использование плагина fill-declare-action-name",
                       "default": false,
                       "type": "boolean"
+                    },
+                    "reactCompiler": {
+                      "description": "https://github.com/facebook/react/blob/main/compiler/packages/babel-plugin-react-compiler/src/Entrypoint/Options.ts",
+                      "title": "Enable React Compiler. You can pass some options, or use it with meaningful defaults.",
+                      "default": false,
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "sources": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "compilationMode": {
+                              "enum": [
+                                "all",
+                                "annotation",
+                                "infer"
+                              ],
+                              "type": "string"
+                            },
+                            "panicThreshold": {
+                              "title": "Determines the point at which compiler should throw an error",
+                              "enum": [
+                                "ALL_ERRORS",
+                                "CRITICAL_ERRORS",
+                                "NONE"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
                     }
                   },
                   "additionalProperties": false
@@ -1938,23 +2016,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6871": {
+                                "__@match@6877": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6873": {
+                                "__@replace@6879": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6876": {
+                                "__@search@6882": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6878": {
+                                "__@split@6884": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6880": {
+                                "__@matchAll@6886": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2474,6 +2552,45 @@
                         "title": "Включает использование плагина fill-declare-action-name",
                         "default": false,
                         "type": "boolean"
+                      },
+                      "reactCompiler": {
+                        "description": "https://github.com/facebook/react/blob/main/compiler/packages/babel-plugin-react-compiler/src/Entrypoint/Options.ts",
+                        "title": "Enable React Compiler. You can pass some options, or use it with meaningful defaults.",
+                        "default": false,
+                        "anyOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "sources": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "compilationMode": {
+                                "enum": [
+                                  "all",
+                                  "annotation",
+                                  "infer"
+                                ],
+                                "type": "string"
+                              },
+                              "panicThreshold": {
+                                "title": "Determines the point at which compiler should throw an error",
+                                "enum": [
+                                  "ALL_ERRORS",
+                                  "CRITICAL_ERRORS",
+                                  "NONE"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "boolean"
+                          }
+                        ]
                       }
                     },
                     "additionalProperties": false
@@ -2663,23 +2780,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6871": {
+                                  "__@match@6877": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6873": {
+                                  "__@replace@6879": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6876": {
+                                  "__@search@6882": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6878": {
+                                  "__@split@6884": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6880": {
+                                  "__@matchAll@6886": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }

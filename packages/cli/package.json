@@ -199,6 +199,14 @@
     "react": "18.2.0",
     "sharp": "0.32.6"
   },
+  "peerDependencies": {
+    "babel-plugin-react-compiler": "*"
+  },
+  "peerDependenciesMeta": {
+    "babel-plugin-react-compiler": {
+      "optional": true
+    }
+  },
   "hiddenDependencies": {
     "image-webpack-loader": "^6.0.0",
     "sharp": "0.32.6"

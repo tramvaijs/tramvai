@@ -5,7 +5,7 @@ import { getSwcOptions } from '../../swc';
 import { babelConfigFactory } from '../../babel';
 import type { Env } from '../../../typings/Env';
 import type { Target } from '../../../typings/target';
-import type { CliConfigEntry } from '../../../typings/configEntry/cli';
+import type { CliConfigEntry, ReactCompilerOptions } from '../../../typings/configEntry/cli';
 
 export type TranspilerConfig = {
   env: Env;
@@ -23,6 +23,7 @@ export type TranspilerConfig = {
   hot: boolean;
   excludesPresetEnv: string[];
   rootDir: string;
+  reactCompiler: boolean | ReactCompilerOptions;
 };
 
 export const addTranspilerLoader =
@@ -56,7 +57,7 @@ export const getTranspilerConfig = (
     alias,
     enableFillActionNamePlugin,
     excludesPresetEnv,
-    experiments: { enableFillDeclareActionNamePlugin },
+    experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
   } = configManager;
   const { env, modern } = configManager;
 
@@ -80,7 +81,8 @@ Just check or add configuration to your tsconfig file and remove alias from tram
     loader: true,
     modules: false,
     typescript: false,
-    ...overrideOptions,
     enableFillDeclareActionNamePlugin,
+    reactCompiler,
+    ...overrideOptions,
   };
 };

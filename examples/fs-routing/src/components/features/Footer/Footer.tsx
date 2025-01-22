@@ -2,6 +2,8 @@ import { usePageService } from '@tramvai/module-router';
 import styles from './Footer.css';
 
 export const Footer = () => {
+  'use no memo';
+
   const pageService = usePageService();
   const ModalComponent = pageService.getComponent('modal');
 

@@ -25,11 +25,9 @@
         "production": true
       },
       "experiments": {
+        "reactCompiler": true,
         "transpilation": {
-          "loader": {
-            "development": "swc",
-            "production": "babel"
-          }
+          "loader": "babel"
         }
       }
     }

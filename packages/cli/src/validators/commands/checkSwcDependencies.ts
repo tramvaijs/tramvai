@@ -1,6 +1,6 @@
 import { sync as resolve } from 'resolve';
 import type { Validator } from './validator.h';
-import type { Experiments, TranspilationLoader, Minifier } from '../../typings/configEntry/cli';
+import type { TranspilationLoader, Minifier } from '../../typings/configEntry/cli';
 
 const validator = 'checkSwcDependencies';
 

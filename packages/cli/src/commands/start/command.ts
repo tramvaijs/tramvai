@@ -6,6 +6,7 @@ import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigr
 import type { StartCommand as StartCommandType } from '../../api/start';
 import { checkPwaDependencies } from '../../validators/commands/checkPwaDependencies';
 import { checkSwcDependencies } from '../../validators/commands/checkSwcDependencies';
+import { checkReactCompilerDependencies } from '../../validators/commands/checkReactCompilerDependencies';
 
 export type Params = Parameters<StartCommandType>[0] & {
   target: string;
@@ -138,6 +139,7 @@ export class StartCommand extends CLICommand<Params> {
     checkDependencies,
     checkPwaDependencies,
     checkSwcDependencies,
+    checkReactCompilerDependencies,
   ];
 
   action(parameters) {

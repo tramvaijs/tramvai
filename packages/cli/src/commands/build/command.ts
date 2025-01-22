@@ -6,6 +6,7 @@ import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigr
 import type { BuildCommand as BuildCommandType } from '../../api/build';
 import { checkPwaDependencies } from '../../validators/commands/checkPwaDependencies';
 import { checkSwcDependencies } from '../../validators/commands/checkSwcDependencies';
+import { checkReactCompilerDependencies } from '../../validators/commands/checkReactCompilerDependencies';
 
 export type Params = Parameters<BuildCommandType>[0] & {
   target: string;
@@ -85,6 +86,7 @@ class BuildCommand extends CLICommand<Params> {
     checkDependencies,
     checkPwaDependencies,
     checkSwcDependencies,
+    checkReactCompilerDependencies,
   ];
 
   action(parameters: Params) {
