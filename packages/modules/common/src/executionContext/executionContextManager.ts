@@ -63,7 +63,7 @@ export class ExecutionContextManager implements Interface {
     try {
       return await cb(context, abortController);
     } catch (error: any) {
-      if (typeof error === 'object' && !error.executionContextName) {
+      if (error !== null && typeof error === 'object' && !error.executionContextName) {
         error.executionContextName = context.name;
       }
 
