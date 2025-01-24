@@ -13,6 +13,7 @@ import { npmRequire, npmRequireList } from '../../../../utils/npmRequire';
 import { BundleAnalyzePlugin } from '../../analyzePlugins/bundle';
 import { StatoscopeAnalyzePlugin } from '../../analyzePlugins/statoscope';
 import { WhyBundledAnalyzePlugin } from '../../analyzePlugins/whyBundled';
+import { RsdoctorAnalyzePlugin } from '../../analyzePlugins/rsdoctor';
 import {
   CLIENT_CONFIG_MANAGER_TOKEN,
   INIT_HANDLER_TOKEN,
@@ -34,6 +35,7 @@ const pluginMap: Record<string, Type<AnalyzePlugin>> = {
   bundle: BundleAnalyzePlugin,
   whybundled: WhyBundledAnalyzePlugin,
   statoscope: StatoscopeAnalyzePlugin,
+  rsdoctor: RsdoctorAnalyzePlugin,
 };
 
 export const analyzeSharedProviders: Provider[] = [

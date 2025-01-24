@@ -8,6 +8,7 @@ export class BundleAnalyzePlugin extends AnalyzePlugin {
     },
   ];
 
+  // bundle analyzer поднимает dev server
   afterBuild = () => new Promise(() => null);
 
   get plugin() {
@@ -24,6 +25,4 @@ export class BundleAnalyzePlugin extends AnalyzePlugin {
 
     return config;
   }
-
-  // bundle analyzer поднимает dev server
 }

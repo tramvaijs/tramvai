@@ -48,3 +48,14 @@ npx tramvai analyze APP_ID --plugin statoscope
 ```
 
 When the command is finished, pass the result file to https://statoscope.tech/ tool.
+
+## Figure out why build is slow
+
+You can use [rsdoctor](https://rsdoctor.dev/) for this. It visualizes the build process and provides a convenient report on the running time of plugins and loaders.
+
+It used only for build speed debug, not bundle structure or size, you should use Statoscope instead.
+
+```sh
+# automatically open report in browser
+npx tramvai analyze APP_ID --plugin rsdoctor
+```
