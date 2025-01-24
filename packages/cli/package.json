@@ -59,6 +59,7 @@
     "@loadable/webpack-plugin": "^5.15.0",
     "@module-federation/node": "^0.15.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "@rsdoctor/webpack-plugin": "^0.4.13",
     "@sentry/node": "^6.2.5",
     "@svgr/webpack": "^8.1.0",
     "@tinkoff/babel-plugin-lodash": "^0.1.0",

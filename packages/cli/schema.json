@@ -1252,23 +1252,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6877": {
+                              "__@match@6879": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6879": {
+                              "__@replace@6881": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6882": {
+                              "__@search@6884": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6884": {
+                              "__@split@6886": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6886": {
+                              "__@matchAll@6888": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -2016,23 +2016,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6877": {
+                                "__@match@6879": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6879": {
+                                "__@replace@6881": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6882": {
+                                "__@search@6884": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6884": {
+                                "__@split@6886": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6886": {
+                                "__@matchAll@6888": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2780,23 +2780,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6877": {
+                                  "__@match@6879": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6879": {
+                                  "__@replace@6881": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6882": {
+                                  "__@search@6884": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6884": {
+                                  "__@split@6886": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6886": {
+                                  "__@matchAll@6888": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
