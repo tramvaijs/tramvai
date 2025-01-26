@@ -2,15 +2,18 @@
 import isPromise from '@tinkoff/utils/is/promise';
 import type { Context, Span, SpanOptions, Tracer } from '@opentelemetry/api';
 import { trace, context, SpanStatusCode, ROOT_CONTEXT } from '@opentelemetry/api';
-import type { TramvaiTracer } from '../tokens';
+import { isSilentError } from '@tinkoff/errors';
+import type { TraceParams, TramvaiTracer } from '../tokens';
 
-function recordAndThrowError(span: Span, error: any) {
+function recordAndThrowError(span: Span, error: any, { skipError = () => false }: TraceParams) {
   span.recordException(error);
 
-  span.setStatus({
-    code: SpanStatusCode.ERROR,
-    message: error?.message ?? 'Unknown error',
-  });
+  if (!(skipError(error) || isSilentError(error))) {
+    span.setStatus({
+      code: SpanStatusCode.ERROR,
+      message: error?.message ?? 'Unknown error',
+    });
+  }
 
   span.end();
 
@@ -18,7 +21,11 @@ function recordAndThrowError(span: Span, error: any) {
 }
 
 export class TramvaiTracerImpl implements TramvaiTracer {
-  constructor(private tracer: Tracer) {}
+  private tracer: Tracer;
+
+  constructor({ tracer }: { tracer: Tracer }) {
+    this.tracer = tracer;
+  }
 
   startSpan(...args: any[]): Span {
     // @ts-expect-error
@@ -48,24 +55,32 @@ export class TramvaiTracerImpl implements TramvaiTracer {
     return trace.getSpan(context.active());
   }
 
-  trace<T>(name: string, fn: (span: Span) => Promise<T>): Promise<T>;
+  trace<T>(name: string, fn: (span: Span) => Promise<T>, params?: TraceParams): Promise<T>;
 
-  trace<T>(name: string, fn: (span: Span) => T): T;
-  trace<T>(name: string, options: SpanOptions, fn: (span: Span) => Promise<T>): Promise<T>;
+  trace<T>(name: string, fn: (span: Span) => T, params?: TraceParams): T;
+  trace<T>(
+    name: string,
+    options: SpanOptions,
+    fn: (span: Span) => Promise<T>,
+    params?: TraceParams
+  ): Promise<T>;
 
-  trace<T>(name: string, options: SpanOptions, fn: (span: Span) => T): T;
+  trace<T>(name: string, options: SpanOptions, fn: (span: Span, params?: TraceParams) => T): T;
 
   trace<T extends Promise<unknown> | unknown>(...args: any[]) {
     const name = args[0];
     let fn: (span: Span, done?: (error?: Error) => any) => T;
     let options: SpanOptions;
+    let params: TraceParams;
 
-    if (args.length === 2) {
+    if (args.length === 2 || (args.length === 3 && typeof args[2] === 'object')) {
       fn = args[1];
       options = {};
+      params = args[2] || {};
     } else {
       fn = args[2];
       options = args[1];
+      params = args[3] || {};
     }
 
     const activeSpan = trace.getSpan(context.active());
@@ -84,7 +99,7 @@ export class TramvaiTracerImpl implements TramvaiTracer {
               return res;
             })
             .catch((error: any) => {
-              recordAndThrowError(span, error);
+              recordAndThrowError(span, error, params);
             });
         }
 
@@ -93,7 +108,7 @@ export class TramvaiTracerImpl implements TramvaiTracer {
 
         return result;
       } catch (error: any) {
-        recordAndThrowError(span, error);
+        recordAndThrowError(span, error, params);
       }
     });
   }

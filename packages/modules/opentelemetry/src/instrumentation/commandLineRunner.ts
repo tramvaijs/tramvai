@@ -2,7 +2,7 @@ import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
 import type { CommandLineRunner, CommandLineRunnerPlugin } from '@tramvai/core';
 import { COMMAND_LINE_RUNNER_PLUGIN } from '@tramvai/core';
-import { SpanKind, SpanStatusCode } from '@opentelemetry/api';
+import { SpanKind } from '@opentelemetry/api';
 import { OPENTELEMETRY_TRACER_TOKEN } from '../tokens';
 
 type Tracer = ExtractDependencyType<typeof OPENTELEMETRY_TRACER_TOKEN>;

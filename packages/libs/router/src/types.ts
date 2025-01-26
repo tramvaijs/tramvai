@@ -1,4 +1,5 @@
 import type { Url, Query } from '@tinkoff/url';
+import { AbstractRouter } from './router/abstract';
 
 export type Params = Record<string, string>;
 
@@ -92,3 +93,7 @@ export type HookName =
   | 'afterUpdateCurrent';
 
 export type SyncHookName = 'change';
+
+export type RouterPlugin = {
+  apply(router: AbstractRouter): void;
+};

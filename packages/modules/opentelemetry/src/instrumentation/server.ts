@@ -2,6 +2,8 @@ import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
   ATTR_HTTP_ROUTE,
+  ATTR_SERVER_ADDRESS,
+  ATTR_SERVER_PORT,
   ATTR_URL_FULL,
   ATTR_URL_PATH,
   ATTR_URL_QUERY,
@@ -19,9 +21,10 @@ import {
   WEB_FASTIFY_APP_INIT_TOKEN,
   WEB_FASTIFY_APP_AFTER_ERROR_TOKEN,
 } from '@tramvai/tokens-server-private';
+import { ENV_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { OPENTELEMETRY_TRACER_TOKEN } from '../tokens';
 
-const REQUEST_SPAN = Symbol('opentelemetry.tramvai.server.request.span');
+export const REQUEST_SPAN = Symbol('opentelemetry.tramvai.server.request.span');
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -32,7 +35,7 @@ declare module 'fastify' {
 export const providers = [
   provide({
     provide: WEB_FASTIFY_APP_INIT_TOKEN,
-    useFactory: ({ app, tracer, tracesExcludePaths }) => {
+    useFactory: ({ app, tracer, tracesExcludePaths, envManager }) => {
       return () => {
         // todo copypaste from @tinkoff/measure-fastify-requests
         const excludePatterns = flatten(tracesExcludePaths).map((p) => pathToRegexp(p));
@@ -79,6 +82,12 @@ export const providers = [
 
               // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/attributes-registry/http.md
               span.setAttribute(ATTR_HTTP_REQUEST_METHOD, httpMethod);
+              span.setAttribute(
+                ATTR_SERVER_ADDRESS,
+                req.headers['x-original-host'] || req.headers.host || envManager.get('PORT')!
+              );
+              span.setAttribute(ATTR_SERVER_PORT, envManager.get('PORT')!);
+
               // route should have low-cardinality - https://github.com/open-telemetry/semantic-conventions/blob/main/docs/attributes-registry/http.md
               span.setAttribute(ATTR_HTTP_ROUTE, httpRoute);
               span.setAttribute(ATTR_URL_PATH, parsedUrl.pathname);
@@ -110,6 +119,7 @@ export const providers = [
       app: WEB_FASTIFY_APP_TOKEN,
       tracer: OPENTELEMETRY_TRACER_TOKEN,
       tracesExcludePaths: UTILITY_SERVER_PATHS,
+      envManager: ENV_MANAGER_TOKEN,
     },
   }),
   provide({

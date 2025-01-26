@@ -32,6 +32,9 @@
         },
         {
             "path": "../../tokens/http-client"
+        },
+        {
+            "path": "../../tokens/router"
         }
     ]
 }

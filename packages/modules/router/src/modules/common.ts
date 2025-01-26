@@ -1,6 +1,6 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import type { Provider } from '@tinkoff/dippy';
-import { commandLineListTokens, provide } from '@tramvai/core';
+import { commandLineListTokens, optional, provide } from '@tramvai/core';
 import type { NavigationHook, NavigationSyncHook, NavigationGuard } from '@tinkoff/router';
 import { setLogger } from '@tinkoff/router';
 import { COMBINE_REDUCERS, LOGGER_TOKEN } from '@tramvai/tokens-common';
@@ -10,6 +10,7 @@ import {
   ROUTER_GUARD_TOKEN,
   ROUTE_RESOLVE_TOKEN,
   ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
+  ROUTER_PLUGIN,
 } from '@tramvai/tokens-router';
 import { RENDER_SLOTS, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import {
@@ -36,13 +37,21 @@ export const providers: Provider[] = [
   ...fsPagesProviders,
   provide({
     provide: ROUTER_TOKEN,
-    useFactory: ({ RouterClass, routes, routeTransform, routeResolve, additionalParameters }) => {
+    useFactory: ({
+      RouterClass,
+      routes,
+      routeTransform,
+      routeResolve,
+      additionalParameters,
+      plugins,
+    }) => {
       const router = new RouterClass({
         ...additionalParameters,
         trailingSlash: true,
         mergeSlashes: true,
         enableViewTransitions: process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true',
         routes: flatten(routes ?? []).map(routeTransform),
+        plugins,
       });
 
       if (routeResolve) {
@@ -78,6 +87,7 @@ export const providers: Provider[] = [
         token: ROUTE_RESOLVE_TOKEN,
         optional: true,
       },
+      plugins: optional(ROUTER_PLUGIN),
     },
   }),
   provide({

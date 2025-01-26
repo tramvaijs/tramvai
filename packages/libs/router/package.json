@@ -24,6 +24,7 @@
     "@tinkoff/react-hooks": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
+    "@tinkoff/hook-runner": "0.0.0-stub",
     "use-sync-external-store": "^1.2.0"
   },
   "peerDependencies": {

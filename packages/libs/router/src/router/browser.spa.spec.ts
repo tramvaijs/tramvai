@@ -358,7 +358,7 @@ describe('router/browser-spa', () => {
           redirect: '/test/',
         });
 
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
@@ -423,7 +423,7 @@ describe('router/browser-spa', () => {
           redirect: '/test/',
         });
 
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
@@ -532,7 +532,7 @@ describe('router/browser-spa', () => {
       });
 
       it('should call guards', async () => {
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
@@ -1234,7 +1234,7 @@ describe('router/browser-spa', () => {
       });
 
       it('should call guards', async () => {
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
@@ -1601,7 +1601,7 @@ describe('router/browser-spa', () => {
       });
 
       it('should call guards', async () => {
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 

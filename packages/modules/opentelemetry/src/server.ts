@@ -5,8 +5,8 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
-import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-import { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import {
   OPENTELEMETRY_PROVIDER_CONFIG_TOKEN,
   OPENTELEMETRY_PROVIDER_RESOURCE_ATTRIBUTES_TOKEN,
@@ -20,6 +20,7 @@ import { providers as serverInstrumentationProviders } from './instrumentation/s
 import { providers as httpClientInstrumentationProviders } from './instrumentation/httpClient';
 import { providers as logsIntegrationProviders } from './instrumentation/logs';
 import { providers as commandLineRunnerIntegrationProviders } from './instrumentation/commandLineRunner';
+import { providers as routerIntegrationProviders } from './instrumentation/router';
 
 export * from './tokens';
 
@@ -30,6 +31,7 @@ export * from './tokens';
     ...httpClientInstrumentationProviders,
     ...logsIntegrationProviders,
     ...commandLineRunnerIntegrationProviders,
+    ...routerIntegrationProviders,
     provide({
       provide: commandLineListTokens.init,
       useFactory: ({ provider }) => {
@@ -99,13 +101,15 @@ export * from './tokens';
     }),
     provide({
       provide: OPENTELEMETRY_PROVIDER_RESOURCE_ATTRIBUTES_TOKEN,
-      useFactory: ({ appInfo }) => {
+      useFactory: ({ appInfo, envManager }) => {
         return {
           [ATTR_SERVICE_NAME]: appInfo.appName,
+          [ATTR_SERVICE_VERSION]: envManager.get('APP_VERSION'),
         };
       },
       deps: {
         appInfo: APP_INFO_TOKEN,
+        envManager: ENV_MANAGER_TOKEN,
       },
     }),
     provide({
@@ -113,7 +117,7 @@ export * from './tokens';
       useFactory: ({ provider }) => {
         const tracer = provider.getTracer('tramvai', '1.0.0');
 
-        return new TramvaiTracerImpl(tracer);
+        return new TramvaiTracerImpl({ tracer });
       },
       deps: {
         provider: OPENTELEMETRY_PROVIDER_TOKEN,

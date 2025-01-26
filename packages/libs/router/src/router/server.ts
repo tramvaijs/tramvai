@@ -52,13 +52,15 @@ export class Router extends AbstractRouter {
 
     this.blocked = true;
 
-    return this.onRedirect({
-      ...navigation,
-      from: navigation.to,
-      fromUrl: navigation.url,
-      to: null,
-      url: this.resolveUrl(target),
-      code: target.code,
+    await this.redirectHook.callPromise({
+      navigation: {
+        ...navigation,
+        from: navigation.to,
+        fromUrl: navigation.url,
+        to: null,
+        url: this.resolveUrl(target),
+        code: target.code,
+      },
     });
   }
 

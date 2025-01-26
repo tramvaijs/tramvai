@@ -201,7 +201,7 @@ _For what_: This is more of an internal stage and should not be used in ordinary
 
 ## CommandLineRunner Hooks
 
-CommandLineRunner provides a set of hooks to monitor or modify execution of commands:
+CommandLineRunner provides a set of tapable hooks to monitor or modify execution of commands:
 - `CommandLineRunner.runLineHook` - async hook for line execution, for example when `CommandLineRunner.run('server', 'customer')` or `CommandLineRunner.run('client', 'spa')` is called.
 - `CommandLineRunner.runCommandHook` - nested async hook for every command in the line, for example when `customer` line executed, `runCommandHook` will be called **in sequence** for every line command - `customerStart`, `resolveUserDeps`, `resolvePageDeps`, `generatePage` and `clear`.
 - `CommandLineRunner.runCommandFnHook` - nested async hook for all command functions, resolved from DI by specific `commandLineListTokens` token, will be called **in parallel** for all functions in this command.

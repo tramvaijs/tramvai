@@ -7,6 +7,10 @@ import type {
 } from '@opentelemetry/sdk-trace-node';
 import type { Resource, ResourceAttributes } from '@opentelemetry/resources';
 
+export type TraceParams = {
+  skipError?: (error: Error) => boolean;
+};
+
 /**
  * API inspired by:
  * - https://github.com/DataDog/dd-trace-js/blob/59e9a2a75f4256755b4e6c9951a0bdf8d39b4015/index.d.ts#L9
@@ -32,10 +36,15 @@ export interface TramvaiTracer {
 
   // setSpan and other from TraceAPI?
 
-  trace<T>(name: string, fn: (span: Span) => Promise<T>): Promise<T>;
-  trace<T>(name: string, fn: (span: Span) => T): T;
-  trace<T>(name: string, options: SpanOptions, fn: (span: Span) => Promise<T>): Promise<T>;
-  trace<T>(name: string, options: SpanOptions, fn: (span: Span) => T): T;
+  trace<T>(name: string, fn: (span: Span) => Promise<T>, params?: TraceParams): Promise<T>;
+  trace<T>(name: string, fn: (span: Span) => T, params?: TraceParams): T;
+  trace<T>(
+    name: string,
+    options: SpanOptions,
+    fn: (span: Span) => Promise<T>,
+    params?: TraceParams
+  ): Promise<T>;
+  trace<T>(name: string, options: SpanOptions, fn: (span: Span) => T, params?: TraceParams): T;
 
   // wrap
 }

@@ -9,6 +9,7 @@ import type {
   UpdateCurrentRouteOptions,
   HistoryOptions,
   RouteConfig,
+  RouterPlugin,
 } from '@tinkoff/router';
 import type { TramvaiComponent } from '@tramvai/react';
 
@@ -115,3 +116,9 @@ export type RouteTransform = (route: Route) => Route;
 export interface LinkPrefetchManager {
   prefetch(url: string): Promise<void>;
 }
+
+/**
+ * @description
+ * Token to provide router plugins
+ */
+export const ROUTER_PLUGIN = createToken<RouterPlugin>('router plugin', { multi: true });

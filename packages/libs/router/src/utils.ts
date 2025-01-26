@@ -36,14 +36,3 @@ export const makeNavigateOptions = (options: string | NavigateOptions): Navigate
 
   return options;
 };
-
-export const registerHook = <T extends NavigationHook | NavigationSyncHook | NavigationGuard>(
-  hooksSet: Set<T>,
-  hook: T
-) => {
-  hooksSet.add(hook);
-
-  return () => {
-    hooksSet.delete(hook);
-  };
-};

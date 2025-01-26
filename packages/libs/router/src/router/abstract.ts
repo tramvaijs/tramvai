@@ -3,6 +3,12 @@ import isObject from '@tinkoff/utils/is/object';
 import type { Url } from '@tinkoff/url';
 import { parse, convertRawUrl, rawParse, rawAssignUrl, rawResolveUrl } from '@tinkoff/url';
 import type {
+  AsyncParallelTapableHookInstance,
+  AsyncTapableHookInstance,
+  SyncTapableHookInstance,
+} from '@tinkoff/hook-runner';
+import { TapableHooks } from '@tinkoff/hook-runner';
+import type {
   Route,
   NavigateOptions,
   UpdateCurrentRouteOptions,
@@ -14,6 +20,7 @@ import type {
   Params,
   SyncHookName,
   HistoryOptions,
+  RouterPlugin,
 } from '../types';
 import type { History } from '../history/base';
 import type { RouteTree } from '../tree/tree';
@@ -21,7 +28,6 @@ import { makePath } from '../tree/utils';
 import { logger } from '../logger';
 import {
   makeNavigateOptions,
-  registerHook,
   normalizeTrailingSlash,
   normalizeManySlashes,
   isSameHost,
@@ -50,6 +56,10 @@ export interface Options {
   onChange?: NavigationSyncHook[];
 
   defaultRedirectCode?: number;
+
+  hooksFactory?: TapableHooks;
+
+  plugins?: RouterPlugin[];
 }
 
 interface InternalOptions {
@@ -71,12 +81,42 @@ export abstract class AbstractRouter {
   protected history: History;
   protected tree?: RouteTree;
 
-  protected guards: Set<NavigationGuard>;
-  protected hooks: Map<HookName, Set<NavigationHook>>;
-  protected syncHooks: Map<SyncHookName, Set<NavigationSyncHook>>;
+  public readonly guards: AsyncParallelTapableHookInstance<{
+    navigation: Navigation;
+    allResults: Array<void | NavigateOptions | string | boolean>;
+  }>;
+
+  public readonly hooks: Map<
+    HookName,
+    AsyncParallelTapableHookInstance<{ navigation: Navigation }>
+  >;
+
+  public readonly syncHooks: Map<SyncHookName, SyncTapableHookInstance<{ navigation: Navigation }>>;
+
+  public readonly navigateHook: AsyncTapableHookInstance<{
+    navigateOptions: NavigateOptions | string;
+  }>;
+
+  public readonly updateHook: AsyncTapableHookInstance<{
+    updateRouteOptions: UpdateCurrentRouteOptions;
+  }>;
+
+  public readonly runNavigateHook: AsyncTapableHookInstance<{ navigation: Navigation }>;
+  public readonly runUpdateHook: AsyncTapableHookInstance<{ navigation: Navigation }>;
+  public readonly redirectHook: AsyncTapableHookInstance<{ navigation: Navigation }>;
+  public readonly notfoundHook: AsyncTapableHookInstance<{ navigation: Navigation }>;
+  public readonly blockHook: AsyncTapableHookInstance<{ navigation: Navigation }>;
+
+  protected hooksFactory: TapableHooks;
+
+  protected plugins?: RouterPlugin[];
 
   private currentUuid: number;
+  private hooksIndex = 0;
+  private syncHooksIndex = 0;
+  private guardsIndex = 0;
 
+  // eslint-disable-next-line max-statements
   constructor({
     trailingSlash,
     mergeSlashes,
@@ -91,34 +131,97 @@ export abstract class AbstractRouter {
     onRedirect,
     onNotFound,
     onBlock,
+    hooksFactory,
+    plugins,
   }: Options) {
     this.trailingSlash = trailingSlash ?? false;
     this.strictTrailingSlash = typeof trailingSlash === 'undefined';
     this.mergeSlashes = mergeSlashes ?? false;
     this.viewTransitionsEnabled = enableViewTransitions ?? false;
-
-    this.hooks = new Map([
-      ['beforeResolve', new Set(beforeResolve)],
-      ['beforeNavigate', new Set(beforeNavigate)],
-      ['afterNavigate', new Set(afterNavigate)],
-      ['beforeUpdateCurrent', new Set(beforeUpdateCurrent)],
-      ['afterUpdateCurrent', new Set(afterUpdateCurrent)],
-    ]);
-
-    this.guards = new Set(guards);
-    this.syncHooks = new Map([['change', new Set(onChange)]]);
-
+    this.hooksFactory = hooksFactory ?? new TapableHooks();
+    this.plugins = plugins ?? [];
+    this.currentUuid = 0;
     this.onRedirect = onRedirect;
     this.onNotFound = onNotFound;
     this.onBlock = onBlock;
 
-    this.currentUuid = 0;
+    this.hooks = new Map([
+      ['beforeResolve', this.hooksFactory.createAsyncParallel('beforeResolve')],
+      ['beforeNavigate', this.hooksFactory.createAsyncParallel('beforeNavigate')],
+      ['afterNavigate', this.hooksFactory.createAsyncParallel('afterNavigate')],
+      ['beforeUpdateCurrent', this.hooksFactory.createAsyncParallel('beforeUpdateCurrent')],
+      ['afterUpdateCurrent', this.hooksFactory.createAsyncParallel('afterUpdateCurrent')],
+    ]);
+
+    beforeResolve.forEach((hook) => this.registerHook('beforeResolve', hook));
+    beforeNavigate.forEach((hook) => this.registerHook('beforeNavigate', hook));
+    afterNavigate.forEach((hook) => this.registerHook('afterNavigate', hook));
+    beforeUpdateCurrent.forEach((hook) => this.registerHook('beforeUpdateCurrent', hook));
+    afterUpdateCurrent.forEach((hook) => this.registerHook('afterUpdateCurrent', hook));
+
+    this.guards = this.hooksFactory.createAsyncParallel('guards');
+    guards.forEach((guard) => this.registerGuard(guard));
+
+    this.syncHooks = new Map([['change', this.hooksFactory.createSync('change')]]);
+    onChange.forEach((hook) => this.registerSyncHook('change', hook));
+
+    this.navigateHook = this.hooksFactory.createAsync('navigate');
+    this.updateHook = this.hooksFactory.createAsync('update');
+    this.runNavigateHook = this.hooksFactory.createAsync('runNavigate');
+    this.runUpdateHook = this.hooksFactory.createAsync('runUpdate');
+    this.redirectHook = this.hooksFactory.createAsync('redirect');
+    this.notfoundHook = this.hooksFactory.createAsync('notfound');
+    this.blockHook = this.hooksFactory.createAsync('block');
+
+    this.navigateHook.tapPromise('router', async (_, { navigateOptions }) => {
+      await this.internalNavigate(makeNavigateOptions(navigateOptions), {});
+    });
+
+    this.updateHook.tapPromise('router', async (_, { updateRouteOptions }) => {
+      await this.internalUpdateCurrentRoute(updateRouteOptions, {});
+    });
+
+    this.runNavigateHook.tapPromise('router', async (_, { navigation }) => {
+      // TODO navigate
+      // check for redirect in new route description
+      if (navigation.to.redirect) {
+        return this.redirect(navigation, makeNavigateOptions(navigation.to.redirect));
+      }
+
+      await this.runGuards(navigation);
+
+      await this.runHooks('beforeNavigate', navigation);
+
+      this.commitNavigation(navigation);
+
+      await this.runHooks('afterNavigate', navigation);
+    });
+
+    this.runUpdateHook.tapPromise('router', async (_, { navigation }) => {
+      await this.runHooks('beforeUpdateCurrent', navigation);
+
+      this.commitNavigation(navigation);
+
+      await this.runHooks('afterUpdateCurrent', navigation);
+    });
+
+    this.redirectHook.tapPromise('router', async (_, { navigation }) => {
+      await this.onRedirect?.(navigation);
+    });
+    this.notfoundHook.tapPromise('router', async (_, { navigation }) => {
+      await this.onNotFound?.(navigation);
+    });
+    this.blockHook.tapPromise('router', async (_, { navigation }) => {
+      await this.onBlock?.(navigation);
+    });
+
+    this.plugins.forEach((plugin) => {
+      plugin.apply(this);
+    });
   }
 
   protected onRedirect?: NavigationHook;
-
   protected onNotFound?: NavigationHook;
-
   protected onBlock?: NavigationHook;
 
   // start is using as marker that any preparation for proper work has done in the app
@@ -168,7 +271,7 @@ export abstract class AbstractRouter {
   }
 
   async updateCurrentRoute(updateRouteOptions: UpdateCurrentRouteOptions) {
-    return this.internalUpdateCurrentRoute(updateRouteOptions, {});
+    await this.updateHook.callPromise({ updateRouteOptions });
   }
 
   protected async internalUpdateCurrentRoute(
@@ -207,15 +310,11 @@ export abstract class AbstractRouter {
   }
 
   protected async runUpdateCurrentRoute(navigation: Navigation) {
-    await this.runHooks('beforeUpdateCurrent', navigation);
-
-    this.commitNavigation(navigation);
-
-    await this.runHooks('afterUpdateCurrent', navigation);
+    await this.runUpdateHook.callPromise({ navigation });
   }
 
   async navigate(navigateOptions: NavigateOptions | string) {
-    return this.internalNavigate(makeNavigateOptions(navigateOptions), {});
+    await this.navigateHook.callPromise({ navigateOptions });
   }
 
   protected async internalNavigate(
@@ -279,18 +378,7 @@ export abstract class AbstractRouter {
   }
 
   protected async runNavigate(navigation: Navigation) {
-    // check for redirect in new route description
-    if (navigation.to.redirect) {
-      return this.redirect(navigation, makeNavigateOptions(navigation.to.redirect));
-    }
-
-    await this.runGuards(navigation);
-
-    await this.runHooks('beforeNavigate', navigation);
-
-    this.commitNavigation(navigation);
-
-    await this.runHooks('afterNavigate', navigation);
+    await this.runNavigateHook.callPromise({ navigation });
   }
 
   protected async run(navigation: Navigation) {
@@ -354,12 +442,14 @@ export abstract class AbstractRouter {
       target,
     });
 
-    return this.onRedirect?.({
-      ...navigation,
-      from: navigation.to,
-      fromUrl: navigation.url,
-      to: null,
-      url: this.resolveUrl(target),
+    await this.redirectHook.callPromise({
+      navigation: {
+        ...navigation,
+        from: navigation.to,
+        fromUrl: navigation.url,
+        to: null,
+        url: this.resolveUrl(target),
+      },
     });
   }
 
@@ -369,7 +459,9 @@ export abstract class AbstractRouter {
       navigation,
     });
 
-    return this.onNotFound?.(navigation);
+    await this.notfoundHook.callPromise({
+      navigation,
+    });
   }
 
   protected async block(navigation: Navigation): Promise<void> {
@@ -381,7 +473,8 @@ export abstract class AbstractRouter {
     this.currentNavigation = null;
 
     if (this.onBlock) {
-      return this.onBlock(navigation);
+      await this.blockHook.callPromise({ navigation });
+      return;
     }
 
     throw new Error('Navigation blocked');
@@ -469,24 +562,9 @@ export abstract class AbstractRouter {
       navigation,
     });
 
-    if (!this.guards) {
-      logger.debug({
-        event: 'guards.empty',
-        navigation,
-      });
-      return;
-    }
+    const results = [];
 
-    const results = await Promise.all(
-      Array.from(this.guards).map((guard) =>
-        Promise.resolve(guard(navigation)).catch((error) => {
-          logger.warn({
-            event: 'guard.error',
-            error,
-          });
-        })
-      )
-    );
+    await this.guards.callPromise({ navigation, allResults: results });
 
     logger.debug({
       event: 'guards.done',
@@ -506,7 +584,23 @@ export abstract class AbstractRouter {
   }
 
   registerGuard(guard: NavigationGuard) {
-    return registerHook(this.guards, guard);
+    const untap = this.guards.tapPromise(
+      guard.name ?? `guard-${this.guardsIndex++}`,
+      async (_, { allResults, navigation }) => {
+        try {
+          const result = await guard(navigation);
+          allResults.push(result);
+        } catch (error) {
+          logger.warn({
+            event: 'guard.error',
+            error,
+          });
+          allResults.push(undefined);
+        }
+      }
+    );
+
+    return untap;
   }
 
   protected runSyncHooks(hookName: SyncHookName, navigation: Navigation) {
@@ -516,27 +610,7 @@ export abstract class AbstractRouter {
       navigation,
     });
 
-    const hooks = this.syncHooks.get(hookName);
-
-    if (!hooks) {
-      logger.debug({
-        event: 'sync-hooks.empty',
-        hookName,
-        navigation,
-      });
-      return;
-    }
-
-    for (const hook of hooks) {
-      try {
-        hook(navigation);
-      } catch (error) {
-        logger.warn({
-          event: 'sync-hooks.error',
-          error,
-        });
-      }
-    }
+    this.syncHooks.get(hookName).call({ navigation });
 
     logger.debug({
       event: 'sync-hooks.done',
@@ -546,7 +620,20 @@ export abstract class AbstractRouter {
   }
 
   registerSyncHook(hookName: SyncHookName, hook: NavigationSyncHook) {
-    return registerHook(this.syncHooks.get(hookName), hook);
+    const untap = this.syncHooks
+      .get(hookName)
+      .tap(hook.name ?? `sync-hook-${this.syncHooksIndex++}`, (_, { navigation }) => {
+        try {
+          return hook(navigation);
+        } catch (error) {
+          logger.warn({
+            event: 'sync-hooks.error',
+            error,
+          });
+        }
+      });
+
+    return untap;
   }
 
   protected async runHooks(hookName: HookName, navigation: Navigation) {
@@ -556,20 +643,22 @@ export abstract class AbstractRouter {
       navigation,
     });
 
-    const hooks = this.hooks.get(hookName);
+    await this.hooks.get(hookName).callPromise({ navigation });
 
-    if (!hooks) {
-      logger.debug({
-        event: 'hooks.empty',
-        hookName,
-        navigation,
-      });
-      return;
-    }
+    logger.debug({
+      event: 'hooks.done',
+      hookName,
+      navigation,
+    });
+  }
 
-    await Promise.all(
-      Array.from(hooks).map((hook) =>
-        Promise.resolve(hook(navigation)).catch((error) => {
+  registerHook(hookName: HookName, hook: NavigationHook) {
+    const untap = this.hooks
+      .get(hookName)
+      .tapPromise(hook.name ?? `hook-${this.hooksIndex++}`, async (_, { navigation }) => {
+        try {
+          await hook(navigation);
+        } catch (error) {
           logger.warn({
             event: 'hook.error',
             error,
@@ -580,19 +669,10 @@ export abstract class AbstractRouter {
           if (hookName === 'beforeResolve') {
             throw error;
           }
-        })
-      )
-    );
+        }
+      });
 
-    logger.debug({
-      event: 'hooks.done',
-      hookName,
-      navigation,
-    });
-  }
-
-  registerHook(hookName: HookName, hook: NavigationHook) {
-    return registerHook(this.hooks.get(hookName), hook);
+    return untap;
   }
 
   private uuid() {

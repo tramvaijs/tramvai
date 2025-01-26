@@ -255,7 +255,7 @@ describe('router/server', () => {
     });
     describe('guards', () => {
       it('should call guards', async () => {
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
@@ -465,7 +465,7 @@ describe('router/server', () => {
     });
     describe('guards', () => {
       it('should call guards', async () => {
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
@@ -663,7 +663,7 @@ describe('router/server', () => {
     });
     describe('guards', () => {
       it('should call guards', async () => {
-        const mockGuard = jest.fn();
+        const mockGuard = jest.fn(async () => {});
 
         router.registerGuard(mockGuard);
 
