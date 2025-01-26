@@ -16,7 +16,7 @@ export abstract class ClientRouter extends AbstractRouter {
 
     this.history.listen(async ({ type, url, navigateState, replace, history }) => {
       const currentUrl = this.getCurrentUrl();
-      const { pathname, query } = this.resolveUrl({ url });
+      const { pathname, query, hash } = this.resolveUrl({ url });
       const isSameUrlNavigation =
         (currentUrl ? currentUrl.pathname : window.location.pathname) === pathname;
       const isUpdateCurrentRoute = type === 'updateCurrentRoute' || (!type && isSameUrlNavigation);
@@ -45,6 +45,7 @@ export abstract class ClientRouter extends AbstractRouter {
           {
             params: route?.params,
             query,
+            hash,
             replace,
             navigateState,
           },
