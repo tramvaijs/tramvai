@@ -503,6 +503,31 @@ describe('router/spa', () => {
       expect(isSpa()).toBe(true);
       expect(await page.evaluate(() => window.history.length)).toBe(3);
     });
+
+    it('history changes after current route updates with hash', async () => {
+      const { serverUrl } = getApp();
+      const { page, router } = await getPageWrapper('/dom/navigate/hash/');
+
+      await router.updateCurrentRoute({ hash: 'foo' });
+
+      expect(page.url()).toBe(`${serverUrl}/dom/navigate/hash/#foo`);
+
+      await router.updateCurrentRoute({ hash: 'bar' });
+
+      expect(page.url()).toBe(`${serverUrl}/dom/navigate/hash/#bar`);
+
+      await page.evaluate(() => window.history.back());
+      await page.waitForFunction(() => window.location.hash === '#foo');
+
+      expect(page.url()).toBe(`${serverUrl}/dom/navigate/hash/#foo`);
+      expect((await router.getCurrentUrl()).hash).toBe(`#foo`);
+
+      await page.evaluate(() => window.history.forward());
+      await page.waitForFunction(() => window.location.hash === '#bar');
+
+      expect(page.url()).toBe(`${serverUrl}/dom/navigate/hash/#bar`);
+      expect((await router.getCurrentUrl()).hash).toBe(`#bar`);
+    });
   });
   describe('proxy', () => {
     it('should rehydrate url in browser after proxied request on server', async () => {
