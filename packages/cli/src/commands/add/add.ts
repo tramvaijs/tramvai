@@ -5,11 +5,11 @@ import { findTramvaiVersion } from '../../utils/commands/dependencies/findTramva
 import { checkVersions } from '../../utils/commands/dependencies/checkVersions';
 
 export type Params = {
-  packageName: string;
+  packageNames: string | string[];
   dev?: boolean;
 };
 
-export default async (context: Context, { packageName, dev }: Params): Promise<CommandResult> => {
+export default async (context: Context, { packageNames, dev }: Params): Promise<CommandResult> => {
   const version = await findTramvaiVersion();
 
   if (!version) {
@@ -19,7 +19,7 @@ export default async (context: Context, { packageName, dev }: Params): Promise<C
   }
 
   await context.packageManager.install({
-    name: packageName,
+    packageNames,
     version,
     devDependency: dev,
     stdio: 'inherit',

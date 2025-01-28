@@ -7,7 +7,7 @@ class AddCommand extends CLICommand {
 
   description = 'Tramvai package install command';
 
-  command = 'add <packageName>';
+  command = 'add <packageNames...>';
 
   options = [
     {

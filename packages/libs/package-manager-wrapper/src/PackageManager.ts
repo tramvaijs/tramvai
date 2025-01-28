@@ -7,7 +7,7 @@ export interface PackageManagerOptions {
 }
 
 export interface InstallOptions extends Options {
-  name?: string;
+  packageNames?: string | string[];
   version?: string;
   registry?: string;
   noSave?: boolean; // works only with npm
@@ -73,5 +73,14 @@ export abstract class PackageManager {
     const registry = options.registry || this.registry;
 
     return registry && `--registry=${registry}`;
+  }
+
+  protected getPackagesForInstall(options: { packageNames?: string | string[]; version?: string }) {
+    const { packageNames, version } = options;
+
+    return (Array.isArray(packageNames) ? packageNames : [packageNames])
+      .filter(Boolean)
+      .map((packageName) => (version ? `${packageName}@${version}` : packageName))
+      .join(' ');
   }
 }

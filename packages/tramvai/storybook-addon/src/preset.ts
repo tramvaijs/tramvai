@@ -7,6 +7,7 @@ import type { TransformOptions } from '@babel/core';
 import { buildConfigManager } from './tramvai/buildConfigManager';
 import { babelConfigFactory } from './babel/babelConfigFactory';
 import { addEnvVariables } from './webpack/addEnvVariables';
+import { addPathsResolver } from './webpack/addPathsResolver';
 import { addFilesRules } from './webpack/addFilesRules';
 import { addStylesRules } from './webpack/addStylesRules';
 import { addNodeModulesTranspile } from './webpack/addNodeModulesTranspile';
@@ -39,6 +40,7 @@ export const webpackFinal = async (
   addEnvVariables({ webpackConfig, configManager, options });
   addFilesRules({ baseConfig, webpackConfig, configManager });
   addStylesRules({ baseConfig, webpackConfig, configManager });
+  addPathsResolver({ webpackConfig, options });
   addNodeModulesTranspile({ baseConfig });
 
   const finalConfig = merge(baseConfig, webpackConfig.toConfig());
