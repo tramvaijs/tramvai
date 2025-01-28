@@ -2,8 +2,7 @@ import flatten from '@tinkoff/utils/array/flatten';
 import identity from '@tinkoff/utils/function/identity';
 import isPromise from '@tinkoff/utils/is/promise';
 import type { Action, ActionParameters, DI_TOKEN } from '@tramvai/core';
-import { isTramvaiAction } from '@tramvai/core';
-import { ACTION_PARAMETERS } from '@tramvai/core';
+import { ACTION_PARAMETERS, Deferred, isTramvaiAction } from '@tramvai/core';
 import type {
   CONTEXT_TOKEN,
   ActionCondition,
@@ -21,7 +20,6 @@ import { ActionChecker } from './actionChecker';
 import type { ActionType } from './constants';
 import { actionType } from './constants';
 import { actionTramvaiReducer } from './actionTramvaiReducer';
-import { Deferred } from './deferred/deferred.inline';
 
 const EMPTY_DEPS = {};
 

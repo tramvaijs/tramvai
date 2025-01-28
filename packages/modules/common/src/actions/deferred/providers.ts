@@ -1,4 +1,4 @@
-import { commandLineListTokens, optional, provide } from '@tramvai/core';
+import { commandLineListTokens, optional, provide, Deferred } from '@tramvai/core';
 import {
   REACT_SERVER_RENDER_MODE,
   RESOURCES_REGISTRY,
@@ -7,7 +7,6 @@ import {
 } from '@tramvai/tokens-render';
 import { DEFERRED_ACTIONS_MAP_TOKEN } from '@tramvai/tokens-common';
 import type { Deferred as IDeferred } from '@tramvai/tokens-common';
-import { Deferred } from './deferred.inline';
 import { generateDeferredReject, generateDeferredResolve } from './clientScriptsUtils';
 
 export const providers = [

@@ -24,4 +24,4 @@ export {
   declareModule,
 } from '@tinkoff/dippy';
 
-export { Deferred } from './utils/deferred';
+export { Deferred } from './utils/deferred.inline';
