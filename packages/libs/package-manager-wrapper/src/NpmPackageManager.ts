@@ -14,12 +14,14 @@ export class NpmPackageManager extends PackageManager {
   }
 
   async install(options: InstallOptions = {}) {
-    const { name, version, noSave, devDependency } = options;
+    const { version, noSave, devDependency } = options;
+    const packagesForInstall = this.getPackagesForInstall(options);
+    const isPackagesSpecified = packagesForInstall !== '';
 
     const commandLineArgs = [
       'npm',
       'install',
-      name && (version ? `${name}@${version}` : name),
+      isPackagesSpecified && packagesForInstall,
       version && '--save-exact',
       '--legacy-peer-deps',
       noSave && '--no-save',

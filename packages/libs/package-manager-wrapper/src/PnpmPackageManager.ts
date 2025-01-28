@@ -14,12 +14,14 @@ export class PnpmPackageManager extends PackageManager {
   }
 
   async install(options: InstallOptions = {}) {
-    const { name, version, noSave, devDependency } = options;
+    const { version, noSave, devDependency } = options;
+    const packagesForInstall = this.getPackagesForInstall(options);
+    const isPackagesSpecified = packagesForInstall !== '';
 
     const commandLineArgs = [
       'pnpm',
-      name ? 'add' : 'install',
-      name && (version ? `${name}@${version}` : name),
+      isPackagesSpecified ? 'add' : 'install',
+      isPackagesSpecified && packagesForInstall,
       version && '--save-exact',
       noSave && '--frozen-lockfile',
       devDependency && '--save-dev',

@@ -28,7 +28,7 @@ async function runtimeInstallPackage({
 
   try {
     await packageManager.install({
-      name: packageName,
+      packageNames: packageName,
       version: packageVersion,
       registry,
       noSave,

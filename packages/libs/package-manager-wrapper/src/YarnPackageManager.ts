@@ -14,12 +14,14 @@ export class YarnPackageManager extends PackageManager {
   }
 
   async install(options: InstallOptions = {}) {
-    const { name, version, noSave, devDependency } = options;
+    const { version, noSave, devDependency } = options;
+    const packagesForInstall = this.getPackagesForInstall(options);
+    const isPackagesSpecified = packagesForInstall !== '';
 
     const commandLineArgs = [
       'yarn',
-      name && 'add',
-      name && (version ? `${name}@${version}` : name),
+      isPackagesSpecified && 'add',
+      isPackagesSpecified && packagesForInstall,
       version && '--exact',
       noSave && '--frozen-lockfile',
       devDependency && '--dev',
