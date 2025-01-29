@@ -1,6 +1,7 @@
 import path from 'path';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
+import { packageManagerFactory } from '@tinkoff/package-manager-wrapper';
 import type { Context } from '../../models/context';
 import type { CommandResult } from '../../models/command';
 import type { Params } from './typings';
@@ -64,41 +65,53 @@ export default async function createNew(context: Context, params: Params): Promi
   const templateDir = getPathToTemplate(type, template);
   const sharedDir = getPathToShared();
   const blockDir = getPathToBlock(type);
-  const isNpm = packageManager === 'npm';
-  const isYarn = packageManager === 'yarn';
-  const isJest = testingFramework === 'jest';
-
+  const isMonorepo = template === 'monorepo';
+  const baseDir = type === 'app' ? 'apps' : 'child-apps';
   const blockDirectoryName = {
-    monorepo: path.join(type === 'app' ? 'apps' : 'child-apps', name),
+    monorepo: path.join(baseDir, name),
     multirepo: 'src',
   }[template];
 
-  await renderTemplate(templateDir, directoryName, { configEntry, isJest, isNpm, isYarn });
-  await renderTemplate(sharedDir, directoryName, { configEntry, isJest, isNpm, isYarn });
-  await renderTemplate(blockDir, path.join(directoryName, blockDirectoryName), {
+  const templateData = {
     configEntry,
-    isJest,
-    isNpm,
-    isYarn,
-  });
+    isJest: testingFramework === 'jest',
+    isNpm: packageManager === 'npm',
+    isYarn: packageManager === 'yarn',
+    workspaceBaseDir: isMonorepo ? baseDir : undefined,
+  };
+
+  await renderTemplate(templateDir, directoryName, templateData);
+  await renderTemplate(sharedDir, directoryName, templateData);
+  await renderTemplate(blockDir, path.join(directoryName, blockDirectoryName), templateData);
   if (template === 'monorepo') {
     const monorepoBlockDir = getPathToMonorepoBlock();
 
-    await renderTemplate(monorepoBlockDir, path.join(directoryName, blockDirectoryName), {
-      configEntry,
-      isJest,
-    });
+    await renderTemplate(
+      monorepoBlockDir,
+      path.join(directoryName, blockDirectoryName),
+      templateData
+    );
   }
 
   if (testingFramework !== 'none') {
-    await renderTemplate(getPathToTestingFramework(type, testingFramework), directoryName, {
-      configEntry,
-      isJest,
-    });
+    await renderTemplate(
+      getPathToTestingFramework(type, testingFramework),
+      directoryName,
+      templateData
+    );
   }
 
   await initializationGit(directoryName);
-  await installDependencies({ localDir: directoryName, type, packageManager, testingFramework });
+  await installDependencies({
+    localDir: directoryName,
+    type,
+    packageManager: packageManagerFactory(
+      { rootDir: path.resolve(process.cwd(), directoryName) },
+      packageManager
+    ),
+    testingFramework,
+    workspace: isMonorepo ? blockDirectoryName : undefined,
+  });
 
   console.log(
     `\n\n Project ${name} has been successfully created. To run the project, enter in the terminal`,

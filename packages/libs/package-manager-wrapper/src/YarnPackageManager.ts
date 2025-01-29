@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import type {
   InstallOptions,
   PackageManagerOptions,
@@ -14,17 +15,20 @@ export class YarnPackageManager extends PackageManager {
   }
 
   async install(options: InstallOptions = {}) {
-    const { version, noSave, devDependency } = options;
+    const { version, noSave, devDependency, workspace } = options;
     const packagesForInstall = this.getPackagesForInstall(options);
     const isPackagesSpecified = packagesForInstall !== '';
 
     const commandLineArgs = [
       'yarn',
+      // Yarn accepts workspace as only name, not full path
+      workspace && `workspace ${this.getWorkspaceName(workspace)}`,
       isPackagesSpecified && 'add',
       isPackagesSpecified && packagesForInstall,
       version && '--exact',
       noSave && '--frozen-lockfile',
       devDependency && '--dev',
+      this.workspaces && !workspace && '--ignore-workspace-root-check',
       this.registryFlag(options),
     ].filter(Boolean);
 
@@ -41,6 +45,15 @@ export class YarnPackageManager extends PackageManager {
 
   async dedupe(options: DedupeOptions = {}) {
     await this.run('npx yarn-deduplicate', options);
+  }
+
+  private getWorkspaceName(path: string) {
+    try {
+      const packageJson = require(resolve(this.rootDir, path, 'package.json'));
+      return packageJson.name as string;
+    } catch {
+      throw new Error(`No workspace found by path: ${path}`);
+    }
   }
 
   getLockFileName() {

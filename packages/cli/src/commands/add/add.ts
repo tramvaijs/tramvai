@@ -3,13 +3,18 @@ import type { CommandResult } from '../../models/command';
 import { migrate } from '../../utils/commands/dependencies/migrate';
 import { findTramvaiVersion } from '../../utils/commands/dependencies/findTramvaiVersion';
 import { checkVersions } from '../../utils/commands/dependencies/checkVersions';
+import { getWorkspaceRootByAppName } from '../../utils/commands/dependencies/getWorkspaceRootByAppName';
 
 export type Params = {
   packageNames: string | string[];
   dev?: boolean;
+  app?: string;
 };
 
-export default async (context: Context, { packageNames, dev }: Params): Promise<CommandResult> => {
+export default async (
+  context: Context,
+  { packageNames, dev, app }: Params
+): Promise<CommandResult> => {
   const version = await findTramvaiVersion();
 
   if (!version) {
@@ -18,10 +23,19 @@ export default async (context: Context, { packageNames, dev }: Params): Promise<
     );
   }
 
+  const workspace = app ? getWorkspaceRootByAppName(context, app) : undefined;
+
+  if (workspace && !context.packageManager.isWorkspaceExists(workspace)) {
+    throw new Error(
+      `Workspace ${workspace} for app ${app} is not exists. Check your package.json and tramvai.json`
+    );
+  }
+
   await context.packageManager.install({
     packageNames,
     version,
     devDependency: dev,
+    workspace,
     stdio: 'inherit',
   });
 

@@ -1,7 +1,5 @@
-import type { Options } from 'execa';
-import execa from 'execa';
 import chalk from 'chalk';
-import type { PackageManagers } from '../questions/packageManager';
+import type { InstallOptions, PackageManager } from '@tinkoff/package-manager-wrapper';
 import type { TestingFrameworks } from '../questions/testingFramework';
 import type { Type } from '../questions/type';
 
@@ -57,7 +55,6 @@ const devDependencies = [
   '@tinkoff/eslint-config',
   '@tinkoff/eslint-config-react',
   '@tinkoff/eslint-plugin-tramvai',
-  '@tramvai/cli',
   '@types/react',
   'postcss-custom-media',
   'postcss-custom-properties',
@@ -69,56 +66,107 @@ const devDependencies = [
   'typescript',
 ];
 
-const packagesInstallCommands: Record<PackageManagers, { deps: string[]; devDeps: string[] }> = {
-  npm: {
-    deps: ['install', '--save', '--package-lock', '--legacy-peer-deps'],
-    devDeps: ['install', '--save-dev', '--legacy-peer-deps'],
-  },
-  yarn: {
-    deps: ['add'],
-    devDeps: ['add', '--dev'],
-  },
-  pnpm: {
-    deps: ['add'],
-    devDeps: ['add', '--save-dev'],
-  },
+const rootDependencies = {
+  devDependencies: ['@tramvai/cli'],
+  dependencies: [],
 };
+
+function getBaseDeps(type: Type, isDev: boolean) {
+  const depsMap = DEPS[type];
+  const jestDeps = depsMap.jestDevDependencies;
+  const baseDeps = isDev ? devDependencies : depsMap.dependencies;
+  const rootDeps = rootDependencies[isDev ? 'devDependencies' : 'dependencies'];
+
+  return { rootDeps, baseDeps, jestDeps };
+}
+
+function getDeps(type: Type, options?: { isDev?: boolean; isRoot?: boolean }) {
+  const { rootDeps, baseDeps } = getBaseDeps(type, options?.isDev);
+
+  return [...rootDeps, ...baseDeps];
+}
+
+function getDepsWorkspace(type: Type, options?: { isDev?: boolean; isRoot?: boolean }) {
+  const { rootDeps, baseDeps } = getBaseDeps(type, options?.isDev);
+
+  if (options?.isRoot) {
+    return rootDeps;
+  }
+
+  return baseDeps;
+}
+
+function jestDeps(type: Type) {
+  return getBaseDeps(type, true).jestDeps;
+}
 
 export async function installDependencies({
   localDir,
   type,
   packageManager,
   testingFramework,
+  workspace,
 }: {
   localDir: string;
   type: Type;
-  packageManager: PackageManagers;
+  packageManager: PackageManager;
   testingFramework: TestingFrameworks;
+  workspace?: string;
 }) {
-  const installCommands = packagesInstallCommands[packageManager];
-  const options: Options = {
+  const deps = workspace ? getDepsWorkspace : getDeps;
+
+  const options: InstallOptions = {
     cwd: localDir,
     env: {
       SKIP_TRAMVAI_MIGRATIONS: 'true',
     },
     stdio: 'inherit',
+    workspace,
   };
+
+  // Install cli and core packages into the root of repository if using workspaces for update command to work correctly
+  if (workspace !== undefined) {
+    console.log(`${chalk.blue('[DEPENDENCIES]')} Installing root dependencies`);
+
+    await packageManager.install({
+      packageNames: deps(type, { isDev: true, isRoot: true }),
+      devDependency: true,
+      ...options,
+      workspace: undefined,
+    });
+
+    console.log(`${chalk.blue('[DEPENDENCIES]')} Installing root dev dependencies`);
+
+    await packageManager.install({
+      packageNames: deps(type, { isDev: false, isRoot: true }),
+      devDependency: false,
+      ...options,
+      workspace: undefined,
+    });
+  }
 
   console.log(`${chalk.blue('[DEPENDENCIES]')} Installing app dependencies`);
 
-  await execa(packageManager, [...installCommands.deps, ...DEPS[type].dependencies], options);
+  await packageManager.install({
+    packageNames: deps(type),
+    ...options,
+  });
 
   console.log(`${chalk.blue('[DEPENDENCIES]')} Installing dev dependencies`);
 
-  await execa(packageManager, [...installCommands.devDeps, ...devDependencies], options);
+  await packageManager.install({
+    packageNames: deps(type, { isDev: true }),
+    devDependency: true,
+    ...options,
+  });
 
   if (testingFramework === 'jest') {
     console.log(`${chalk.blue('[DEPENDENCIES]')} Installing jest dependencies`);
 
-    await execa(
-      packageManager,
-      [...installCommands.devDeps, ...DEPS[type].jestDevDependencies],
-      options
-    );
+    await packageManager.install({
+      packageNames: jestDeps(type),
+      devDependency: true,
+      ...options,
+    });
   }
 }

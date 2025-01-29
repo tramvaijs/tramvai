@@ -3,6 +3,7 @@ import fs from 'fs';
 import pMap from 'p-map';
 import type { Ora } from 'ora';
 import ora from 'ora';
+import { resolve } from 'path';
 import { packageHasVersion } from '../../utils/commands/dependencies/packageHasVersion';
 import { getLibPackageVersion } from './dependantLibs';
 import { isDependantLib, isUnifiedVersion } from '../../utils/tramvaiVersions';
@@ -61,21 +62,15 @@ const updateDependencies = (
   );
 };
 
-export const updatePackageJson = async (version: string, prerelease?: boolean) => {
-  const file = fs.readFileSync('package.json');
+export const updatePackageJson = async (
+  version: string,
+  currentVersion: string,
+  prerelease?: boolean,
+  path = '.'
+) => {
+  const packageJsonPath = resolve(path, 'package.json');
+  const file = fs.readFileSync(packageJsonPath);
   const content = JSON.parse(file.toString());
-  const currentVersion = getVersionFromDep(content.dependencies['@tramvai/core']);
-
-  if (!currentVersion) {
-    throw new Error(
-      "Couldn't resolve current tramvai version, do you have '@tramvai/core' package in your dependencies?"
-    );
-  }
-
-  if (currentVersion === version) {
-    console.error('The installed version is equal to the current version, no update is required.');
-    return;
-  }
 
   const spinner = ora(`Updating package.json versions`).start();
 
@@ -90,7 +85,7 @@ export const updatePackageJson = async (version: string, prerelease?: boolean) =
       spinner
     );
 
-    fs.writeFileSync('package.json', JSON.stringify(content, null, 2));
+    fs.writeFileSync(packageJsonPath, JSON.stringify(content, null, 2));
   } finally {
     spinner.stop();
   }

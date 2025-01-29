@@ -22,5 +22,6 @@
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix"
     ]
-  }
+  }{{#if workspaceBaseDir}},
+  "workspaces": ["{{workspaceBaseDir}}/*"]{{/if}}
 }

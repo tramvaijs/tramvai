@@ -10,7 +10,7 @@ const getVersionFromDep = (dep?: string) => {
 export const findTramvaiVersion = async () => {
   const file = fs.readFileSync('package.json');
   const content = JSON.parse(file.toString());
-  const currentVersion = getVersionFromDep(content.dependencies['@tramvai/core']);
+  const currentVersion = getVersionFromDep(content.devDependencies['@tramvai/cli']);
 
   return currentVersion;
 };

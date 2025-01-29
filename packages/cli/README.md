@@ -42,6 +42,14 @@ After any command you can pass `--help` string, e.g. `tramvai --help` or `tramva
 
 ## Explanation
 
+### Workspaces
+
+If you are using monorepo, you may not want to install all tramvai modules into your repository root. CLI can automatically define monorepo context and provides some special behaviour and options for ceratin commands:
+
+- `tramvai new` will install all tramvai modules (except `@tramvai/cli`) into provided app workspace if `monorepo` template chosen
+- `tramvai add` supports `--app` or `-a` parameter. You can provide any app name from your `tramvai.json` to install module into workspace
+- `tramvai update` will automatically update tramvai modules for all existing workspaces in your project
+
 ### Notifications settings
 
 Inside `tramvai.json` the settings for the notification can be specified at path `notifications`. Parameters are passed to [webpack-build-notifier](https://github.com/RoccoC/webpack-build-notifier#config-options). You can specify global configuration or a specific configuration either for client or server build.

@@ -1,8 +1,12 @@
+import { resolve } from 'path';
 import { updatePackageJson } from './updatePackageJson';
 
 const LATEST_TRAMVAI_VERSION = '1.115.6';
 const LATEST_LIB_VERSION = '0.8.23';
 const PRERELEASE_LIB_VERSION = '2.0.1';
+const CURRENT_TRAMVAI_VERSION = '1.93.2';
+
+const packageJsonPath = resolve('package.json');
 
 let mockPackageJson: Record<string, any>;
 const mockFsWrite = jest.fn();
@@ -38,13 +42,13 @@ beforeEach(() => {
 it('should update tramvai deps to latest versions', async () => {
   mockPackageJson = {
     dependencies: {
-      '@tramvai/core': '1.93.2',
-      '@tramvai/module-common': '1.93.2',
+      '@tramvai/core': CURRENT_TRAMVAI_VERSION,
+      '@tramvai/module-common': CURRENT_TRAMVAI_VERSION,
       '@tinkoff/router': '^0.2.3',
       '@tinkoff/url': '0.3.2',
     },
     devDependencies: {
-      '@tramvai/cli': '1.93.2',
+      '@tramvai/cli': CURRENT_TRAMVAI_VERSION,
     },
     peerDependencies: {
       '@tinkoff/dippy': '0.7.10',
@@ -72,11 +76,12 @@ it('should update tramvai deps to latest versions', async () => {
     return {};
   });
 
-  await updatePackageJson(LATEST_TRAMVAI_VERSION);
+  await updatePackageJson(LATEST_TRAMVAI_VERSION, CURRENT_TRAMVAI_VERSION);
 
+  // eslint-disable-next-line jest/no-interpolation-in-snapshots
   expect(mockFsWrite.mock.calls[0]).toMatchInlineSnapshot(`
     [
-      "package.json",
+      "${packageJsonPath}",
       "{
       "dependencies": {
         "@tramvai/core": "1.115.6",
@@ -98,14 +103,14 @@ it('should update tramvai deps to latest versions', async () => {
 it('prerelease should be used for dependant libs', async () => {
   mockPackageJson = {
     dependencies: {
-      '@tramvai/core': '1.93.2',
-      '@tramvai/module-common': '1.93.2',
+      '@tramvai/core': CURRENT_TRAMVAI_VERSION,
+      '@tramvai/module-common': CURRENT_TRAMVAI_VERSION,
       '@tinkoff/router': '^0.2.3',
       '@tinkoff/url': '0.3.2',
       '@tinkoff/pack-polyfills': '1.0.0',
     },
     devDependencies: {
-      '@tramvai/cli': '1.93.2',
+      '@tramvai/cli': CURRENT_TRAMVAI_VERSION,
     },
     peerDependencies: {
       '@tinkoff/dippy': '0.7.10',
@@ -133,11 +138,12 @@ it('prerelease should be used for dependant libs', async () => {
     return {};
   });
 
-  await updatePackageJson(LATEST_TRAMVAI_VERSION, true);
+  await updatePackageJson(LATEST_TRAMVAI_VERSION, CURRENT_TRAMVAI_VERSION, true);
 
+  // eslint-disable-next-line jest/no-interpolation-in-snapshots
   expect(mockFsWrite.mock.calls[0]).toMatchInlineSnapshot(`
     [
-      "package.json",
+      "${packageJsonPath}",
       "{
       "dependencies": {
         "@tramvai/core": "1.115.6",

@@ -14,6 +14,11 @@ class AddCommand extends CLICommand {
       name: '-D, --dev',
       description: 'Save package to devDependencies',
     },
+    {
+      name: '-a, --app',
+      value: '[app]',
+      description: 'Install package in app-specific workspace',
+    },
   ];
 
   alias = '';

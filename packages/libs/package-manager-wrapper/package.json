@@ -21,6 +21,8 @@
   },
   "module": "lib/index.es.js",
   "dependencies": {
-    "execa": "^5.1.1"
+    "execa": "^5.1.1",
+    "@tinkoff/utils": "^2.1.2",
+    "fast-glob": "^3.2.2"
   }
 }

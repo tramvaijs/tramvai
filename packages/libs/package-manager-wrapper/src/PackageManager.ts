@@ -1,5 +1,6 @@
 import type { Options } from 'execa';
 import { command } from 'execa';
+import { WorkspacesParser } from './WorkspacesParser';
 
 export interface PackageManagerOptions {
   rootDir: string;
@@ -10,6 +11,7 @@ export interface InstallOptions extends Options {
   packageNames?: string | string[];
   version?: string;
   registry?: string;
+  workspace?: string;
   noSave?: boolean; // works only with npm
   cwd?: string;
   devDependency?: boolean;
@@ -35,12 +37,14 @@ export abstract class PackageManager {
 
   protected rootDir: string;
   protected registry?: string;
+  protected worskpacesParser: WorkspacesParser;
 
   constructor(options: PackageManagerOptions) {
     const { rootDir, registry } = options;
 
     this.rootDir = rootDir;
     this.registry = registry;
+    this.worskpacesParser = new WorkspacesParser({ rootDir });
   }
 
   abstract install(options?: InstallOptions): Promise<void>;
@@ -82,5 +86,13 @@ export abstract class PackageManager {
       .filter(Boolean)
       .map((packageName) => (version ? `${packageName}@${version}` : packageName))
       .join(' ');
+  }
+
+  isWorkspaceExists(workspace: string) {
+    return this.worskpacesParser.exists(workspace);
+  }
+
+  get workspaces() {
+    return this.worskpacesParser.workspaces;
   }
 }

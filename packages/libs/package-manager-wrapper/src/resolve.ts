@@ -10,25 +10,40 @@ const checkLockFile = (rootDir: string, lockName: string) => {
   return existsSync(resolve(rootDir, lockName));
 };
 
+export const packageManagerFactory = (
+  options: PackageManagerOptions,
+  name?: PackageManager['name']
+) => {
+  switch (name) {
+    case 'npm':
+      return new NpmPackageManager(options);
+    case 'pnpm':
+      return new PnpmPackageManager(options);
+    case 'yarn':
+      return new YarnPackageManager(options);
+    default:
+      return new UnknownPackageManager(options);
+  }
+};
+
 export const resolvePackageManager = (
   packageManagerOptions: PackageManagerOptions,
   { throwUnknown = false }: { throwUnknown?: boolean } = {}
 ): PackageManager => {
   const { rootDir } = packageManagerOptions;
-  let packageManager: PackageManager;
+  let packageManager: PackageManager['name'];
 
   if (checkLockFile(rootDir, 'yarn.lock')) {
-    packageManager = new YarnPackageManager(packageManagerOptions);
+    packageManager = 'yarn';
   } else if (checkLockFile(rootDir, 'package-lock.json')) {
-    packageManager = new NpmPackageManager(packageManagerOptions);
+    packageManager = 'npm';
   } else if (checkLockFile(rootDir, 'pnpm-lock.yaml')) {
-    packageManager = new PnpmPackageManager(packageManagerOptions);
-  } else {
-    if (throwUnknown) {
-      throw new Error(`Cannot find supported packageManager in "${rootDir}"`);
-    }
-    packageManager = new UnknownPackageManager(packageManagerOptions);
+    packageManager = 'pnpm';
   }
 
-  return packageManager;
+  if (throwUnknown) {
+    throw new Error(`Cannot find supported packageManager in "${rootDir}"`);
+  }
+
+  return packageManagerFactory(packageManagerOptions, packageManager!);
 };

@@ -14,7 +14,7 @@ export class NpmPackageManager extends PackageManager {
   }
 
   async install(options: InstallOptions = {}) {
-    const { version, noSave, devDependency } = options;
+    const { version, noSave, devDependency, workspace } = options;
     const packagesForInstall = this.getPackagesForInstall(options);
     const isPackagesSpecified = packagesForInstall !== '';
 
@@ -26,6 +26,7 @@ export class NpmPackageManager extends PackageManager {
       '--legacy-peer-deps',
       noSave && '--no-save',
       devDependency && '--save-dev',
+      workspace && `-w ${workspace}`,
       // use already existing package version if it satisfies semver,
       // instead of adding latest version during install
       '--prefer-dedupe',
