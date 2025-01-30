@@ -1,5 +1,7 @@
 import noop from '@tinkoff/utils/function/noop';
 import eachObj from '@tinkoff/utils/object/each';
+import chokidar from 'chokidar';
+import chalk from 'chalk';
 import path from 'path';
 import type webpack from 'webpack';
 import type Config from 'webpack-chain';
@@ -72,6 +74,7 @@ export const serverRunner = ({
     }
 
     const fs = serverCompiler.outputFileSystem as any;
+
     // ThreadWorkerPool is experimental
     // it doesn't work well when running integration tests in tramvai repo
     // mostly because of the some problems with `babel-plugin-lodash`
@@ -85,6 +88,7 @@ export const serverRunner = ({
         ? ThreadWorkerBridge
         : ProcessWorkerBridge
     );
+
     let worker: Worker | null;
     let serverInvalidated = true;
     let workerPort: number | null;
@@ -260,14 +264,14 @@ export const serverRunner = ({
       }
     });
 
-    compiler.hooks.done.tap(HOOK_NAME, async (stats) => {
+    async function runWorker(stats?: any) {
       if (serverInvalidated) {
         workerPort = null;
         workerPortPromise = null;
 
         serverInvalidated = false;
 
-        if (stats.hasErrors()) {
+        if (stats?.hasErrors()) {
           // всплыли ошибки при сборке - просто игнорим калбек чтобы не падать ниже и дать возможность выполнить пересборку
           return;
         }
@@ -313,6 +317,29 @@ export const serverRunner = ({
 
         await send(worker, 'script', { filename: realFilename, script });
       }
+    }
+
+    // отключаем watch за при выключенном rebuild
+    if (!configManager.noServerRebuild) {
+      const watchedFileName = 'env.development.js';
+      try {
+        const envPath = path.resolve(process.cwd(), watchedFileName);
+        const watchHandler = (_changedFilePath) => {
+          console.log(chalk.yellow(`${envPath} changed, restart server...`));
+          serverInvalidated = true;
+          runWorker();
+        };
+
+        chokidar.watch(envPath).on('change', watchHandler);
+      } catch (err) {
+        console.error(
+          `Something went wrong while watching for changes in ${watchedFileName}: ${err}`
+        );
+      }
+    }
+
+    compiler.hooks.done.tap(HOOK_NAME, async (stats) => {
+      runWorker(stats);
     });
   };
 };
