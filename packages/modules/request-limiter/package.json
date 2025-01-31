@@ -25,7 +25,8 @@
   "dependencies": {
     "@tinkoff/errors": "0.0.0-stub",
     "fastify-plugin": "^4.2.1",
-    "on-finished": "^2.3.0"
+    "on-finished": "^2.3.0",
+    "@tramvai/tokens-metrics": "0.0.0-stub"
   },
   "devDependencies": {},
   "peerDependencies": {

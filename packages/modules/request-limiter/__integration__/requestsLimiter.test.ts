@@ -98,6 +98,17 @@ describe('modules/requestsLimiter', () => {
       expect(metricsResponse).toContain('http_requests_total{method="GET",status="200"}');
       expect(metricsResponse).toContain('http_requests_total{method="GET",status="429"}');
       expect(metricsResponse).toContain('http_requests_total{method="GET",status="404"}');
+
+      expect(metricsResponse).toContain('http_requests_limiter_queue_size');
+      expect(metricsResponse).toContain('http_requests_limiter_queue_limit');
+      expect(metricsResponse).toContain('http_requests_limiter_current_requests');
+      expect(metricsResponse).toContain('http_requests_limiter_current_requests_limit');
+      expect(metricsResponse).toContain(
+        'http_requests_limiter_requests_queued_seconds_count{result="take"}'
+      );
+      expect(metricsResponse).toContain(
+        'http_requests_limiter_requests_queued_seconds_count{result="drop"}'
+      );
     },
     JEST_TIMEOUT
   );
