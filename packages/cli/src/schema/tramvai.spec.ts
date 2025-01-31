@@ -145,6 +145,7 @@ describe('JSON schema для tramvai.json', () => {
             "sourceMap": false,
             "splitChunks": {
               "commonChunkSplitNumber": 3,
+              "frameworkChunk": false,
               "granularChunksMinSize": 20000,
               "granularChunksSplitNumber": 2,
               "mode": "granularChunks",

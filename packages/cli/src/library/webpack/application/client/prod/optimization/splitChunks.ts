@@ -65,6 +65,50 @@ export const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]
   return topLevelFrameworkPaths;
 };
 
+const tramvaiScopes = ['@tramvai/', '@tramvai-tinkoff/'];
+const tinkoffPackages = [
+  '@tinkoff/router',
+  '@tinkoff/logger',
+  '@tinkoff/dippy',
+  '@tinkoff/user-agent',
+  '@tinkoff/module-loader-client',
+  '@tinkoff/meta-tags-generate',
+  '@tinkoff/browser-cookies',
+  '@tinkoff/errors',
+  '@tinkoff/layout-factory',
+  '@tinkoff/url',
+  '@tinkoff/roles',
+  '@tinkoff/hook-runner',
+  '@tinkoff/pubsub',
+  '@tinkoff/browser-timings',
+];
+const tinkoffPackagesSet = new Set(tinkoffPackages);
+
+function isTramvaiPackage(packageName: string | undefined) {
+  if (!packageName) return false;
+
+  return (
+    tramvaiScopes.some((scope) => packageName.startsWith(scope)) ||
+    tinkoffPackagesSet.has(packageName)
+  );
+}
+
+function normalizePath(packagePath: string) {
+  return packagePath.endsWith('/') ? packagePath : `${packagePath}/`;
+}
+
+const tramvaiPackagesPaths = [...tramvaiScopes, ...tinkoffPackages].map((packageName) =>
+  normalizePath(`/node_modules/${packageName}`)
+);
+
+function isTramvaiResource(resource: string | undefined) {
+  if (!resource) return false;
+
+  return tramvaiPackagesPaths.some((tramvaiPackagePath) => resource.includes(tramvaiPackagePath));
+}
+
+type CacheGroup = Exclude<Required<SplitChunksOptions>, boolean>['cacheGroups'][string];
+
 // eslint-disable-next-line max-statements
 export const splitChunksConfig =
   (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
@@ -72,13 +116,13 @@ export const splitChunksConfig =
 
     const topLevelFrameworkPaths = resolveFrameworksPaths(rootDir, ['react', 'react-dom']);
 
-    const reactCacheGroup: Exclude<Required<SplitChunksOptions>, boolean>['cacheGroups'][string] = {
+    const reactCacheGroup: CacheGroup = {
       chunks: 'all',
       name: 'react',
       // This regex ignores nested copies of framework libraries so they're bundled with their issuer.
       // test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
       test(module: webpack.Module) {
-        const resource = module.nameForCondition && module.nameForCondition();
+        const resource = module.nameForCondition?.();
 
         if (!resource) {
           return false;
@@ -93,6 +137,24 @@ export const splitChunksConfig =
       // Don't let webpack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
       enforce: true,
     };
+
+    const tramvaiCacheGroup: CacheGroup = splitChunks.frameworkChunk
+      ? {
+          chunks: 'all',
+          name: 'tramvai',
+          test(module: webpack.Module) {
+            const resource = module.nameForCondition?.();
+            const packageName = (module as webpack.NormalModule).resourceResolveData
+              ?.descriptionFileData?.name as string | undefined;
+
+            return isTramvaiPackage(packageName) || isTramvaiResource(resource);
+          },
+          priority: 35,
+          // Don't let webpack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
+          enforce: true,
+        }
+      : false;
+
     let webpackSplitChunks: SplitChunksOptions = false;
 
     switch (splitChunks.mode) {
@@ -130,6 +192,7 @@ export const splitChunksConfig =
             default: false,
             defaultVendors: false,
             reactCacheGroup,
+            tramvaiCacheGroup,
             shared,
           },
         };
@@ -141,6 +204,7 @@ export const splitChunksConfig =
             default: false,
             defaultVendors: false,
             reactCacheGroup,
+            tramvaiCacheGroup,
             commons: {
               name: 'common-chunk',
               minChunks: splitChunks.commonChunkSplitNumber,
