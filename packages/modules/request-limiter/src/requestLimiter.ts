@@ -23,6 +23,16 @@ export interface RequestLimiterOptions {
   };
 }
 
+export type RequestQueuedResult = 'drop' | 'take';
+
+export interface RequestsLimiterMetrics {
+  collectQueueSize: (v: number) => void;
+  collectQueueLimit: (v: number) => void;
+  collectCurrentRequests: (v: number) => void;
+  collectCurrentRequestsLimit: (v: number) => void;
+  collectRequestsQueuedTime: (result: RequestQueuedResult, duration: number) => void;
+}
+
 export interface RequestLimiterRequest {
   req: FastifyRequest;
   res: FastifyReply;
@@ -34,15 +44,20 @@ const resolution = 10;
 export class RequestLimiter {
   private currentActive = 0;
   private eventLoopDelay = 0;
-  private queue = new DoubleLinkedList<RequestLimiterRequest>();
+  private queue = new DoubleLinkedList<{
+    requestLimiterRequest: RequestLimiterRequest;
+    timestamp: number;
+  }>();
+
   private activeRequestLimit: number;
   private queueLimit: number;
   private error: RequestLimiterOptions['error'];
   private minimalActiveRequestLimit: number;
   private maxEventLoopDelay: number;
   private eventLoopHistogram: IntervalHistogram;
+  private metrics: RequestsLimiterMetrics;
 
-  constructor(options: RequestLimiterOptions) {
+  constructor(options: RequestLimiterOptions, metrics: RequestsLimiterMetrics) {
     const { limit, queue, maxEventLoopDelay, error } = options;
 
     this.activeRequestLimit = limit;
@@ -50,7 +65,9 @@ export class RequestLimiter {
     this.queueLimit = queue;
     this.error = error;
     this.maxEventLoopDelay = maxEventLoopDelay;
+    this.metrics = metrics;
 
+    this.metrics.collectQueueLimit(this.queueLimit);
     this.eventLoopHistogram = monitorEventLoopDelay({ resolution });
     this.eventLoopHistogram.enable();
     const timer = setInterval(() => this.nextTick(), 1000);
@@ -58,8 +75,18 @@ export class RequestLimiter {
   }
 
   onResponse() {
-    this.currentActive--;
+    this.updateCurrentActiveRequests(this.currentActive - 1);
     this.loop();
+  }
+
+  private updateCurrentActiveRequests(value) {
+    this.currentActive = value;
+    this.metrics.collectCurrentRequests(value);
+  }
+
+  private updateActiveRequestLimit(value: number) {
+    this.activeRequestLimit = value;
+    this.metrics.collectCurrentRequestsLimit(value);
   }
 
   // General idea is change limits every second. Because if DDOS was happened we need some time to get problem with event loop. And better if we slowly adapt
@@ -70,11 +97,11 @@ export class RequestLimiter {
 
     if (this.eventLoopDelay <= this.maxEventLoopDelay) {
       if (this.currentActive >= this.activeRequestLimit) {
-        this.activeRequestLimit++;
+        this.updateActiveRequestLimit(this.activeRequestLimit + 1);
       }
       // We need to have minimalActiveRequestLimit
     } else if (this.activeRequestLimit > this.minimalActiveRequestLimit) {
-      this.activeRequestLimit--;
+      this.updateActiveRequestLimit(this.activeRequestLimit - 1);
     }
   }
 
@@ -85,21 +112,29 @@ export class RequestLimiter {
     }
 
     if (this.queue.length >= this.queueLimit) {
-      const lastNode = this.queue.shift();
-      lastNode.next(new HttpError(this.error));
+      const { requestLimiterRequest, timestamp } = this.queue.shift();
+      requestLimiterRequest.next(new HttpError(this.error));
+
+      this.metrics.collectRequestsQueuedTime('drop', Date.now() - timestamp);
     }
-    this.queue.push(request);
+    this.queue.push({ requestLimiterRequest: request, timestamp: Date.now() });
+    this.metrics.collectQueueSize(this.queue.size());
   }
 
   private loop() {
     while (this.queue.length > 0 && this.currentActive < this.activeRequestLimit) {
       // better if we start with new requests. Because more opportunity to answer before client cancel request
-      this.run(this.queue.pop());
+      const { requestLimiterRequest, timestamp } = this.queue.pop();
+
+      this.run(requestLimiterRequest);
+
+      this.metrics.collectRequestsQueuedTime('take', Date.now() - timestamp);
+      this.metrics.collectQueueSize(this.queue.size());
     }
   }
 
   private run({ next, res }: RequestLimiterRequest) {
-    this.currentActive++;
+    this.updateCurrentActiveRequests(this.currentActive + 1);
 
     // onFinished doesn't work OK in DEV mode. Just stuck with high load without any reasons
     // fastify: it only works this way with on-finished, as using hook `onRequest` is not enough to handle all of the requests

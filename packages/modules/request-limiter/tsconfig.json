@@ -1,29 +1,32 @@
 {
-  "extends": "../../../tsconfig.lib.json",
-  "include": [
-    "./src"
-  ],
-  "compilerOptions": {
-    "outDir": "./lib",
-    "declarationDir": "./lib",
-    "rootDir": "./src",
-    "strict": false
-  },
-  "references": [
-    {
-      "path": "../../libs/dippy"
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "outDir": "./lib",
+        "declarationDir": "./lib",
+        "rootDir": "./src",
+        "strict": false
     },
-    {
-      "path": "../../tramvai/core"
-    },
-    {
-      "path": "../../libs/errors"
-    },
-    {
-      "path": "../../tokens/server-private"
-    },
-    {
-      "path": "../../tokens/common"
-    }
-  ]
+    "references": [
+        {
+            "path": "../../libs/dippy"
+        },
+        {
+            "path": "../../tramvai/core"
+        },
+        {
+            "path": "../../libs/errors"
+        },
+        {
+            "path": "../../tokens/server-private"
+        },
+        {
+            "path": "../../tokens/common"
+        },
+        {
+            "path": "../../tokens/metrics"
+        }
+    ]
 }
