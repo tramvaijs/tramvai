@@ -102,7 +102,7 @@ The options shown in the table below may be set to instance of [Cookies.construc
 
 | Name       | Type                       | Default | Description
 |------------|----------------------------|---------|--------
-| `expires`  | `Number`, `Date`, `String` | `0`     | Configure when the cookie expires by using one of the following types as value:<ul><li>A `Number` of days until the cookie expires. If set to `0` the cookie will expire at the end of the session.</li><li>A `Date` object such as `new Date(2018, 3, 27)`.</li><li>A `String` in a format recognized by [Date.parse()][ref-date-parse].</li></ul>
+| `expires`  | `Number`, `Date`, `String` | `0`     | Configure when the cookie expires by using one of the following types as value:<ul><li>A `Number` of seconds until the cookie expires. If set to `0` the cookie will expire at the end of the session.</li><li>A `Date` object such as `new Date(2018, 3, 27)`.</li><li>A `String` in a format recognized by [Date.parse()][ref-date-parse].</li></ul>
 | `domain`   | `String`                   | `""`    | The [domain][ref-cookie-domain] from where the cookie is readable.<ul><li>If set to `""` the current domain will be used.</li></ul>
 | `path`     | `String`                   | `"/"`   | The path from where the cookie is readable.<ul><li>The default value of `"/"` allows the cookie to be readable from all paths.</li><li>If set to `""` the cookie will only be readable from the current browser path.</li><li>Note that cookies don't support relative paths such as `"../../some/path"` so paths must be absolute like `"/some/path"`.</li></ul>
 | `secure`   | `Boolean`                  | `false` | If true the cookie will only be transmitted over secure protocols like https.
