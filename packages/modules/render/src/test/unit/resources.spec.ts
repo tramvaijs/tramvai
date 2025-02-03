@@ -84,6 +84,53 @@ describe('testPageResources', () => {
     `);
   });
 
+  it('should add integrity to preloaded js resources', async () => {
+    const { render, runLine } = testPageResources({
+      providers: [
+        provide({
+          provide: commandLineListTokens.resolvePageDeps,
+          multi: true,
+          useFactory: ({ resourcesRegistry }) => {
+            return () => {
+              resourcesRegistry.register({
+                slot: ResourceSlot.BODY_START,
+                type: ResourceType.script,
+                payload: 'https://scripts.org/script2.js',
+                attrs: {
+                  integrity: 'foo',
+                },
+              });
+              resourcesRegistry.register({
+                slot: ResourceSlot.BODY_START,
+                type: ResourceType.script,
+                payload: 'https://scripts.org/script1.js',
+              });
+            };
+          },
+          deps: {
+            resourcesRegistry: RESOURCES_REGISTRY,
+          },
+        }),
+      ],
+    });
+
+    expect(render()!.body).toMatchInlineSnapshot(`""`);
+
+    await runLine(commandLineListTokens.resolvePageDeps);
+
+    expect(render()!.body).toMatchInlineSnapshot(`
+      "
+          <script defer="defer"
+            charset="utf-8"
+            crossorigin="anonymous"
+            integrity="foo"
+            src="https://scripts.org/script2.js"
+          ></script>
+          <script defer="defer" charset="utf-8" crossorigin="anonymous" src="https://scripts.org/script1.js"></script>
+        "
+    `);
+  });
+
   it('should allow to pass modules', async () => {
     @Module({
       providers: [
