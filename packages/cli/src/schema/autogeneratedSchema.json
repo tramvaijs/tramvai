@@ -116,6 +116,11 @@
                 "granularChunks"
               ]
             },
+            "frameworkChunk": {
+              "title": "Move tramvai packages into a separate chunk",
+              "default": false,
+              "type": "boolean"
+            },
             "granularChunksSplitNumber": {
               "title": "Move module to shared chunk if used at least as many times in other chunks",
               "default": 2,
@@ -1191,23 +1196,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6873": {
+                        "__@match@6874": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6875": {
+                        "__@replace@6876": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6878": {
+                        "__@search@6879": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6880": {
+                        "__@split@6881": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6882": {
+                        "__@matchAll@6883": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1907,23 +1912,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6873": {
+                        "__@match@6874": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6875": {
+                        "__@replace@6876": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6878": {
+                        "__@search@6879": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6880": {
+                        "__@split@6881": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6882": {
+                        "__@matchAll@6883": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2623,23 +2628,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6873": {
+                        "__@match@6874": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6875": {
+                        "__@replace@6876": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6878": {
+                        "__@search@6879": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6880": {
+                        "__@split@6881": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6882": {
+                        "__@matchAll@6883": {
                           "type": "object",
                           "additionalProperties": false
                         }

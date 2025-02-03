@@ -54,7 +54,6 @@ The strategy is included in the CLI by default, all common code from bundles and
 
 For applications with a lot of bundles, `common-chunk.js` can include a huge amount of code that is not needed on every single page, and it is worth either increasing the `commonChunkSplitNumber` or using the Granular Chunks strategy. Example configuration to increase the minimum number of chunks using shared code:
 
-
 ```json
 {
   "projects": {
@@ -94,3 +93,24 @@ For applications that have only one tramvai bundle for all pages, or separate th
 **Why not leave the common chunk if it doesn't interfere?** The problem is in third-party libraries that can use dynamic `import` under the hood, while the application may not use this code, but it may end up in the common chunk, which will be loaded on every page.
 
 Also, if your application is serving multiple pages and separating the code at the page component level via [@tramvai/react lazy](how-to/how-create-async-component.md), it makes sense to consider other strategies, since duplicates will appear in dynamic chunks of pages.
+
+### Framework chunk
+
+The `frameworkChunk` option allows you to optimize the caching of JS files between releases and improve the loading speed of your web application. By enabling this option, all tramvai-related packages are moved to a separate chunk - `tramvai.js`, which can be cached independently of your application code.
+
+This option requires the SplitChunksPlugin to be enabled, otherwise it will have no effect.
+
+```json
+{
+  "projects": {
+    "{appName}": {
+      "splitChunks": {
+        "mode": "granularChunks",
+        "frameworkChunk": true
+      }
+    }
+  }
+}
+```
+
+By default `frameworkChunk` option is disabled.

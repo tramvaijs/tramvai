@@ -190,6 +190,11 @@ export interface ApplicationConfigEntry extends CliConfigEntry {
      */
     mode: 'granularChunks' | 'commonChunk' | false;
     /**
+     * @title Move tramvai packages into a separate chunk
+     * @default false
+     */
+    frameworkChunk: boolean;
+    /**
      * @title Move module to shared chunk if used at least as many times in other chunks
      * @default 2
      */

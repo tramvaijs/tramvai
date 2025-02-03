@@ -115,6 +115,7 @@ it('should populate defaults for config', () => {
           "sourceMap": false,
           "splitChunks": {
             "commonChunkSplitNumber": 3,
+            "frameworkChunk": false,
             "granularChunksMinSize": 20000,
             "granularChunksSplitNumber": 2,
             "mode": "granularChunks",
@@ -363,6 +364,7 @@ it('should populate defaults for overridable options', () => {
           "sourceMap": false,
           "splitChunks": {
             "commonChunkSplitNumber": 3,
+            "frameworkChunk": false,
             "granularChunksMinSize": 20000,
             "granularChunksSplitNumber": 2,
             "mode": "granularChunks",
