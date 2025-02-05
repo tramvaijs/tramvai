@@ -330,7 +330,16 @@ export const serverRunner = ({
           runWorker();
         };
 
-        chokidar.watch(envPath).on('change', watchHandler);
+        const watcher = chokidar.watch(envPath);
+        watcher.on('change', watchHandler);
+
+        di.register({
+          provide: CLOSE_HANDLER_TOKEN,
+          multi: true,
+          useValue: () => {
+            watcher.unwatch(envPath);
+          },
+        });
       } catch (err) {
         console.error(
           `Something went wrong while watching for changes in ${watchedFileName}: ${err}`
