@@ -118,6 +118,13 @@ export const routes: Route[] = [
     },
   },
   {
+    name: 'guard-query',
+    path: '/guard-query/',
+    config: {
+      checkQuery: true,
+    },
+  },
+  {
     name: 'use-route-1',
     path: '/useroute/1/',
     config: {

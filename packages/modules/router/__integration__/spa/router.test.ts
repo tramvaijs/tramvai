@@ -210,6 +210,22 @@ describe('router/spa', () => {
       expect(page.url()).toBe(`${serverUrl}/test/`);
     });
 
+    it('should change query by guard at first load', async () => {
+      await getApp()
+        .request('/guard-query/')
+        .expect(307)
+        .expect('Location', `/guard-query/?test=test`);
+    });
+
+    it('should change query by guard on spa', async () => {
+      const { serverUrl } = getApp();
+      const { page, router } = await getPageWrapper('/');
+
+      await router.navigate('/guard-query/');
+
+      expect(page.url()).toBe(`${serverUrl}/guard-query/?test=test`);
+    });
+
     // eslint-disable-next-line jest/expect-expect
     it('should redirect from action with default httpStatus', async () => {
       await getApp()

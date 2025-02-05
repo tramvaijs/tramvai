@@ -14,15 +14,27 @@ declare global {
 
 export const providers: Provider[] = [
   { provide: COMBINE_REDUCERS, multi: true, useValue: [ActionsStore] },
-  {
+  provide({
     provide: ROUTER_GUARD_TOKEN,
     multi: true,
     useValue: async ({ to }) => {
-      if (to.config.guardRedirect) {
+      if (to?.config?.guardRedirect !== undefined) {
         return to.config.guardRedirect;
       }
     },
-  },
+  }),
+  provide({
+    provide: ROUTER_GUARD_TOKEN,
+    useValue: async ({ to, url }) => {
+      if (to?.config?.checkQuery !== undefined && url?.query.test === undefined) {
+        return {
+          query: {
+            test: 'test',
+          },
+        };
+      }
+    },
+  }),
   provide({
     provide: commandLineListTokens.customerStart,
     multi: true,
