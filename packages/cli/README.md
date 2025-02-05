@@ -229,6 +229,14 @@ tramvai start my-app --debug
 
 Then open chrome devTools, click on NodeJs logo in the upper left corner. New window with the nodejs devtools will be opened that allows to debug memory and cpu usage, debug code and take the performance profiles.
 
+Also `--debug` supports `wait` and `break` values for `--inspect` ([doc](https://nodejs.org/en/learn/getting-started/debugging#command-line-options)).
+
+```sh
+tramvai start my-app --debug=wait
+```
+
+Will start tramvai with `--inspect-wait`.
+
 ### Get details for deprecated and warning logs
 
 It might be useful to get the stacktraces of some of the warnings.
@@ -284,6 +292,28 @@ You can use `NODE_OPTIONS` env variable, e.g.:
 ```bash
 NODE_OPTIONS="--max-semi-space-size=64" tramvai start-prod {appName}
 ```
+
+### How to debug webpack build?
+
+For webpack build debug use `TRAMVAI_DEBUG_BUILD` env variable.
+
+```bash
+TRAMVAI_DEBUG_BUILD=1 tramvai build {appName}
+```
+
+You can also change the inspect command.
+
+```bash
+TRAMVAI_DEBUG_BUILD=wait tramvai build {appName}
+```
+
+Equal to `--inspect-wait`.
+
+```bash
+TRAMVAI_DEBUG_BUILD=break tramvai build {appName}
+```
+
+Equal to `--inspect-break`.
 
 ### How to get CPU profile of @tramvai/cli work?
 

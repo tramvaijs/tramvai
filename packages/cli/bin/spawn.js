@@ -4,10 +4,12 @@ const exit = require('exit');
 const args = process.argv.slice(2);
 const maxMemory = process.env.MAX_USED_MEMORY || '3000';
 const maxSemiSpaceSize = process.env.MAX_SEMI_SPACE_SIZE || '128';
+const debugBuild = process.env.TRAMVAI_DEBUG_BUILD;
 const defaultArgs = [
   `--max-old-space-size=${maxMemory}`,
   `--max-semi-space-size=${maxSemiSpaceSize}`,
-];
+  getDebugOption(debugBuild),
+].filter(Boolean);
 
 const paramsIndex = args.findIndex((x) => !x.startsWith('-'));
 const nodeArgs = paramsIndex > 0 ? args.slice(0, paramsIndex) : [];
@@ -42,3 +44,17 @@ It's unexpected, please check available/used memory and cpu while running last c
 
   return controller;
 };
+
+function getDebugOption(debugType) {
+  if (debugType === 'wait') {
+    return '--inspect-wait';
+  }
+
+  if (debugType === 'break') {
+    return '--inspect-brk';
+  }
+
+  if (debugType) {
+    return '--inspect';
+  }
+}

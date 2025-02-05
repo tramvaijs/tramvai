@@ -2,7 +2,8 @@ import path from 'path';
 import type { Worker } from 'cluster';
 import cluster from 'cluster';
 import type { WorkerBridgeFactory } from '../base/types';
-import { DEBUG_ARGV, TRACE_ARGV } from '../../../../../config/constants';
+import { TRACE_ARGV } from '../../../../../config/constants';
+import { getDebugArg } from '../../../../../config/utils';
 import { SERVER_CONFIG_MANAGER_TOKEN } from '../../../tokens';
 import {
   STDOUT_TOKEN,
@@ -24,7 +25,7 @@ export const ProcessWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
         // указываем другой файл для работы cluster.fork
         exec: path.resolve(__dirname, './worker.js'),
         execArgv: ([] as string[]).concat(
-          configManager.debug ? DEBUG_ARGV : [],
+          getDebugArg(configManager.debug),
           configManager.trace ? TRACE_ARGV : []
         ),
         // устанавливаем в качестве дебага дефолтный порт мастера, т.к. у нас и так один процесс может работать

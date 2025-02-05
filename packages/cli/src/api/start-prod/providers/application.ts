@@ -12,7 +12,7 @@ import {
 } from '../../../di/tokens';
 import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
 import { CLOSE_HANDLER_TOKEN, SERVER_PROCESS_TOKEN } from '../tokens';
-import { DEBUG_ARGV } from '../../../config/constants';
+import { getDebugArg } from '../../../config/utils';
 import { safeRequire } from '../../../utils/safeRequire';
 import type { ConfigManager } from '../../../config/configManager';
 import { createConfigManager } from '../../../config/configManager';
@@ -62,7 +62,7 @@ export const applicationsProviders: readonly Provider[] = [
       const { debug, port, assetsPrefix, https } = serverConfigManager;
       const root = serverConfigManager.buildPath;
       return fork(path.resolve(root, 'server.js'), [], {
-        execArgv: debug ? DEBUG_ARGV : [],
+        execArgv: getDebugArg(debug),
         cwd: root,
         env: {
           ...safeRequire(path.resolve(process.cwd(), 'env.development'), true),

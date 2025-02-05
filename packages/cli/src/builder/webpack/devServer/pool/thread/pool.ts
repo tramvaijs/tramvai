@@ -1,7 +1,8 @@
 import path from 'path';
 import { Worker } from 'worker_threads';
 import type { WorkerBridgeFactory } from '../base/types';
-import { DEBUG_ARGV, TRACE_ARGV } from '../../../../../config/constants';
+import { TRACE_ARGV } from '../../../../../config/constants';
+import { getDebugArg } from '../../../../../config/utils';
 import { SERVER_CONFIG_MANAGER_TOKEN } from '../../../tokens';
 import { COMMAND_PARAMETERS_TOKEN, CONFIG_ROOT_DIR_TOKEN } from '../../../../../di/tokens';
 
@@ -27,7 +28,7 @@ export const ThreadWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
 
       const worker = new Worker(path.resolve(__dirname, './worker.js'), {
         execArgv: [].concat(
-          configManager.debug ? DEBUG_ARGV : [],
+          getDebugArg(configManager.debug),
           configManager.trace ? TRACE_ARGV : []
         ),
         env: {

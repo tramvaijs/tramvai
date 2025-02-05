@@ -25,7 +25,7 @@ export interface Settings<E extends Env> {
   rootDir?: string;
   version?: string;
   buildType?: BuildType;
-  debug?: boolean;
+  debug?: string | boolean;
   verboseWebpack?: boolean;
   trace?: boolean;
   sourceMap?: boolean;
