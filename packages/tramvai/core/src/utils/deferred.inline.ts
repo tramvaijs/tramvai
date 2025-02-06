@@ -16,16 +16,13 @@ export class Deferred<T> {
   };
 
   reset = () => {
+    this.status = 'pending';
     this.resolveData = undefined;
     this.rejectReason = undefined;
     this.promise = this.initPromise();
   };
 
-  constructor() {
-    this.promise = this.initPromise();
-  }
-
-  private initPromise(): Promise<T> {
+  private initPromise = (): Promise<T> => {
     return new Promise((resolve, reject) => {
       this.resolve = (value) => {
         if (this.status === 'pending') {
@@ -43,5 +40,9 @@ export class Deferred<T> {
         }
       };
     });
+  };
+
+  constructor() {
+    this.promise = this.initPromise();
   }
 }
