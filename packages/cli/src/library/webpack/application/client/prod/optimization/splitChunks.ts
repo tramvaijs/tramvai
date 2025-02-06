@@ -140,7 +140,7 @@ export const splitChunksConfig =
 
     const tramvaiCacheGroup: CacheGroup = splitChunks.frameworkChunk
       ? {
-          chunks: 'all',
+          chunks: 'initial',
           name: 'tramvai',
           test(module: webpack.Module) {
             const resource = module.nameForCondition?.();
