@@ -187,6 +187,10 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     },
   });
 
+  if (retryOptions) {
+    plugins.push(retry(retryOptions));
+  }
+
   if (validator || errorValidator) {
     plugins.push(
       validate({
@@ -195,10 +199,6 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
         allowFallback: true,
       })
     );
-  }
-
-  if (retryOptions) {
-    plugins.push(retry(retryOptions));
   }
 
   // Executes only on server
