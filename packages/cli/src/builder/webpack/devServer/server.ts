@@ -337,7 +337,7 @@ export const serverRunner = ({
           provide: CLOSE_HANDLER_TOKEN,
           multi: true,
           useValue: () => {
-            watcher.unwatch(envPath);
+            watcher.close();
           },
         });
       } catch (err) {
