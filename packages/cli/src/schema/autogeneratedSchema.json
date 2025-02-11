@@ -1283,9 +1283,9 @@
                 "eval",
                 "eval-cheap-module-source-map",
                 "eval-cheap-source-map",
-                "eval-source-map"
-              ],
-              "type": "string"
+                "eval-source-map",
+                false
+              ]
             }
           },
           "additionalProperties": false
@@ -2038,9 +2038,9 @@
                 "eval",
                 "eval-cheap-module-source-map",
                 "eval-cheap-source-map",
-                "eval-source-map"
-              ],
-              "type": "string"
+                "eval-source-map",
+                false
+              ]
             }
           },
           "additionalProperties": false
@@ -2793,9 +2793,9 @@
                 "eval",
                 "eval-cheap-module-source-map",
                 "eval-cheap-source-map",
-                "eval-source-map"
-              ],
-              "type": "string"
+                "eval-source-map",
+                false
+              ]
             }
           },
           "additionalProperties": false

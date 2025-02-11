@@ -434,6 +434,7 @@ declare module 'webpack-chain' {
     }
 
     type DevTool =
+      | boolean
       | 'eval'
       | 'eval-cheap-source-map'
       | 'eval-cheap-module-source-map'

@@ -33,6 +33,9 @@ beforeAll(async () => {
     strictErrorHandle: true,
     config: {
       name: 'swc-app',
+      webpack: {
+        devtool: 'eval',
+      },
       type: 'application',
       root: './',
       experiments: {

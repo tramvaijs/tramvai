@@ -251,7 +251,12 @@ export interface CliConfigEntry extends ConfigEntry {
     /**
      * @title Use the specified type of source maps for building in development mode
      */
-    devtool: 'eval' | 'eval-cheap-source-map' | 'eval-cheap-module-source-map' | 'eval-source-map';
+    devtool:
+      | false
+      | 'eval'
+      | 'eval-cheap-source-map'
+      | 'eval-cheap-module-source-map'
+      | 'eval-source-map';
   };
 
   // options that affect only production builds

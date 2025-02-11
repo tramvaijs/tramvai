@@ -45,7 +45,7 @@ export const webpackClientConfig = ({
 
   config.mode('development');
 
-  config.devtool(configManager.webpack.devtool ?? 'eval');
+  config.devtool(configManager.webpack.devtool ?? false);
 
   if (configManager.sourceMap) {
     config.batch(sourcemaps(configManager));
