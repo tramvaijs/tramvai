@@ -359,8 +359,10 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         disableCache: true,
       });
 
-      await httpClient.request({ path: 'first', cache: true });
-      await httpClient.request({ path: 'first', cache: true });
+      await Promise.all([
+        httpClient.request({ path: 'first', cache: true }),
+        httpClient.request({ path: 'first', cache: true }),
+      ]);
 
       expect(firstHandler).toBeCalledTimes(1);
 
@@ -380,8 +382,10 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         baseUrl: `http://localhost:${port}/`,
       });
 
-      const { status: first } = await httpClient.request({ path: 'json' });
-      const { status: second } = await httpClient.request({ path: 'json' });
+      const [{ status: first }, { status: second }] = await Promise.all([
+        httpClient.request({ path: 'json' }),
+        httpClient.request({ path: 'json' }),
+      ]);
 
       expect(handler).toBeCalledTimes(1);
       expect(first).toBe(STATUS);
@@ -610,6 +614,36 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         await httpClient.get('static-file');
 
         expect(staticFileHandler).toHaveBeenCalledTimes(2);
+
+        await terminate();
+      });
+
+      it('cached requests include response status code when etag cache plugin enabled', async () => {
+        const handler: Handler = jest.fn();
+        const { port, terminate } = await startMockServer((app) => {
+          app.get('/json', handler);
+        });
+        const httpClient = createAdapter({
+          logger: loggerFactoryMock,
+          baseUrl: `http://localhost:${port}/`,
+          allowStale: false,
+          etagCacheOptions: {
+            enabled: true,
+          },
+        });
+
+        (handler as jest.Mock).mockImplementationOnce(successEtagHandler);
+        await httpClient.request({ path: 'json' });
+
+        (handler as jest.Mock).mockImplementationOnce(notModifiedEtagHandler);
+        const [{ status: first }, { status: second }] = await Promise.all([
+          httpClient.request({ path: 'json' }),
+          httpClient.request({ path: 'json' }),
+        ]);
+
+        expect(handler).toBeCalledTimes(1);
+        expect(first).toBe(200);
+        expect(first).toEqual(second);
 
         await terminate();
       });
