@@ -21,9 +21,9 @@
   },
   "dependencies": {
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-cache-deduplicate": "^0.10.1",
-    "@tinkoff/request-plugin-cache-etag": "^0.4.2",
-    "@tinkoff/request-plugin-cache-memory": "^0.10.1",
+    "@tinkoff/request-plugin-cache-deduplicate": "^0.10.3",
+    "@tinkoff/request-plugin-cache-etag": "^0.4.3",
+    "@tinkoff/request-plugin-cache-memory": "^0.10.2",
     "@tinkoff/request-plugin-circuit-breaker": "^0.4.0",
     "@tinkoff/request-plugin-log": "^0.10.0",
     "@tinkoff/request-plugin-protocol-http": "^0.12.1",
