@@ -127,6 +127,7 @@ it('should populate defaults for config', () => {
           "transpileOnlyModernLibs": true,
           "type": "application",
           "webpack": {},
+          "withModulesStats": false,
         },
         "child-app": {
           "cssMinimize": "css-minimizer",
@@ -387,6 +388,7 @@ it('should populate defaults for overridable options', () => {
           "webpack": {
             "devtool": "eval-source-map",
           },
+          "withModulesStats": false,
         },
         "child-app": {
           "cssMinimize": "css-minimizer",

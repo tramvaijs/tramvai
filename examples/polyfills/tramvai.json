@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "polyfills": {
+      "name": "polyfills",
+      "polyfill": "src/polyfill.ts",
+      "root": "src",
+      "modern": false,
+      "type": "application",
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "splitChunks": {
+        "mode": "granularChunks"
+      },
+      "sourceMap": {
+        "development": false,
+        "production": false
+      }
+    }
+  }
+}

@@ -9,6 +9,7 @@ import { ModuleFederationIgnoreEntries } from '../plugins/ModuleFederationIgnore
 import { rootErrorBoundaryFactory } from '../blocks/rootErrorBoundary';
 import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
 import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
+import { FileStatsPlugin } from '../plugins/FileStats';
 
 export const commonApplication =
   (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
@@ -18,6 +19,18 @@ export const commonApplication =
         shared: getSharedModules(configManager),
       } as ModuleFederationPluginOptions,
     ]);
+
+    if (configManager.withModulesStats) {
+      config.plugin('stats-modules-plugin').use(FileStatsPlugin, [
+        {
+          filename: 'stats-modules.json',
+          stats: {
+            chunks: true,
+            chunkModules: true,
+          },
+        },
+      ]);
+    }
 
     config
       .plugin('module-federation-ignore-entries')
