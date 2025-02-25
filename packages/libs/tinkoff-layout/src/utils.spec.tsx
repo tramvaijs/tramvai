@@ -6,12 +6,11 @@ import { composeLayoutOptions } from './utils';
 
 describe('composeLayoutOptions', () => {
   const createComponent = (name) => (props) => <div>{name}</div>;
-  const createWrapper = (name) => (Wrapped) => (props) =>
-    (
-      <div className={name}>
-        <Wrapped />
-      </div>
-    );
+  const createWrapper = (name) => (Wrapped) => (props) => (
+    <div className={name}>
+      <Wrapped />
+    </div>
+  );
 
   it('should compose options list', () => {
     const c1 = createComponent('c1');

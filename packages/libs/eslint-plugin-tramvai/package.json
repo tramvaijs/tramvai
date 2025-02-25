@@ -23,10 +23,10 @@
     "@tinkoff/utils": "^2.1.2"
   },
   "devDependencies": {
-    "@types/eslint": "^7.2.0",
-    "@typescript-eslint/parser": "^6.7.2",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.5.0"
+    "@babel/eslint-parser": "^7.26.8",
+    "@types/eslint": "^8.38.0",
+    "@typescript-eslint/parser": "^8.24.1",
+    "eslint": "^8.38.0"
   },
   "peerDependencies": {
     "eslint": ">=7.0.0"

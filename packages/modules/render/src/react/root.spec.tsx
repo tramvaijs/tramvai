@@ -10,8 +10,8 @@ import { useRoute } from '@tramvai/module-router';
 import { createMockDi } from '@tramvai/test-mocks';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { provide } from '@tinkoff/dippy';
-import { ComponentRegistry } from '../../../common/src/componentRegistry/componentRegistry';
-import { PageService } from '../../../router/src/modules/tokens/common/pageService';
+import { ComponentRegistry } from '@tramvai/module-common/src/componentRegistry/componentRegistry';
+import { PageService } from '@tramvai/module-router/src/modules/tokens/common/pageService';
 import { Root } from './root';
 
 jest.mock('@tramvai/module-router', () => ({

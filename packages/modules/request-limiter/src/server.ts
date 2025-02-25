@@ -48,11 +48,11 @@ export * from './tokens';
         const limit = envManager.get('REQUEST_LIMITER_LIMIT');
 
         const resultOptions = {
-          limit: limit ? Number(limit) : options?.limit ?? DEFAULT_OPTIONS.limit,
-          queue: queue ? Number(queue) : options?.queue ?? DEFAULT_OPTIONS.queue,
+          limit: limit ? Number(limit) : (options?.limit ?? DEFAULT_OPTIONS.limit),
+          queue: queue ? Number(queue) : (options?.queue ?? DEFAULT_OPTIONS.queue),
           maxEventLoopDelay: meld
             ? Number(meld)
-            : options?.maxEventLoopDelay ?? DEFAULT_OPTIONS.maxEventLoopDelay,
+            : (options?.maxEventLoopDelay ?? DEFAULT_OPTIONS.maxEventLoopDelay),
           error: options?.error ?? DEFAULT_OPTIONS.error,
         };
 

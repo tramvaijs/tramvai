@@ -232,7 +232,7 @@ export const sharedProviders: Provider[] = [
             (di.get({
               token: REGISTER_CLEAR_CACHE_TOKEN,
               optional: true,
-            }) as any as typeof REGISTER_CLEAR_CACHE_TOKEN[]) ?? [];
+            }) as any as (typeof REGISTER_CLEAR_CACHE_TOKEN)[]) ?? [];
 
           return Promise.all(registeredClearCache.map((clear) => clear(type)));
         });

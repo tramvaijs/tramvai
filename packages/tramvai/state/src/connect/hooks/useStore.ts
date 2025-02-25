@@ -15,6 +15,7 @@ export function useStore<S>(reducer: Reducer<S>): S {
   // и сохраняем в `addedReducerRef`, что бы удалить при unmount
   if (!context.hasStore(reducer)) {
     if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
       console.warn(`
 The store "${reducer.storeName}" has been used, but not registered via COMBINE_REDUCERS token.
 Have you forgot to register it? Note, that we are registering it for you to make things just work.

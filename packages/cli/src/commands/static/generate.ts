@@ -19,14 +19,17 @@ export const generateStatic = async (
   const { header = [], folder = '' } = params;
   const q = new PQueue(MAX_CONCURRENT);
   const promises = [];
-  const headers = header.reduce((result, item) => {
-    const [key, value] = item.split(':');
+  const headers = header.reduce(
+    (result, item) => {
+      const [key, value] = item.split(':');
 
-    // eslint-disable-next-line no-param-reassign
-    result[key.trim()] = value.trim();
+      // eslint-disable-next-line no-param-reassign
+      result[key.trim()] = value.trim();
 
-    return result;
-  }, {} as Record<string, string>);
+      return result;
+    },
+    {} as Record<string, string>
+  );
 
   const { rootDir, output } = configManager;
   const staticPath = resolve(rootDir, output.static, folder);

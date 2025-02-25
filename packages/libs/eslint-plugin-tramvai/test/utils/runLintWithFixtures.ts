@@ -1,10 +1,10 @@
-import { CLIEngine } from 'eslint';
+import { ESLint } from 'eslint';
 import path from 'path';
 import sortBy from '@tinkoff/utils/array/sortBy';
 import prop from '@tinkoff/utils/object/prop';
 
-export const runLintWithFixtures = (type: string, eslintConfig: Record<string, any>) => {
-  const cli = new CLIEngine({
+export const runLintWithFixtures = async (type: string, eslintConfig: Record<string, any>) => {
+  const cli = new ESLint({
     ignore: false,
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
     useEslintrc: false,
@@ -13,10 +13,11 @@ export const runLintWithFixtures = (type: string, eslintConfig: Record<string, a
       ...eslintConfig,
     },
   });
-  const targetDir = path.resolve(__dirname, '..', '__fixtures__', type);
-  const lintResult = cli.executeOnFiles([targetDir]);
 
-  return lintResult.results.reduce((results, { filePath, messages }) => {
+  const targetDir = path.resolve(__dirname, '..', '__fixtures__', type);
+  const lintResult = await cli.lintFiles([targetDir]);
+
+  return lintResult.reduce((results, { filePath, messages }) => {
     const sortedMessages = sortBy(prop('ruleId'), messages);
 
     // strip path

@@ -50,7 +50,7 @@ describe('server/static', () => {
     const appStatic = staticAppCommand(mockDeps);
     serverInstance = await appStatic();
 
-    expect(mockLogger.info).toBeCalledWith(`Running static server on 0.0.0.0:${serverPort}`);
+    expect(mockLogger.info).toHaveBeenCalledWith(`Running static server on 0.0.0.0:${serverPort}`);
     expect(serverInstance?.addresses()[0]).toMatchObject({
       address: '0.0.0.0',
       family: 'IPv4',
@@ -68,7 +68,9 @@ describe('server/static', () => {
 
     ENV_MOCK.HOST_STATIC = HOST_STATIC;
 
-    expect(mockLogger.info).toBeCalledWith(`Running static server on ${targetHost}:${serverPort}`);
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      `Running static server on ${targetHost}:${serverPort}`
+    );
     expect(serverInstance?.addresses()[0]).toMatchObject({
       address: targetHost,
       family: 'IPv4',
@@ -85,7 +87,7 @@ describe('server/static', () => {
 
     ENV_MOCK.HOST_STATIC = HOST_STATIC;
 
-    expect(mockLogger.info).toBeCalledWith(`Running static server on 0.0.0.0:${serverPort}`);
+    expect(mockLogger.info).toHaveBeenCalledWith(`Running static server on 0.0.0.0:${serverPort}`);
     expect(serverInstance?.addresses()[0]).toMatchObject({
       address: '0.0.0.0',
       family: 'IPv4',

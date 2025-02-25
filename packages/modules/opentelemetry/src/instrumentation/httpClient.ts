@@ -27,7 +27,7 @@ export const providers = [
         const url =
           request.url ??
           // todo add leading slash before path if needed
-          (request.baseUrl ? `${request.baseUrl}${request.path}` : request.path ?? '');
+          (request.baseUrl ? `${request.baseUrl}${request.path}` : (request.path ?? ''));
         const parsedUrl = new URL(
           request.query ? `${url}?${new URLSearchParams(request.query).toString()}` : url
         );

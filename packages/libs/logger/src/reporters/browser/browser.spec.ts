@@ -28,6 +28,7 @@ describe('@tinkoff/logger/reporters/browser', () => {
     // под капотом browser reporter вызывает console,
     // первые два аргумента - стилизация отображения
     // третий аргумент - это первый элемент в массиве args
+    // eslint-disable-next-line no-console
     expect(console.error).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),

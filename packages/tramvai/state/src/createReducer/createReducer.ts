@@ -7,7 +7,7 @@ import { SimpleEmitter } from '../stores/SimpleEmitter';
 interface Options<
   Name extends string,
   State,
-  Events extends Record<string, EventHandler<State, any>>
+  Events extends Record<string, EventHandler<State, any>>,
 > {
   name: Name;
   initialState: State;
@@ -17,7 +17,10 @@ interface Options<
 export function createReducer<
   State,
   Name extends string,
-  Events extends Record<string, EventHandler<State, any>> = Record<string, EventHandler<State, any>>
+  Events extends Record<string, EventHandler<State, any>> = Record<
+    string,
+    EventHandler<State, any>
+  >,
 >(
   options: Options<Name, State, Events>
 ): Reducer<State, Name, EventHandlersToEventCreators<State, Events>>;
@@ -28,7 +31,7 @@ export function createReducer<State = {}, Name extends string = string>(
 export function createReducer<
   State = {},
   Name extends string = string,
-  Events extends Record<string, EventHandler<State, any>> = {}
+  Events extends Record<string, EventHandler<State, any>> = {},
 >(
   nameOrOptions: Name | Options<Name, State, Events>,
   initialStateArg?: State

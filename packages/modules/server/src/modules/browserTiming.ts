@@ -79,7 +79,7 @@ export const BrowserTimingModule = declareModule({
           performance.mark(endName, { startTime: end });
           performance.measure(name, startName, endName);
 
-          [startName, endName].forEach((name) => performance.clearMarks(name));
+          [startName, endName].forEach((perfName) => performance.clearMarks(perfName));
           performance.clearMeasures(name);
         });
       },

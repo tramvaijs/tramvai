@@ -31,12 +31,12 @@ describe('SimpleEmitter', () => {
     emitter.on('change', fn2);
     emitter.off('change', fn2);
     emitter.emit('change');
-    expect(fn1).toBeCalled();
-    expect(fn2).not.toBeCalled();
+    expect(fn1).toHaveBeenCalled();
+    expect(fn2).not.toHaveBeenCalled();
     fn1.mockClear();
     emitter.off('change', fn1);
     emitter.emit('change');
-    expect(fn1).not.toBeCalled();
-    expect(fn2).not.toBeCalled();
+    expect(fn1).not.toHaveBeenCalled();
+    expect(fn2).not.toHaveBeenCalled();
   });
 });

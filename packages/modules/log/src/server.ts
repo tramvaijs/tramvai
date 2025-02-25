@@ -61,15 +61,18 @@ export function factory({ environmentManager, loggerInitHooks }) {
   logger.setLevel(level as any);
 
   if (enable) {
-    each((val) => {
-      const [lvl, ...name] = val.split(':');
+    each(
+      (val) => {
+        const [lvl, ...name] = val.split(':');
 
-      if (lvl in LEVELS) {
-        logger.enable(lvl, name.join(':'));
-      } else {
-        logger.enable(val);
-      }
-    }, split(',', enable));
+        if (lvl in LEVELS) {
+          logger.enable(lvl, name.join(':'));
+        } else {
+          logger.enable(val);
+        }
+      },
+      split(',', enable)
+    );
   }
 
   if (loggerInitHooks) {

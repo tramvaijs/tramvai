@@ -5,7 +5,7 @@ const testCases = [
     name: 'lint tramvai app files, configure tramvai plugin manually',
     type: 'tramvai',
     eslintConfig: {
-      parser: 'babel-eslint',
+      parser: '@babel/eslint-parser',
       plugins: ['@tinkoff/tramvai'],
       rules: {
         '@tinkoff/tramvai/bundle-chunk-name': 'error',
@@ -24,8 +24,8 @@ const testCases = [
 
 describe('fixture eslint plugin test', () => {
   testCases.forEach((testCase) => {
-    it(`check: ${testCase.name}`, () => {
-      const result = runLintWithFixtures(testCase.type, testCase.eslintConfig);
+    it(`check: ${testCase.name}`, async () => {
+      const result = await runLintWithFixtures(testCase.type, testCase.eslintConfig);
       expect(result).toMatchSnapshot();
     });
   });

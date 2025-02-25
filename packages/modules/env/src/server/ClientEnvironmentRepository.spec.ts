@@ -2,10 +2,13 @@ import type { EnvParameter, EnvironmentManager } from '@tramvai/tokens-common';
 import { ClientEnvironmentRepository } from './ClientEnvironmentRepository';
 
 const valuesFromTokens = (tokens: EnvParameter[]): Record<string, string | undefined> => {
-  return tokens.reduce((acc, { key, value }) => {
-    acc[key] = value;
-    return acc;
-  }, {} as Record<string, string | undefined>);
+  return tokens.reduce(
+    (acc, { key, value }) => {
+      acc[key] = value;
+      return acc;
+    },
+    {} as Record<string, string | undefined>
+  );
 };
 
 describe('ClientEnvironmentRepository', () => {

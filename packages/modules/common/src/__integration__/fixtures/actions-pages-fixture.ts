@@ -20,23 +20,17 @@ export class ActionPagesCO {
   }
 
   async expectOnServerWasExecutedActions(actions: string[]) {
-    await test.step(
-      `checks that [data-testid="actions-server"] will contain actions: "${actions.join(',')}"`,
-      async () => {
-        const serverActions = await this.page.getByTestId('actions-server').textContent();
-        expect(serverActions).toBe(actions.join(','));
-      }
-    );
+    await test.step(`checks that [data-testid="actions-server"] will contain actions: "${actions.join(',')}"`, async () => {
+      const serverActions = await this.page.getByTestId('actions-server').textContent();
+      expect(serverActions).toBe(actions.join(','));
+    });
   }
 
   async expectOnClientWasExecutedActions(actions: string[]) {
-    await test.step(
-      `checks that [data-testid="actions-client"] will contain actions: "${actions.join(',')}"`,
-      async () => {
-        const clientActions = await this.page.getByTestId('actions-client').textContent();
-        expect(clientActions).toBe(actions.join(','));
-      }
-    );
+    await test.step(`checks that [data-testid="actions-client"] will contain actions: "${actions.join(',')}"`, async () => {
+      const clientActions = await this.page.getByTestId('actions-client').textContent();
+      expect(clientActions).toBe(actions.join(','));
+    });
   }
 
   private getGlobalActionTramvaiState() {
@@ -62,13 +56,10 @@ export class ActionPagesCO {
   }
 
   expectActionTestPageHasFollowingStatus(status: ActionStatus[]) {
-    return test.step(
-      `expect actionTestPage has following status: ${status.join(',')}`,
-      async () => {
-        const statusOnPage = await this.page.getByTestId('status').textContent();
-        expect(statusOnPage).toBe(status.join(','));
-      }
-    );
+    return test.step(`expect actionTestPage has following status: ${status.join(',')}`, async () => {
+      const statusOnPage = await this.page.getByTestId('status').textContent();
+      expect(statusOnPage).toBe(status.join(','));
+    });
   }
 
   waitTillActionTestPageWillHaveFollowingStatus(status: ActionStatus[]) {

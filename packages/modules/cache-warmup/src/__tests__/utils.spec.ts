@@ -1,5 +1,5 @@
+import { startMockServer } from '@tramvai/internal-test-utils/utils/simpleMockServer';
 import { queueRequests, sendWarmUpRequest } from '../utils';
-import { startMockServer } from '../../../../../test/utils/simpleMockServer';
 
 const flushPromises = () => new Promise(setImmediate);
 

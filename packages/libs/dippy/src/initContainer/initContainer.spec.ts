@@ -35,7 +35,7 @@ describe('initContainer', () => {
     });
 
     expect(di.get(loggerToken)).toBe('log');
-    expect(dependencyFn).toBeCalled();
+    expect(dependencyFn).toHaveBeenCalled();
   });
 
   it('imports', () => {

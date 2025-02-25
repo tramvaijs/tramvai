@@ -145,7 +145,7 @@ export interface LayoutOptions {
 
 export interface PageResource {
   type: keyof typeof StorageRecord;
-  slot: typeof ResourceSlot[keyof typeof ResourceSlot];
+  slot: (typeof ResourceSlot)[keyof typeof ResourceSlot];
   payload: string | null;
   attrs?: Record<string, string | null>;
 }

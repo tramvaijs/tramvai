@@ -51,6 +51,7 @@ class Logger implements LoggerInterface {
     this.key = options.key || this.name;
 
     if (Logger.instances[this.key]) {
+      // eslint-disable-next-line no-constructor-return
       return Logger.instances[this.key];
     }
 
@@ -98,7 +99,7 @@ class Logger implements LoggerInterface {
     Logger.save();
   }
 
-  static setOnChange(onChange: typeof Logger['onChange']) {
+  static setOnChange(onChange: (typeof Logger)['onChange']) {
     Logger.onChange = onChange;
   }
 

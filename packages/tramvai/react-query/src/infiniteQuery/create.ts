@@ -71,7 +71,7 @@ export const createInfiniteQuery = <
   Options = unknown,
   PageParam = unknown,
   Result = unknown,
-  Deps extends ProviderDeps = {}
+  Deps extends ProviderDeps = {},
 >(
   queryParameters: CreateInfiniteQueryOptions<Options, PageParam, Result, Deps>
 ): InfiniteQuery<Options, PageParam, Result, Deps> => {

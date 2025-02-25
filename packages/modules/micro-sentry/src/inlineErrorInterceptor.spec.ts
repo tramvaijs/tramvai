@@ -37,7 +37,7 @@ describe('createErrorInterceptor', () => {
     const error = new Error('window error');
     window.dispatchEvent(new ErrorEvent('error', { error }));
 
-    expect(onError).toBeCalledTimes(1);
+    expect(onError).toHaveBeenCalledTimes(1);
     expect(errorInterceptor.errorsQueue).toHaveLength(1);
     expect(errorInterceptor.errorsQueue[0]).toBe(error);
   });

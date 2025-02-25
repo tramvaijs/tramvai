@@ -25,11 +25,14 @@ const generateReducer = (name: any) => {
 };
 
 const reducersAndActions = range(0, 100).map((id) => generateReducer(id));
-const reducersSlice = reducersAndActions.reduce((slice, { name, reducer }) => {
-  // eslint-disable-next-line no-param-reassign
-  slice[name] = reducer;
-  return slice;
-}, {} as Record<string, Reducer>);
+const reducersSlice = reducersAndActions.reduce(
+  (slice, { name, reducer }) => {
+    // eslint-disable-next-line no-param-reassign
+    slice[name] = reducer;
+    return slice;
+  },
+  {} as Record<string, Reducer>
+);
 const actions = reducersAndActions.map(({ actionCreator }) => actionCreator);
 const store = createStore(combineReducers(reducersSlice));
 let currentPayload = 1;

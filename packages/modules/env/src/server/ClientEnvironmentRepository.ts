@@ -8,7 +8,10 @@ import type {
 export class ClientEnvironmentRepository implements Interface {
   protected parameters: Record<string, string | undefined>;
 
-  constructor(private envManager: EnvironmentManager, private tokens: EnvParameter[]) {
+  constructor(
+    private envManager: EnvironmentManager,
+    private tokens: EnvParameter[]
+  ) {
     this.parameters = {};
     this.processing();
   }

@@ -11,16 +11,19 @@ import {
   clearCookieManagerMock,
 } from '@tramvai/internal-test-utils/mocks/tramvai/cookieManager';
 import { WEB_USER_ID_TOKEN } from '@tramvai/module-web-user-id';
-import { createLoggerMocks, clearLoggerMocks } from '../../../../../test/mocks/tramvai/logger';
+import {
+  createLoggerMocks,
+  clearLoggerMocks,
+} from '@tramvai/internal-test-utils/mocks/tramvai/logger';
 import {
   createRequestManagerMock,
   clearRequestManagerMock,
-} from '../../../../../test/mocks/tramvai/requestManager';
+} from '@tramvai/internal-test-utils/mocks/tramvai/requestManager';
 import {
   createEnvManagerMock,
   clearEnvManagerMock,
-} from '../../../../../test/mocks/tramvai/envManager';
-import { createPapiMethod } from '../../../../tramvai/papi/src/createPapiMethod';
+} from '@tramvai/internal-test-utils/mocks/tramvai/envManager';
+import { createPapiMethod } from '@tramvai/papi/src/createPapiMethod';
 import { HttpClientModule } from '../httpClientModule';
 
 const { loggerMock, loggerFactoryMock } = createLoggerMocks();

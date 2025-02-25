@@ -322,7 +322,7 @@ describe('EnvironmentManagerServer', () => {
     const templates: EnvTemplate[] = [];
 
     it('unknown template', () => {
-      expect(() => new EnvironmentManagerServer(envTokens, templates)).toThrowError(
+      expect(() => new EnvironmentManagerServer(envTokens, templates)).toThrow(
         'Problem with "API_URL=http://www.$[unknown].com/" env variable - template for $[unknown] not found.'
       );
     });

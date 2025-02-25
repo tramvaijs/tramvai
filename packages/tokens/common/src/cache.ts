@@ -127,8 +127,8 @@ export type CacheFactoryOptions<Type extends CacheType> = CacheWithMetricsOption
   (Type extends typeof MEMORY_LRU
     ? LRUOptions
     : Type extends typeof MEMORY_LFU
-    ? LFUOptions
-    : never);
+      ? LFUOptions
+      : never);
 
 export type CacheOptions<Type extends CacheType> = CacheFactoryOptions<Type> & {
   type: Type;

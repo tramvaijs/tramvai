@@ -281,6 +281,7 @@ export class DedupePlugin {
     if (keys.length === 0) {
       log += '   no duplicates found';
     }
+    // eslint-disable-next-line no-console
     console.warn(log);
   }
 }

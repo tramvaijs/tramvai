@@ -99,9 +99,9 @@ export function connectAdvanced(
         // and values needed to control behavior (forwarded refs, alternate context instances).
         // To maintain the wrapperProps object reference, memoize this destructuring.
         // eslint-disable-next-line no-shadow
-        const { forwardedRef, ...wrapperProps } = props;
+        const { forwardedRef: innerForwardedRef, ...innerWrapperProps } = props;
 
-        return [forwardedRef, wrapperProps];
+        return [innerForwardedRef, innerWrapperProps];
       }, [props]);
 
       // Retrieve the store and ancestor subscription via context, if available

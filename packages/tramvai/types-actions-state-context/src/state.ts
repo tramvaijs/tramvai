@@ -6,13 +6,13 @@ export type EventHandler<State, Payload = void> = (state: State, payload: Payloa
 
 export type EventHandlersToEventCreators<
   State,
-  Model extends { [K: string]: EventHandler<State, any> }
+  Model extends { [K: string]: EventHandler<State, any> },
 > = {
   [K in keyof Model]: Model[K] extends EmptyEventHandler<State>
     ? EmptyEventCreator
     : Model[K] extends EventHandler<State, infer Payload>
-    ? EventCreator1<Payload>
-    : null;
+      ? EventCreator1<Payload>
+      : null;
 };
 
 /**
@@ -103,7 +103,7 @@ export interface ConsumerContext {
     CreateActionOrType extends (...args: unknown[]) => Event | Event = (
       ...args: unknown[]
     ) => Event | Event,
-    Options extends Record<string, any> = Record<string, any>
+    Options extends Record<string, any> = Record<string, any>,
   >(
     createActionOrType: CreateActionOrType,
     options?: Options
@@ -120,7 +120,7 @@ export interface ConsumerContext {
       | BaseStoreConstructor<State>
       | string
       | { store: Reducer<State> | BaseStoreConstructor<State> | string; optional: true },
-    State = any
+    State = any,
   >(
     store: Store
   ): Store extends Reducer<State> | BaseStoreConstructor<State>

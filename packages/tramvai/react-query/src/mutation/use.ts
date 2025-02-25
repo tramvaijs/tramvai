@@ -13,7 +13,7 @@ interface UseMutation {
     Result,
     Deps extends ProviderDeps,
     Key extends MutationKey<Options, Deps>,
-    Context = unknown
+    Context = unknown,
   >(
     Mutation:
       | UseMutationOptions<Result, any, Variables, Context>
@@ -27,7 +27,7 @@ interface UseMutation {
     Result,
     Deps extends ProviderDeps,
     Key extends MutationKey<Options, Deps>,
-    Context = unknown
+    Context = unknown,
   >(
     Mutation:
       | UseMutationOptions<Result, any, Variables, Context>
@@ -41,7 +41,7 @@ export const useMutation: UseMutation = <
   Result,
   Deps extends ProviderDeps,
   Key extends MutationKey<Options, Deps>,
-  Context = unknown
+  Context = unknown,
 >(
   mutation:
     | UseMutationOptions<Result, any, Variables, Context>

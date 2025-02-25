@@ -23,7 +23,7 @@ export const executeRootStateSubscriptions = ({
       const subscriptions = di.get({
         token: CHILD_APP_INTERNAL_ROOT_STATE_SUBSCRIPTION_TOKEN,
         optional: true,
-      }) as unknown as typeof CHILD_APP_INTERNAL_ROOT_STATE_SUBSCRIPTION_TOKEN[];
+      }) as unknown as (typeof CHILD_APP_INTERNAL_ROOT_STATE_SUBSCRIPTION_TOKEN)[];
       subscriptions?.forEach((sub) => {
         sub.listener(state);
       });

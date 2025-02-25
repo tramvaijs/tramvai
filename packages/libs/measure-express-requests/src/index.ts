@@ -40,7 +40,7 @@ export function measure<T extends string = string>({
   metrics,
   metricsExcludePaths = [],
   additionalLabelNames = [],
-  getAdditionalLabelValues = () => ({} as LabelValues<T>),
+  getAdditionalLabelValues = () => ({}) as LabelValues<T>,
   httpRequestsDurationBuckets,
 }: MeasureOptions<T>) {
   const labelNames = LABEL_NAMES.concat(additionalLabelNames);

@@ -63,8 +63,8 @@ type OmitOverridable<T extends Record<string, any>> = {
   [key in keyof T]: T[key] extends OverridableOption<infer U>
     ? U
     : T[key] extends Record<string, any>
-    ? OmitOverridable<T[key]>
-    : T[key];
+      ? OmitOverridable<T[key]>
+      : T[key];
 };
 
 const omitEnvOptions = <T extends Record<string, any>>(
@@ -86,7 +86,7 @@ const omitEnvOptions = <T extends Record<string, any>>(
 
 export type ConfigManager<
   C extends ConfigEntry = ConfigEntry,
-  E extends Env = Env
+  E extends Env = Env,
 > = OmitOverridable<C> &
   Required<Settings<E>> & {
     target: Target;

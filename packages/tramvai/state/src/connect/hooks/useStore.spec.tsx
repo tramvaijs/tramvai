@@ -56,9 +56,9 @@ describe('useStore', () => {
       context.dispatch(event(5));
     });
 
-    expect(watchRender).toBeCalledTimes(2);
-    expect(watchRender).toBeCalledWith({ id: 1 });
-    expect(watchRender).toBeCalledWith({ id: 5 });
+    expect(watchRender).toHaveBeenCalledTimes(2);
+    expect(watchRender).toHaveBeenCalledWith({ id: 1 });
+    expect(watchRender).toHaveBeenCalledWith({ id: 5 });
   });
 
   it('register new reducer', () => {
@@ -132,15 +132,15 @@ describe('useStore', () => {
       context.dispatch(removeEvent());
     });
 
-    expect(watchParentRender).toBeCalledTimes(2);
-    expect(watchParentRender).toBeCalledWith([{ id: 1 }, { id: 2 }, { id: 3 }]);
-    expect(watchParentRender).toBeCalledWith([{ id: 2 }, { id: 3 }]);
+    expect(watchParentRender).toHaveBeenCalledTimes(2);
+    expect(watchParentRender).toHaveBeenCalledWith([{ id: 1 }, { id: 2 }, { id: 3 }]);
+    expect(watchParentRender).toHaveBeenCalledWith([{ id: 2 }, { id: 3 }]);
 
-    expect(watchChildRender).toBeCalledTimes(5);
-    expect(watchChildRender).toBeCalledWith(1, 'first');
-    expect(watchChildRender).toBeCalledWith(2, 'second');
-    expect(watchChildRender).toBeCalledWith(3, 'third');
-    expect(watchChildRender).toBeCalledWith(2, 'second');
-    expect(watchChildRender).toBeCalledWith(3, 'third');
+    expect(watchChildRender).toHaveBeenCalledTimes(5);
+    expect(watchChildRender).toHaveBeenCalledWith(1, 'first');
+    expect(watchChildRender).toHaveBeenCalledWith(2, 'second');
+    expect(watchChildRender).toHaveBeenCalledWith(3, 'third');
+    expect(watchChildRender).toHaveBeenCalledWith(2, 'second');
+    expect(watchChildRender).toHaveBeenCalledWith(3, 'third');
   });
 });

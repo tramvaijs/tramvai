@@ -4,13 +4,14 @@ import type { PackageConfigEntry } from '../typings/configEntry/package';
 import type { ChildAppConfigEntry } from '../typings/configEntry/child-app';
 import type { ConfigEntry, OverridableOption } from '../typings/configEntry/common';
 
-type ConvertOptionsToSchema<T> = T extends OverridableOption<infer U>
-  ? { development?: U; production?: U } | U
-  : T extends Record<string, any>
-  ? {
-      [key in keyof T]?: ConvertOptionsToSchema<T[key]>;
-    }
-  : T;
+type ConvertOptionsToSchema<T> =
+  T extends OverridableOption<infer U>
+    ? { development?: U; production?: U } | U
+    : T extends Record<string, any>
+      ? {
+          [key in keyof T]?: ConvertOptionsToSchema<T[key]>;
+        }
+      : T;
 
 export type ConvertToSchema<T extends ConfigEntry> = ConfigEntry & ConvertOptionsToSchema<T>;
 

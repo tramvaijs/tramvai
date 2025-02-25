@@ -6,19 +6,19 @@ import type { JestHookSubscriber } from 'jest-watcher';
 import { BaseWatchPlugin } from 'jest-watcher';
 import * as cli from '@tramvai/cli';
 
-type CliApp = PromiseType<ReturnType<typeof cli['start']>>;
+type CliApp = PromiseType<ReturnType<(typeof cli)['start']>>;
 
 declare global {
-  // eslint-disable-next-line no-var
+  // eslint-disable-next-line no-var, vars-on-top
   var app: CliApp;
-  // eslint-disable-next-line no-var
+  // eslint-disable-next-line no-var, vars-on-top
   var __tramvai_cli_mock: typeof cli;
 }
 
 module.exports = class TramvaiWatchPlugin extends BaseWatchPlugin {
   private rawApp?: CliApp;
 
-  private lastStartParams?: Omit<Parameters<typeof cli['start']>[0], 'stdout' | 'stderr'>;
+  private lastStartParams?: Omit<Parameters<(typeof cli)['start']>[0], 'stdout' | 'stderr'>;
 
   private compilationInProgress?: Promise<void>;
 

@@ -2,7 +2,7 @@ import type { HttpClientRequest, HttpClientResponse, HttpClient } from './httpCl
 import { BaseHttpClient } from './httpClient';
 
 export class ApiService<
-  Request extends HttpClientRequest = HttpClientRequest
+  Request extends HttpClientRequest = HttpClientRequest,
 > extends BaseHttpClient<Request> {
   constructor(public readonly httpClient: HttpClient) {
     super();

@@ -46,12 +46,12 @@ function useDi<T extends ProviderDep>(
 ): T extends string
   ? any
   : T extends {
-      token: infer OptionsToken;
-      optional?: infer OptionsOptional;
-      multi?: infer OptionsMulti;
-    }
-  ? OptionsType<OptionsToken, OptionsMulti, OptionsOptional>
-  : T;
+        token: infer OptionsToken;
+        optional?: infer OptionsOptional;
+        multi?: infer OptionsMulti;
+      }
+    ? OptionsType<OptionsToken, OptionsMulti, OptionsOptional>
+    : T;
 function useDi<T extends ProviderDep>(dep: T): T extends string ? any : T;
 function useDi(deps: ProviderDep | ProviderDeps): any {
   const di = useDiContainer();

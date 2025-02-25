@@ -47,7 +47,7 @@ export abstract class Command<TParams = any> {
 }
 
 export abstract class CLICommand<
-  TParams extends { target?: string } = any
+  TParams extends { target?: string } = any,
 > extends Command<TParams> {
   context: Context;
 

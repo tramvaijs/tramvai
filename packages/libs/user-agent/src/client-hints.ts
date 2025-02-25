@@ -151,7 +151,7 @@ export const parseClientHintsHeaders = (
     },
     cpu: {
       architecture: architecture
-        ? BACKWARD_COMPATIBILITY_ARCH[architecture] ?? architecture
+        ? (BACKWARD_COMPATIBILITY_ARCH[architecture] ?? architecture)
         : architecture,
     },
     mobileOS,
@@ -194,7 +194,7 @@ export const parseClientHintsUserAgentData = (payload: UADataValues): UserAgent 
     },
     cpu: {
       architecture: payload.architecture
-        ? BACKWARD_COMPATIBILITY_ARCH[payload.architecture] ?? payload.architecture
+        ? (BACKWARD_COMPATIBILITY_ARCH[payload.architecture] ?? payload.architecture)
         : payload.architecture,
     },
     mobileOS: getMobileOs(payload.platform),

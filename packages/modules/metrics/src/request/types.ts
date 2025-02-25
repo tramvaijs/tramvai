@@ -20,7 +20,7 @@ export type MetricsInstances = {
   tcpConnectDuration: Histogram<'service'>;
   tlsHandshakeDuration: Histogram<'service'>;
 };
-export type GetServiceName = typeof METRICS_SERVICES_REGISTRY_TOKEN['getServiceName'];
+export type GetServiceName = (typeof METRICS_SERVICES_REGISTRY_TOKEN)['getServiceName'];
 export type Args =
   | [RequestOptions | string | URL, (res: IncomingMessage) => void]
   | [string | URL, RequestOptions, (res: IncomingMessage) => void];

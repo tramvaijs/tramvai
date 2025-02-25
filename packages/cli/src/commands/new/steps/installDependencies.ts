@@ -96,7 +96,7 @@ function getDepsWorkspace(type: Type, options?: { isDev?: boolean; isRoot?: bool
   return baseDeps;
 }
 
-function jestDeps(type: Type) {
+function getJestDeps(type: Type) {
   return getBaseDeps(type, true).jestDeps;
 }
 
@@ -164,7 +164,7 @@ export async function installDependencies({
     console.log(`${chalk.blue('[DEPENDENCIES]')} Installing jest dependencies`);
 
     await packageManager.install({
-      packageNames: jestDeps(type),
+      packageNames: getJestDeps(type),
       devDependency: true,
       ...options,
     });

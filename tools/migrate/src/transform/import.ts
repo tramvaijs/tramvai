@@ -1,9 +1,9 @@
 import type { ASTPath, Collection, StringLiteral } from 'jscodeshift';
-import { Identifier } from 'jscodeshift';
-import { identifier } from 'jscodeshift';
-import { stringLiteral } from 'jscodeshift';
-import { callExpression } from 'jscodeshift';
 import {
+  Identifier,
+  identifier,
+  stringLiteral,
+  callExpression,
   ImportSpecifier,
   ImportDeclaration,
   Program,
@@ -25,20 +25,20 @@ const isRequireExpression = (path: ASTPath<CallExpression>) =>
  *  - if it is not exist in ast - add it
  *  - if import from the same package exists - add only missing specifiers
  *  - if same imports already exists do nothing
- * @param importDeclaration jscodeshift ast type
+ * @param importDeclarationNode jscodeshift ast type
  * @returns true if any changes to ast were made, false - otherwise
  */
-export function addImport<N>(this: Collection<N>, importDeclaration: ImportDeclaration) {
+export function addImport<N>(this: Collection<N>, importDeclarationNode: ImportDeclaration) {
   const imports = this.find(ImportDeclaration);
 
   if (imports.length) {
     const sourceImport = imports.filter(
-      (declaration) => declaration.node.source.value === importDeclaration.source.value
+      (declaration) => declaration.node.source.value === importDeclarationNode.source.value
     );
     const sourceImportNode = sourceImport.nodes()[0];
 
     if (sourceImport.length) {
-      importDeclaration.specifiers.forEach((specifier) => {
+      importDeclarationNode.specifiers.forEach((specifier) => {
         const name =
           specifier.local?.name ??
           (specifier.type === 'ImportSpecifier' ? specifier.imported.name : specifier.local.name);
@@ -52,10 +52,10 @@ export function addImport<N>(this: Collection<N>, importDeclaration: ImportDecla
         return hasChanged;
       });
     } else {
-      imports.at(0).insertBefore(importDeclaration);
+      imports.at(0).insertBefore(importDeclarationNode);
     }
   } else {
-    this.find(Program).get('body', 0).insertBefore(importDeclaration);
+    this.find(Program).get('body', 0).insertBefore(importDeclarationNode);
   }
 
   return true;
@@ -82,21 +82,21 @@ export function removeImport<N>(this: Collection<N>, importName: string) {
 /**
  * @description
  *  Find import declaration
- * @param importDeclaration jscodeshift ast type
+ * @param importDeclarationNode jscodeshift ast type
  * @returns true if any import declaration exists
  */
-export function findImport<N>(this: Collection<N>, importDeclaration: ImportDeclaration) {
+export function findImport<N>(this: Collection<N>, importDeclarationNode: ImportDeclaration) {
   let hasImport = false;
 
   this.find(ImportDeclaration, {
     source: {
-      value: importDeclaration.source.value,
+      value: importDeclarationNode.source.value,
     },
   })
     .filter((p) => {
       return p.node.specifiers.some((specifier) =>
-        importDeclaration.specifiers.length
-          ? importDeclaration.specifiers.some((targetSpecifier) => {
+        importDeclarationNode.specifiers.length
+          ? importDeclarationNode.specifiers.some((targetSpecifier) => {
               if ('imported' in targetSpecifier) {
                 return specifier.local.name === targetSpecifier.imported.name;
               }

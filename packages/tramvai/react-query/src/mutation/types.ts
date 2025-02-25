@@ -20,7 +20,7 @@ export interface CreateMutationOptions<
   Result,
   Deps extends ProviderDeps,
   Key extends MutationKey<Options, Deps>,
-  Context = unknown
+  Context = unknown,
 > {
   key?: Key;
 
@@ -47,7 +47,7 @@ export interface Mutation<
   Result,
   Deps extends ProviderDeps,
   Key extends MutationKey<Options, Deps>,
-  Context = unknown
+  Context = unknown,
 > {
   [MUTATION_PARAMETERS]: CreateMutationOptions<Options, Variables, Result, Deps, Key, Context>;
   fork(
@@ -69,7 +69,7 @@ export const isMutation = <
   Result,
   Deps extends ProviderDeps,
   Key extends MutationKey<Options, Deps>,
-  Context
+  Context,
 >(
   arg:
     | Mutation<Options, Variables, Result, Deps, Key, Context>

@@ -8,16 +8,19 @@ import { DEFAULT_HTTP_CLIENT_INTERCEPTORS, HTTP_CLIENT_FACTORY } from '@tramvai/
 import { APP_INFO_TOKEN } from '@tramvai/core';
 import { CommonModule } from '@tramvai/module-common';
 import type { Provider } from '@tinkoff/dippy';
-import { createLoggerMocks, clearLoggerMocks } from '../../../../../test/mocks/tramvai/logger';
+import {
+  createLoggerMocks,
+  clearLoggerMocks,
+} from '@tramvai/internal-test-utils/mocks/tramvai/logger';
 import {
   createRequestManagerMock,
   clearRequestManagerMock,
-} from '../../../../../test/mocks/tramvai/requestManager';
+} from '@tramvai/internal-test-utils/mocks/tramvai/requestManager';
 import {
   createEnvManagerMock,
   clearEnvManagerMock,
-} from '../../../../../test/mocks/tramvai/envManager';
-import { createJsonResponse } from '../../../../../test/utils/fetch';
+} from '@tramvai/internal-test-utils/mocks/tramvai/envManager';
+import { createJsonResponse } from '@tramvai/internal-test-utils/utils/fetch';
 import { HttpClientModule } from '../httpClientModule';
 
 const { loggerMock, loggerFactoryMock } = createLoggerMocks();
@@ -86,7 +89,7 @@ describe('httpClientFactory', () => {
     await httpClient.request({ path: 'fake' });
     await httpClient.request({ path: 'fake' });
 
-    expect(fetch).toBeCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 
   it('cache disabled with env HTTP_CLIENT_CACHE_DISABLED', async () => {
@@ -115,7 +118,7 @@ describe('httpClientFactory', () => {
     await httpClient.request({ path: 'fake' });
     await httpClient.request({ path: 'fake' });
 
-    expect(fetch).toBeCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('disableCache property overwrite with env HTTP_CLIENT_CACHE_DISABLED', async () => {
@@ -141,7 +144,7 @@ describe('httpClientFactory', () => {
     await httpClient.request({ path: 'fake' });
     await httpClient.request({ path: 'fake' });
 
-    expect(fetch).toBeCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
   it('add User-Agent and X-real-ip headers by default', async () => {

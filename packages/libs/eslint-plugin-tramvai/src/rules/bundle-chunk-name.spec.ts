@@ -207,7 +207,7 @@ const tests: {
 };
 
 const jsRuleTester = new RuleTester({
-  parser: require.resolve('babel-eslint'),
+  parser: require.resolve('@babel/eslint-parser'),
 });
 
 const tsRuleTester = new RuleTester({

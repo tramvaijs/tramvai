@@ -19,15 +19,18 @@ const enable = process.env.LOG_ENABLE ?? process.env.DEBUG_ENABLE;
 Logger.setLevel(level as LogLevel);
 
 if (enable) {
-  each((val) => {
-    const [lvl, ...name] = val.split(':');
+  each(
+    (val) => {
+      const [lvl, ...name] = val.split(':');
 
-    if (lvl in LEVELS) {
-      Logger.enable(lvl, name.join(':'));
-    } else {
-      Logger.enable(val);
-    }
-  }, split(',', enable));
+      if (lvl in LEVELS) {
+        Logger.enable(lvl, name.join(':'));
+      } else {
+        Logger.enable(val);
+      }
+    },
+    split(',', enable)
+  );
 }
 
 if (!level && !enable) {

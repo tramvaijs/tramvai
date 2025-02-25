@@ -15,6 +15,7 @@ export const parseHtml = (
   }
 
   const prettyHtml = prettier.format(html, { parser: 'html', printWidth: 120 });
+  // @ts-ignore - используется тайпинг от 3 prettier, а в проекте 2
   const parsed = parse(prettyHtml, parserOptions);
 
   return {

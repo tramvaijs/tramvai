@@ -77,18 +77,21 @@ async function npmRequire({
     const source = (npmRc || '')
       .trim()
       .split('\n')
-      .reduce((result, line) => {
-        if (!line.trim()) {
+      .reduce(
+        (result, line) => {
+          if (!line.trim()) {
+            return result;
+          }
+
+          const [key, value] = line.split('=');
+
+          // eslint-disable-next-line no-param-reassign
+          result[key.trim()] = value.trim();
+
           return result;
-        }
-
-        const [key, value] = line.split('=');
-
-        // eslint-disable-next-line no-param-reassign
-        result[key.trim()] = value.trim();
-
-        return result;
-      }, {} as Record<string, any>);
+        },
+        {} as Record<string, any>
+      );
 
     if (source.registry) {
       registry = source.registry;

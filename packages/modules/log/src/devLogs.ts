@@ -138,11 +138,14 @@ export const serverProviders: Provider[] = [
             globalLogger.setLevel(debugLevel);
           }
           if (debugEnable) {
-            each((val) => {
-              const [lvl, name] = val.split(':');
+            each(
+              (val) => {
+                const [lvl, name] = val.split(':');
 
-              globalLogger.enable(lvl, name);
-            }, split(',', debugEnable));
+                globalLogger.enable(lvl, name);
+              },
+              split(',', debugEnable)
+            );
           }
         },
       });

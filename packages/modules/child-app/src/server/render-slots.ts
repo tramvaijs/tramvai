@@ -178,7 +178,7 @@ export const registerChildAppRenderSlots =
           }
 
           for (const sharedModule of federatedModule.sharedModules) {
-            const { shareKey } = sharedModule.provides?.[0];
+            const { shareKey } = sharedModule.provides?.[0] ?? {};
             const { chunks } = sharedModule;
 
             const bestShared = mapSharedToChildApp.get(shareKey);

@@ -16,7 +16,7 @@ const convertToRawMutation = <
   Result,
   Deps extends ProviderDeps,
   Key extends MutationKey<Options, Deps>,
-  Context = unknown
+  Context = unknown,
 >(
   mutation: Mutation<Options, Variables, Result, Deps, Key, Context>,
   di: Container,
@@ -61,7 +61,7 @@ export const createMutation = <
   Result,
   Deps extends ProviderDeps = {},
   Key extends MutationKey<Options, Deps> = MutationKey<Options, Deps>,
-  Context = unknown
+  Context = unknown,
 >(
   mutationParameters: CreateMutationOptions<Options, Variables, Result, Deps, Key, Context>
 ): Mutation<Options, Variables, Result, Deps, Key, Context> => {

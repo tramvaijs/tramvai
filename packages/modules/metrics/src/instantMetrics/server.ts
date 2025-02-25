@@ -22,7 +22,7 @@ import { setInstantMetrics } from './store';
       }: {
         metrics: typeof METRICS_MODULE_TOKEN;
         logger: typeof LOGGER_TOKEN;
-        instantMetrics: typeof REGISTER_INSTANT_METRIC_TOKEN[];
+        instantMetrics: (typeof REGISTER_INSTANT_METRIC_TOKEN)[];
       }) {
         const log = logger('instantmetrics:papi');
         const instantMetricsMap: Record<string, Counter<string>> = fromPairs(instantMetrics || []);
@@ -84,7 +84,7 @@ import { setInstantMetrics } from './store';
         instantMetrics,
         context,
       }: {
-        instantMetrics: typeof REGISTER_INSTANT_METRIC_TOKEN[];
+        instantMetrics: (typeof REGISTER_INSTANT_METRIC_TOKEN)[];
         context: typeof CONTEXT_TOKEN;
       }) {
         return async () => {

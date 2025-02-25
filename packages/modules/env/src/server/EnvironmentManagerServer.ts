@@ -21,7 +21,10 @@ export class EnvironmentManagerServer extends EnvironmentManager {
   private clientEnvRepository: ClientEnvironmentRepository;
   private templates: Templates;
 
-  constructor(private tokens: EnvParameter[], templates: EnvTemplate[] = []) {
+  constructor(
+    private tokens: EnvParameter[],
+    templates: EnvTemplate[] = []
+  ) {
     super();
 
     this.templates = templates.reduce((acc, { key, fn, validator }) => {

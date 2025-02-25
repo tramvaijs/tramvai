@@ -31,7 +31,7 @@ export const getDiWrapper = ({
      * @description Run specific command line
      * @param line one of the commandLineListTokens
      */
-    runLine: (line: typeof commandLineListTokens[keyof typeof commandLineListTokens]) => {
+    runLine: (line: (typeof commandLineListTokens)[keyof typeof commandLineListTokens]) => {
       const handlers = di.get({ token: line, multi: true });
 
       return Promise.all(handlers.map((handler) => handler()));

@@ -88,6 +88,6 @@ describe('@tinkoff/logger/reporters/json', () => {
 
     log.error(error);
 
-    expect(mockStream.write).toBeCalledWith(expect.stringContaining('inner error'));
+    expect(mockStream.write).toHaveBeenCalledWith(expect.stringContaining('inner error'));
   });
 });

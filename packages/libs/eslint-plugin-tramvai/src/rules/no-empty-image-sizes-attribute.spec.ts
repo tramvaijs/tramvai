@@ -21,8 +21,11 @@ const tests: {
 };
 
 const jsRuleTester = new RuleTester({
-  parser: require.resolve('babel-eslint'),
-  parserOptions: { ecmaFeatures: { jsx: true } },
+  parser: require.resolve('@babel/eslint-parser'),
+  parserOptions: {
+    requireConfigFile: false,
+    babelOptions: { babelrc: false, configFile: false, presets: ['@babel/preset-react'] },
+  },
 });
 
 const tsRuleTester = new RuleTester({

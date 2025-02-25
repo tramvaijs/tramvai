@@ -161,7 +161,7 @@ describe('@tinkoff/logger', () => {
 
       logger.info({ event: 'test' });
 
-      expect(reporter1.log).not.toBeCalled();
+      expect(reporter1.log).not.toHaveBeenCalled();
       expect(remoteReporter.log).toHaveBeenCalledWith({
         type: 'info',
         level: 30,

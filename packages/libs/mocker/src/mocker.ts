@@ -49,6 +49,7 @@ export class Mocker {
     this.applyApiRouter();
 
     this.app.use((err, req, res, next) => {
+      // eslint-disable-next-line no-console
       console.error(err.stack);
       res.status(500).send('Something broke!');
     });

@@ -21,6 +21,7 @@ export function addEnvVariables({
   try {
     envFromFile = require(path.join(rootDir, 'env.development.js'));
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.error('env.development.js parsing failed, reason:', e);
   }
 

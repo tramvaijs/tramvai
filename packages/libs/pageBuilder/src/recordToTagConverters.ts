@@ -60,6 +60,7 @@ const converters = {
       try {
         require('acorn').parse(payload, { ecmaVersion: 5 });
       } catch (e) {
+        // eslint-disable-next-line no-console
         console.error('ES5 incompatibility in inline script!', '\n', payload, '\n', e);
       }
     }

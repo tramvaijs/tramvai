@@ -42,7 +42,7 @@ export const buildAppFixture: [
       buildOptions?: BuildAppTypes.BuildOptions;
     }
   >,
-  { scope: 'worker'; timeout: number }
+  { scope: 'worker'; timeout: number },
 ] = [
   async ({ appTarget, buildOptions }, use) => {
     await buildCli(
@@ -81,7 +81,7 @@ export const appServerFixture: [
       buildApp: void;
     }
   >,
-  { scope: 'test' }
+  { scope: 'test' },
 ] = [
   async ({ appTarget, appServerOptions, buildApp }, use) => {
     const { env = {}, output = {} } = appServerOptions;

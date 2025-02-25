@@ -11,7 +11,7 @@ const knownMethods = {
 
 const unknownMethod = 'unknown';
 
-type MethodName = typeof knownMethods[keyof typeof knownMethods] | typeof unknownMethod;
+type MethodName = (typeof knownMethods)[keyof typeof knownMethods] | typeof unknownMethod;
 
 type MethodDictionary = {
   [method in MethodName]: (key?: string, value?: string | string[]) => void | boolean | string;

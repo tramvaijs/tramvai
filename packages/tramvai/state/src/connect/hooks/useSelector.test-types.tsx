@@ -381,25 +381,25 @@ describe('useSelector type infer', () => {
       }
     );
 
-    const isNumber11: IsNumber<typeof result1[1]> = 1;
-    const isAny11: IsAny<typeof result1[1]> = 1;
-    const isString12: IsString<typeof result1[2]> = 1;
-    const isAny12: IsAny<typeof result1[2]> = 1;
-    const isBoolean13: IsBoolean<typeof result1[3]> = 1;
-    const isAny13: IsAny<typeof result1[3]> = 1;
-    const isArray14: IsArray<typeof result1[4]> = 1;
-    const isAny14: IsAny<typeof result1[4]> = 1;
+    const isNumber11: IsNumber<(typeof result1)[1]> = 1;
+    const isAny11: IsAny<(typeof result1)[1]> = 1;
+    const isString12: IsString<(typeof result1)[2]> = 1;
+    const isAny12: IsAny<(typeof result1)[2]> = 1;
+    const isBoolean13: IsBoolean<(typeof result1)[3]> = 1;
+    const isAny13: IsAny<(typeof result1)[3]> = 1;
+    const isArray14: IsArray<(typeof result1)[4]> = 1;
+    const isAny14: IsAny<(typeof result1)[4]> = 1;
 
-    const isNumber21: IsNumber<typeof result2[1]> = 1;
-    const isAny21: IsAny<typeof result2[1]> = 1;
-    const isString22: IsString<typeof result2[2]> = 1;
+    const isNumber21: IsNumber<(typeof result2)[1]> = 1;
+    const isAny21: IsAny<(typeof result2)[1]> = 1;
+    const isString22: IsString<(typeof result2)[2]> = 1;
     // @ts-expect-error
-    const isAny22: IsAny<typeof result2[2]> = 1;
-    const isBoolean23: IsBoolean<typeof result2[3]> = 1;
+    const isAny22: IsAny<(typeof result2)[2]> = 1;
+    const isBoolean23: IsBoolean<(typeof result2)[3]> = 1;
     // @ts-expect-error
-    const isAny23: IsAny<typeof result2[3]> = 1;
-    const isArray24: IsArray<typeof result2[4]> = 1;
-    const isAny24: IsAny<typeof result2[4]> = 1;
+    const isAny23: IsAny<(typeof result2)[3]> = 1;
+    const isArray24: IsArray<(typeof result2)[4]> = 1;
+    const isAny24: IsAny<(typeof result2)[4]> = 1;
   });
 
   it('infer right store name from single legacy BaseStore argument', () => {

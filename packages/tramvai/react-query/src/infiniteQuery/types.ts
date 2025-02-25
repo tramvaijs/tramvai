@@ -7,7 +7,7 @@ export type CreateInfiniteQueryOptions<
   Options,
   PageParam,
   Result,
-  Deps extends ProviderDeps
+  Deps extends ProviderDeps,
 > = BaseCreateQueryOptions<Options, Deps> & {
   infiniteQueryOptions?: UseInfiniteQueryOptions<Result, Error>;
 

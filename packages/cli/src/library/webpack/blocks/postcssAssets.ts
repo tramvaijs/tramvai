@@ -13,9 +13,9 @@ export const postcssAssetsWebpackRulesFactory =
     } = configManager;
 
     const postcssAssetsConfig = postcssAssetsConfigPath
-      ? safeRequire(path.resolve(configManager.rootDir, postcssAssetsConfigPath)) ?? {
+      ? (safeRequire(path.resolve(configManager.rootDir, postcssAssetsConfigPath)) ?? {
           plugins: [],
-        }
+        })
       : { plugins: [] };
 
     if (postcssAssetsConfig.plugins.length) {

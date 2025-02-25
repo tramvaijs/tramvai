@@ -20,16 +20,19 @@ import {
   clearCookieManagerMock,
 } from '@tramvai/internal-test-utils/mocks/tramvai/cookieManager';
 import { WEB_USER_ID_TOKEN } from '@tramvai/module-web-user-id';
-import { createLoggerMocks, clearLoggerMocks } from '../../../../../test/mocks/tramvai/logger';
+import {
+  createLoggerMocks,
+  clearLoggerMocks,
+} from '@tramvai/internal-test-utils/mocks/tramvai/logger';
 import {
   createRequestManagerMock,
   clearRequestManagerMock,
-} from '../../../../../test/mocks/tramvai/requestManager';
+} from '@tramvai/internal-test-utils/mocks/tramvai/requestManager';
 import {
   createEnvManagerMock,
   clearEnvManagerMock,
-} from '../../../../../test/mocks/tramvai/envManager';
-import { createJsonResponse } from '../../../../../test/utils/fetch';
+} from '@tramvai/internal-test-utils/mocks/tramvai/envManager';
+import { createJsonResponse } from '@tramvai/internal-test-utils/utils/fetch';
 import { HttpClientModule } from '../httpClientModule';
 
 global.setImmediate = ((fn, ...args) => fn(...args)) as any;

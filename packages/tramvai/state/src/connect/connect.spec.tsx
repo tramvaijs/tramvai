@@ -219,6 +219,7 @@ describe('connect integration tests', () => {
     @connect(['test'], ({ test }) => test)
     class Root extends React.Component<any, any> {
       render() {
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         return <>{this.props.id > 1 && <Child />}</>;
       }
     }

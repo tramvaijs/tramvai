@@ -86,6 +86,7 @@ const renderer: Renderer = ({ element, container, callback, log, renderMode }) =
     return;
   }
 
+  // eslint-disable-next-line react/no-deprecated
   const { hydrate } = require('react-dom');
   return hydrate(element, container(), callback);
 };

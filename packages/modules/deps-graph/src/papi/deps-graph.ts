@@ -37,10 +37,10 @@ ${graphs
   .map(
     ([token, graph]) => `
   <input id="${token}" type="checkbox" ${
-      ((query.lines ?? '') as string).search(token) !== -1 ? 'checked' : ''
-    } onchange="toggleLine('${token}')"/><label ${
-      !graph ? 'style="color: gray"' : ''
-    } for="${token}">${token}</label>
+    ((query.lines ?? '') as string).search(token) !== -1 ? 'checked' : ''
+  } onchange="toggleLine('${token}')"/><label ${
+    !graph ? 'style="color: gray"' : ''
+  } for="${token}">${token}</label>
 `
   )
   .join('<br/>')}

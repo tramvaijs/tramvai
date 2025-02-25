@@ -1,7 +1,7 @@
 import type { Cache, CacheServerMetricsHandlers } from '@tramvai/tokens-common';
 import { CacheWithMetricsProxy } from './cacheWithMetricsProxy';
 
-const TEST_CACHE_NAME = 'test-cache'
+const TEST_CACHE_NAME = 'test-cache';
 
 const cacheMock = {
   get: jest.fn(),
@@ -35,9 +35,9 @@ describe('@tramvai/module-common cache with metrics limited by size', () => {
       cacheMetrics
     );
 
-    expect(cacheMetrics.onMax).toHaveBeenCalledWith('test-cache', 10)
-  })
-})
+    expect(cacheMetrics.onMax).toHaveBeenCalledWith('test-cache', 10);
+  });
+});
 
 describe('@tramvai/module-common cache with metrics proxy class handlers', () => {
   const cacheWithMetricsProxy = new CacheWithMetricsProxy(

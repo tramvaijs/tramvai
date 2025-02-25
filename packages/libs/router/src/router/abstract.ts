@@ -324,7 +324,7 @@ export abstract class AbstractRouter {
     const { url, replace, params, navigateState, code, viewTransition } = navigateOptions;
     const prevNavigation = redirect
       ? this.lastNavigation
-      : this.currentNavigation ?? this.lastNavigation;
+      : (this.currentNavigation ?? this.lastNavigation);
 
     if (!url && !prevNavigation) {
       throw new Error(

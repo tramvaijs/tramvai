@@ -144,7 +144,7 @@ describe('shared/utils/selfSignedCertificate', () => {
       return true;
     });
     const result = createSelfSignedCertificate({ host: 'new.localhost.domain' });
-    expect(appendFileSyncSpy).toBeCalledTimes(1);
+    expect(appendFileSyncSpy).toHaveBeenCalledTimes(1);
 
     expect(result).toEqual({
       keyPath: defaultKeyPath,

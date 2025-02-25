@@ -17,6 +17,7 @@ try {
   appConfig = require('@tramvai/cli/lib/external/config').appConfig;
 } catch (e) {
   if (process.env.NODE_ENV === 'development') {
+    // eslint-disable-next-line no-console
     console.error('Error while reading app config', e);
   }
 }

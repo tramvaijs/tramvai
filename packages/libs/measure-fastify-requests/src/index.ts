@@ -58,7 +58,7 @@ export const fastifyMeasureRequests = fp<MeasureOptions<any>>(
       additionalLabelNames = [],
       httpRequestsDurationBuckets,
       metricsExcludePaths = [],
-      getAdditionalLabelValues = () => ({} as LabelValues<any>),
+      getAdditionalLabelValues = () => ({}) as LabelValues<any>,
     }
   ) => {
     const labelNames = LABEL_NAMES.concat(additionalLabelNames);

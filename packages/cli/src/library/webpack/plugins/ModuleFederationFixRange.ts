@@ -93,6 +93,7 @@ export class ModuleFederationFixRange implements webpack.WebpackPluginInstance {
             for (const sharedModule of sharedModulesByPath) {
               const connections = compilation.moduleGraph.getOutgoingConnections(sharedModule);
 
+              // eslint-disable-next-line no-unreachable-loop
               for (const { module } of connections) {
                 const resolvedVersion = module.resourceResolveData?.descriptionFileData?.version;
                 this.fixVersionRange(sharedModule, resolvedVersion);

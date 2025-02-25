@@ -42,7 +42,7 @@ export type Action<Payload = any, Result = any, Deps = any> = ActionParameters<
 export interface PlatformAction<
   Payload = any,
   Result = any,
-  Context extends ActionContext = ActionContext
+  Context extends ActionContext = ActionContext,
 > {
   (context: Context, payload?: Payload): Promise<Result>;
   priority?: 3 | 5 | 7 | 10;

@@ -22,7 +22,7 @@ export const startAppFixture: [
     StartAppTypes.TestApp,
     { appTarget: StartAppTypes.AppTarget; startOptions: StartAppTypes.StartOptions }
   >,
-  { scope: 'worker'; timeout: number }
+  { scope: 'worker'; timeout: number },
 ] = [
   async ({ appTarget, startOptions }, use) => {
     let app: StartCliResult | undefined;
@@ -46,6 +46,7 @@ export const startAppFixture: [
 
       await app.close();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`startApp fixture failed:`, error);
 
       await app?.close();

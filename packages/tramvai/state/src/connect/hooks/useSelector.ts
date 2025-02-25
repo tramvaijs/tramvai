@@ -43,8 +43,8 @@ export function useSelector<T, S extends OptionalStoreType>(
     state: S['store'] extends Reducer<any>
       ? { [key in S['store']['storeName']]: InferStoreStateFromReducer<S['store']> }
       : S['store'] extends string
-      ? { [key in S['store']]: any }
-      : Record<string, any>
+        ? { [key in S['store']]: any }
+        : Record<string, any>
   ) => T,
   equalityFn?: typeof shallowEqual
 ): T;
@@ -99,6 +99,7 @@ export function useSelector<T, S extends StoreType | StoreType[]>(
       const exists = context.hasStore(store);
 
       if (!exists) {
+        // eslint-disable-next-line no-console
         console.warn(`
 The store "${storeName}" has been used, but not registered via COMBINE_REDUCERS token.
 Have you forgot to register it? Note, that we are registering it for you to make things just work.
@@ -176,18 +177,17 @@ type InferStoreStateFromOptionalStore<Store extends OptionalStoreType> =
 type InferStoreNameFromUnknownStore<Store> = Store extends string
   ? Store
   : Store extends OptionalStoreType
-  ? InferStoreNameFromOptionalStore<Store>
-  : Store extends Reducer<any>
-  ? InferStoreNameFromReducer<Store>
-  : Store extends BaseStoreConstructor<any>
-  ? InferStoreNameFromLegacyStore<Store>
-  : DEFAULT_STORE_NAME;
+    ? InferStoreNameFromOptionalStore<Store>
+    : Store extends Reducer<any>
+      ? InferStoreNameFromReducer<Store>
+      : Store extends BaseStoreConstructor<any>
+        ? InferStoreNameFromLegacyStore<Store>
+        : DEFAULT_STORE_NAME;
 
 type InferStoreNameFromReducer<Store extends Reducer<any>> = Store['storeName'];
 
-type InferStoreStateFromReducer<Store extends Reducer<any>> = Store extends Reducer<infer State>
-  ? State
-  : DEFAULT_STORE_STATE;
+type InferStoreStateFromReducer<Store extends Reducer<any>> =
+  Store extends Reducer<infer State> ? State : DEFAULT_STORE_STATE;
 
 type InferStoreNameFromLegacyStore<Store extends BaseStoreConstructor<any>> = Store['storeName'];
 
@@ -197,9 +197,9 @@ type InferStoreStateFromLegacyStore<Store extends BaseStoreConstructor<any>> =
 type InferStoreStateFromUnknownStore<Store> = Store extends string
   ? DEFAULT_STORE_STATE
   : Store extends OptionalStoreType
-  ? InferStoreStateFromOptionalStore<Store>
-  : Store extends Reducer<any>
-  ? InferStoreStateFromReducer<Store>
-  : Store extends BaseStoreConstructor<any>
-  ? InferStoreStateFromLegacyStore<Store>
-  : DEFAULT_STORE_STATE;
+    ? InferStoreStateFromOptionalStore<Store>
+    : Store extends Reducer<any>
+      ? InferStoreStateFromReducer<Store>
+      : Store extends BaseStoreConstructor<any>
+        ? InferStoreStateFromLegacyStore<Store>
+        : DEFAULT_STORE_STATE;

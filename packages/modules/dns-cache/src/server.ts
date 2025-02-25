@@ -111,9 +111,9 @@ export const TramvaiDnsCacheModule = declareModule({
       scope: Scope.SINGLETON,
       useFactory: ({ createCache, envManager }) => {
         const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
-        const ttl = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+        const dnsTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
 
-        const cache = createCache('memory', { name: 'dns-lookup', max, ttl });
+        const cache = createCache('memory', { name: 'dns-lookup', max, ttl: dnsTTL });
 
         const adapter: CacheInstance = {
           set: (hostname: string, entries: any[], ttl: number): any => {

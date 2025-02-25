@@ -24,6 +24,7 @@ export const ChildAppRenderChildren: FC<Props> = ({ di, ...props }) => {
   }
 
   // Only `children` and `key` are allowed as props for Fragment
+  // eslint-disable-next-line react/jsx-no-useless-fragment
   return <>{props.children}</>;
 };
 

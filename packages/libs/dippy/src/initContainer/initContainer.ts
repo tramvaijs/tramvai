@@ -18,8 +18,8 @@ export const initContainer = ({
   const di = createContainer();
   const modulesToResolve = new Set<ModuleType>();
 
-  const walkOfProviders = (providers: Provider[]) => {
-    providers.forEach((provide) => {
+  const walkOfProviders = (providersForWalk: Provider[]) => {
+    providersForWalk.forEach((provide) => {
       di.register(provide);
     });
   };

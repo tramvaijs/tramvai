@@ -53,7 +53,7 @@ describe('actionPageRunnerBrowser', () => {
       }),
     ]);
 
-    expect(router.registerHook).toBeCalledTimes(1);
+    expect(router.registerHook).toHaveBeenCalledTimes(1);
     expect(result).toEqual([1, 2, 3]);
   });
 

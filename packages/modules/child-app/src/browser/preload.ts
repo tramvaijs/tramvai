@@ -91,11 +91,13 @@ export class PreloadManager implements ChildAppPreloadManager {
             // TODO: Can be a race condition between Child App render and actions?
             this.run('clear', config).catch((error) => {
               if (process.env.NODE_ENV === 'development') {
+                // eslint-disable-next-line no-console
                 console.error('Child App command line error', error);
               }
             });
           } catch (error) {
             if (process.env.NODE_ENV === 'development') {
+              // eslint-disable-next-line no-console
               console.error('Child App loading error', error);
             }
           }
@@ -128,6 +130,7 @@ export class PreloadManager implements ChildAppPreloadManager {
         await this.resolveComponent(config, route);
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
           console.error('Child App prefetch error', error);
         }
       }

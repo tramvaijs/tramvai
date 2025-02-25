@@ -1,18 +1,21 @@
 import type { Express, Handler } from 'express';
 import type { HttpClientError, HttpClientBaseOptions } from '@tramvai/http-client';
 
-import { createAdapter } from '../createAdapter';
 import {
   startMockServer,
   delayResponseWithFakeTimers,
-} from '../../../../../test/utils/simpleMockServer';
-import { createLoggerMocks, clearLoggerMocks } from '../../../../../test/mocks/tramvai/logger';
+} from '@tramvai/internal-test-utils/utils/simpleMockServer';
+import {
+  createLoggerMocks,
+  clearLoggerMocks,
+} from '@tramvai/internal-test-utils/mocks/tramvai/logger';
 import {
   createCacheMocks,
   mockCacheImplementation,
   clearCacheMocks,
   createCacheMock,
-} from '../../../../../test/mocks/tramvai/cache';
+} from '@tramvai/internal-test-utils/mocks/tramvai/cache';
+import { createAdapter } from '../createAdapter';
 
 const { loggerMock, loggerFactoryMock } = createLoggerMocks();
 const { cacheMock, cacheFactoryMock } = createCacheMocks();
@@ -234,8 +237,8 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await httpClient.get('first');
       await httpClient.get('second');
 
-      expect(firstHandler).toBeCalledTimes(1);
-      expect(secondHandler).toBeCalledTimes(1);
+      expect(firstHandler).toHaveBeenCalledTimes(1);
+      expect(secondHandler).toHaveBeenCalledTimes(1);
 
       await terminate();
     });
@@ -262,9 +265,9 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await httpClient.get('first');
       await httpClient.get('second');
 
-      expect(cacheFactoryMock).toBeCalled();
-      expect(firstHandler).toBeCalledTimes(1);
-      expect(secondHandler).toBeCalledTimes(1);
+      expect(cacheFactoryMock).toHaveBeenCalled();
+      expect(firstHandler).toHaveBeenCalledTimes(1);
+      expect(secondHandler).toHaveBeenCalledTimes(1);
 
       await terminate();
     });
@@ -290,8 +293,8 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await httpClient.request({ path: 'second' });
       await httpClient.request({ path: 'second' });
 
-      expect(firstHandler).toBeCalledTimes(2);
-      expect(secondHandler).toBeCalledTimes(2);
+      expect(firstHandler).toHaveBeenCalledTimes(2);
+      expect(secondHandler).toHaveBeenCalledTimes(2);
 
       await terminate();
     });
@@ -317,8 +320,8 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await httpClient.request({ path: 'second', cache: true });
       await httpClient.request({ path: 'second', cache: true });
 
-      expect(firstHandler).toBeCalledTimes(1);
-      expect(secondHandler).toBeCalledTimes(1);
+      expect(firstHandler).toHaveBeenCalledTimes(1);
+      expect(secondHandler).toHaveBeenCalledTimes(1);
 
       await terminate();
     });
@@ -340,7 +343,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await httpClient.request({ path: 'first' });
       await httpClient.request({ path: 'first' });
 
-      expect(firstHandler).toBeCalledTimes(2);
+      expect(firstHandler).toHaveBeenCalledTimes(2);
 
       await terminate();
     });
@@ -364,7 +367,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         httpClient.request({ path: 'first', cache: true }),
       ]);
 
-      expect(firstHandler).toBeCalledTimes(1);
+      expect(firstHandler).toHaveBeenCalledTimes(1);
 
       await terminate();
     });
@@ -387,7 +390,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         httpClient.request({ path: 'json' }),
       ]);
 
-      expect(handler).toBeCalledTimes(1);
+      expect(handler).toHaveBeenCalledTimes(1);
       expect(first).toBe(STATUS);
       expect(first).toEqual(second);
 
@@ -414,8 +417,8 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await httpClient.request({ path: 'second', cache: false });
       await httpClient.request({ path: 'second', cache: false });
 
-      expect(firstHandler).toBeCalledTimes(2);
-      expect(secondHandler).toBeCalledTimes(2);
+      expect(firstHandler).toHaveBeenCalledTimes(2);
+      expect(secondHandler).toHaveBeenCalledTimes(2);
 
       await terminate();
     });
@@ -446,7 +449,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         }
       }
 
-      expect(errorHandlerMock).toBeCalledTimes(sentReqCount);
+      expect(errorHandlerMock).toHaveBeenCalledTimes(sentReqCount);
 
       expect(error?.__meta).toMatchObject({
         CIRCUIT_BREAKER: {
@@ -661,7 +664,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
           httpClient.request({ path: 'json' }),
         ]);
 
-        expect(handler).toBeCalledTimes(1);
+        expect(handler).toHaveBeenCalledTimes(1);
         expect(first).toBe(200);
         expect(first).toEqual(second);
 

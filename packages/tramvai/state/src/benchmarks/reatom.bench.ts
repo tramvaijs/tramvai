@@ -18,11 +18,14 @@ const generateAtom = (name) => {
 };
 
 const atomsAndActions = range(0, 100).map((id) => generateAtom(id));
-const atomsSlice = atomsAndActions.reduce((slice, { atom, name }) => {
-  // eslint-disable-next-line no-param-reassign
-  slice[name] = atom;
-  return slice;
-}, {} as Record<string, Atom<any>>);
+const atomsSlice = atomsAndActions.reduce(
+  (slice, { atom, name }) => {
+    // eslint-disable-next-line no-param-reassign
+    slice[name] = atom;
+    return slice;
+  },
+  {} as Record<string, Atom<any>>
+);
 const actions = atomsAndActions.map(({ action }) => action);
 const preloadedStore = createStore(combine(atomsSlice));
 let currentPayload = 1;

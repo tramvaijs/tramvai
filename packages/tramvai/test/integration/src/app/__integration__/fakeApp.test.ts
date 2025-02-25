@@ -25,6 +25,7 @@ describe('test/integration/app/runFakeApp', () => {
     return app.close();
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('should return 200 status', async () => {
     return app.request('/').expect(200);
   });
@@ -72,6 +73,7 @@ describe('test/integration/app/runFakeApp', () => {
     await browser.close();
   });
 
+  // eslint-disable-next-line jest/expect-expect
   it('should work with mocker', async () => {
     await app.mocker.addMocks('CONFIG_API', {
       'GET /test/': {

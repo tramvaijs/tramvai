@@ -15,7 +15,7 @@ export const createUniqueActionKeyForQuery = <Options, Deps extends ProviderDeps
   queryParameters: BaseCreateQueryOptions<Options, Deps>
 ): string => {
   const rawQueryKey = isSerializableKey(queryParameters)
-    ? queryParameters.actionNamePostfix ?? queryParameters.key
+    ? (queryParameters.actionNamePostfix ?? queryParameters.key)
     : queryParameters.actionNamePostfix;
 
   const queryKeyArray = normalizeKey(rawQueryKey as ReactQueryKeyOrString);

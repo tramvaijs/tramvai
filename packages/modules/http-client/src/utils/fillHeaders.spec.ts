@@ -1,5 +1,5 @@
+import { RequestManager } from '@tramvai/module-common/src/requestManager/requestManager';
 import { fillHeaderIp, fillHeaders } from './fillHeaders';
-import { RequestManager } from '../../../common/src/requestManager/requestManager';
 
 describe('http-client/utils/fillHeaders', () => {
   it('fillHeaderIp', () => {

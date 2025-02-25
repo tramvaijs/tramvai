@@ -18,17 +18,13 @@ export abstract class Task {
 
   context: Context;
 
+  abstract readonly name: string;
+  abstract readonly description: string;
+  abstract readonly command: string;
+  abstract readonly arguments: string[];
   constructor(context) {
     this.context = context;
   }
-
-  abstract readonly name: string;
-
-  abstract readonly description: string;
-
-  abstract readonly command: string;
-
-  abstract readonly arguments: string[];
 
   async run(
     parameters: { arguments?: string[]; options?: Record<string, any> } = {}
