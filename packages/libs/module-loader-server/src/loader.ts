@@ -58,7 +58,7 @@ export class ServerLoader {
   loadByUrl<R = any>(url: string, options: LoadOptions = {}): R | Promise<R> {
     const key = this.getCacheKey(url, options);
     const mod: R | void = this.cache.get(key);
-    const { displayName: displayNameIn, kind = 'module', type = 'js' } = options;
+    const { displayName: displayNameIn, kind = 'module', type = 'js', silent } = options;
     const displayName = displayNameIn ? `${kind} "${displayNameIn}"` : kind;
 
     if (mod) {
@@ -102,7 +102,7 @@ export class ServerLoader {
         return parsedResponse;
       })
       .catch((err) => {
-        this.log.error({
+        this.log[silent ? 'info' : 'error']({
           event: 'load-module-failed',
           error: err,
           url,

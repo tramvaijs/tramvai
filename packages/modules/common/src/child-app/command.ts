@@ -1,5 +1,10 @@
 import type { Provider } from '@tramvai/core';
-import { COMMAND_LINES_TOKEN, Scope } from '@tramvai/core';
+import {
+  COMMAND_LINE_RUNNER_PLUGIN,
+  COMMAND_LINES_TOKEN,
+  Scope,
+  TAPABLE_HOOK_FACTORY_TOKEN,
+} from '@tramvai/core';
 import { COMMAND_LINE_RUNNER_TOKEN } from '@tramvai/core';
 import { provide } from '@tramvai/core';
 import {
@@ -39,6 +44,8 @@ export const commandProviders: Provider[] = [
       COMMAND_LINE_RUNNER_TOKEN,
       EXECUTION_CONTEXT_MANAGER_TOKEN,
       COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
+      TAPABLE_HOOK_FACTORY_TOKEN,
+      COMMAND_LINE_RUNNER_PLUGIN,
     ],
   }),
   provide({

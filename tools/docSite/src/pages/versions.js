@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '@theme/Layout';
 
 export default function Versions() {
-  const baseUrl = '/tramvai/';
+  const baseUrl = '/';
 
   return (
     <Layout title="Tramvai Versions" description="Tramvai Versions Page">

@@ -1,7 +1,14 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import type { Container } from '@tinkoff/dippy';
 import type { Provider } from '@tramvai/core';
-import { APP_INFO_TOKEN, Scope, optional, provide } from '@tramvai/core';
+import {
+  APP_INFO_TOKEN,
+  COMMAND_LINE_RUNNER_PLUGIN,
+  Scope,
+  TAPABLE_HOOK_FACTORY_TOKEN,
+  optional,
+  provide,
+} from '@tramvai/core';
 import { ActionRegistry } from '@tramvai/module-common';
 import {
   COMPONENT_REGISTRY_TOKEN,
@@ -96,6 +103,8 @@ export const getChildProviders = (appDi: Container, loadableStats: LoadableStats
         COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
         PUBSUB_TOKEN,
         PUBSUB_FACTORY_TOKEN,
+        TAPABLE_HOOK_FACTORY_TOKEN,
+        COMMAND_LINE_RUNNER_PLUGIN,
       ],
     }),
     ...getChildEndProviders(appDi),

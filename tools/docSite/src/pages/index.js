@@ -1,8 +1,6 @@
 import React from 'react';
 // eslint-disable-next-line import/no-unresolved
 import Layout from '@theme/Layout';
-// eslint-disable-next-line no-restricted-imports
-import { DocsRating } from '../components/DocsRating/src';
 import { Title } from '../components/main/title';
 import { QuickStart } from '../components/main/quick-start';
 import { Universal } from '../components/main/universal';
@@ -25,11 +23,6 @@ function Index() {
       <View />
       <State />
       <Commands />
-      <div className="row padding-bottom--xl">
-        <div className="col col--8 col--offset-2">
-          <DocsRating label="root" />
-        </div>
-      </div>
     </Layout>
   );
 }

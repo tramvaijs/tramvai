@@ -37,9 +37,9 @@ const docusaurusConfig = {
           exclude: ['**/*.public.md'],
           // rehypePlugins: [[require('rehype-partials'), {}]],
         },
-        googleAnalytics: {
-          trackingID: 'UA-122261674-2',
-        },
+        // googleAnalytics: {
+        //   trackingID: 'UA-122261674-2',
+        // },
       },
     ],
   ],
@@ -84,8 +84,8 @@ const docusaurusConfig = {
 
   title: 'tramvai', // Title for your website.
   tagline: 'Modular framework for universal React applications',
-  url: 'https://tramvai.dev/', // Your website URL
-  baseUrl: process.env.DOCS_BASE_URL ?? '/tramvai/', // Base URL for your project */
+  url: 'https://tramvai.t-tech.team/', // Your website URL
+  baseUrl: process.env.DOCS_BASE_URL ?? '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',
   //   baseUrl: '/test-site/',

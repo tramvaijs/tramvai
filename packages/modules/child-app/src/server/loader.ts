@@ -62,6 +62,7 @@ export class ServerLoader extends Loader {
           type: 'json',
           kind: 'child-app stats',
           displayName: config.name,
+          silent: true,
         })
         // we can live without stats
         .catch(() => {}),
@@ -74,6 +75,7 @@ export class ServerLoader extends Loader {
             type: 'json',
             kind: 'child-app loadable stats',
             displayName: config.name,
+            silent: true,
           })
           // we can live without loadable stats, for backward compatibility is ok
           // but hydration errors will occur when lazy component will loaded at client-side at demand
