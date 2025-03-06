@@ -9,6 +9,7 @@ import { getPapiParameters } from '@tramvai/papi';
 import { FASTIFY_REQUEST, FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
 import type { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
 import { PAPI_EXECUTOR } from '@tramvai/tokens-server-private';
+import { comparePathWithPattern, getPathParams } from '../utils';
 
 export interface Deps {
   di: ExtractDependencyType<typeof DI_TOKEN>;
@@ -25,14 +26,30 @@ export class PapiService extends BaseHttpClient {
     this.di = di;
   }
 
-  async request<R = any>({ path, query, body }: HttpClientRequest): Promise<HttpClientResponse<R>> {
-    const papiRoute = find((papi) => getPapiParameters(papi).path === `/${path}`, this.papi ?? []);
+  async request<R = any>({
+    path,
+    query,
+    body,
+    headers,
+  }: HttpClientRequest): Promise<HttpClientResponse<R>> {
+    const pathWithLeadingSlash = path?.startsWith('/') ? path : `/${path}`;
+
+    const papiRoute = find(
+      (papi) => comparePathWithPattern(pathWithLeadingSlash, getPapiParameters(papi).path),
+      this.papi ?? []
+    );
 
     if (!papiRoute) {
       throw new Error(`papi handler '${path}' not found`);
     }
 
-    const req = { headers: { host: 'localhost' }, cookies: {}, query, body };
+    const req = {
+      headers: { ...headers, host: 'localhost' },
+      cookies: {},
+      query,
+      body,
+      params: getPathParams(pathWithLeadingSlash, getPapiParameters(papiRoute).path),
+    };
     const res = {};
 
     const childDi = createChildContainer(this.di, [

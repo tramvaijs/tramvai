@@ -117,6 +117,36 @@ describe('PapiService, server', () => {
     });
   });
 
+  it('GET request with path params', async () => {
+    apiClient = mockApiClient({
+      providers: [
+        {
+          provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+          multi: true,
+          useValue: createPapiMethod({
+            path: '/example/:type/:id',
+            async handler({ params }) {
+              return {
+                resultCode: 'OK',
+                payload: params,
+              };
+            },
+          }),
+        },
+      ],
+    });
+
+    const { payload } = await apiClient.request({ path: '/example/mock/12345' });
+
+    expect(payload).toEqual({
+      resultCode: 'OK',
+      payload: {
+        type: 'mock',
+        id: '12345',
+      },
+    });
+  });
+
   it('POST request', async () => {
     apiClient = mockApiClient({
       providers: [
