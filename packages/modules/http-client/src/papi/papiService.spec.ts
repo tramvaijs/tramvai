@@ -11,16 +11,19 @@ import {
   clearCookieManagerMock,
 } from '@tramvai/internal-test-utils/mocks/tramvai/cookieManager';
 import { WEB_USER_ID_TOKEN } from '@tramvai/module-web-user-id';
-import { createLoggerMocks, clearLoggerMocks } from '../../../../../test/mocks/tramvai/logger';
+import {
+  createLoggerMocks,
+  clearLoggerMocks,
+} from '@tramvai/internal-test-utils/mocks/tramvai/logger';
 import {
   createRequestManagerMock,
   clearRequestManagerMock,
-} from '../../../../../test/mocks/tramvai/requestManager';
+} from '@tramvai/internal-test-utils/mocks/tramvai/requestManager';
 import {
   createEnvManagerMock,
   clearEnvManagerMock,
-} from '../../../../../test/mocks/tramvai/envManager';
-import { createPapiMethod } from '../../../../tramvai/papi/src/createPapiMethod';
+} from '@tramvai/internal-test-utils/mocks/tramvai/envManager';
+import { createPapiMethod } from '@tramvai/papi/src/createPapiMethod';
 import { HttpClientModule } from '../httpClientModule';
 
 const { loggerMock, loggerFactoryMock } = createLoggerMocks();
@@ -111,6 +114,36 @@ describe('PapiService, server', () => {
     expect(payload).toEqual({
       resultCode: 'OK',
       payload: 'payload',
+    });
+  });
+
+  it('GET request with path params', async () => {
+    apiClient = mockApiClient({
+      providers: [
+        {
+          provide: SERVER_MODULE_PAPI_PUBLIC_ROUTE,
+          multi: true,
+          useValue: createPapiMethod({
+            path: '/example/:type/:id',
+            async handler({ params }) {
+              return {
+                resultCode: 'OK',
+                payload: params,
+              };
+            },
+          }),
+        },
+      ],
+    });
+
+    const { payload } = await apiClient.request({ path: '/example/mock/12345' });
+
+    expect(payload).toEqual({
+      resultCode: 'OK',
+      payload: {
+        type: 'mock',
+        id: '12345',
+      },
     });
   });
 
