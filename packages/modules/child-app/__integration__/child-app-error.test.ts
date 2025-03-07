@@ -477,23 +477,26 @@ if (rootAppVersion !== 'v2.0.0') {
 
             const { page } = await getPageWrapper();
 
-            page.on('console', async (msg) => {
-              if (msg.type() === 'error' && msg.args()[2] !== undefined) {
-                const error = await msg.args()[2].jsonValue();
-                if (error?.event === 'component-did-catch') {
-                  errors.push(error);
+            const waitForDidCatchMessage = new Promise((resolve) => {
+              page.on('console', async (msg) => {
+                if (msg.type() === 'error' && msg.args()[2] !== undefined) {
+                  const error = await msg.args()[2].jsonValue();
+                  if (error?.event === 'component-did-catch') {
+                    errors.push(error);
+                    resolve(null);
+                  }
                 }
-              }
+              });
             });
 
             await page.goto(`${serverUrl}/error/?renderError=client`);
-            await waitHydrated(page);
+            await waitForDidCatchMessage;
 
             expect(errors.length).toBe(1);
             expect(errors[0]).toStrictEqual({
               event: 'component-did-catch',
               message: 'An unexpected error occured during rendering',
-              error: expect.any(String),
+              error: expect.any(Object),
               info: expect.any(Object),
               childApp: {
                 name: 'error',

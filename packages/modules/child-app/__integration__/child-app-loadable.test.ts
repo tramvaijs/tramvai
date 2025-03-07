@@ -219,9 +219,9 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
         // assets for rendered on client-side components
         expect(loadableAssets[0].includes('lazy-cmp-unused_client.chunk')).toBeTruthy();
 
-        expect(await page.locator('#loadable').innerHTML()).toMatchInlineSnapshot(
-          `"Child App: <!-- -->I'm little child app"`
-        );
+        expect(
+          (await page.locator('#loadable').innerHTML()).replace('<!-- -->', '')
+        ).toMatchInlineSnapshot(`"Child App: I'm little child app"`);
         expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
           `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li>"`
         );

@@ -20,6 +20,7 @@ export const webpackServerConfig = ({
   config.batch(commonDev(configManager));
 
   config.mode('development');
+  config.devtool(configManager.webpack.devtool ?? false);
 
   if (showProgress) {
     config.plugin('progress').use(WebpackBar, [

@@ -82,7 +82,8 @@ export const satisfies = (
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent#Rendering_engine
   if (
     engineName === 'chromium' ||
-    (engineName.toLowerCase() === 'blink' && CHROMIUM_BASED_BROWSERS.indexOf(browserName) !== -1)
+    (engineName.toLowerCase() === 'blink' &&
+      CHROMIUM_BASED_BROWSERS.indexOf(browserName.toLowerCase()) !== -1)
   ) {
     browserName = 'chrome';
     browserVersion = engineVersion || '';
