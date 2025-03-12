@@ -100,6 +100,7 @@ export const babelConfigFactory = ({
           // from core-js version depends on what polyfills will be included with `useBuiltIns: 'entry'` option
           // this logic is here - https://github.com/zloirock/core-js/blob/master/packages/core-js-compat/src/modules-by-versions.mjs
           corejs: require('core-js/package.json').version,
+          // TODO: will be deprecated in babel@8 - https://babeljs.io/docs/babel-preset-env#loose
           loose: true,
           targets,
           browserslistEnv: resultTarget,

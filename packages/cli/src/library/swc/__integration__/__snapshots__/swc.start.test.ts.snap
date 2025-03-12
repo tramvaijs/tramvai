@@ -405,15 +405,17 @@ exports[`client: server.inline.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ForBrowser: function() { return /* binding */ ForBrowser; }
 /* harmony export */ });
+/* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js");
 /* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
 __webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+
 
 class ForBrowser {
     test() {
         console.log("Ok");
     }
 }
-ForBrowser.prop = "static";
+(0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__._)(ForBrowser, "prop", "static");
 
 
 const $ReactRefreshModuleId$ = __webpack_require__.$Refresh$.moduleId;
@@ -728,16 +730,28 @@ exports[`server: server.inline.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ForBrowser: function() { return /* binding */ ForBrowser; }
 /* harmony export */ });
+/* harmony import */ var _swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_class_call_check.js");
+/* harmony import */ var _swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_create_class.js");
+/* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js");
+
+
+
 var ForBrowser = /*#__PURE__*/ function() {
     "use strict";
-    function ForBrowser() {}
-    var _proto = ForBrowser.prototype;
-    _proto.test = function test() {
-        console.log("Ok");
-    };
+    function ForBrowser() {
+        (0,_swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__._)(this, ForBrowser);
+    }
+    (0,_swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__._)(ForBrowser, [
+        {
+            key: "test",
+            value: function test() {
+                console.log("Ok");
+            }
+        }
+    ]);
     return ForBrowser;
 }();
-ForBrowser.prop = "static";
+(0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__._)(ForBrowser, "prop", "static");
 
 
 "

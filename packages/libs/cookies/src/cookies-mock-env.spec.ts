@@ -136,9 +136,9 @@ describe('Cookies mocked environment', () => {
 
   it('Verify erase options are applied', () => {
     // Erase cookie with all available options
-    cookies.erase('banana', { domain: 'example.org', path: '/a/path' });
+    cookies.erase('banana', { domain: 'example.org', path: '/a/path', secure: true });
     expect(document.cookie).toBe(
-      'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=example.org;path=/a/path'
+      'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=example.org;path=/a/path;secure'
     );
 
     // Erase cookie with only the path set
@@ -150,6 +150,10 @@ describe('Cookies mocked environment', () => {
     expect(document.cookie).toBe(
       'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=example.org;path=/'
     );
+
+    // Erase cookie with only the secure set
+    cookies.erase('banana', { secure: true });
+    expect(document.cookie).toBe('banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;path=/;secure');
   });
 
   it("Verify erase doesn't apply default configuration", () => {
@@ -162,19 +166,19 @@ describe('Cookies mocked environment', () => {
       httpOnly: true,
     });
 
-    // Erase cookie should apply the domain and path specified in the defaults above
+    // Erase cookie should apply the domain, path and secure specified in the defaults above
     cookies.erase('banana');
     expect(document.cookie).toBe(
-      'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=default.example.org;path=/default/path'
+      'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=default.example.org;path=/default/path;secure'
     );
 
-    // Erase cookie with specified domain and path overrules the defaults
-    cookies.erase('banana', { domain: 'other.example.org', path: '/other/path' });
+    // Erase cookie with specified domain, path and secure overrules the defaults
+    cookies.erase('banana', { domain: 'other.example.org', path: '/other/path', secure: false });
     expect(document.cookie).toBe(
       'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=other.example.org;path=/other/path'
     );
 
-    // All options besides domain and path should be ignored
+    // All options besides domain, path and secure should be ignored
     cookies.erase('banana', {
       domain: 'other.example.org',
       path: '/other/path',
@@ -183,7 +187,7 @@ describe('Cookies mocked environment', () => {
       httpOnly: true,
     });
     expect(document.cookie).toBe(
-      'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=other.example.org;path=/other/path'
+      'banana=;expires=Thu, 19 Dec 2030 23:15:30 GMT;domain=other.example.org;path=/other/path;secure'
     );
   });
 

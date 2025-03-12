@@ -84,7 +84,7 @@ const docusaurusConfig = {
 
   title: 'tramvai', // Title for your website.
   tagline: 'Modular framework for universal React applications',
-  url: 'https://tramvai.t-tech.team/', // Your website URL
+  url: 'https://tramvai.dev/', // Your website URL
   baseUrl: process.env.DOCS_BASE_URL ?? '/', // Base URL for your project */
   // For github.io type URLs, you would set the url and baseUrl like:
   //   url: 'https://facebook.github.io',

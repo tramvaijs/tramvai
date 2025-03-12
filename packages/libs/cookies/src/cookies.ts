@@ -88,7 +88,7 @@ export class Cookies implements ICookies {
       expires: -1,
       domain: options.domain,
       path: options.path,
-      secure: false,
+      secure: options.secure,
       httpOnly: false,
     });
   }

@@ -56,6 +56,10 @@ export class CookieComponentObject {
 
     return testCookie?.value;
   }
+
+  async removeTestCookie() {
+    return this.page.evaluate('contextExternal.di.get("cookieManager").remove("testcookies")');
+  }
 }
 
 export const CookieFixture: TestFixture<

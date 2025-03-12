@@ -23,6 +23,23 @@ testChrome.describe('packages/modules/cookie', async () => {
       await testChrome.expect(await Cookie.getTestCookie()).toBe('true');
     }
   );
+
+  testChrome(
+    'Check that the cookie module in Chrome can set and remove cookies',
+    async ({ app, I, proxyServer, Cookie }) => {
+      await I.gotoPage(app.serverUrl);
+
+      await testChrome.expect(await Cookie.getTestCookie()).toBe(undefined);
+
+      await Cookie.setTestCookie();
+
+      await testChrome.expect(await Cookie.getTestCookie()).toBe('true');
+
+      await Cookie.removeTestCookie();
+
+      await testChrome.expect(await Cookie.getTestCookie()).toBe(undefined);
+    }
+  );
 });
 
 testSafari.describe('packages/modules/cookie', async () => {
@@ -35,6 +52,23 @@ testSafari.describe('packages/modules/cookie', async () => {
 
     await testSafari.expect(await Cookie.getTestCookie()).toBe('true');
   });
+
+  testSafari(
+    'Check that the cookie module in Safari can set and remove cookies',
+    async ({ app, I, Cookie }) => {
+      await I.gotoPage(app.serverUrl);
+
+      await testSafari.expect(await Cookie.getTestCookie()).toBe(undefined);
+
+      await Cookie.setTestCookie();
+
+      await testSafari.expect(await Cookie.getTestCookie()).toBe('true');
+
+      await Cookie.removeTestCookie();
+
+      await testChrome.expect(await Cookie.getTestCookie()).toBe(undefined);
+    }
+  );
 });
 
 testSafariHttps.describe('packages/modules/cookie', async () => {
