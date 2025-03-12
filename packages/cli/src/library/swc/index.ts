@@ -104,7 +104,10 @@ Having swc config may conflict with @tramvai/cli configuration`
       // Use relevant core-js version, because it affects which polyfills are included
       // https://github.com/swc-project/swc/blob/main/crates/swc_ecma_preset_env/data/core-js-compat/modules-by-versions.json
       coreJs: require('core-js/package.json').version,
-      loose: true,
+      // disabled because `arrayLikeIsIterable` and `iterableIsArray` assumtions is not supported yet in swc,
+      // this can leads to incorrect code generation e.g. when Set with spread is used - `[...new Set()] => [].concat(new Set())`
+      // TCORE-4904
+      loose: false,
       mode: 'entry',
     },
     module: {

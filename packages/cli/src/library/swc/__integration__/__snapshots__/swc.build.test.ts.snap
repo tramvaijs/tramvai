@@ -13,14 +13,15 @@ exports[`client-legacy: create-token-pure.ts 1`] = `
 `;
 
 exports[`client-legacy: images/logo.svg\\?react 1`] = `
-"              /* harmony import */ var _swc_helpers_extends__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_extends.js"), react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime");
+"              /* harmony import */ var _swc_helpers_object_spread__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_object_spread.js"), _swc_helpers_object_spread_props__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_object_spread_props.js"), react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime");
               /* harmony import */              __webpack_require__("webpack/sharing/consume/default/react/react"), 
               /* harmony default export */ __webpack_exports__.Z = function(props) {
                   /*#__PURE__*/
-                  return (0, react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("svg", (0, _swc_helpers_extends__WEBPACK_IMPORTED_MODULE_2__._)({
+                  return (0, react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)("svg", (0, _swc_helpers_object_spread_props__WEBPACK_IMPORTED_MODULE_2__._)((0, 
+                  _swc_helpers_object_spread__WEBPACK_IMPORTED_MODULE_3__._)({
                       xmlns: "http://www.w3.org/2000/svg",
                       viewBox: "0 0 80.9 72.2"
-                  }, props, {
+                  }, props), {
                       children: [ 
                       /*#__PURE__*/ (0, react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("path", {
                           fill: "#fff",
@@ -152,13 +153,18 @@ exports[`client-legacy: server.inline.ts 1`] = `
                       /* binding */ return ForBrowser;
                   }
                   /* harmony export */              });
-              var ForBrowser = /*#__PURE__*/ function() {
-                  function ForBrowser() {}
-                  return ForBrowser.prototype.test = function() {
-                      console.log("Ok");
-                  }, ForBrowser;
+              /* harmony import */ var _swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_class_call_check.js"), _swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_create_class.js"), _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js"), ForBrowser = /*#__PURE__*/ function() {
+                  function ForBrowser() {
+                      (0, _swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__._)(this, ForBrowser);
+                  }
+                  return (0, _swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__._)(ForBrowser, [ {
+                      key: "test",
+                      value: function() {
+                          console.log("Ok");
+                      }
+                  } ]), ForBrowser;
               }();
-              ForBrowser.prop = "static";
+              /* harmony import */              (0, _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__._)(ForBrowser, "prop", "static");
           },
           "
 `;
@@ -313,12 +319,13 @@ exports[`client-modern: server.inline.ts 1`] = `
                       /* binding */ return ForBrowser;
                   }
                   /* harmony export */              });
+              /* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js");
               class ForBrowser {
                   test() {
                       console.log("Ok");
                   }
               }
-              ForBrowser.prop = "static";
+              (0, _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__._)(ForBrowser, "prop", "static");
           },
           "
 `;
@@ -477,13 +484,18 @@ exports[`server: server.inline.ts 1`] = `
                       /* binding */ return ForBrowser;
                   }
                   /* harmony export */              });
-              var ForBrowser = /*#__PURE__*/ function() {
-                  function ForBrowser() {}
-                  return ForBrowser.prototype.test = function test() {
-                      console.log("Ok");
-                  }, ForBrowser;
+              /* harmony import */ var _swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_class_call_check.js"), _swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_create_class.js"), _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js"), ForBrowser = /*#__PURE__*/ function() {
+                  function ForBrowser() {
+                      (0, _swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__._)(this, ForBrowser);
+                  }
+                  return (0, _swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__._)(ForBrowser, [ {
+                      key: "test",
+                      value: function test() {
+                          console.log("Ok");
+                      }
+                  } ]), ForBrowser;
               }();
-              ForBrowser.prop = "static";
+              /* harmony import */              (0, _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__._)(ForBrowser, "prop", "static");
           },
           "
 `;
