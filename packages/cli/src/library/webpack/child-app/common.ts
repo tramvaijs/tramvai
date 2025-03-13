@@ -20,6 +20,7 @@ import { extractCssPluginFactory } from '../blocks/extractCssPlugin';
 import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
 import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
 import { resolveFrameworksPaths } from '../application/client/prod/optimization/splitChunks';
+import { PatchAutoPublicPathPlugin } from '../plugins/AutoPublicPathPlugin';
 
 // eslint-disable-next-line max-statements
 export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: Config) => {
@@ -163,6 +164,8 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
       shared: sharedModules,
     } as UniversalFederationPluginOptions,
   ]);
+
+  config.plugin('patch-auto-public-path').use(PatchAutoPublicPathPlugin);
 
   config.plugin('module-federation-validate-duplicates').use(ModuleFederationFixRange, [
     {
