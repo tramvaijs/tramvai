@@ -51,6 +51,8 @@ export const babelConfigFactory = ({
   excludesPresetEnv,
   rootDir = process.cwd(),
   reactCompiler = false,
+  loose = true,
+  externalHelpers = true,
 }: Partial<TranspilerConfig>) => {
   const cfg = envConfig[env] || {};
   let resultTarget = target;
@@ -101,7 +103,7 @@ export const babelConfigFactory = ({
           // this logic is here - https://github.com/zloirock/core-js/blob/master/packages/core-js-compat/src/modules-by-versions.mjs
           corejs: require('core-js/package.json').version,
           // TODO: will be deprecated in babel@8 - https://babeljs.io/docs/babel-preset-env#loose
-          loose: true,
+          loose,
           targets,
           browserslistEnv: resultTarget,
           bugfixes: resultTarget === 'modern',
@@ -125,7 +127,10 @@ export const babelConfigFactory = ({
       // React compiler must be the first plugin in the chain
       getReactCompilerPlugin({ isServer, options: reactCompiler }),
       // TODO: useESModules is deprecated and should work automatically - https://babeljs.io/docs/en/babel-plugin-transform-runtime#useesmodules
-      ['@babel/transform-runtime', { useESModules: !(isServer && env === 'development') }],
+      externalHelpers && [
+        '@babel/transform-runtime',
+        { useESModules: !(isServer && env === 'development') },
+      ],
       path.resolve(__dirname, './plugins/lazy-component/legacy-universal-replace'), // TODO: удалить плагин после того как отпадёт необходимость поддерживать легаси
       path.resolve(__dirname, './plugins/lazy-component/lazy-component'),
       enableFillDeclareActionNamePlugin &&
@@ -144,13 +149,13 @@ export const babelConfigFactory = ({
       [
         '@babel/plugin-proposal-class-properties',
         {
-          loose: true,
+          loose,
         },
       ],
       isServer && [
         '@babel/plugin-transform-private-methods',
         {
-          loose: true,
+          loose,
         },
       ],
       '@babel/plugin-proposal-export-default-from',

@@ -414,6 +414,11 @@ class ForBrowser {
     test() {
         console.log("Ok");
     }
+    constructor(){
+        (0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__._)(this, "property", ()=>{
+            console.log("Ok");
+        });
+    }
 }
 (0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__._)(ForBrowser, "prop", "static");
 
@@ -730,28 +735,20 @@ exports[`server: server.inline.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ForBrowser: function() { return /* binding */ ForBrowser; }
 /* harmony export */ });
-/* harmony import */ var _swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_class_call_check.js");
-/* harmony import */ var _swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_create_class.js");
-/* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js");
-
-
-
 var ForBrowser = /*#__PURE__*/ function() {
     "use strict";
     function ForBrowser() {
-        (0,_swc_helpers_class_call_check__WEBPACK_IMPORTED_MODULE_0__._)(this, ForBrowser);
+        this.property = function() {
+            console.log("Ok");
+        };
     }
-    (0,_swc_helpers_create_class__WEBPACK_IMPORTED_MODULE_1__._)(ForBrowser, [
-        {
-            key: "test",
-            value: function test() {
-                console.log("Ok");
-            }
-        }
-    ]);
+    var _proto = ForBrowser.prototype;
+    _proto.test = function test() {
+        console.log("Ok");
+    };
     return ForBrowser;
 }();
-(0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_2__._)(ForBrowser, "prop", "static");
+ForBrowser.prop = "static";
 
 
 "
