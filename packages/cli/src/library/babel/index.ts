@@ -1,6 +1,4 @@
 import path from 'path';
-import browserslist from 'browserslist';
-import envTargets from '@tinkoff/browserslist-config';
 import { sync as resolve } from 'resolve';
 import type { TransformOptions } from '@babel/core';
 
@@ -33,10 +31,9 @@ function hasJsxRuntime() {
 // eslint-disable-next-line complexity
 export const babelConfigFactory = ({
   env = 'development',
-  target,
-  modern,
   isServer = false,
   modules = false,
+  actualTarget,
   generateDataQaTag = true,
   enableFillActionNamePlugin = false,
   enableFillDeclareActionNamePlugin = false,
@@ -49,32 +46,12 @@ export const babelConfigFactory = ({
   tramvai = false,
   hot = false,
   excludesPresetEnv,
-  rootDir = process.cwd(),
+  browsersListTargets,
   reactCompiler = false,
   loose = true,
   externalHelpers = true,
 }: Partial<TranspilerConfig>) => {
   const cfg = envConfig[env] || {};
-  let resultTarget = target;
-
-  if (!target) {
-    if (isServer) {
-      resultTarget = 'node';
-    } else if (modern) {
-      resultTarget = 'modern';
-    }
-  }
-
-  const browserslistConfigRaw = browserslist.findConfig(rootDir);
-
-  // выставляем дефолты если явный конфиг для browserslist не был найден или в нём нет нужного targets
-  const browserslistQuery =
-    browserslistConfigRaw?.[resultTarget] ?? envTargets[resultTarget] ?? envTargets.defaults;
-
-  const targets = browserslist(browserslistQuery, {
-    mobileToDesktop: true,
-    env: resultTarget,
-  });
 
   const babelConfig = {
     // по умолчанию sourceType: 'module' и тогда бабель рассматривает все файлы как es-модули, что может
@@ -104,9 +81,9 @@ export const babelConfigFactory = ({
           corejs: require('core-js/package.json').version,
           // TODO: will be deprecated in babel@8 - https://babeljs.io/docs/babel-preset-env#loose
           loose,
-          targets,
-          browserslistEnv: resultTarget,
-          bugfixes: resultTarget === 'modern',
+          targets: browsersListTargets,
+          browserslistEnv: actualTarget,
+          bugfixes: actualTarget === 'modern',
           exclude: excludesPresetEnv,
         },
       ],

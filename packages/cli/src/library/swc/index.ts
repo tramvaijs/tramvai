@@ -1,8 +1,6 @@
 import isEmpty from '@tinkoff/utils/is/empty';
 import path from 'path';
 import { existsSync } from 'fs';
-import browserslist from 'browserslist';
-import envTargets from '@tinkoff/browserslist-config';
 import { sync as resolve } from 'resolve';
 import findCacheDir from 'find-cache-dir';
 import type { Options as SwcOptions } from '@swc/core';
@@ -16,10 +14,10 @@ let warningWasShown = false;
 export const getSwcOptions = (config: TranspilerConfig): SwcOptions => {
   const {
     env = 'development',
-    target,
-    modern,
     isServer = false,
     modules = false,
+    excludesPresetEnv,
+    browsersListTargets,
     typescript = false,
     hot = false,
     removeTypeofWindow,
@@ -82,34 +80,17 @@ Having swc config may conflict with @tramvai/cli configuration`
     }
   }
 
-  let resultTarget = target;
-
-  if (!target) {
-    if (isServer) {
-      resultTarget = 'node';
-    } else if (modern) {
-      resultTarget = 'modern';
-    }
-  }
-
-  const browserslistConfigRaw = browserslist.findConfig(rootDir);
-
-  // выставляем дефолты если явный конфиг для browserslist не был найден или в нём нет нужного targets
-  const browserslistQuery =
-    browserslistConfigRaw?.[resultTarget] ?? envTargets[resultTarget] ?? envTargets.defaults;
-
-  const targets = browserslist(browserslistQuery, {
-    mobileToDesktop: true,
-    env: resultTarget,
-  });
-
   return {
     env: {
-      targets,
+      targets: browsersListTargets,
       // Use relevant core-js version, because it affects which polyfills are included
       // https://github.com/swc-project/swc/blob/main/crates/swc_ecma_preset_env/data/core-js-compat/modules-by-versions.json
       coreJs: require('core-js/package.json').version,
+      // disabled because `arrayLikeIsIterable` and `iterableIsArray` assumtions is not supported yet in swc,
+      // this can leads to incorrect code generation e.g. when Set with spread is used - `[...new Set()] => [].concat(new Set())`
+      // TCORE-4904
       loose,
+      exclude: excludesPresetEnv,
       mode: 'entry',
     },
     module: {

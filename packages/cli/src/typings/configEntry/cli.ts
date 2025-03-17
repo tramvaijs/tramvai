@@ -142,8 +142,7 @@ export interface CliConfigEntry extends ConfigEntry {
    */
   experiments: Experiments;
   /**
-   * @title List of modules to exclude from `@babel/preset-env`
-   * @description Option doesn't affect build with swc loader
+   * @title List of modules to exclude from `@babel/preset-env` and `swc-loader`
    */
   excludesPresetEnv?: string[];
   /**

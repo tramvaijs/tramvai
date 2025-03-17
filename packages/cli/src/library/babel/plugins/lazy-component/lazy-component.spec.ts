@@ -10,8 +10,9 @@ pluginTester({
     typescript: true,
     generateDataQaTag: false,
     loader: false,
-    modern: true,
     hot: true,
+    actualTarget: 'modern',
+    browsersListTargets: ['defaults'],
   }),
   tests: {
     'not lazy': {

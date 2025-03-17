@@ -27,6 +27,7 @@ import {
   WEBPACK_DEBUG_STATS_FIELDS,
 } from '../../constants/stats';
 import { pwaBlock } from '../../blocks/pwa/client';
+import PolyfillConditionPlugin from '../../plugins/PolyfillCondition';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
   const { polyfill, fileSystemPages, env } = configManager;
@@ -59,11 +60,13 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .when(portalExists, (cfg) => cfg.entry('portal').add(portal))
     .when(polyfillExists, (cfg) => cfg.entry('polyfill').add(polyfillPath));
 
+  const statsFileName = configManager.modern ? 'stats.modern.json' : 'stats.json';
+
   config
     .plugin('stats-plugin')
     .use(StatsWriterPlugin, [
       {
-        filename: configManager.modern ? 'stats.modern.json' : 'stats.json',
+        filename: statsFileName,
         stats: {
           ...(env === 'development' ? DEV_STATS_OPTIONS : DEFAULT_STATS_OPTIONS),
           ...(configManager.verboseWebpack ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
@@ -74,6 +77,9 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
         ],
       },
     ])
+    .end()
+    .plugin('polyfill-condition-plugin')
+    .use(PolyfillConditionPlugin, [{ filename: statsFileName }])
     .end()
     .plugin('define')
     .tap((args) => [

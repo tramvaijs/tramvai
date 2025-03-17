@@ -1016,8 +1016,7 @@
           ]
         },
         "excludesPresetEnv": {
-          "title": "List of modules to exclude from `@babel/preset-env`",
-          "description": "Option doesn't affect build with swc loader",
+          "title": "List of modules to exclude from `@babel/preset-env` and `swc-loader`",
           "type": "array",
           "items": {
             "type": "string"
@@ -1811,8 +1810,7 @@
           "additionalProperties": false
         },
         "excludesPresetEnv": {
-          "title": "List of modules to exclude from `@babel/preset-env`",
-          "description": "Option doesn't affect build with swc loader",
+          "title": "List of modules to exclude from `@babel/preset-env` and `swc-loader`",
           "type": "array",
           "items": {
             "type": "string"
@@ -2566,8 +2564,7 @@
           "additionalProperties": false
         },
         "excludesPresetEnv": {
-          "title": "List of modules to exclude from `@babel/preset-env`",
-          "description": "Option doesn't affect build with swc loader",
+          "title": "List of modules to exclude from `@babel/preset-env` and `swc-loader`",
           "type": "array",
           "items": {
             "type": "string"

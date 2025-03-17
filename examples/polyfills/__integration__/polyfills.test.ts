@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'fs';
 import { build } from '@tramvai/cli';
-import { brotliCompressSync } from 'zlib';
 import type { StatsCompilation } from 'webpack';
 
 jest.setTimeout(60000);
@@ -29,9 +28,7 @@ describe('polyfills', () => {
     const polyfillChunkFilename = polyfillChunk?.files?.[0];
     expect(polyfillChunkFilename).toBeTruthy();
 
-    const polyfillChunkPath = path.join(distClientDirectory, polyfillChunkFilename!);
     const polyfillChunkModules = polyfillChunk?.modules;
-
     expect(polyfillChunkModules).toBeTruthy();
 
     const polyfillModules = polyfillChunkModules!

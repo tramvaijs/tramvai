@@ -1,5 +1,7 @@
 import type Config from 'webpack-chain';
 import { sync as resolve } from 'resolve';
+import envTargets from '@tinkoff/browserslist-config';
+import browserslist from 'browserslist';
 import type { ConfigManager } from '../../../config/configManager';
 import { getSwcOptions } from '../../swc';
 import { babelConfigFactory } from '../../babel';
@@ -10,6 +12,7 @@ import type { CliConfigEntry, ReactCompilerOptions } from '../../../typings/conf
 export type TranspilerConfig = {
   env: Env;
   target: Target;
+  actualTarget: Target;
   modern: boolean;
   isServer: boolean;
   generateDataQaTag: boolean;
@@ -23,6 +26,7 @@ export type TranspilerConfig = {
   hot: boolean;
   excludesPresetEnv: string[];
   rootDir: string;
+  browsersListTargets: string[];
   reactCompiler: boolean | ReactCompilerOptions;
   /**
    * Enable or disable `loose` transformations:
@@ -67,19 +71,43 @@ export const getTranspilerConfig = (
   const {
     generateDataQaTag,
     alias,
+    target,
+    rootDir,
     enableFillActionNamePlugin,
     excludesPresetEnv,
     experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
   } = configManager;
   const { env, modern } = configManager;
+  const isServer = configManager.buildType === 'server';
 
   if (alias) {
     console.warn(`"alias" option deprecated and ignored as cli now supports baseUrl and paths from the app's tsconfig.json file.
 Just check or add configuration to your tsconfig file and remove alias from tramvai.json`);
   }
 
+  let actualTarget = target;
+
+  if (!target) {
+    if (isServer) {
+      actualTarget = 'node';
+    } else if (modern) {
+      actualTarget = 'modern';
+    }
+  }
+
+  const browserslistConfigRaw = browserslist.findConfig(rootDir);
+
+  // Set defaults if the explicit config for browserslist was not found or the config does not contain the necessary targets
+  const browserslistQuery =
+    browserslistConfigRaw?.[actualTarget] ?? envTargets[actualTarget] ?? envTargets.defaults;
+
+  const browsersListTargets = browserslist(browserslistQuery, {
+    mobileToDesktop: true,
+    env: actualTarget,
+  });
+
   return {
-    isServer: configManager.buildType === 'server',
+    isServer,
     env,
     generateDataQaTag,
     modern,
@@ -89,7 +117,9 @@ Just check or add configuration to your tsconfig file and remove alias from tram
     excludesPresetEnv,
     enableFillActionNamePlugin,
     rootDir: configManager.rootDir,
-    target: configManager.target,
+    target,
+    actualTarget,
+    browsersListTargets,
     loader: true,
     modules: false,
     typescript: false,
