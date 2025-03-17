@@ -17,7 +17,13 @@ export const serverInline = (configManager: ConfigManager<CliConfigEntry>) => (c
       .batch(
         addTranspilerLoader(
           clientConfigManager,
-          getTranspilerConfig(clientConfigManager, { typescript: type === 'ts' })
+          getTranspilerConfig(clientConfigManager, {
+            typescript: type === 'ts',
+            // inline transpiler runtime helpers to prevent webpack imports in generated inline scripts
+            externalHelpers: false,
+            // minimize swc helpers usage to prevent inline scripts bloat, risks is minimal for rarely used inline scripts
+            loose: true,
+          })
         )
       );
   };

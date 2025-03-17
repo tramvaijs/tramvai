@@ -23,6 +23,18 @@ export type TranspilerConfig = {
   hot: boolean;
   excludesPresetEnv: string[];
   rootDir: string;
+  /**
+   * Enable or disable `loose` transformations:
+   * with swc loader - https://swc.rs/docs/configuration/compilation#jscloose
+   * with babel loader - https://babeljs.io/docs/babel-preset-env#loose
+   */
+  loose?: boolean;
+  /**
+   * Enable or disable external transpiler runtime helpers:
+   * with swc loader, pass value directly to `jsc.externalHelpers` option - https://swc.rs/docs/configuration/compilation#jscexternalhelpers
+   * with babel loader, when `false`, disable `@babel/plugin-transform-runtime` - https://babeljs.io/docs/babel-plugin-transform-runtime
+   */
+  externalHelpers?: boolean;
 };
 
 export const addTranspilerLoader =
