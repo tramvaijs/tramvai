@@ -1,7 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`client-legacy: create-token-pure.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ TEST_TOKEN: function() {
                       /* binding */ return TEST_TOKEN;
@@ -13,7 +14,8 @@ exports[`client-legacy: create-token-pure.ts 1`] = `
 `;
 
 exports[`client-legacy: images/logo.svg\\?react 1`] = `
-"              /* harmony import */ var _swc_helpers_object_spread__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_object_spread.js"), _swc_helpers_object_spread_props__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_object_spread_props.js"), react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime");
+"              "use strict";
+              /* harmony import */              var _swc_helpers_object_spread__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_object_spread.js"), _swc_helpers_object_spread_props__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_object_spread_props.js"), react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime");
               /* harmony import */              __webpack_require__("webpack/sharing/consume/default/react/react"), 
               /* harmony default export */ __webpack_exports__.Z = function(props) {
                   /*#__PURE__*/
@@ -56,7 +58,8 @@ exports[`client-legacy: images/logo.svg\\?react 1`] = `
 `;
 
 exports[`client-legacy: lazy-component.tsx 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ Component: function() {
                       /* binding */ return Component;
@@ -101,7 +104,8 @@ exports[`client-legacy: lazy-component.tsx 1`] = `
 `;
 
 exports[`client-legacy: node-env.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ func: function() {
                       /* binding */ return func;
@@ -114,7 +118,8 @@ exports[`client-legacy: node-env.ts 1`] = `
 `;
 
 exports[`client-legacy: provider-stack.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ providers: function() {
                       /* binding */ return providers;
@@ -130,7 +135,8 @@ exports[`client-legacy: provider-stack.ts 1`] = `
 `;
 
 exports[`client-legacy: react-svg.tsx 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ Component: function() {
                       /* binding */ return Component;
@@ -147,7 +153,8 @@ exports[`client-legacy: react-svg.tsx 1`] = `
 `;
 
 exports[`client-legacy: server.inline.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ ForBrowser: function() {
                       /* binding */ return ForBrowser;
@@ -173,7 +180,8 @@ exports[`client-legacy: server.inline.ts 1`] = `
 `;
 
 exports[`client-legacy: typeof-window.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ func: function() {
                       /* binding */ return func;
@@ -186,7 +194,8 @@ exports[`client-legacy: typeof-window.ts 1`] = `
 `;
 
 exports[`client-modern: create-token-pure.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ TEST_TOKEN: function() {
                       /* binding */ return TEST_TOKEN;
@@ -197,7 +206,8 @@ exports[`client-modern: create-token-pure.ts 1`] = `
 `;
 
 exports[`client-modern: images/logo.svg\\?react 1`] = `
-"              /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+"              "use strict";
+              /* harmony export */              __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ Z: function() {
                       return __WEBPACK_DEFAULT_EXPORT__;
                   }
@@ -242,7 +252,8 @@ exports[`client-modern: images/logo.svg\\?react 1`] = `
 `;
 
 exports[`client-modern: lazy-component.tsx 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ Component: function() {
                       /* binding */ return Component;
@@ -275,7 +286,8 @@ exports[`client-modern: lazy-component.tsx 1`] = `
 `;
 
 exports[`client-modern: node-env.ts 1`] = `
-"              let internalFunc;
+"              "use strict";
+              let internalFunc;
               __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ func: function() {
@@ -287,7 +299,8 @@ exports[`client-modern: node-env.ts 1`] = `
 `;
 
 exports[`client-modern: provider-stack.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ providers: function() {
                       /* binding */ return providers;
@@ -302,7 +315,8 @@ exports[`client-modern: provider-stack.ts 1`] = `
 `;
 
 exports[`client-modern: react-svg.tsx 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ Component: function() {
                       /* binding */ return Component;
@@ -316,7 +330,8 @@ exports[`client-modern: react-svg.tsx 1`] = `
 `;
 
 exports[`client-modern: server.inline.ts 1`] = `
-"              __webpack_require__.r(__webpack_exports__), 
+"              "use strict";
+              __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ ForBrowser: function() {
                       /* binding */ return ForBrowser;
@@ -339,7 +354,8 @@ exports[`client-modern: server.inline.ts 1`] = `
 `;
 
 exports[`client-modern: typeof-window.ts 1`] = `
-"              let internalFunc;
+"              "use strict";
+              let internalFunc;
               __webpack_require__.r(__webpack_exports__), 
               /* harmony export */ __webpack_require__.d(__webpack_exports__, {
                   /* harmony export */ func: function() {

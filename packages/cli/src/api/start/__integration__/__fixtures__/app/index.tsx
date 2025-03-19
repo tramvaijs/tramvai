@@ -1,5 +1,5 @@
-import ReactDOM from 'react-dom';
 import App from './App';
+import { hydrateRoot } from 'react-dom/client';
 
 const bundlesMap = {
   main: () => import('./bundles/main'),
@@ -19,5 +19,5 @@ if (typeof window === 'undefined') {
     ]().then(({ default: name }: { default: string }) => console.log(`loaded bundle ${name}`));
   }
 
-  ReactDOM.hydrate(<App />, document.getElementById('root'));
+  hydrateRoot(document.getElementById('root')!, <App />);
 }

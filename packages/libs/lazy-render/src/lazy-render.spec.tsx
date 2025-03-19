@@ -2,12 +2,14 @@
  * @jest-environment jsdom
  */
 
-/* eslint-disable react/no-deprecated */
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { act } from 'react-dom/test-utils';
+import React, { act } from 'react';
+import type { Root } from 'react-dom/client';
+import { hydrateRoot } from 'react-dom/client';
 import { LazyRender } from './lazy-render';
 import { mockIntersectionObserver } from '../mocks/mock-intersection-observer';
+
+//@ts-expect-error
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 jest.mock('./use-observer-visible', () => {
   return require('./use-observer-visible.browser');
@@ -20,37 +22,39 @@ const Content = ({ onClick }: { onClick?(): void }) => (
 );
 
 describe('ProgressiveRenderer', () => {
+  let reactRoot: Root | null;
+  let root: HTMLElement | null;
   beforeEach(() => {
     document.body.innerHTML =
       '<div id="root"><div><section><h1>Original markup</h1></section></div></div>';
+    root = document.getElementById('root');
   });
 
   afterEach(() => {
-    const root = document.getElementById('root');
-    ReactDOM.unmountComponentAtNode(root);
     mockIntersectionObserver.clear();
+    act(() => {
+      reactRoot?.unmount();
+    });
+    reactRoot = null;
+    root = null;
   });
 
   it('render original markup', () => {
-    const root = document.getElementById('root');
-
     act(() => {
-      ReactDOM.hydrate(
+      reactRoot = hydrateRoot(
+        root!,
         <LazyRender>
           <Content />
-        </LazyRender>,
-        root
+        </LazyRender>
       );
     });
 
-    expect(root.innerHTML).toMatchInlineSnapshot(
+    expect(root?.innerHTML).toMatchInlineSnapshot(
       `"<div><section><h1>Original markup</h1></section></div>"`
     );
   });
 
   it('custom observer mechanism', async () => {
-    const root = document.getElementById('root');
-
     const useObserver = () => {
       const [isVisible, changeVisibility] = React.useState(false);
       React.useEffect(() => {
@@ -60,53 +64,51 @@ describe('ProgressiveRenderer', () => {
     };
 
     act(() => {
-      ReactDOM.hydrate(
+      hydrateRoot(
+        root!,
         <LazyRender useObserver={useObserver}>
           <Content />
           Custom text
-        </LazyRender>,
-        root
+        </LazyRender>
       );
     });
     act(() => {
       jest.advanceTimersByTime(100);
     });
 
-    expect(root.innerHTML).toMatchInlineSnapshot(
+    expect(root?.innerHTML).toMatchInlineSnapshot(
       `"<div><section><h1>Original markup</h1></section>Custom text</div>"`
     );
   });
 
   it('hydrate client markup on static mode', () => {
-    const root = document.getElementById('root');
     const mockOnClick = jest.fn();
 
     act(() => {
-      ReactDOM.hydrate(
+      hydrateRoot(
+        root!,
         <LazyRender mode="static">
           <Content onClick={mockOnClick} />
-        </LazyRender>,
-        root
+        </LazyRender>
       );
     });
 
-    const h1 = root.querySelector('h1');
+    const h1 = root?.querySelector('h1');
 
-    h1.click();
+    h1?.click();
 
     expect(mockOnClick.mock.calls.length).toBe(1);
   });
 
   it('hydrate client markup when block is visible', () => {
-    const root = document.getElementById('root');
     const mockOnClick = jest.fn();
 
     act(() => {
-      ReactDOM.hydrate(
+      hydrateRoot(
+        root!,
         <LazyRender>
           <Content onClick={mockOnClick} />
-        </LazyRender>,
-        root
+        </LazyRender>
       );
     });
 
@@ -114,23 +116,22 @@ describe('ProgressiveRenderer', () => {
       mockIntersectionObserver.trigger([{ isIntersecting: true }]);
     });
 
-    const h1 = root.querySelector('h1');
+    const h1 = root?.querySelector('h1');
 
-    h1.click();
+    h1?.click();
 
     expect(mockOnClick.mock.calls.length).toBe(1);
   });
 
   it('prevent hydrate client markup when block is hidden', () => {
-    const root = document.getElementById('root');
     const mockOnClick = jest.fn();
 
     act(() => {
-      ReactDOM.hydrate(
+      hydrateRoot(
+        root!,
         <LazyRender>
           <Content onClick={mockOnClick} />
-        </LazyRender>,
-        root
+        </LazyRender>
       );
     });
 
@@ -138,9 +139,9 @@ describe('ProgressiveRenderer', () => {
       mockIntersectionObserver.trigger([{ isIntersecting: false }]);
     });
 
-    const h1 = root.querySelector('h1');
+    const h1 = root?.querySelector('h1');
 
-    h1.click();
+    h1?.click();
 
     expect(mockOnClick.mock.calls.length).toBe(0);
   });

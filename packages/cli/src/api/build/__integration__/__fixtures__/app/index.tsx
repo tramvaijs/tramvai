@@ -1,4 +1,4 @@
-import ReactDOM from 'react-dom';
+import { hydrateRoot } from 'react-dom/client';
 import App from './App';
 
 const bundlesMap = {
@@ -9,7 +9,7 @@ const bundlesMap = {
 };
 
 if (typeof window === 'undefined') {
-  require('./server.tsx')
+  require('./server.tsx');
 }
 
 if (typeof window !== 'undefined') {
@@ -21,6 +21,5 @@ if (typeof window !== 'undefined') {
     );
   }
 
-  ReactDOM.hydrate(<App />, document.getElementById('root'));
-
+  hydrateRoot(document.getElementById('root')!, <App />);
 }

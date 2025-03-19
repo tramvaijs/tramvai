@@ -115,7 +115,7 @@ Have you forgot to register it? Note, that we are registering it for you to make
     [storesRef, context]
   );
 
-  const latestSubscriptionCallbackError = useRef<Error>();
+  const latestSubscriptionCallbackError = useRef<Error>(undefined);
 
   const subscribe = useCallback(
     (reactUpdate: () => void) => {

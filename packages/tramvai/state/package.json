@@ -20,15 +20,14 @@
     "@tinkoff/react-hooks": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/types-actions-state-context": "0.0.0-stub",
-    "@types/hoist-non-react-statics": "^3.3.1",
+    "@types/hoist-non-react-statics": "^3.3.6",
     "invariant": "^2.2.4",
     "react-is": ">=17",
     "tslib": "^2.4.0",
-    "use-sync-external-store": "^1.2.0"
+    "use-sync-external-store": "^1.4.0"
   },
   "peerDependencies": {
     "hoist-non-react-statics": "^3.3.1",
-    "prop-types": "^15.6.2",
     "react": ">=16.14.0",
     "react-dom": ">=16.14.0"
   },

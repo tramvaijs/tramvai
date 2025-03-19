@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { hydrateRoot } from 'react-dom/client';
 import App from './App';
 
 const bundlesMap = {
@@ -17,4 +17,4 @@ if (url.searchParams.has('bundle')) {
   );
 }
 
-ReactDOM.hydrate(<App />, document.getElementById('root'));
+hydrateRoot(document.getElementById('root')!, <App />);

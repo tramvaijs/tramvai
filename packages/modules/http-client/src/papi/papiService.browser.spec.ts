@@ -5,6 +5,7 @@
 /* eslint-disable import/first */
 jest.mock('node-fetch');
 jest.mock('../papiClientModule', () => require('../papiClientModule.browser'));
+jest.mock('react-dom/server', () => require('react-dom/server.node'));
 
 import fetch from 'node-fetch';
 import type { Provider } from '@tinkoff/dippy';

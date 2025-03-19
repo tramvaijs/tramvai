@@ -9,7 +9,7 @@ interface Options {
   path: string;
 }
 const COMPONENT_NAME = 'RootErrorBoundary';
-const REACT_18_HYDRATION_CODE = `
+const REACT_HYDRATE_ROOT_CODE = `
 const { hydrateRoot } = require('react-dom/client')
 
 hydrateRoot(
@@ -17,7 +17,7 @@ hydrateRoot(
   <${COMPONENT_NAME} error={window.serverError} url={window.serverUrl} />,
 );
 `;
-const REACT_HYDRATION_CODE = `
+const REACT_HYDRATE_CODE = `
 const { hydrate } = require('react-dom')
 
 hydrate(
@@ -35,7 +35,7 @@ const rootErrorBoundaryLoader: LoaderDefinition<Options> = function (content) {
   // We don't need hydration code on the server
   if (options.buildType === 'client') {
     const IMPORT_CODE = `import ${COMPONENT_NAME} from "${options.path}"\n`;
-    const HYDRATION_CODE = shouldUseReactRoot() ? REACT_18_HYDRATION_CODE : REACT_HYDRATION_CODE;
+    const HYDRATION_CODE = shouldUseReactRoot() ? REACT_HYDRATE_ROOT_CODE : REACT_HYDRATE_CODE;
 
     return IMPORT_CODE.concat(HYDRATION_CODE);
   }

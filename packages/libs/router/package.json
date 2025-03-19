@@ -25,7 +25,7 @@
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "@tinkoff/hook-runner": "0.0.0-stub",
-    "use-sync-external-store": "^1.2.0"
+    "use-sync-external-store": "^1.4.0"
   },
   "peerDependencies": {
     "@tramvai/core": "0.0.0-stub",

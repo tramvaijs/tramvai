@@ -133,7 +133,6 @@ describe('@tramvai/cli start command', () => {
         ).toMatchInlineSnapshot(`"Cmp test: start"`);
 
         await outputFile(REFRESH_CMP_PATH, CMP_FILE_CONTENT_UPDATE);
-
         await page.waitForFunction(
           () => {
             return document.getElementById('cmp')?.innerHTML !== 'Cmp test: start';

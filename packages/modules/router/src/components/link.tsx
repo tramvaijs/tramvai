@@ -108,7 +108,13 @@ function Link(props: Props) {
 
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
-    <a ref={(element) => setLinkElement(element)} {...otherProps} {...extraProps}>
+    <a
+      ref={(element) => {
+        setLinkElement(element);
+      }}
+      {...otherProps}
+      {...extraProps}
+    >
       {children}
     </a>
   );

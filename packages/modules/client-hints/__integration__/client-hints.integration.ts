@@ -1,5 +1,4 @@
 import { expect } from '@playwright/test';
-import { sleep } from '@tramvai/test-integration';
 import { testChrome, testSafari } from './test.fixture';
 import {
   chromeClientHints,

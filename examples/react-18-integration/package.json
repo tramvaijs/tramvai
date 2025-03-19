@@ -13,7 +13,7 @@
     "test:integration:watch": "jest --runInBand --watch --config ./jest.integration.config.js"
   },
   "devDependencies": {
-    "@types/react": "^18.0.0",
+    "@types/react": "^19.0.6",
     "@types/jest": "^29.5.0",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/test-integration": "0.0.0-stub",
@@ -38,8 +38,8 @@
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "tslib": "^2.4.0"
   }
 }

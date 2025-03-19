@@ -10,9 +10,13 @@
     "cross-env": "^7.0.3",
     "detect-port": "^1.5.1",
     "fastify": "^4.14.1",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0"
   },
   "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "@tinkoff/dippy": "0.7.41",
     "@tinkoff/utils": "^2.1.3",
     "@tramvai/child-app-core": "2.0.0",

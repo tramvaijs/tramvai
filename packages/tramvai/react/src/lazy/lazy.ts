@@ -1,6 +1,7 @@
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import type { LoadableComponent, DefaultComponent } from '@loadable/component';
 import loadable, { lazy as loadableLazy } from '@loadable/component';
+import type { JSX } from 'react';
 import type { TramvaiComponent, TramvaiComponentDecl } from '../typings/components';
 
 export const resolveLazyComponent = async (

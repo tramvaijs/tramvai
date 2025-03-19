@@ -6,9 +6,9 @@ export const shouldUseReactRoot = once(() => {
   // eslint-disable-next-line import/no-extraneous-dependencies
   const reactVersion = require('react').version;
   const isReactExperimental = reactVersion && /0\.0\.0-experimental/.test(reactVersion);
-  const hasReact18 =
+  const hasReact18orHigher =
     reactVersion &&
     (semver.gte(reactVersion, '18.0.0') || semver.coerce(reactVersion)?.version === '18.0.0');
 
-  return Boolean(hasReact18 || isReactExperimental);
+  return Boolean(hasReact18orHigher || isReactExperimental);
 });

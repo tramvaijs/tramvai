@@ -50,10 +50,9 @@ export const testComponent = (
   );
 
   const renderResults = render(<Wrapper>{element}</Wrapper>, renderOptions);
-
   return {
     render: renderResults,
-    rerender: (el: React.ReactElement) => renderResults.rerender(<Wrapper>{el}</Wrapper>),
+    rerender: (el: React.ReactElement<any>) => renderResults.rerender(<Wrapper>{el}</Wrapper>),
     act: (callback: () => Promise<void> | void) => {
       return act(async () => {
         await callback();

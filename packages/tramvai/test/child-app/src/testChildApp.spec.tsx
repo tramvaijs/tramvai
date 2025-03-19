@@ -5,6 +5,8 @@ import { testComponent } from '@tramvai/test-react';
 import { testChildApp } from './testChildApp';
 import BaseChildApp, { CHILD_APP_BASE_TOKEN } from './__fixtures__/base';
 
+jest.mock('react-dom/server', () => require('react-dom/server.node'));
+
 describe('test/childApp/testChildApp', () => {
   it('base test', async () => {
     const {

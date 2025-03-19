@@ -1,16 +1,12 @@
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { createBundle } from '@tramvai/core';
 import { Link, useRoute, useUrl } from '@tramvai/module-router';
 import { lazy } from '@tramvai/react';
 
-const CustomLink = forwardRef<PropsWithChildren, any>(({ children, ...props }, ref) => {
-  return (
-    <a ref={ref} {...props}>
-      {children}
-    </a>
-  );
-});
+const CustomLink = ({ children, ...props }: PropsWithChildren) => {
+  return <a {...props}>{children}</a>;
+};
 
 const Layout = ({ children }: PropsWithChildren) => {
   const route = useRoute();

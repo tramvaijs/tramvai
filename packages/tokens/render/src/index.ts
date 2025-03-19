@@ -2,6 +2,7 @@ import type { ReactElement, ComponentType } from 'react';
 import { Scope, createToken } from '@tinkoff/dippy';
 import { StorageRecord } from '@tinkoff/htmlpagebuilder';
 import type { UniversalErrorBoundaryFallbackProps } from '@tramvai/react';
+import type { JSX } from 'react';
 import * as ResourceSlot from './slots';
 
 /**

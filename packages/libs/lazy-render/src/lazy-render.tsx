@@ -11,7 +11,7 @@ export interface LazyRenderCache {
 type Props = {
   mode?: 'static';
   children: React.ReactNode;
-  useObserver?: (containerRef: RefObject<HTMLElement>) => boolean;
+  useObserver?: (containerRef: RefObject<HTMLElement | null>) => boolean;
   wrapper?: ComponentType | string;
   wrapperProps?: HTMLProps<HTMLElement>;
   serverCache?: LazyRenderCache;
