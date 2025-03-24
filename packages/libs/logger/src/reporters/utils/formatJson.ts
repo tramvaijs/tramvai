@@ -17,23 +17,33 @@ export const formatError = (error: Error | string) => {
   // чтобы JSON.stringify сложил их в результирующую json строку
   Object.defineProperties(error, {
     message: {
+      configurable: true,
       enumerable: true,
+      writable: true,
     },
     stack: {
+      configurable: true,
       enumerable: true,
+      // stack is getter
     },
     cause: {
+      configurable: true,
       enumerable: true,
+      writable: true,
     },
   });
 
   if ('cause' in error && typeof error.cause === 'object') {
     Object.defineProperties(error.cause, {
       message: {
+        configurable: true,
         enumerable: true,
+        writable: true,
       },
       stack: {
+        configurable: true,
         enumerable: true,
+        // stack is getter
       },
     });
   }
