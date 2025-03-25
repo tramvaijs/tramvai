@@ -20,13 +20,13 @@
     "registry": "https://registry.npmjs.org/"
   },
   "peerDependencies": {
+    "@loadable/server": "*",
     "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/router": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
-    "@loadable/server": "*",
     "react": ">=16.14.0"
   },
   "module": "lib/index.es.js"

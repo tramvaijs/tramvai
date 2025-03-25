@@ -22,10 +22,10 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "workbox-routing": "^6.6.1",
-    "workbox-strategies": "^6.6.1",
-    "workbox-expiration": "^6.6.1",
     "workbox-cacheable-response": "^6.6.1",
-    "workbox-precaching": "^6.6.1"
+    "workbox-expiration": "^6.6.1",
+    "workbox-precaching": "^6.6.1",
+    "workbox-routing": "^6.6.1",
+    "workbox-strategies": "^6.6.1"
   }
 }

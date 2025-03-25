@@ -6,9 +6,9 @@
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "browser": {
+    "./lib/index.es.js": "./lib/index.browser.js",
     "./lib/papiClientModule.js": "./lib/papiClientModule.browser.js",
-    "./lib/utils/fillHeaders.js": "./lib/utils/fillHeaders.browser.js",
-    "./lib/index.es.js": "./lib/index.browser.js"
+    "./lib/utils/fillHeaders.js": "./lib/utils/fillHeaders.browser.js"
   },
   "files": [
     "lib",
@@ -27,8 +27,8 @@
   "dependencies": {
     "@tramvai/http-client": "0.0.0-stub",
     "@tramvai/tinkoff-request-http-client-adapter": "0.0.0-stub",
-    "@tramvai/tokens-http-client": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-http-client": "0.0.0-stub",
     "@tramvai/tokens-server": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub"
   },
@@ -38,14 +38,14 @@
     "@types/node-fetch": "^2.6.2"
   },
   "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub",
     "@tramvai/papi": "0.0.0-stub",
     "@tramvai/test-helpers": "0.0.0-stub",
-    "@tramvai/test-unit": "0.0.0-stub",
     "@tramvai/test-mocks": "0.0.0-stub",
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/test-unit": "0.0.0-stub",
     "node-fetch": "^2.6.1",
     "tslib": "^2.4.0"
   },

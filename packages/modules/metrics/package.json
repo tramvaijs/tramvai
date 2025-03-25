@@ -18,24 +18,24 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tramvai/core": "0.0.0-stub",
-    "@tramvai/tokens-common": "0.0.0-stub",
-    "@tramvai/tokens-core-private": "0.0.0-stub",
-    "@tramvai/tokens-server": "0.0.0-stub",
-    "@tramvai/tokens-server-private": "0.0.0-stub",
-    "@tramvai/tokens-metrics": "0.0.0-stub",
-    "@tramvai/tokens-router": "0.0.0-stub",
-    "@tramvai/tokens-http-client": "0.0.0-stub",
-    "@tramvai/state": "0.0.0-stub",
-    "@tramvai/papi": "0.0.0-stub",
+    "@tinkoff/browser-timings": "0.0.0-stub",
+    "@tinkoff/logger": "0.0.0-stub",
     "@tinkoff/measure-fastify-requests": "0.0.0-stub",
+    "@tinkoff/metrics-noop": "0.0.0-stub",
     "@tinkoff/monkeypatch": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
-    "prom-client": "^14.2.0",
-    "@tinkoff/logger": "0.0.0-stub",
-    "@tinkoff/metrics-noop": "0.0.0-stub",
-    "@tinkoff/browser-timings": "0.0.0-stub"
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/papi": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-core-private": "0.0.0-stub",
+    "@tramvai/tokens-http-client": "0.0.0-stub",
+    "@tramvai/tokens-metrics": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "@tramvai/tokens-server": "0.0.0-stub",
+    "@tramvai/tokens-server-private": "0.0.0-stub",
+    "prom-client": "^14.2.0"
   },
   "peerDependencies": {
     "tslib": "^2.4.0"

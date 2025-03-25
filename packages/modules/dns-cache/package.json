@@ -29,7 +29,6 @@
     "@tramvai/tokens-http-client": "0.0.0-stub",
     "cacheable-lookup": "^7.0.0"
   },
-  "devDependencies": {},
   "peerDependencies": {
     "tslib": "^2.4.0"
   }

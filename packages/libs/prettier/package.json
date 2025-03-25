@@ -23,7 +23,6 @@
     "type": "git",
     "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/prettier": "^1.18.2"
   },

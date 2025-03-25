@@ -19,18 +19,17 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@tanstack/react-query": "^4.7.1",
     "@tinkoff/errors": "0.0.0-stub",
     "@tramvai/safe-strings": "0.0.0-stub",
     "@tramvai/tokens-child-app": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-react-query": "0.0.0-stub",
-    "@tramvai/tokens-render": "0.0.0-stub",
-    "@tanstack/react-query": "^4.7.1"
+    "@tramvai/tokens-render": "0.0.0-stub"
   },
-  "devDependencies": {},
   "peerDependencies": {
-    "@tinkoff/utils": "^2.1.2",
     "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",
     "react": ">=16.14.0",
     "tslib": "^2.4.0"

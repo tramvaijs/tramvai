@@ -26,7 +26,6 @@
     "fastify": ">=3.0.0",
     "prom-client": "14.x"
   },
-  "devDependencies": {},
   "sideEffects": false,
   "license": "Apache-2.0"
 }

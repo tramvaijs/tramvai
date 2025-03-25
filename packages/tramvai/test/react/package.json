@@ -30,7 +30,6 @@
   "peerDependencies": {
     "react": ">=18"
   },
-  "devDependencies": {},
   "license": "Apache-2.0",
   "module": "lib/index.es.js"
 }

@@ -19,11 +19,11 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@tinkoff/env-validators": "0.0.0-stub",
     "@tinkoff/user-agent": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
-    "@tinkoff/env-validators": "0.0.0-stub",
-    "@tramvai/safe-strings": "0.0.0-stub",
     "@tramvai/module-metrics": "0.0.0-stub",
+    "@tramvai/safe-strings": "0.0.0-stub",
     "@tramvai/tokens-child-app": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-cookie": "0.0.0-stub",
