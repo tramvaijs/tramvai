@@ -18,15 +18,23 @@ jobs:
 
     steps:
       - name: Setup Git
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Setup Corepack
+        run: corepack enable
+
+      - name: Setup yarn
+        run: |
+          yarn config set nodeLinker node-modules
+          yarn config set enableImmutableInstalls false
 
       - name: Install dependencies
         run: yarn install

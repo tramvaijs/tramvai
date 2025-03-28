@@ -180,7 +180,7 @@ import { createQuery, useQuery } from '@tramvai/react-query';
 import { useRoute, PAGE_SERVICE_TOKEN } from '@tramvai/module-router';
 
 const query = createQuery({
-  key: (slug?: string) => {
+  key(slug?: string) {
     // get slug from query options, otherwise from page service
     const articleId = slug || this.deps.pageService.getCurrentRoute().params.article;
 
@@ -215,7 +215,7 @@ Article.actions = [query.prefetchAction()];
 
 ### Dependencies
 
-Queries has full Dependency Injection support, so you can declare dependencies like in [DI providers](concepts/provider.md), in `deps` property. These dependencies will be available in the action `fn` and `key` functions фы `this.deps` property.
+Queries has full Dependency Injection support, so you can declare dependencies like in [DI providers](concepts/provider.md), in `deps` property. These dependencies will be available in the action `fn` and `key` functions as `this.deps` property.
 
 :::tip
 
@@ -644,11 +644,12 @@ As a parameter `key` you can use:
 - a string, such as `key: 'query-name'`
 - an array where any serializable data can be used as elements, for example `key: ['query-name', false, { bar: 'baz }]`
 - a function that takes the parameters with which `query` is called and returns a string - `key: (this: { deps }, options) => 'query-name'`. Where through `this.deps` you can get resolved deps for the query.
-- a function that accepts parameters, with which `query` is called, and returns an array, where any serializable data can be used as elements - `key: (this: { deps }, options) => ['query-name', options, { bar: 'baz' }]`
+- a function that accepts parameters, with which `query` is called, and returns an array, where any serializable data can be used as elements - `key: (this: { deps }, options) => ['query-name', options, { bar: 'baz' }]`.
 
 :::note
 
-If you pass parameter `key` as a function, you should pass actionNamePostfix to avoid duplicates in the server-client cache
+If you pass parameter `key` as a function, you should pass `actionNamePostfix` to avoid duplicates in the server-client cache
+Also, `this` will be undefined for arrow functions.
 
 :::
 
