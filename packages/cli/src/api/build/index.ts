@@ -23,6 +23,7 @@ export type Params = WithConfig<{
   env?: Record<string, string>;
   fileCache?: boolean;
   withBuildStats?: boolean;
+  withModulesStats?: boolean;
 
   // `package` target parameters
   watchMode?: boolean;

@@ -6,6 +6,7 @@ import type { ConfigManager } from '../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
 import type { ModuleFederationIgnoreEntriesOptions } from '../plugins/ModuleFederationIgnoreEntries';
 import { ModuleFederationIgnoreEntries } from '../plugins/ModuleFederationIgnoreEntries';
+import { FileStatsPlugin } from '../plugins/FileStats';
 import { rootErrorBoundaryFactory } from '../blocks/rootErrorBoundary';
 import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
 import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
@@ -18,6 +19,18 @@ export const commonApplication =
         shared: getSharedModules(configManager),
       } as ModuleFederationPluginOptions,
     ]);
+
+    if (configManager.withModulesStats) {
+      config.plugin('stats-modules-plugin').use(FileStatsPlugin, [
+        {
+          filename: 'stats-modules.json',
+          stats: {
+            chunks: true,
+            chunkModules: true,
+          },
+        },
+      ]);
+    }
 
     config
       .plugin('module-federation-ignore-entries')
