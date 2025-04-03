@@ -38,8 +38,14 @@ It's unexpected, please check available/used memory and cpu while running last c
     }
   });
 
-  cliInstance.on('exit', (code) => {
-    exit(code);
+  cliInstance.on('exit', (code, sig) => {
+    if (sig) {
+      console.warn(`Process was exited with signal "${sig}"
+It's unexpected, please check available/used memory and cpu while running last command`);
+      exit(1);
+    } else {
+      exit(code);
+    }
   });
 
   return controller;
