@@ -26,7 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'yarn'
 
       - name: Setup Corepack
         run: corepack enable
@@ -42,21 +41,28 @@ jobs:
       - name: Build
         run: yarn build
 
+      - name: Setup tramvai
+        run: npm i -g @tramvai/cli
+
+      - name: Setup tramvai debug
+        run: tramvai-debug debugPath="$PWD/packages/cli"
+
       - name: Bootstrap application
-        run: ./node_modules/.bin/tramvai new smoke-bootstrap --type=app --template=multirepo --packageManager=npm --testingFramework=jest
+        working-directory: ../
+        run: tramvai-debug new smoke-bootstrap --type=app --template=multirepo --packageManager=npm --testingFramework=jest
 
       - name: Install Playwright
-        working-directory: smoke-bootstrap
+        working-directory: ../smoke-bootstrap
         run: yarn playwright install
 
       - name: Build application
-        working-directory: smoke-bootstrap
+        working-directory: ../smoke-bootstrap
         run: yarn build
 
       - name: Test:unit application
-        working-directory: smoke-bootstrap
+        working-directory: ../smoke-bootstrap
         run: yarn test
 
       - name: Test:integration application
-        working-directory: smoke-bootstrap
+        working-directory: ../smoke-bootstrap
         run: yarn test:integration

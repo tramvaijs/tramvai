@@ -17,7 +17,6 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          cache: 'yarn'
           node-version: '20'
 
       - name: Setup Corepack
@@ -27,9 +26,9 @@ jobs:
         run: |
           yarn config set nodeLinker node-modules
           yarn config set enableImmutableInstalls false
-          yarn config ser npmAuthToken $NPM_AUTH_TOKEN
+          yarn config set npmAuthToken $NPM_AUTH_TOKEN
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - run: yarn install
       - run: yarn build

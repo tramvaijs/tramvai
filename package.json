@@ -13,13 +13,14 @@
   ],
   "scripts": {
     "postinstall": "tsc -b tools/monorepo/fix-ts-references tools/monorepo/depscheck tools/build packages/libs/webpack-dedupe-plugin && wsrun -p '@{tinkoff,tramvai}/*' -m copy-external-files",
-    "references": "fix-ts-references --fix",
+    "references": "npx fix-ts-references --fix",
     "prewatch": "npm run cli:generate-schema",
     "watch": "yarn references && tsc -b ./tsconfig.solution.json --watch",
     "prebuild": "npm run cli:generate-schema",
+    "json:cli": "json",
     "build": "yarn references && tsc -b ./tsconfig.solution.json",
     "build:publish": "wsrun -p '@{tinkoff,tramvai}/*' -e -m --serial build",
-    "build:change-typings": "wsrun -p '@{tinkoff,tramvai}/*' -c json -I -f package.json -e \"this.typings=this.typings && this.typings.replace(/^src\\/(.*)\\.ts/, 'lib/\\$1.d.ts')\"",
+    "build:change-typings": "wsrun -p '@{tinkoff,tramvai}/*' -c json:cli -I -f package.json -e \"this.typings=this.typings && this.typings.replace(/^src\\/(.*)\\.ts/, 'lib/\\$1.d.ts')\"",
     "build:change-versions": "node tools/public-packages/update-public-packages-versions.js",
     "cli:generate-schema": "yarn workspace @tramvai/cli generate-schema",
     "publish:all": "node tools/public-packages/publish-public-packages.js"
@@ -34,20 +35,21 @@
     "examples/**"
   ],
   "devDependencies": {
+    "@tramvai/build": "workspace:tools/build",
     "@types/jest": "^29.0.2",
     "@types/node": "20.14.13",
     "@types/webpack-env": "^1.13.16",
     "expect-type": "^0.13.0",
-    "typescript": "~5.1.0",
     "json": "^9.0.6",
+    "typescript": "~5.1.0",
     "wsrun": "^5.2.0"
   },
-  "dependencies": {},
   "resolutions": {
     "webpack": "^5",
     "@types/webpack": "^5",
     "@types/mime": "3.0.4",
     "@types/react": "^18.0.0",
     "@types/express-serve-static-core": "^4.17.18"
-  }
+  },
+  "packageManager": "yarn@4.7.0+sha512.5a0afa1d4c1d844b3447ee3319633797bcd6385d9a44be07993ae52ff4facabccafb4af5dcd1c2f9a94ac113e5e9ff56f6130431905884414229e284e37bb7c9"
 }
