@@ -19,11 +19,19 @@ export const addLink = (
 
   link.dataset.critical = 'true';
 
-  return new Promise((resolve, reject) => {
+  return new Promise<any>((resolve, reject) => {
     link.onerror = (error) => {
       if (options.resolveOnFailed) {
         return resolve(error);
       }
+
+      // try to find a fallback link if the main link fails
+      const fallback = document.querySelector(`[data-href="${href}"]`);
+
+      if (fallback) {
+        return resolve(error);
+      }
+
       return reject(new Error(`could not load link ${href}`));
     };
 
