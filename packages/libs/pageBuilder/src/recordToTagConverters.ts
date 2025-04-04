@@ -54,22 +54,11 @@ const converters = {
     },
   }),
   [StorageRecord.meta]: prop('payload'),
-  [StorageRecord.inlineScript]: ({ payload, attrs }: PageResource) => {
-    // проверям инлайновые скрипты на es5 т.к. пока поддерживаем старые браузеры
-    if (process.env.NODE_ENV === 'development' && typeof window === 'undefined' && payload) {
-      try {
-        require('acorn').parse(payload, { ecmaVersion: 5 });
-      } catch (e) {
-        console.error('ES5 incompatibility in inline script!', '\n', payload, '\n', e);
-      }
-    }
-
-    return {
-      tag: 'script',
-      innerHtml: payload,
-      attributes: attrs,
-    };
-  },
+  [StorageRecord.inlineScript]: ({ payload, attrs }: PageResource) => ({
+    tag: 'script',
+    innerHtml: payload,
+    attributes: attrs,
+  }),
   [StorageRecord.script]: ({ payload, attrs }: PageResource) => ({
     tag: 'script',
     attributes: {

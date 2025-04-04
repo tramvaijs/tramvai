@@ -25,7 +25,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
 
   config
     .name('server')
-    .target('node')
+    .target(['node'])
     .entry('server')
     .add(path.resolve(configManager.rootDir, `${configManager.root}/index`));
 
