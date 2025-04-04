@@ -4,7 +4,7 @@ exports[`polyfill condition polyfill condition exists in html 1`] = `
 "(function (){
   var con;
   try {
-    con = !(Object.hasOwn) || !('at' in window.Array.prototype) || !('includes' in window.Array.prototype) || false;
+    con = !(Object.hasOwn) || !('at' in window.Array.prototype) || false;
   } catch (e) {
     con = true;
   }

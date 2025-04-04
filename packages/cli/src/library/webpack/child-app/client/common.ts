@@ -26,7 +26,7 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
 
   config.batch(common(configManager));
 
-  config.target(['web', 'es5']);
+  config.target(['web']);
 
   config.output
     .path(configManager.buildPath)

@@ -735,19 +735,16 @@ exports[`server: server.inline.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ForBrowser: function() { return /* binding */ ForBrowser; }
 /* harmony export */ });
-var ForBrowser = /*#__PURE__*/ function() {
-    "use strict";
-    function ForBrowser() {
-        this.property = function() {
+class ForBrowser {
+    test() {
+        console.log("Ok");
+    }
+    constructor(){
+        this.property = ()=>{
             console.log("Ok");
         };
     }
-    var _proto = ForBrowser.prototype;
-    _proto.test = function test() {
-        console.log("Ok");
-    };
-    return ForBrowser;
-}();
+}
 ForBrowser.prop = "static";
 
 

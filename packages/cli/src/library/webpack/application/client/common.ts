@@ -39,7 +39,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
 
   config
     .name('client')
-    .target(configManager.modern ? 'web' : ['web', 'es5'])
+    .target(['web'])
     .batch(common(configManager))
     .batch(commonApplication(configManager))
     .batch(configToEnv(configManager))

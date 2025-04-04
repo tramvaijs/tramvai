@@ -31,7 +31,7 @@ var _ref, _ref2, _ref3;
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import { Scope } from '@tramvai/core';
-export var providers = [
+export const providers = [
   ((_ref =
     /*__tramvai_stack_provider__*/
     {
@@ -49,7 +49,7 @@ export var providers = [
       provide: 'b',
       multi: true,
       deps: {},
-      useFactory: function useFactory() {},
+      useFactory: () => {},
     }),
   Object.defineProperty(_ref2, '__stack', {
     enumerable: false,
@@ -62,7 +62,7 @@ export var providers = [
       provide: 'c',
       scope: Scope.SINGLETON,
       // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-      useClass: function useClass() {},
+      useClass: class {},
     }),
   Object.defineProperty(_ref3, '__stack', {
     enumerable: false,
@@ -107,7 +107,7 @@ var _ref, _ref2, _ref3;
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import { Scope, Error as _Error } from '@tramvai/core';
-export var providers = [
+export const providers = [
   ((_ref =
     /*__tramvai_stack_provider__*/
     {
@@ -125,7 +125,7 @@ export var providers = [
       provide: 'b',
       multi: true,
       deps: {},
-      useFactory: function useFactory() {
+      useFactory: () => {
         console.log(_Error);
       },
     }),
@@ -140,7 +140,7 @@ export var providers = [
       provide: 'c',
       scope: Scope.SINGLETON,
       // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-      useClass: function useClass() {},
+      useClass: class {},
     }),
   Object.defineProperty(_ref3, '__stack', {
     enumerable: false,
@@ -188,7 +188,7 @@ var _dec, _ref, _ref2, _ref3, _class;
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import { module, Scope } from '@tramvai/core';
-export var ClassModule =
+export let ClassModule =
   ((_dec = module({
     providers: [
       ((_ref =
@@ -196,7 +196,7 @@ export var ClassModule =
         {
           provide: 'provide',
           // eslint-disable-next-line @typescript-eslint/no-extraneous-class
-          useClass: function useClass() {},
+          useClass: class {},
           multi: true,
           deps: {},
         }),
@@ -209,7 +209,7 @@ export var ClassModule =
         /*__tramvai_stack_provider__*/
         {
           provide: 'test',
-          useFactory: function useFactory() {},
+          useFactory: () => {},
           multi: false,
           scope: Scope.SINGLETON,
         }),
@@ -231,7 +231,7 @@ export var ClassModule =
       _ref3),
     ],
   })),
-  _dec((_class = function ClassModule() {})) || _class);
+  _dec((_class = class ClassModule {})) || _class);
 
 
 `;
@@ -255,12 +255,12 @@ var _ref;
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 
-export var providers = [
+export const providers = [
   ((_ref =
     /*__tramvai_stack_provider__*/
     {
       provide: 'a',
-      useFactory: function () {},
+      useFactory: () => {},
     }),
   Object.defineProperty(_ref, '__stack', {
     enumerable: false,
@@ -293,7 +293,7 @@ export const providers = [
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-export var providers = [
+export const providers = [
   {
     provide: 'test',
   },
@@ -330,52 +330,33 @@ export const func = async () => {
 
       ↓ ↓ ↓ ↓ ↓ ↓
 
-import _asyncToGenerator from '@babel/runtime/helpers/esm/asyncToGenerator';
-import _regeneratorRuntime from '@babel/runtime/regenerator';
-export var func = /*#__PURE__*/ (function () {
-  var _ref = _asyncToGenerator(
-    /*#__PURE__*/ _regeneratorRuntime.mark(function _callee() {
-      var _ref2, _ref3;
-      return _regeneratorRuntime.wrap(function _callee$(_context) {
-        while (1)
-          switch ((_context.prev = _context.next)) {
-            case 0:
-              _context.next = 2;
-              return Promise.resolve([
-                ((_ref2 =
-                  /*__tramvai_stack_provider__*/
-                  {
-                    provide: 'a',
-                    useValue: 'a',
-                  }),
-                Object.defineProperty(_ref2, '__stack', {
-                  enumerable: false,
-                  value: new Error().stack,
-                }),
-                _ref2),
-                ((_ref3 =
-                  /*__tramvai_stack_provider__*/
-                  {
-                    provide: 'b',
-                    useValue: 'b',
-                  }),
-                Object.defineProperty(_ref3, '__stack', {
-                  enumerable: false,
-                  value: new Error().stack,
-                }),
-                _ref3),
-              ]);
-            case 2:
-            case 'end':
-              return _context.stop();
-          }
-      }, _callee);
-    })
-  );
-  return function func() {
-    return _ref.apply(this, arguments);
-  };
-})();
+export const func = async () => {
+  var _ref, _ref2;
+  await Promise.resolve([
+    ((_ref =
+      /*__tramvai_stack_provider__*/
+      {
+        provide: 'a',
+        useValue: 'a',
+      }),
+    Object.defineProperty(_ref, '__stack', {
+      enumerable: false,
+      value: new Error().stack,
+    }),
+    _ref),
+    ((_ref2 =
+      /*__tramvai_stack_provider__*/
+      {
+        provide: 'b',
+        useValue: 'b',
+      }),
+    Object.defineProperty(_ref2, '__stack', {
+      enumerable: false,
+      value: new Error().stack,
+    }),
+    _ref2),
+  ]);
+};
 
 
 `;

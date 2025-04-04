@@ -34,15 +34,15 @@ export default declareAction({
       ↓ ↓ ↓ ↓ ↓ ↓
 
 import { declareAction } from '@tramvai/core';
-var action = declareAction({
+const action = declareAction({
   name: 'action',
-  fn: function fn() {
+  fn: () => {
     console.log('action');
   },
 });
-var secondAction = declareAction({
+const secondAction = declareAction({
   name: 'secondAction',
-  fn: function fn() {
+  fn: () => {
     console.log('second action');
   },
   conditions: {
@@ -51,7 +51,7 @@ var secondAction = declareAction({
 });
 export default declareAction({
   name: 'anonymousAction',
-  fn: function fn() {
+  fn: () => {
     console.log('anonymous action');
   },
   conditions: {
@@ -85,15 +85,15 @@ const secondAction = declareAction({
       ↓ ↓ ↓ ↓ ↓ ↓
 
 import { declareAction } from '@tramvai/core';
-var action = declareAction({
+const action = declareAction({
   name: 'action',
-  fn: function fn() {
+  fn: () => {
     console.log('action');
   },
 });
-var secondAction = declareAction({
+const secondAction = declareAction({
   name: 'secondAction__-5f0ssw',
-  fn: function fn() {
+  fn: () => {
     console.log('second action');
   },
   conditions: {
@@ -135,15 +135,15 @@ export default declareAction({
       ↓ ↓ ↓ ↓ ↓ ↓
 
 import { declareAction } from '@tramvai/core';
-var action = declareAction({
+const action = declareAction({
   name: 'action__n5c5ae',
-  fn: function fn() {
+  fn: () => {
     console.log('action');
   },
 });
-var secondAction = declareAction({
+const secondAction = declareAction({
   name: 'secondAction__n5fz8b',
-  fn: function fn() {
+  fn: () => {
     console.log('second action');
   },
   conditions: {
@@ -152,7 +152,7 @@ var secondAction = declareAction({
 });
 export default declareAction({
   name: 'import-without-name.ts__797bng',
-  fn: function fn() {
+  fn: () => {
     console.log('anonymous action');
   },
   conditions: {
@@ -190,21 +190,20 @@ const secondAction = declareAction({
       ↓ ↓ ↓ ↓ ↓ ↓
 
 // @ts-ignore
-var _require = require('@tramvai/core'),
-  declareAction = _require.declareAction;
+const { declareAction } = require('@tramvai/core');
 
 // @ts-ignore
-var action = declareAction({
+const action = declareAction({
   name: 'action',
-  fn: function fn() {
+  fn: () => {
     console.log('action');
   },
 });
 
 // @ts-ignore
-var secondAction = declareAction({
+const secondAction = declareAction({
   name: 'secondAction',
-  fn: function fn() {
+  fn: () => {
     console.log('second action');
   },
   conditions: {
@@ -240,21 +239,20 @@ const secondAction = declareAction({
       ↓ ↓ ↓ ↓ ↓ ↓
 
 // @ts-ignore
-var _require = require('@tramvai/core'),
-  declareAction = _require.declareAction;
+const { declareAction } = require('@tramvai/core');
 
 // @ts-ignore
-var action = declareAction({
+const action = declareAction({
   name: 'action__l6frq0',
-  fn: function fn() {
+  fn: () => {
     console.log('action');
   },
 });
 
 // @ts-ignore
-var secondAction = declareAction({
+const secondAction = declareAction({
   name: 'secondAction__h789zd',
-  fn: function fn() {
+  fn: () => {
     console.log('second action');
   },
   conditions: {

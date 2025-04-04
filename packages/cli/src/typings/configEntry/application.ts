@@ -226,7 +226,6 @@ export interface ApplicationConfigEntry extends CliConfigEntry {
    * @default {}
    */
   experiments: ApplicationExperiments;
-
   /**
    * @title Enable generation of stats modules file for polyfill usage analysis
    * @default false

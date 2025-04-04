@@ -13,7 +13,7 @@ export const TOKEN = createToken('token');
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import { createToken } from '@tinkoff/dippy';
-export var TOKEN = /*#__PURE__*/ createToken('token');
+export const TOKEN = /*#__PURE__*/ createToken('token');
 
 
 `;
@@ -31,7 +31,7 @@ export const TOKEN = createToken('token');
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import { createToken } from '@tramvai/core';
-export var TOKEN = /*#__PURE__*/ createToken('token');
+export const TOKEN = /*#__PURE__*/ createToken('token');
 
 
 `;
@@ -49,7 +49,7 @@ export const TOKEN = /* #__PURE__*/ createToken('token');
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
 import { createToken } from '@tinkoff/dippy';
-export var TOKEN = /* #__PURE__*/ createToken('token');
+export const TOKEN = /* #__PURE__*/ createToken('token');
 
 
 `;
@@ -72,8 +72,8 @@ const module = Module({
 // eslint-disable-next-line import/no-unresolved
 import { createToken } from '@tinkoff/dippy';
 import { Module } from '@tramvai/core';
-export var TOKEN = /*#__PURE__*/ createToken('token');
-var module = Module({
+export const TOKEN = /*#__PURE__*/ createToken('token');
+const module = Module({
   providers: [],
 });
 
@@ -99,7 +99,7 @@ createApp({
 // eslint-disable-next-line import/no-unresolved
 import { createApp } from '@tramvai/core';
 import { Container } from '@tinkoff/dippy';
-var di = new Container();
+const di = new Container();
 createApp({
   name: 'test',
 });

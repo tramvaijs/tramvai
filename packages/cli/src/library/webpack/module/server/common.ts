@@ -12,7 +12,7 @@ export default (configManager: ConfigManager<ModuleConfigEntry>) => (config: Con
 
   config.batch(common(configManager));
 
-  config.target('node');
+  config.target(['node']);
 
   config.output
     .path(configManager.buildPath)
