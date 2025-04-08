@@ -42,7 +42,7 @@ jobs:
         run: yarn build
 
       - name: Setup tramvai
-        run: npm i -g @tramvai/cli
+        run: npm i -g @tramvai/cli@prerelease
 
       - name: Setup tramvai debug
         run: tramvai-debug debugPath="$PWD/packages/cli"
