@@ -241,6 +241,11 @@ export const serverRunner = ({
 
     // Проксируем также и веб-сокеты
     server.on('upgrade', (req, socket, head) => {
+      // prevent uncaughtException when WS is not supported in application server
+      socket.on('error', (err) => {
+        console.error('[dev-server-error] websocket proxy error', err.message);
+      });
+
       proxy.ws(req, socket, { target: `http://localhost:${workerPort}` });
     });
 
