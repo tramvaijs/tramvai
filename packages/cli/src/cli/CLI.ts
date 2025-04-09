@@ -49,7 +49,8 @@ export class CLI {
     config: ConfigManager,
     analytics: Analytics,
     cliRootDir: string,
-    cliPackageManager: PackageManager
+    cliPackageManager: PackageManager,
+    packageManager: PackageManager
   ) {
     this.context = new Context(
       config,
@@ -57,6 +58,7 @@ export class CLI {
       analytics,
       cliRootDir,
       cliPackageManager,
+      packageManager,
       this.runTask,
       this.runCommand,
       this.getTasks,

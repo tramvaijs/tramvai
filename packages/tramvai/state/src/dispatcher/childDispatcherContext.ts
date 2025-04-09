@@ -109,6 +109,23 @@ export class ChildDispatcherContext<TContext> extends DispatcherContext<TContext
     super.unregisterStore(store);
   }
 
+  hasStore(store: Reducer<any> | string) {
+    const storeName = typeof store === 'string' ? store : store.storeName;
+
+    if (this.dispatcher.stores[storeName]) {
+      return super.hasStore(store);
+    }
+
+    if (this.allowedParentStores.has(storeName)) {
+      return !!this.parentDispatcherContext.getStore({
+        store: storeName,
+        optional: true,
+      });
+    }
+
+    return super.hasStore(store);
+  }
+
   _getParentAllowedStore(storeName: string): InstanceType<StoreClass> | null {
     // use just storeName to prevent store initialization on the root-app side
     const storeInstance = this.parentDispatcherContext.getStore({

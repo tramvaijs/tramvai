@@ -77,6 +77,7 @@ export async function cliInitialized(cliArgs = process.argv) {
     });
 
     const configManager = new ConfigManager({ config, syncConfigFile: syncJsonFile });
+    const packageManager = resolvePackageManager({ rootDir: process.cwd() });
 
     const cliRootDir = path.resolve(__dirname, '../', '../');
     const cliPackageManager = new NpmPackageManager({
@@ -90,7 +91,8 @@ export async function cliInitialized(cliArgs = process.argv) {
       configManager,
       analytic,
       cliRootDir,
-      cliPackageManager
+      cliPackageManager,
+      packageManager
     );
 
     return await cliInstance.run(cliArgs);
