@@ -24,6 +24,10 @@ export const polyfillResources = async ({
     ignoreDependencies: true,
   });
 
+  const { scripts: modernPolyfillScripts } = flushFiles(['modern.polyfill'], webpackStats, {
+    ignoreDependencies: true,
+  });
+
   const genHref = (href) => `${publicPath}${href}`;
 
   const result: PageResource[] = [];
@@ -51,6 +55,17 @@ export const polyfillResources = async ({
     renderMode === 'streaming' ? '' : ' defer="defer"'
   } charset="utf-8" data-critical="true" crossorigin="anonymous" src="${href}"><\\/script>')}
 })()`,
+    });
+  });
+
+  modernPolyfillScripts.forEach((script) => {
+    result.push({
+      type: ResourceType.script,
+      payload: genHref(script),
+      attrs: {
+        id: 'modern-polyfills',
+      },
+      slot: ResourceSlot.HEAD_POLYFILLS,
     });
   });
 

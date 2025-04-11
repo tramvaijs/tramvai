@@ -119,6 +119,10 @@ export interface ApplicationConfigEntry extends CliConfigEntry {
    */
   polyfill?: string;
   /**
+   * @title Path to modern polyfill file. By default, looks for the `src/modern-polyfill`
+   */
+  modernPolyfill?: string;
+  /**
    * @title Path to folder with papi handlers
    * @default "src/api"
    */

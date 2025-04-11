@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`polyfills modern list of polyfills: modern 1`] = `
+{
+  "polyfills": [
+    "../../examples/polyfills/src/modern.polyfill.ts",
+    "../../node_modules/core-js/modules/es.array.find-last-index.js",
+    "../../node_modules/core-js/modules/es.array.find-last.js",
+    "../../node_modules/core-js/modules/es.array.push.js",
+    "../../node_modules/core-js/modules/es.array.to-reversed.js",
+    "../../node_modules/core-js/modules/es.array.to-sorted.js",
+    "../../node_modules/core-js/modules/es.array.to-spliced.js",
+    "../../node_modules/core-js/modules/es.array.with.js",
+    "../../node_modules/core-js/modules/es.error.cause.js",
+    "../../node_modules/core-js/modules/es.map.group-by.js",
+    "../../node_modules/core-js/modules/es.object.group-by.js",
+    "../../node_modules/core-js/modules/es.promise.try.js",
+    "../../node_modules/core-js/modules/es.promise.with-resolvers.js",
+    "../../node_modules/core-js/modules/es.string.is-well-formed.js",
+    "../../node_modules/core-js/modules/es.string.to-well-formed.js",
+    "../../node_modules/core-js/modules/web.structured-clone.js",
+    "../../node_modules/core-js/modules/web.url-search-params.delete.js",
+    "../../node_modules/core-js/modules/web.url-search-params.has.js",
+    "../../node_modules/core-js/modules/web.url-search-params.size.js",
+    "../../node_modules/core-js/modules/web.url.can-parse.js",
+    "../../node_modules/core-js/modules/web.url.parse.js",
+    "webpack/runtime/compat get default export",
+    "webpack/runtime/define property getters",
+    "webpack/runtime/global",
+    "webpack/runtime/hasOwnProperty shorthand",
+  ],
+  "polyfillsCount": 25,
+}
+`;
+
 exports[`polyfills stable list of polyfills: default 1`] = `
 {
   "polyfills": [

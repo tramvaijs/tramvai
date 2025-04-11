@@ -35,7 +35,7 @@ export const commonApplication =
     config
       .plugin('module-federation-ignore-entries')
       .use(ModuleFederationIgnoreEntries, [
-        { entries: ['polyfill'] } as ModuleFederationIgnoreEntriesOptions,
+        { entries: ['polyfill', 'modern.polyfill'] } as ModuleFederationIgnoreEntriesOptions,
       ]);
 
     config.plugin('module-federation-validate-duplicates').use(ModuleFederationFixRange, [
