@@ -54,8 +54,6 @@ export class PageBuilder {
 
   private polyfillCondition: typeof POLYFILL_CONDITION;
 
-  private modern: boolean;
-
   private renderFlowAfter: ExtractDependencyType<typeof RENDER_FLOW_AFTER_TOKEN>;
 
   private log: ReturnType<ExtractDependencyType<typeof LOGGER_TOKEN>>;
@@ -77,7 +75,6 @@ export class PageBuilder {
     htmlPageSchema,
     polyfillCondition,
     htmlAttrs,
-    modern,
     renderFlowAfter,
     logger,
     fetchWebpackStats,
@@ -93,7 +90,6 @@ export class PageBuilder {
     this.reactRender = reactRender;
     this.htmlPageSchema = htmlPageSchema;
     this.polyfillCondition = polyfillCondition;
-    this.modern = modern;
     this.renderFlowAfter = renderFlowAfter || [];
     this.log = logger('page-builder');
     this.fetchWebpackStats = fetchWebpackStats;
@@ -103,7 +99,7 @@ export class PageBuilder {
   }
 
   async flow(): Promise<string> {
-    const stats = await this.fetchWebpackStats({ modern: this.modern });
+    const stats = await this.fetchWebpackStats();
     const extractor = new ChunkExtractor({ stats, entrypoints: [] });
 
     // first we render the application, because we need to extract information about the data used by the components
@@ -160,13 +156,12 @@ export class PageBuilder {
   }
 
   async fetchChunksInfo(extractor: ChunkExtractor) {
-    const { modern, renderMode } = this;
+    const { renderMode } = this;
     const { bundle, pageComponent } = this.pageService.getConfig();
 
     this.resourcesRegistry.register(
       await bundleResource({
         bundle,
-        modern,
         extractor,
         pageComponent,
         fetchWebpackStats: this.fetchWebpackStats,
@@ -177,7 +172,6 @@ export class PageBuilder {
     this.resourcesRegistry.register(
       await polyfillResources({
         condition: this.polyfillCondition,
-        modern,
         fetchWebpackStats: this.fetchWebpackStats,
         renderMode,
       })

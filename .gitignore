@@ -51,7 +51,6 @@ tests.js
 __migrations__
 **/dist
 stats.json
-stats.modern.json
 webpackAssets.json
 .tmp
 test/tramvai.json

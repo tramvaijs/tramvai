@@ -15,9 +15,7 @@ export const buildModule = async (di: Container): Result => {
     },
   });
 
-  const builderBuild = await builder.build({
-    modern: false,
-  });
+  const builderBuild = await builder.build();
 
   return {
     builder,

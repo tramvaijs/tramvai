@@ -25,7 +25,6 @@ export function showBanner(di: Container) {
   if (config.type !== 'application') {
     titleLines.push(`${label('Type')}             ${config.type}`);
   }
-  titleLines.push(`${label('Modern')}           ${config.modern}`);
   titleLines.push(`${label('ReactRefresh')}     ${config.hotRefresh.enabled}`);
 
   if (isApplication(config) && config.fileSystemPages.enabled) {

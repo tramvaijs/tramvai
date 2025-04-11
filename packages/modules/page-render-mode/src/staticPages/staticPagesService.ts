@@ -7,7 +7,6 @@ import type {
   RESPONSE_MANAGER_TOKEN,
 } from '@tramvai/tokens-common';
 import type { FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
-import type { MODERN_SATISFIES_TOKEN } from '@tramvai/tokens-render';
 import type {
   STATIC_PAGES_BACKGROUND_FETCH_SERVICE,
   STATIC_PAGES_GET_CACHE_KEY_TOKEN,
@@ -40,7 +39,6 @@ export class StaticPagesService {
   readonly path: string;
   readonly port: string;
   readonly deviceType: string;
-  readonly modern: string;
 
   private responseManager: ResponseManager;
   private response: Response;
@@ -60,7 +58,6 @@ export class StaticPagesService {
     responseManager,
     environmentManager,
     userAgent,
-    modern,
     logger,
     cache,
     modifyCache,
@@ -75,7 +72,6 @@ export class StaticPagesService {
     response: Response;
     environmentManager: ExtractDependencyType<typeof ENV_MANAGER_TOKEN>;
     userAgent: ExtractDependencyType<typeof USER_AGENT_TOKEN>;
-    modern: ExtractDependencyType<typeof MODERN_SATISFIES_TOKEN>;
     logger: Logger;
     cache: Cache;
     modifyCache: ModifyCache;
@@ -88,7 +84,6 @@ export class StaticPagesService {
     this.path = requestManager.getParsedUrl().pathname;
     this.port = environmentManager.get('PORT');
     this.deviceType = userAgent.mobileOS ? 'mobile' : 'desktop';
-    this.modern = modern ? 'modern' : 'default';
     this.log = logger('static-pages');
     this.responseManager = responseManager;
     this.response = response;
@@ -172,7 +167,6 @@ export class StaticPagesService {
         path: this.path,
         port: this.port,
         deviceType: this.deviceType,
-        modern: this.modern,
       })
       .then((response) => {
         if (!response) {

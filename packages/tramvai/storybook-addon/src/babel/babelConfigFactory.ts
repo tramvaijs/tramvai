@@ -8,5 +8,4 @@ export const babelConfigFactory = ({ typescript = true }: { typescript?: boolean
     env: process.env.NODE_ENV as Env,
     generateDataQaTag: false,
     removeTypeofWindow: true,
-    modern: true,
   });

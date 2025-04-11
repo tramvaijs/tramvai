@@ -6,7 +6,7 @@ import type { ConfigManager } from '../../../config/configManager';
 import type { CliConfigEntry } from '../../../typings/configEntry/cli';
 
 export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config) => {
-  const { modern, debug, disableProdOptimization } = configManager;
+  const { debug, disableProdOptimization } = configManager;
 
   const isProductionProfilingEnabled = !!process.env.TRAMVAI_REACT_PROFILE;
   const tramvaiReactProfileTerserOptions = {
@@ -60,7 +60,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
       parallel: terser.parallel,
       terserOptions: {
         ...tramvaiReactProfileTerserOptions,
-        ecma: modern ? 6 : 5,
+        ecma: 6,
         mangle: {
           // https://github.com/node-fetch/node-fetch/issues/667
           // иначе AbortSignal минифицируется и на сервере падает ошибка в node-fetch

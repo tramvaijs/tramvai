@@ -7,9 +7,7 @@ const contenthashPngRegexp = /\.([\w\d]+?)\.png/;
 
 describe('packages/modules/pwa - assets', () => {
   let swFilename: string;
-  let swModernFilename: string;
   let statsFilename: string;
-  let statsModernFilename: string;
   let webmanifestFilename: string;
   let iconsFilenames: string[];
 
@@ -24,9 +22,7 @@ describe('packages/modules/pwa - assets', () => {
     const distClientDirectory = path.resolve(__dirname, '../dist', 'client');
 
     swFilename = path.join(distClientDirectory, 'service-worker.js');
-    swModernFilename = path.join(distClientDirectory, 'service-worker.modern.js');
     statsFilename = path.join(distClientDirectory, 'stats.json');
-    statsModernFilename = path.join(distClientDirectory, 'stats.modern.json');
     webmanifestFilename = path.join(
       distClientDirectory,
       (await fs.promises.readdir(distClientDirectory)).find((filename) =>
@@ -46,27 +42,6 @@ describe('packages/modules/pwa - assets', () => {
     it('should contain chunks from "include" parameter', () => {
       const swContent = fs.readFileSync(swFilename, 'utf-8');
       const statsContent: Record<string, any> = require(statsFilename);
-
-      const chunks = ['react', 'platform', 'tramvai-workbox-window']
-        .map((chunkname) => {
-          return statsContent.assetsByChunkName[chunkname][0];
-        })
-        .concat(path.basename(webmanifestFilename));
-
-      chunks.forEach((chunkname) => {
-        expect(swContent.includes(chunkname)).toBe(true);
-      });
-    });
-  });
-
-  describe('modern Service Worker', () => {
-    it('should be created', () => {
-      expect(fs.existsSync(swModernFilename)).toBe(true);
-    });
-
-    it('should contain chunks from "include" parameter', () => {
-      const swContent = fs.readFileSync(swModernFilename, 'utf-8');
-      const statsContent: Record<string, any> = require(statsModernFilename);
 
       const chunks = ['react', 'platform', 'tramvai-workbox-window']
         .map((chunkname) => {

@@ -10,7 +10,7 @@ import { registerProviders } from '../../utils/di';
 
 export const buildApplication = async (di: Container): Result => {
   const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
-  const { buildType = 'all', onlyModern } = options;
+  const { buildType = 'all' } = options;
 
   const shouldBuildClient = buildType === 'client' || buildType === 'all';
   const shouldBuildServer = buildType === 'server' || buildType === 'all';
@@ -24,13 +24,10 @@ export const buildApplication = async (di: Container): Result => {
     options: {
       shouldBuildClient,
       shouldBuildServer,
-      onlyModern,
     },
   });
 
-  const builderBuild = await builder.build({
-    modern: configManager.modern,
-  });
+  const builderBuild = await builder.build();
 
   return {
     builder,

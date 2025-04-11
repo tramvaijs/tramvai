@@ -27,7 +27,6 @@ const generateFilename = (
   [
     '[name]',
     !configManager.disableProdOptimization && '[contenthash]',
-    configManager.disableProdOptimization && configManager.modern && 'modern',
     isChunk && 'chunk',
     extension,
   ]

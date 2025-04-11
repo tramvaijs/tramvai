@@ -8,22 +8,18 @@ import { flushFiles } from './utils/flushFiles';
 
 export const polyfillResources = async ({
   condition,
-  modern,
   fetchWebpackStats,
   renderMode,
 }: {
   condition: string;
-  modern: boolean;
   fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
   renderMode: typeof REACT_SERVER_RENDER_MODE;
 }) => {
-  const webpackStats = await fetchWebpackStats({ modern });
+  const webpackStats = await fetchWebpackStats();
 
   const { publicPath, polyfillCondition } = webpackStats;
 
-  // получает файл полифилла из stats.json\stats.modern.json.
-  // В зависимости от версии браузера будет использован полифилл из legacy или modern сборки,
-  // т.к. полифиллы для них могут отличаться на основании преобразований `@babel/preset-env`
+  // получает файл полифилла из stats.json.
   const { scripts: polyfillScripts } = flushFiles(['polyfill'], webpackStats, {
     ignoreDependencies: true,
   });

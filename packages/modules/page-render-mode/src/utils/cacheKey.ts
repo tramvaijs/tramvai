@@ -3,15 +3,13 @@ export const getCacheKey = ({
   host,
   path,
   deviceType,
-  modern,
 }: {
   method: string;
   host: string;
   path: string;
   deviceType: 'desktop' | 'mobile';
-  modern: boolean;
 }) => {
-  return `${method}=${host}=${path}=${deviceType}=${modern ? 'modern' : 'default'}`;
+  return `${method}=${host}=${path}=${deviceType}`;
 };
 
 export const parseCacheKey = (key: string): string[] => {

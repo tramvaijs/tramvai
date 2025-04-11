@@ -11,11 +11,9 @@ import type { Builder } from '../../typings/build/Builder';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all' | 'none';
-  onlyModern?: boolean;
   debug?: boolean;
   verboseWebpack?: boolean;
   profile?: boolean;
-  modern?: boolean;
   sourceMap?: boolean;
   resolveSymlinks?: boolean;
   disableProdOptimization?: boolean;

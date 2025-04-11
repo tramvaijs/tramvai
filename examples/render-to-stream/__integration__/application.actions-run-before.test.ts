@@ -13,7 +13,6 @@ describe('render-to-stream. actions run mode - before', () => {
       name: 'render-to-stream',
       root: path.resolve(__dirname, '../', 'src'),
       type: 'application',
-      modern: true,
       fileSystemPages: {
         enabled: true,
         pagesDir: false,

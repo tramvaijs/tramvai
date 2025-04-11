@@ -10,7 +10,6 @@ pluginTester({
     typescript: true,
     generateDataQaTag: false,
     loader: false,
-    actualTarget: 'modern',
     browsersListTargets: ['defaults'],
   }),
   tests: {

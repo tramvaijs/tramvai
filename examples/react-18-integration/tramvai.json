@@ -5,7 +5,6 @@
       "name": "react-18-integration",
       "root": "src",
       "type": "application",
-      "modern": true,
       "fileSystemPages": {
         "enabled": true,
         "pagesDir": false

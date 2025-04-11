@@ -60,7 +60,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .when(portalExists, (cfg) => cfg.entry('portal').add(portal))
     .when(polyfillExists, (cfg) => cfg.entry('polyfill').add(polyfillPath));
 
-  const statsFileName = configManager.modern ? 'stats.modern.json' : 'stats.json';
+  const statsFileName = 'stats.json';
 
   config
     .plugin('stats-plugin')

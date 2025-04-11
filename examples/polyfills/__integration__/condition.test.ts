@@ -11,7 +11,6 @@ describe('polyfill condition', () => {
   beforeAll(async () => {
     app = await startCli('polyfills', {
       rootDir: path.resolve(__dirname, '../'),
-      modern: false,
       fileCache: false,
     });
   }, 80000);

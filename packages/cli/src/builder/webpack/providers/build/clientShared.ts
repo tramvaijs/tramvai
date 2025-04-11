@@ -4,32 +4,27 @@ import { provide } from '@tinkoff/dippy';
 import rimraf from 'rimraf';
 import { CLI_PACKAGE_MANAGER, CLI_ROOT_DIR_TOKEN } from '../../../../di/tokens';
 import { npmRequire } from '../../../../utils/npmRequire';
-import {
-  CLIENT_CONFIG_MANAGER_TOKEN,
-  CLIENT_MODERN_CONFIG_MANAGER_TOKEN,
-  INIT_HANDLER_TOKEN,
-} from '../../tokens';
+import { CLIENT_CONFIG_MANAGER_TOKEN, INIT_HANDLER_TOKEN } from '../../tokens';
 
 export const buildClientSharedProviders: Provider[] = [
   provide({
     provide: INIT_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ configManager, modernConfigManager }) => {
+    useFactory: ({ configManager }) => {
       return function clearBuildDir() {
-        return rimraf.sync(`${(configManager || modernConfigManager).buildPath}/**`, {});
+        return rimraf.sync(`${configManager.buildPath}/**`, {});
       };
     },
     deps: {
       configManager: optional(CLIENT_CONFIG_MANAGER_TOKEN),
-      modernConfigManager: optional(CLIENT_MODERN_CONFIG_MANAGER_TOKEN),
     },
   }),
   provide({
     provide: INIT_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ configManager, modernConfigManager, rootDir, packageManager }) => {
+    useFactory: ({ configManager, rootDir, packageManager }) => {
       return async function prepareImageOptimization() {
-        if ((configManager || modernConfigManager).imageOptimization?.enabled) {
+        if (configManager.imageOptimization?.enabled) {
           await npmRequire({
             cliRootDir: rootDir,
             packageManager,
@@ -41,7 +36,6 @@ export const buildClientSharedProviders: Provider[] = [
     },
     deps: {
       configManager: optional(CLIENT_CONFIG_MANAGER_TOKEN),
-      modernConfigManager: optional(CLIENT_MODERN_CONFIG_MANAGER_TOKEN),
       rootDir: CLI_ROOT_DIR_TOKEN,
       packageManager: CLI_PACKAGE_MANAGER,
     },

@@ -4,8 +4,7 @@
     "app": {
       "name": "app",
       "root": "app",
-      "type": "application",
-      "modern": false
+      "type": "application"
     },
     "module": {
       "name": "module",

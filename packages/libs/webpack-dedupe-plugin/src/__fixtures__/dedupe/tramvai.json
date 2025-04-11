@@ -4,7 +4,6 @@
       "name": "dedupe-no",
       "root": "src",
       "type": "application",
-      "modern": false,
       "dedupe": {
         "enabled": false
       }
@@ -13,7 +12,6 @@
       "name": "dedupe-eq",
       "root": "src",
       "type": "application",
-      "modern": false,
       "dedupe": {
         "enabled": true,
         "enabledDev": true
@@ -23,7 +21,6 @@
       "name": "dedupe-sem",
       "root": "src",
       "type": "application",
-      "modern": false,
       "dedupe": {
         "enabledDev": true,
         "strategy": "semver"
@@ -33,7 +30,6 @@
       "name": "dedupe",
       "root": "src",
       "type": "application",
-      "modern": false,
       "dedupe": {
         "enabledDev": true,
         "strategy": "semver",

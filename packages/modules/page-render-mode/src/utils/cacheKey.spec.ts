@@ -8,9 +8,8 @@ describe('cacheKey', () => {
         host: 'localhost',
         path: '/test',
         deviceType: 'desktop',
-        modern: true,
       })
-    ).toBe('GET=localhost=/test=desktop=modern');
+    ).toBe('GET=localhost=/test=desktop');
 
     expect(
       getCacheKey({
@@ -18,9 +17,8 @@ describe('cacheKey', () => {
         host: 'localhost',
         path: '/test',
         deviceType: 'mobile',
-        modern: false,
       })
-    ).toBe('GET=localhost=/test=mobile=default');
+    ).toBe('GET=localhost=/test=mobile');
   });
 
   it('parseCacheKey', () => {
@@ -29,19 +27,17 @@ describe('cacheKey', () => {
       host: 'localhost',
       path: '/test',
       deviceType: 'desktop',
-      modern: true,
     });
 
-    expect(parseCacheKey(key1)).toEqual(['GET', 'localhost', '/test', 'desktop', 'modern']);
+    expect(parseCacheKey(key1)).toEqual(['GET', 'localhost', '/test', 'desktop']);
 
     const key2 = getCacheKey({
       method: 'GET',
       host: 'localhost',
       path: '/test',
       deviceType: 'mobile',
-      modern: false,
     });
 
-    expect(parseCacheKey(key2)).toEqual(['GET', 'localhost', '/test', 'mobile', 'default']);
+    expect(parseCacheKey(key2)).toEqual(['GET', 'localhost', '/test', 'mobile']);
   });
 });

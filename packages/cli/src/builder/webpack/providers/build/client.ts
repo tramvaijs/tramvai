@@ -19,7 +19,6 @@ export const buildClientProviders: Provider[] = [
     useFactory: ({ configManager }) => {
       return configManager.withSettings({
         buildType: 'client',
-        modern: false,
       });
     },
     deps: {

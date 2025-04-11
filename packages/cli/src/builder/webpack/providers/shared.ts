@@ -9,7 +9,6 @@ import {
   GET_BUILD_STATS_TOKEN,
   INIT_HANDLER_TOKEN,
   WEBPACK_CLIENT_COMPILER_TOKEN,
-  WEBPACK_CLIENT_MODERN_COMPILER_TOKEN,
   WEBPACK_SERVER_COMPILER_TOKEN,
 } from '../tokens';
 import { calculateBuildTime } from '../utils/calculateBuildTime';
@@ -19,7 +18,7 @@ import { maxMemoryRss } from '../utils/maxMemoryRss';
 export const sharedProviders: Provider[] = [
   provide({
     provide: GET_BUILD_STATS_TOKEN,
-    useFactory: ({ withBuildStats, clientCompiler, clientModernCompiler, serverCompiler }) => {
+    useFactory: ({ withBuildStats, clientCompiler, serverCompiler }) => {
       if (!withBuildStats) {
         return () => {
           return {};
@@ -27,14 +26,12 @@ export const sharedProviders: Provider[] = [
       }
 
       const getClientTime = clientCompiler && calculateBuildTime(clientCompiler);
-      const getClientModernTime = clientModernCompiler && calculateBuildTime(clientModernCompiler);
       const getServerTime = serverCompiler && calculateBuildTime(serverCompiler);
 
       const getMaxMemoryRss = maxMemoryRss();
       return () => {
         return {
           clientBuildTime: getClientTime?.(),
-          clientModernBuildTime: getClientModernTime?.(),
           serverBuildTime: getServerTime?.(),
           maxMemoryRss: getMaxMemoryRss?.(),
         };
@@ -43,7 +40,6 @@ export const sharedProviders: Provider[] = [
     deps: {
       withBuildStats: { token: WITH_BUILD_STATS_TOKEN, optional: true },
       clientCompiler: { token: WEBPACK_CLIENT_COMPILER_TOKEN, optional: true },
-      clientModernCompiler: { token: WEBPACK_CLIENT_MODERN_COMPILER_TOKEN, optional: true },
       serverCompiler: { token: WEBPACK_SERVER_COMPILER_TOKEN, optional: true },
     },
   }),
@@ -54,18 +50,15 @@ export const sharedProviders: Provider[] = [
   provide({
     provide: INIT_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ eventEmitter, clientCompiler, clientModernCompiler, serverCompiler }) => {
+    useFactory: ({ eventEmitter, clientCompiler, serverCompiler }) => {
       return () => {
         clientCompiler && emitWebpackEvents(clientCompiler, eventEmitter, 'client');
-        clientModernCompiler &&
-          emitWebpackEvents(clientModernCompiler, eventEmitter, 'clientModern');
         serverCompiler && emitWebpackEvents(serverCompiler, eventEmitter, 'server');
       };
     },
     deps: {
       eventEmitter: EVENT_EMITTER_TOKEN,
       clientCompiler: { token: WEBPACK_CLIENT_COMPILER_TOKEN, optional: true },
-      clientModernCompiler: { token: WEBPACK_CLIENT_MODERN_COMPILER_TOKEN, optional: true },
       serverCompiler: { token: WEBPACK_SERVER_COMPILER_TOKEN, optional: true },
     },
   }),

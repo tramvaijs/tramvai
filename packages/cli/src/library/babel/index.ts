@@ -83,7 +83,7 @@ export const babelConfigFactory = ({
           loose,
           targets: browsersListTargets,
           browserslistEnv: actualTarget,
-          bugfixes: actualTarget === 'modern',
+          bugfixes: true,
           exclude: excludesPresetEnv,
         },
       ],

@@ -15,11 +15,7 @@ export const buildChildApp = async (di: Container): Result => {
     },
   });
 
-  const builderBuild = await builder.build({
-    // child-app either should be built for legacy code always
-    // or should be smart loaded depending on browser capabilities
-    modern: false,
-  });
+  const builderBuild = await builder.build();
 
   return {
     builder,

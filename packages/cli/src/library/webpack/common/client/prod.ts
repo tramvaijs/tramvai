@@ -29,7 +29,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
   if (configManager.dedupe.enabled) {
     config.batch(
       dedupe(configManager, {
-        showLogs: !configManager.modern,
+        showLogs: true,
         onDedupeInfo,
       })
     );

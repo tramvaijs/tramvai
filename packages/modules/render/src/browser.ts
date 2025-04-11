@@ -7,7 +7,6 @@ import {
   RENDER_MODE,
   RENDERER_CALLBACK,
   USE_REACT_STRICT_MODE,
-  MODERN_SATISFIES_TOKEN,
   REACT_SERVER_RENDER_MODE,
   DEFAULT_ERROR_BOUNDARY_COMPONENT,
 } from '@tramvai/tokens-render';
@@ -107,17 +106,6 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
     provide({
       provide: RENDER_MODE,
       useValue: 'legacy',
-    }),
-    provide({
-      provide: MODERN_SATISFIES_TOKEN,
-      useFactory: ({ cookieManager }) => {
-        const result = cookieManager.get('_t_modern');
-
-        return result === 'true' || result === 'false' ? JSON.parse(result) : false;
-      },
-      deps: {
-        cookieManager: COOKIE_MANAGER_TOKEN,
-      },
     }),
     provide({
       provide: REACT_SERVER_RENDER_MODE,

@@ -126,7 +126,6 @@ describe('JSON schema для tramvai.json', () => {
                 "overlay": false,
               },
             },
-            "modern": true,
             "name": "test-app",
             "notifications": {},
             "output": {

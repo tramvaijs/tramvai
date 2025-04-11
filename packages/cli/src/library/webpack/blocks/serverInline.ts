@@ -4,8 +4,7 @@ import type { CliConfigEntry } from '../../../typings/configEntry/cli';
 import { addTranspilerLoader, getTranspilerConfig } from '../utils/transpiler';
 
 export const serverInline = (configManager: ConfigManager<CliConfigEntry>) => (config: Config) => {
-  // создаём клиентский конфиг и отключаем modern режим
-  const clientConfigManager = configManager.withSettings({ buildType: 'client', modern: false });
+  const clientConfigManager = configManager.withSettings({ buildType: 'client' });
 
   const addInlineHandler = (type: string) => {
     config.module

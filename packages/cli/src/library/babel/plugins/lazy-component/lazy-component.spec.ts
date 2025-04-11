@@ -11,7 +11,6 @@ pluginTester({
     generateDataQaTag: false,
     loader: false,
     hot: true,
-    actualTarget: 'modern',
     browsersListTargets: ['defaults'],
   }),
   tests: {

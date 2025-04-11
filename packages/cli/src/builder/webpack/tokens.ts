@@ -10,17 +10,11 @@ import type { CliConfigEntry } from '../../typings/configEntry/cli';
 export const CLIENT_CONFIG_MANAGER_TOKEN = createToken<ConfigManager<CliConfigEntry>>(
   'builder-webpack clientConfigManager'
 );
-export const CLIENT_MODERN_CONFIG_MANAGER_TOKEN = createToken<ConfigManager<CliConfigEntry>>(
-  'builder-webpack clientModernConfigManager'
-);
 export const SERVER_CONFIG_MANAGER_TOKEN = createToken<ConfigManager<CliConfigEntry>>(
   'builder-webpack serverConfigManager'
 );
 export const WEBPACK_CLIENT_CONFIG_TOKEN = createToken<Config>('builder-webpack clientConfig');
 
-export const WEBPACK_CLIENT_MODERN_CONFIG_TOKEN = createToken<Config>(
-  'builder-webpack clientModernConfig'
-);
 export const WEBPACK_SERVER_CONFIG_TOKEN = createToken<Config>('builder-webpack serverConfig');
 
 export const WEBPACK_COMPILER_TOKEN = createToken<MultiCompiler>('builder-webpack webpackCompiler');
@@ -29,9 +23,6 @@ export const WEBPACK_CLIENT_COMPILER_TOKEN = createToken<Compiler>(
   'builder-webpack webpackClientCompiler'
 );
 
-export const WEBPACK_CLIENT_MODERN_COMPILER_TOKEN = createToken<Compiler>(
-  'builder-webpack webpackClientModernCompiler'
-);
 export const WEBPACK_SERVER_COMPILER_TOKEN = createToken<Compiler>(
   'builder-webpack webpackServerCompiler'
 );

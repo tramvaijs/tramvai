@@ -5,7 +5,7 @@ test.describe('packages/modules/pwa', () => {
     test('should be registered with correct url', async ({ app, I, Pwa }) => {
       await I.gotoPage(`${app.serverUrl}/scope/`);
 
-      test.expect(await Pwa.getSWUrl()).toBe('/scope/service-worker.modern.js');
+      test.expect(await Pwa.getSWUrl()).toBe('/scope/service-worker.js');
     });
 
     test('should be registered with correct scope', async ({ app, I, Pwa }) => {

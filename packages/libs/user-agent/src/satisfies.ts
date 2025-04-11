@@ -60,7 +60,7 @@ const normalizedBrowserslist = (query: string[]) => {
 };
 
 interface SatisfiesOptions {
-  env?: 'modern' | 'defaults';
+  env?: 'defaults';
   forceMinimumUnknownVersions?: boolean;
 }
 

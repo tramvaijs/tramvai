@@ -217,8 +217,6 @@ export const RENDER_FLOW_AFTER_TOKEN = createToken<() => Promise<void>>('render 
   multi: true,
 });
 
-export const MODERN_SATISFIES_TOKEN = createToken<boolean>('modernSatisfies');
-
 export const BACK_FORWARD_CACHE_ENABLED = createToken<boolean>('back forward cache');
 
 export type ReactServerRenderMode = 'sync' | 'streaming';
@@ -236,7 +234,7 @@ export interface WebpackStats {
   [key: string]: any;
 }
 
-type FetchWebpackStatsFn = (payload?: { modern?: boolean }) => Promise<WebpackStats>;
+type FetchWebpackStatsFn = () => Promise<WebpackStats>;
 
 export const FETCH_WEBPACK_STATS_TOKEN = createToken<FetchWebpackStatsFn>('fetchWebpackStatsFn', {
   scope: Scope.SINGLETON,

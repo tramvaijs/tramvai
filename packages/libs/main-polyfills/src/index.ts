@@ -1,5 +1,4 @@
 // imports from core-js will transform by [`@babel/preset-env`](https://babeljs.io/docs/en/babel-preset-env#usebuiltins-entry) in more specific,
-// according to browser versions in the browserslist, separately for legacy and modern builds
 import 'core-js/modules/es.aggregate-error';
 
 import 'core-js/modules/es.array.at';

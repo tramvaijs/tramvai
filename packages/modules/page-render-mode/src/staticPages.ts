@@ -9,7 +9,6 @@ import {
   RESPONSE_MANAGER_TOKEN,
 } from '@tramvai/tokens-common';
 import { FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
-import { MODERN_SATISFIES_TOKEN } from '@tramvai/tokens-render';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
 import { SERVER_MODULE_PAPI_PRIVATE_ROUTE } from '@tramvai/tokens-server';
@@ -79,7 +78,7 @@ export const staticPagesProviders = [
   }),
   provide({
     provide: STATIC_PAGES_GET_CACHE_KEY_TOKEN,
-    useFactory: ({ requestManager, userAgent, modern }) => {
+    useFactory: ({ requestManager, userAgent }) => {
       return () => {
         const deviceType = userAgent.mobileOS ? 'mobile' : 'desktop';
 
@@ -88,14 +87,12 @@ export const staticPagesProviders = [
           host: requestManager.getHost(),
           path: requestManager.getParsedUrl().pathname,
           deviceType,
-          modern,
         });
       };
     },
     deps: {
       requestManager: REQUEST_MANAGER_TOKEN,
       userAgent: USER_AGENT_TOKEN,
-      modern: MODERN_SATISFIES_TOKEN,
     },
   }),
   provide({
@@ -141,7 +138,6 @@ export const staticPagesProviders = [
       response: FASTIFY_RESPONSE,
       environmentManager: ENV_MANAGER_TOKEN,
       userAgent: USER_AGENT_TOKEN,
-      modern: MODERN_SATISFIES_TOKEN,
       logger: LOGGER_TOKEN,
       cache: STATIC_PAGES_CACHE_TOKEN,
       modifyCache: { token: STATIC_PAGES_MODIFY_CACHE, optional: true },

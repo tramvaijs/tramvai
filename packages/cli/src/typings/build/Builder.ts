@@ -4,7 +4,6 @@ export interface BuilderCustomOptions {
 
 export interface BuilderOptions {
   shouldBuildClient: boolean;
-  onlyModern?: boolean;
   shouldBuildServer: boolean;
 }
 
@@ -29,23 +28,19 @@ interface BuilderStartOptions {
   strictError: boolean;
 }
 
-interface BuilderBuildOptions {
-  modern: boolean;
-}
+interface BuilderBuildOptions {}
 
 interface BuilderAnalyzeOptions {
-  modern?: boolean;
   plugin?: string;
 }
 
 export type GetBuildStats = () => {
   clientBuildTime?: number;
-  clientModernBuildTime?: number;
   serverBuildTime?: number;
   maxMemoryRss?: number;
 };
 
-export type BuildType = 'client' | 'server' | 'clientModern';
+export type BuildType = 'client' | 'server';
 
 export interface BuilderEvents {
   invalid: [];
@@ -60,7 +55,7 @@ export interface Builder<Name extends string> {
     invalidate: () => Promise<void>;
     getBuildStats: GetBuildStats;
   }>;
-  build(options: BuilderBuildOptions): Promise<{
+  build(options?: BuilderBuildOptions): Promise<{
     getBuildStats: GetBuildStats;
   }>;
 

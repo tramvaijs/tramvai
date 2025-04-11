@@ -18,7 +18,6 @@ export const pwaBlock =
       root,
       output,
       env,
-      modern,
       sourceMap,
       assetsPrefix,
     } = configManager;
@@ -99,10 +98,6 @@ export const pwaBlock =
         workboxOptions.modifyURLPrefix = {
           '': assetsPrefix,
         };
-      }
-
-      if (modern) {
-        workboxOptions.swDest = workboxOptions.swDest.replace(/\.js$/, '.modern.js');
       }
 
       // @todo: break hmr on client when sw.ts is changed - infinity loop !!!

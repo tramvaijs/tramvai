@@ -22,7 +22,6 @@ export type Params = WithConfig<{
   trace?: boolean;
   verboseWebpack?: boolean;
   profile?: boolean;
-  modern?: boolean;
   sourceMap?: boolean;
   noServerRebuild?: boolean;
   noClientRebuild?: boolean;

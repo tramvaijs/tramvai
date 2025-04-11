@@ -8,10 +8,6 @@ Tinkoff-specific settings for [browserslist](https://github.com/browserslist/bro
 
 Contains config for every supported browser
 
-### modern
-
-Contains config for, so called "modern" browser. Browser's versions in this list are higher than for [defaults](#defaults) and these browsers support more functionality
-
 ### node
 
 Contains config for nodejs

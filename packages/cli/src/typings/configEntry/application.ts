@@ -144,11 +144,6 @@ export interface ApplicationConfigEntry extends CliConfigEntry {
      */
     static: string;
   };
-  /**
-   * @title Enable build for modern browsers
-   * @default true
-   */
-  modern?: boolean;
 
   /**
    * @title File-System Routing feature

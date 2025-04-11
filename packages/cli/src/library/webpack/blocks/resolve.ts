@@ -6,11 +6,11 @@ import type { ConfigManager } from '../../../config/configManager';
 import { extensions } from '../../../config/constants';
 
 export default (configManager: ConfigManager) => (config: Config) => {
-  const { rootDir, root, modern, buildType } = configManager;
+  const { rootDir, root, buildType } = configManager;
 
   config.resolve.mainFields.merge(
     [
-      ...(modern && buildType === 'client' ? ['es2017', 'es2016', 'es2015'] : []),
+      ...(buildType === 'client' ? ['es2017', 'es2016', 'es2015'] : []),
       buildType === 'client' && 'browser',
       'module',
       'main',

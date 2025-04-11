@@ -60,17 +60,6 @@ class BuildCommand extends CLICommand<Params> {
       description: 'Enable/disable persistent file cache for used cli builder',
     },
     {
-      name: '--modern',
-      value: '[modern]',
-      description: 'modern compilation code with es2015+',
-    },
-    {
-      name: '--onlyModern',
-      value: '[onlyModern]',
-      transformer: (value: string) => value !== 'false',
-      description: 'Emit only modern build from client compilation',
-    },
-    {
       name: '--verboseWebpack',
       value: '[verboseWebpack]',
       description: 'verbose output for webpack',

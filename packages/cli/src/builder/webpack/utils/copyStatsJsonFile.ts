@@ -8,7 +8,6 @@ export const copyStatsJsonFileToServerDirectory = async (
   clientConfigManager: ConfigManager<ApplicationConfigEntry>
 ) => {
   const STATS_JSON_FILE_NAME = 'stats.json';
-  const STATS_JSON_FILE_NAME_MODERN = 'stats.modern.json';
 
   const statsJsonFileDirectoryPath = clientConfigManager.output.client;
 
@@ -18,14 +17,7 @@ export const copyStatsJsonFileToServerDirectory = async (
     STATS_JSON_FILE_NAME
   );
 
-  const statsJsonFilePathModern = path.resolve(
-    clientConfigManager.rootDir,
-    statsJsonFileDirectoryPath,
-    STATS_JSON_FILE_NAME_MODERN
-  );
-
   const isExistStatsJsonFilePath = fs.existsSync(statsJsonFilePath);
-  const isExistStatsJsonFilePathModern = fs.existsSync(statsJsonFilePathModern);
 
   // TODO: Необходимо вынести все локальные константы обозначающие тип сборки
   // ('client' | 'server' | 'all') в отдельный enum и переиспользовать по всему коду @tramvai/cli
@@ -39,15 +31,6 @@ export const copyStatsJsonFileToServerDirectory = async (
       inputPath: statsJsonFileDirectoryPath,
       fromType: FROM_BUILD_DIRECTORY_TYPE,
       fileName: STATS_JSON_FILE_NAME,
-    });
-  }
-
-  if (isExistStatsJsonFilePathModern && clientConfigManager.modern) {
-    await copyBuildFile({
-      config: clientConfigManager,
-      inputPath: statsJsonFileDirectoryPath,
-      fromType: FROM_BUILD_DIRECTORY_TYPE,
-      fileName: STATS_JSON_FILE_NAME_MODERN,
     });
   }
 };

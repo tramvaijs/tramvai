@@ -1,1 +1,1 @@
-export type Target = 'modern' | 'node' | 'defaults';
+export type Target = 'node' | 'defaults';

@@ -13,7 +13,6 @@ export type TranspilerConfig = {
   env: Env;
   target: Target;
   actualTarget: Target;
-  modern: boolean;
   isServer: boolean;
   generateDataQaTag: boolean;
   enableFillActionNamePlugin: boolean;
@@ -77,7 +76,7 @@ export const getTranspilerConfig = (
     excludesPresetEnv,
     experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
   } = configManager;
-  const { env, modern } = configManager;
+  const { env } = configManager;
   const isServer = configManager.buildType === 'server';
 
   if (alias) {
@@ -90,8 +89,6 @@ Just check or add configuration to your tsconfig file and remove alias from tram
   if (!target) {
     if (isServer) {
       actualTarget = 'node';
-    } else if (modern) {
-      actualTarget = 'modern';
     }
   }
 
@@ -110,7 +107,6 @@ Just check or add configuration to your tsconfig file and remove alias from tram
     isServer,
     env,
     generateDataQaTag,
-    modern,
     tramvai: true,
     removeTypeofWindow: true,
     hot: !!configManager.hotRefresh.enabled,

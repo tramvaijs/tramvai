@@ -11,9 +11,8 @@ Where browserslist is used:
 
 In cli only specific list of supported env targets is used for browserslist:
 
-- `modern` - used for builds supposed to be provided for modern browsers
 - `node` - used for builds running on server
-- `defaults` - used otherwise, usually for outdated browsers
+- `defaults` - used for builds supposed to be provided for browsers
 
 ## cli setup
 
@@ -25,10 +24,6 @@ To extend or override default settings, you can use any of the methods [for brow
 - If you want to extend default settings then use [the ability to extend config](https://github.com/browserslist/browserslist#shareable-configs)
   ```json
   "browserslist": {
-    "modern": [
-      "extends @tinkoff/browserslist-config",
-      "chrome > 25"
-    ],
     "node": [
       "extends @tinkoff/browserslist-config"
     ],
@@ -45,7 +40,6 @@ To extend or override default settings, you can use any of the methods [for brow
 You can test how browserslist works using next commands:
 
 ```sh
-npx browserslist --env=modern # list of the modern browsers
 npx browserslist --env=node # list of the supported nodejs versions
 npx browserslist # list of the browsers including legacy one
 ```

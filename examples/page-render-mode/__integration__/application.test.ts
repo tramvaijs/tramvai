@@ -7,13 +7,9 @@ import fetch from 'node-fetch';
 
 jest.setTimeout(30000);
 
-const desktopModernUA =
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.3987.87 Safari/537.36';
-const desktopDefaultUA =
+const desktopUA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.3987.87 Safari/537.36';
-const mobileModernUA =
-  'Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.3071.125 Mobile Safari/537.36';
-const mobileDefaultUA =
+const mobileUA =
   'Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.3071.125 Mobile Safari/537.36';
 
 describe('page-render-mode', () => {
@@ -264,44 +260,20 @@ describe('page-render-mode', () => {
 
     it('cache pages by deviceType', async () => {
       const res1 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': desktopModernUA, cookie: 'foo=bar' },
+        headers: { 'User-Agent': desktopUA, cookie: 'foo=bar' },
       });
       // time to background fetch unpersonalized page
       await sleep(150);
       const res2 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': desktopModernUA, cookie: 'foo=bar' },
+        headers: { 'User-Agent': desktopUA, cookie: 'foo=bar' },
       });
       const res3 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': mobileModernUA, cookie: 'foo=bar' },
+        headers: { 'User-Agent': mobileUA, cookie: 'foo=bar' },
       });
       // time to background fetch unpersonalized page
       await sleep(150);
       const res4 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': mobileModernUA, cookie: 'foo=bar' },
-      });
-
-      expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
-      expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
-      expect(res3.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
-      expect(res4.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
-    });
-
-    it('cache pages by modern', async () => {
-      const res1 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': desktopModernUA, cookie: 'foo=bar' },
-      });
-      // time to background fetch unpersonalized page
-      await sleep(150);
-      const res2 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': desktopModernUA, cookie: 'foo=bar' },
-      });
-      const res3 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': desktopDefaultUA, cookie: 'foo=bar' },
-      });
-      // time to background fetch unpersonalized page
-      await sleep(150);
-      const res4 = await fetch(`${app.serverUrl}/static/`, {
-        headers: { 'User-Agent': desktopDefaultUA, cookie: 'foo=bar' },
+        headers: { 'User-Agent': mobileUA, cookie: 'foo=bar' },
       });
 
       expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe(null);

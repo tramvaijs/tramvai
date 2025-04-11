@@ -97,7 +97,6 @@ it('should populate defaults for config', () => {
               "overlay": false,
             },
           },
-          "modern": true,
           "name": "test-app",
           "notifications": {},
           "output": {
@@ -349,7 +348,6 @@ it('should populate defaults for overridable options', () => {
               "overlay": false,
             },
           },
-          "modern": true,
           "name": "test-app",
           "notifications": {},
           "output": {

@@ -19,27 +19,10 @@ const defaults = [
   'UCAndroid >= 13',
 ];
 
-// https://philipwalton.com/articles/deploying-es2015-code-in-production-today/
-const modern = [
-  // desktop
-  'Chrome >= 61',
-  'Safari >= 12.1',
-  'Firefox >= 115',
-  'Opera >= 62',
-  'Edge >= 79',
-  // mobile
-  'ChromeAndroid >= 61',
-  'ios_saf >= 12.1',
-  'OperaMobile >= 73',
-  'FirefoxAndroid >= 119',
-  'Samsung >= 8.2',
-];
-
 const node = ['Node >= 18'];
 
 module.exports = {
   defaults,
-  legacy: defaults,
-  modern,
+  modern: defaults,
   node,
 };

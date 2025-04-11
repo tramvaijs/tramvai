@@ -12,7 +12,7 @@ sidebar_position: 2
     "react-app": {
       "name": "new-app",
       "root": "src",
-      "type": "application",
+      "type": "application"
       // other options
     }
   }
@@ -61,10 +61,6 @@ Path to folder with papi handlers
 ### sourceMap
 
 If sourcemaps are enabled
-
-### modern
-
-Enable build for modern browsers
 
 ### fileSystemPages
 

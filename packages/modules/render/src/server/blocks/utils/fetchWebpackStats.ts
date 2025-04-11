@@ -22,21 +22,18 @@ try {
   }
 }
 
-let fetchStats: (
-  modern: boolean,
-  assetsPrefixFactory: () => string | null
-) => Promise<WebpackStats> = async () => {
+let fetchStats: (assetsPrefixFactory: () => string | null) => Promise<WebpackStats> = async () => {
   throw new Error(`Unknown environment`);
 };
 
 if (process.env.NODE_ENV === 'development') {
-  fetchStats = async (_, assetsPrefixFactory: () => string | null) => {
-    const { modern: configModern, staticHost, staticPort, output, httpProtocol } = appConfig;
+  fetchStats = async (assetsPrefixFactory: () => string | null) => {
+    const { staticHost, staticPort, output, httpProtocol } = appConfig;
 
     const getUrl = (filename: string) =>
       `${httpProtocol}://${staticHost}:${staticPort}/${output.client}/${filename}`;
 
-    const request = await fetch(getUrl(configModern ? 'stats.modern.json' : 'stats.json'));
+    const request = await fetch(getUrl('stats.json'));
     const stats = await request.json();
     const assetsPrefix = assetsPrefixFactory();
     // static - популярная заглушка в env.development.js файлах, надо игнорировать, как было раньше
@@ -101,27 +98,22 @@ if (process.env.NODE_ENV === 'production') {
 
   const statsCache: Record<string, WebpackStats> = {};
 
-  fetchStats = (modern: boolean, assetsPrefixFactory: () => string | null) => {
+  fetchStats = (assetsPrefixFactory: () => string | null) => {
     const assetsPrefix = assetsPrefixFactory();
-    const legacyStatsKey = `${assetsPrefix}legacy`;
-    const modernStatsKey = `${assetsPrefix}modern`;
+    const statsKey = `${assetsPrefix}legacy`;
 
-    if (!statsCache[legacyStatsKey]) {
-      statsCache[legacyStatsKey] = webpackStats('stats.json', assetsPrefix);
-    }
-    if (!statsCache[modernStatsKey]) {
-      statsCache[modernStatsKey] =
-        webpackStats('stats.modern.json', assetsPrefix) || statsCache[legacyStatsKey];
+    if (!statsCache[statsKey]) {
+      statsCache[statsKey] = webpackStats('stats.json', assetsPrefix);
     }
 
-    if (!statsCache[legacyStatsKey]) {
+    if (!statsCache[statsKey]) {
       throw new Error(`Cannot find stats.json.
     It should be placed in one of the next places:
       ${SEARCH_PATHS.join('\n\t')}
     In case it happens on deployment:
       - In case you are using two independent jobs for building app
         - Either do not split build command by two independent jobs and use one common job with "tramvai build" command without --buildType
-        - Or copy stats.json (and stats.modern.json if present) file from client build output to server output by yourself in your CI
+        - Or copy stats.json file from client build output to server output by yourself in your CI
       - Otherwise report issue to tramvai team
     In case it happens locally:
       - prefer to use command "tramvai start-prod" to test prod-build locally
@@ -129,7 +121,7 @@ if (process.env.NODE_ENV === 'production') {
   `);
     }
 
-    const stats = modern ? statsCache[modernStatsKey] : statsCache[legacyStatsKey];
+    const stats = statsCache[statsKey];
 
     return Promise.resolve(stats);
   };
@@ -139,6 +131,6 @@ type Deps = { assetsPrefixFactory: ExtractDependencyType<typeof ASSETS_PREFIX_TO
 
 export const fetchWebpackStats =
   ({ assetsPrefixFactory }: Deps): typeof FETCH_WEBPACK_STATS_TOKEN =>
-  async ({ modern } = {}) => {
-    return fetchStats(modern, assetsPrefixFactory);
+  async () => {
+    return fetchStats(assetsPrefixFactory);
   };

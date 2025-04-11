@@ -62,11 +62,6 @@ export class StartCommand extends CLICommand<Params> {
       description: 'report statistic how much time execute loaders and plugins',
     },
     {
-      name: '--modern',
-      value: '[modern]',
-      description: 'modern compilation code with es2015+',
-    },
-    {
       name: '--sm, --sourceMap',
       value: '[sourceMap]',
       description: 'enable source map generation',

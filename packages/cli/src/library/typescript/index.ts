@@ -7,13 +7,12 @@ const rootDir = process.cwd();
 
 interface Options {
   env: Env;
-  modern: boolean;
   isServer: boolean;
   tramvai?: boolean;
 }
 
 export default (options: Options) => {
-  const { env, modern, isServer, tramvai } = options;
+  const { env, isServer, tramvai } = options;
 
   return {
     errorsAsWarnings: true,
@@ -27,7 +26,6 @@ export default (options: Options) => {
       babelConfigFactory({
         env,
         isServer,
-        modern,
         tramvai,
       })
     ),

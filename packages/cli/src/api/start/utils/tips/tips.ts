@@ -27,15 +27,6 @@ Consider to test out swc support.`,
     },
   },
   {
-    text: `Ship modern code to browser`,
-    docLink: 'how-to/how-enable-modern',
-    isApplicable(di) {
-      const configManager = di.get(CONFIG_MANAGER_TOKEN);
-
-      return configManager.modern !== true;
-    },
-  },
-  {
     text: `Forget about reloading page with hotRefresh cli option`,
     docLink: 'references/cli/start/#react-hot-refresh',
     isApplicable(di) {

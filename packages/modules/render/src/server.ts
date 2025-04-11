@@ -19,7 +19,6 @@ import {
   RESOURCE_INLINE_OPTIONS,
   ResourceType,
   RENDER_FLOW_AFTER_TOKEN,
-  MODERN_SATISFIES_TOKEN,
   BACK_FORWARD_CACHE_ENABLED,
   REACT_SERVER_RENDER_MODE,
   FETCH_WEBPACK_STATS_TOKEN,
@@ -261,7 +260,6 @@ Page Error Boundary will be rendered for the client`,
         renderSlots: { token: RENDER_SLOTS, optional: true },
         polyfillCondition: POLYFILL_CONDITION,
         htmlAttrs: HTML_ATTRS,
-        modern: MODERN_SATISFIES_TOKEN,
         renderFlowAfter: { token: RENDER_FLOW_AFTER_TOKEN, optional: true },
         logger: LOGGER_TOKEN,
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
@@ -329,40 +327,6 @@ Page Error Boundary will be rendered for the client`,
           size: RESOURCES_REGISTRY_SIZE_CACHE_SIZE,
           disabledUrl: RESOURCES_REGISTRY_DISABLED_URL_CACHE_SIZE,
         },
-      },
-    }),
-    provide({
-      provide: MODERN_SATISFIES_TOKEN,
-      useFactory: ({ requestManager, userAgent, cache, cookieManager }) => {
-        const reqUserAgent = requestManager.getHeader('user-agent') as string;
-        let result: boolean;
-
-        if (cache.has(reqUserAgent)) {
-          result = cache.get(reqUserAgent);
-        } else {
-          result = satisfies(userAgent, null, { env: 'modern' });
-          cache.set(reqUserAgent, result);
-        }
-
-        cookieManager.set({ name: '_t_modern', value: JSON.stringify(result) });
-
-        return result;
-      },
-      deps: {
-        requestManager: REQUEST_MANAGER_TOKEN,
-        userAgent: USER_AGENT_TOKEN,
-        cache: 'modernSatisfiesMemoryCache',
-        cookieManager: COOKIE_MANAGER_TOKEN,
-      },
-    }),
-    provide({
-      provide: 'modernSatisfiesMemoryCache',
-      scope: Scope.SINGLETON,
-      useFactory: ({ createCache }) => {
-        return createCache('memory', { name: 'modern-satisfies', max: 200 });
-      },
-      deps: {
-        createCache: CREATE_CACHE_TOKEN,
       },
     }),
     provide({

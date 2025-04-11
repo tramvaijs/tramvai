@@ -37,7 +37,6 @@ export const staticApp = async (
     env: 'production',
     ...options,
     buildType: 'client',
-    modern: false,
     port: portManager.port,
     staticPort: portManager.staticPort,
   });

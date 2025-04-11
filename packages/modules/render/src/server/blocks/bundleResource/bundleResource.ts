@@ -31,7 +31,6 @@ try {
 
 export const bundleResource = async ({
   bundle,
-  modern,
   extractor,
   pageComponent,
   fetchWebpackStats,
@@ -39,7 +38,6 @@ export const bundleResource = async ({
   assetsPrefixFactory,
 }: {
   bundle: string;
-  modern: boolean;
   extractor: ChunkExtractor;
   pageComponent?: string;
   fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
@@ -51,7 +49,7 @@ export const bundleResource = async ({
     ? fileSystemPageToWebpackChunkName(pageComponent)
     : last(bundle.split('/'));
 
-  const webpackStats = await fetchWebpackStats({ modern });
+  const webpackStats = await fetchWebpackStats();
   const { publicPath, assetsByChunkName } = webpackStats;
 
   const bundles: string[] = has('common-chunk', assetsByChunkName)

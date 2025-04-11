@@ -6,17 +6,11 @@ import type { STATIC_PAGES_BACKGROUND_FETCH_ENABLED } from '../tokens';
 
 const userAgentByDeviceType = {
   /** Chrome on Mobile */
-  'mobile-modern':
+  mobile:
     'Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.3071.125 Mobile Safari/537.36',
-  /** Old Chrome on Mobile */
-  'mobile-default':
-    'Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.3071.125 Mobile Safari/537.36',
-  /** Chrome on Mac OS */
-  'desktop-modern':
+  /** Chrome on Desktop */
+  desktop:
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.3987.87 Safari/537.36',
-  /** Old Chrome on Mac OS */
-  'desktop-default':
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.3987.87 Safari/537.36',
 };
 
 type Logger = ExtractDependencyType<typeof LOGGER_TOKEN>;
@@ -48,13 +42,11 @@ export class BackgroundFetchService {
     path,
     port,
     deviceType,
-    modern,
   }: {
     key: string;
     path: string;
     port: string;
     deviceType: string;
-    modern: string;
   }) {
     if (this.requests.has(key)) {
       return;
@@ -76,7 +68,7 @@ export class BackgroundFetchService {
 
     return fetch(revalidateUrl, {
       headers: {
-        'User-Agent': userAgentByDeviceType[`${deviceType}-${modern}`],
+        'User-Agent': userAgentByDeviceType[`${deviceType}`],
         'X-Tramvai-Static-Page-Revalidate': 'true',
       },
       timeout: 10000,

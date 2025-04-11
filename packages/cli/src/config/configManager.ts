@@ -37,7 +37,6 @@ export interface Settings<E extends Env> {
   profile?: boolean;
   noServerRebuild?: boolean;
   noClientRebuild?: boolean;
-  modern?: boolean;
   resolveSymlinks?: boolean;
   showConfig?: boolean;
   onlyBundles?: string[];
@@ -112,26 +111,11 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
   const debug = settings.debug ?? false;
   const verboseWebpack = settings.verboseWebpack ?? false;
   const appEnv = settings.appEnv ?? {};
-  // First problem, modern build is not supported for CSR mode.
-  // Second, in development mode with enabled modern, only modern JS chunks will be generated.
-  // With PWA module, only sw.modern.js file exists - but in CSR mode application needs sw.js, which is not generated.
-  // In production mode with enabled modern, everything is ok - all type of chunks generated in parallel.
-  const disableModernForCsrInDevMode =
-    (process.env.TRAMVAI_FORCE_CLIENT_SIDE_RENDERING ||
-      appEnv.TRAMVAI_FORCE_CLIENT_SIDE_RENDERING) === 'true' && env === 'development';
-  // For Child Apps and dynamic modules legacy build always used
-  const disableModernForMicrofrontends = type === 'child-app' || type === 'module';
-  const modern =
-    disableModernForCsrInDevMode || disableModernForMicrofrontends
-      ? false
-      : getOption('modern', [settings, configEntry], true);
   const buildType = settings.buildType ?? 'client';
   let target: Target = 'defaults';
 
   if (buildType === 'server') {
     target = 'node';
-  } else if (modern) {
-    target = 'modern';
   }
 
   const config: ConfigManager<C, E> = {
@@ -170,7 +154,6 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
           ? PortManager.DEFAULT_MODULE_STATIC_PORT
           : PortManager.DEFAULT_STATIC_PORT)
     ),
-    modern,
     // eslint-disable-next-line no-nested-ternary
     sourceMap: debug
       ? // allow to disable sourcemaps with debug flag, when sourceMap passed to cli api

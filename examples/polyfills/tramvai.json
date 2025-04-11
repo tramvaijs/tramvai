@@ -5,7 +5,6 @@
       "name": "polyfills",
       "polyfill": "src/polyfill.ts",
       "root": "src",
-      "modern": false,
       "type": "application",
       "fileSystemPages": {
         "enabled": true,

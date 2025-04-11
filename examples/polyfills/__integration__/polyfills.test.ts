@@ -10,7 +10,6 @@ describe('polyfills', () => {
     await build({
       rootDir: path.resolve(__dirname, '../'),
       target: 'polyfills',
-      modern: false,
       withModulesStats: true,
       buildType: 'client',
       fileCache: false,

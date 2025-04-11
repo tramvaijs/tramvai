@@ -50,11 +50,6 @@
           },
           "additionalProperties": false
         },
-        "modern": {
-          "title": "Enable build for modern browsers",
-          "default": true,
-          "type": "boolean"
-        },
         "fileSystemPages": {
           "title": "File-System Routing feature",
           "default": {},
@@ -1239,23 +1234,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6881": {
+                        "__@match@6880": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6883": {
+                        "__@replace@6882": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6886": {
+                        "__@search@6885": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6888": {
+                        "__@split@6887": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6890": {
+                        "__@matchAll@6889": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1993,23 +1988,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6881": {
+                        "__@match@6880": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6883": {
+                        "__@replace@6882": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6886": {
+                        "__@search@6885": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6888": {
+                        "__@split@6887": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6890": {
+                        "__@matchAll@6889": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2747,23 +2742,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6881": {
+                        "__@match@6880": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6883": {
+                        "__@replace@6882": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6886": {
+                        "__@search@6885": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6888": {
+                        "__@split@6887": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6890": {
+                        "__@matchAll@6889": {
                           "type": "object",
                           "additionalProperties": false
                         }

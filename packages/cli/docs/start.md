@@ -74,14 +74,6 @@ In addition, it is possible to set one of the following values for the `devtool`
 }
 ```
 
-## Modern build and dev-mode
-
-In dev-mode may work only single build mode: either `modern` or `legacy`. By default `modern` is used. If you want to use legacy build in dev mode, add next lines to the `tramvai.json`:
-
-```json
-"modern": false
-```
-
 ## How to
 
 ### Speed up development build
