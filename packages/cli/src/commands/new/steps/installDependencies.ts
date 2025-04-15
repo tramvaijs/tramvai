@@ -32,7 +32,6 @@ const DEPS: Record<Type, { dependencies: string[]; jestDevDependencies: string[]
       '@tramvai/module-server',
       '@tramvai/tokens-render',
       '@tramvai/tokens-router',
-      '@tramvai/tokens-router',
       'react',
       'react-dom',
       'tslib@^2.0.3',

@@ -12,7 +12,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "@tinkoff/logger": "0.0.0-stub",
+    "@tinkoff/logger": "^0.10.178",
     "@tinkoff/utils": "^2.1.2",
     "fs-extra": "^9.0.0",
     "p-map": "^4.0.0",

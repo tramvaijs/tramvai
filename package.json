@@ -46,6 +46,7 @@
   "resolutions": {
     "webpack": "^5",
     "@types/webpack": "^5",
-    "@types/react": "^18.0.0"
+    "@types/react": "^18.0.0",
+    "@types/express-serve-static-core": "^4.17.18"
   }
 }

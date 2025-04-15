@@ -33,7 +33,7 @@
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "prom-client": "^14.2.0",
-    "@tinkoff/logger": "0.0.0-stub",
+    "@tinkoff/logger": "^0.10.178",
     "@tinkoff/metrics-noop": "0.0.0-stub",
     "@tinkoff/browser-timings": "0.0.0-stub"
   },

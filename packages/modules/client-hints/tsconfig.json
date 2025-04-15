@@ -35,9 +35,6 @@
             "path": "../../tokens/cookie"
         },
         {
-            "path": "../../libs/logger"
-        },
-        {
             "path": "../../libs/env-validators"
         },
         {
