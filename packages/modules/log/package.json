@@ -18,7 +18,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/logger": "0.0.0-stub"
+    "@tinkoff/logger": "^0.10.286"
   },
   "peerDependencies": {
     "@tinkoff/utils": "^2.1.2",
