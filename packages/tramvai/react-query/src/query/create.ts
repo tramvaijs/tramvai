@@ -54,7 +54,7 @@ const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
   };
 };
 
-export const createQuery = <Options = unknown, Result = unknown, Deps extends ProviderDeps = {}>(
+export const createQuery = <Options, Result, Deps extends ProviderDeps = {}>(
   queryParameters: CreateQueryOptions<Options, Result, Deps>
 ): Query<Options, Result, Deps> => {
   const { queryOptions, conditions } = queryParameters;

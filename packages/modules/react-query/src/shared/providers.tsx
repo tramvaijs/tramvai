@@ -1,9 +1,10 @@
-import type { ReactElement } from 'react';
+import type { PropsWithChildren, ReactElement } from 'react';
 import { isConditionFailError } from '@tinkoff/errors';
 import type { Provider } from '@tramvai/core';
 import { APP_INFO_TOKEN } from '@tramvai/core';
 import { provide } from '@tramvai/core';
-import { QueryClient, QueryClientProvider, Hydrate } from '@tanstack/react-query';
+import * as ReactQuery from '@tanstack/react-query';
+import type { DehydratedState } from '@tanstack/react-query';
 import { CHILD_APP_INTERNAL_CONFIG_TOKEN } from '@tramvai/tokens-child-app';
 import { EXTEND_RENDER } from '@tramvai/tokens-render';
 import {
@@ -13,13 +14,20 @@ import {
   QUERY_DEHYDRATE_STATE_NAME_TOKEN,
 } from '@tramvai/tokens-react-query';
 
+const HydrateNameV4 = 'Hydrate';
+// @ts-expect-error Can't use require because of dual-package hazard
+// (CJS version of context will be imported here, and ESM version in user space)
+// I think treeshaking will be broken here, but looks like we already use all exports from `@tanstack/react-query`
+const Hydrate: React.ComponentType<PropsWithChildren<{ state: DehydratedState }>> =
+  HydrateNameV4 in ReactQuery ? ReactQuery[HydrateNameV4] : ReactQuery.HydrationBoundary;
+
 export const sharedQueryProviders: Provider[] = [
   provide({
     provide: QUERY_CLIENT_TOKEN,
     useFactory: ({ defaultOptions }) => {
       const { queries = {} } = defaultOptions;
 
-      return new QueryClient({
+      return new ReactQuery.QueryClient({
         defaultOptions: {
           ...defaultOptions,
           queries: {
@@ -60,9 +68,9 @@ export const sharedQueryProviders: Provider[] = [
     useFactory: ({ queryClient, state }) => {
       return (render: ReactElement) => {
         return (
-          <QueryClientProvider client={queryClient}>
+          <ReactQuery.QueryClientProvider client={queryClient}>
             <Hydrate state={state}>{render}</Hydrate>
-          </QueryClientProvider>
+          </ReactQuery.QueryClientProvider>
         );
       };
     },

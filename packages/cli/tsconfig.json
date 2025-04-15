@@ -21,9 +21,6 @@
             "path": "../libs/is-modern-lib"
         },
         {
-            "path": "../libs/logger"
-        },
-        {
             "path": "../libs/minicss"
         },
         {

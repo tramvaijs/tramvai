@@ -41,8 +41,8 @@ export type CreateQueryOptionsWithNonSerializableKey<Options, Deps extends Provi
 };
 
 export type BaseCreateQueryOptions<Options, Deps extends ProviderDeps> =
-  | CreateQueryOptionsWithSerializableKey<Options, Deps>
-  | CreateQueryOptionsWithNonSerializableKey<Options, Deps>;
+  | CreateQueryOptionsWithNonSerializableKey<Options, Deps>
+  | CreateQueryOptionsWithSerializableKey<Options, Deps>;
 
 export interface BaseQuery<Options, TCreateQuery, TQuery, TUseQuery> {
   [QUERY_PARAMETERS]: TCreateQuery;

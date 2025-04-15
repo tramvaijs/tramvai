@@ -1,5 +1,5 @@
 import identity from '@tinkoff/utils/function/identity';
-import type { UseInfiniteQueryOptions } from '@tanstack/react-query';
+import type { InfiniteData, QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query';
 import type { ActionContext } from '@tramvai/core';
 import { declareAction } from '@tramvai/core';
 import { QUERY_CLIENT_TOKEN } from '@tramvai/module-react-query';
@@ -18,11 +18,13 @@ const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps
   query: InfiniteQuery<Options, PageParam, Result, Deps>,
   di: Container,
   options: Options
-): UseInfiniteQueryOptions<Result, Error> => {
+): UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam> => {
   const {
     key = identity,
     fn,
-    getNextPageParam,
+    // TODO: remove after dropping support @tanstack/react-query v4
+    initialPageParam = 0 as PageParam,
+    getNextPageParam = () => null,
     getPreviousPageParam,
     deps = {},
     conditions,
@@ -55,6 +57,7 @@ const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps
 
   return {
     ...infiniteQueryOptions,
+    initialPageParam,
     getNextPageParam,
     getPreviousPageParam,
     queryKey,
@@ -63,15 +66,16 @@ const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps
     },
     queryFn: (queryContext) => {
       const context = di.get(CONTEXT_TOKEN);
+      // @ts-expect-error TODO: remove comment after drop support for @tanstack/react-query v4
       return context.executeAction(actionWrapper, queryContext);
     },
   };
 };
 export const createInfiniteQuery = <
-  Options = unknown,
-  PageParam = unknown,
-  Result = unknown,
+  Options,
+  Result,
   Deps extends ProviderDeps = {},
+  PageParam = unknown,
 >(
   queryParameters: CreateInfiniteQueryOptions<Options, PageParam, Result, Deps>
 ): InfiniteQuery<Options, PageParam, Result, Deps> => {
@@ -80,7 +84,9 @@ export const createInfiniteQuery = <
   const query: InfiniteQuery<Options, PageParam, Result, Deps> = {
     [QUERY_PARAMETERS]: queryParameters,
     actionNamePostfix: createUniqueActionKeyForQuery(queryParameters),
-    fork: (options: UseInfiniteQueryOptions<Result, Error>) => {
+    fork: (
+      options: UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+    ) => {
       return createInfiniteQuery({
         ...queryParameters,
         infiniteQueryOptions: {
