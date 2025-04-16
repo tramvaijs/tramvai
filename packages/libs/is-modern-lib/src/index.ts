@@ -12,6 +12,7 @@ export const modernLibs = [
   // inner libs
   '@tinkoff',
   '@tinkoff-boxy',
+  '@boxy',
   '@tramvai',
   '@tramvai-tinkoff',
   '@tinkoff-ui',
