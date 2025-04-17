@@ -998,6 +998,46 @@
                   }
                 ]
               },
+              "integrity": {
+                "title": "Integrity generation options",
+                "default": false,
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "enum": [
+                          "auto",
+                          false,
+                          true
+                        ]
+                      },
+                      "hashFuncNames": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "sha256",
+                            "sha384",
+                            "sha512"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "hashLoading": {
+                        "enum": [
+                          "eager",
+                          "lazy"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "boolean"
+                  }
+                ]
+              },
               "excludesPresetEnv": {
                 "title": "List of modules to exclude from `@babel/preset-env`",
                 "description": "Option doesn't affect build with swc loader",
@@ -1223,23 +1263,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6875": {
+                              "__@match@6880": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6877": {
+                              "__@replace@6882": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6880": {
+                              "__@search@6885": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6882": {
+                              "__@split@6887": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6884": {
+                              "__@matchAll@6889": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1586,6 +1626,46 @@
                         },
                         "production": {
                           "type": "boolean"
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                "integrity": {
+                  "title": "Integrity generation options",
+                  "default": false,
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "enum": [
+                            "auto",
+                            false,
+                            true
+                          ]
+                        },
+                        "hashFuncNames": {
+                          "type": "array",
+                          "items": {
+                            "enum": [
+                              "sha256",
+                              "sha384",
+                              "sha512"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "hashLoading": {
+                          "enum": [
+                            "eager",
+                            "lazy"
+                          ],
+                          "type": "string"
                         }
                       },
                       "additionalProperties": false
@@ -1948,23 +2028,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6875": {
+                                "__@match@6880": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6877": {
+                                "__@replace@6882": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6880": {
+                                "__@search@6885": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6882": {
+                                "__@split@6887": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6884": {
+                                "__@matchAll@6889": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2311,6 +2391,46 @@
                           },
                           "production": {
                             "type": "boolean"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  "integrity": {
+                    "title": "Integrity generation options",
+                    "default": false,
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "enum": [
+                              "auto",
+                              false,
+                              true
+                            ]
+                          },
+                          "hashFuncNames": {
+                            "type": "array",
+                            "items": {
+                              "enum": [
+                                "sha256",
+                                "sha384",
+                                "sha512"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "hashLoading": {
+                            "enum": [
+                              "eager",
+                              "lazy"
+                            ],
+                            "type": "string"
                           }
                         },
                         "additionalProperties": false
@@ -2673,23 +2793,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6875": {
+                                  "__@match@6880": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6877": {
+                                  "__@replace@6882": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6880": {
+                                  "__@search@6885": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6882": {
+                                  "__@split@6887": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6884": {
+                                  "__@matchAll@6889": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }

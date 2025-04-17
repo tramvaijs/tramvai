@@ -88,6 +88,15 @@ export interface Experiments {
 }
 
 /**
+ * @see https://github.com/waysact/webpack-subresource-integrity/tree/main/webpack-subresource-integrity#options
+ */
+export interface IntegrityOptions {
+  enabled: boolean | 'auto';
+  hashFuncNames: ('sha256' | 'sha384' | 'sha512')[];
+  hashLoading: 'eager' | 'lazy';
+}
+
+/**
  * @default {}
  * @additionalProperties true
  */
@@ -113,6 +122,11 @@ export interface CliConfigEntry extends ConfigEntry {
    * @default false
    */
   sourceMap: OverridableOption<boolean>;
+  /**
+   * @title Integrity generation options
+   * @default false
+   */
+  integrity: boolean | IntegrityOptions;
   /**
    * @title Change different experimental cli settings
    * @default {}

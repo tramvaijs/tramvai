@@ -1,0 +1,36 @@
+{
+  "name": "integrity",
+  "version": "0.0.0-stub",
+  "private": true,
+  "scripts": {
+    "start": "tramvai start integrity",
+    "start:prod": "tramvai start-prod integrity",
+    "build": "tramvai build integrity",
+    "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:integration": "jest -w=3 --config ./jest.integration.config.js",
+    "test:integration:watch": "jest --runInBand --watch --config ./jest.integration.config.js"
+  },
+  "devDependencies": {
+    "@tramvai/cli": "0.0.0-stub",
+    "@tramvai/test-integration": "0.0.0-stub",
+    "@tramvai/test-integration-jest": "0.0.0-stub"
+  },
+  "dependencies": {
+    "@tinkoff/react-hooks": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/module-error-interceptor": "0.0.0-stub",
+    "@tramvai/module-render": "0.0.0-stub",
+    "@tramvai/module-router": "0.0.0-stub",
+    "@tramvai/module-seo": "0.0.0-stub",
+    "@tramvai/module-server": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  }
+}

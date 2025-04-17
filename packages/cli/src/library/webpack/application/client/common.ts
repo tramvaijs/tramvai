@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import type Config from 'webpack-chain';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
+import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
@@ -27,9 +28,11 @@ import {
   WEBPACK_DEBUG_STATS_FIELDS,
 } from '../../constants/stats';
 import { pwaBlock } from '../../blocks/pwa/client';
+import AssetsIntegritiesPlugin from '../../plugins/AssetsIntegritiesPlugin';
+import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
-  const { polyfill, fileSystemPages, env } = configManager;
+  const { polyfill, fileSystemPages, env, integrity } = configManager;
 
   const portal = path.resolve(configManager.rootDir, `packages/${process.env.APP_ID}/portal.js`);
   const polyfillPath = path.resolve(configManager.rootDir, polyfill ?? 'src/polyfill');
@@ -59,11 +62,12 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .when(portalExists, (cfg) => cfg.entry('portal').add(portal))
     .when(polyfillExists, (cfg) => cfg.entry('polyfill').add(polyfillPath));
 
+  const statsFileName = configManager.modern ? 'stats.modern.json' : 'stats.json';
   config
     .plugin('stats-plugin')
     .use(StatsWriterPlugin, [
       {
-        filename: configManager.modern ? 'stats.modern.json' : 'stats.json',
+        filename: statsFileName,
         stats: {
           ...(env === 'development' ? DEV_STATS_OPTIONS : DEFAULT_STATS_OPTIONS),
           ...(configManager.verboseWebpack ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
@@ -83,6 +87,33 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
         'process.env.SERVER': false,
       },
     ]);
+
+  if (integrity) {
+    const defaultIntegrityOptions: IntegrityOptions = {
+      enabled: 'auto',
+      hashFuncNames: ['sha256'],
+      hashLoading: 'eager',
+    };
+
+    let integrityOptions;
+    if (typeof integrity === 'object') {
+      integrityOptions = {
+        ...defaultIntegrityOptions,
+        ...integrity,
+      };
+    } else {
+      integrityOptions = defaultIntegrityOptions;
+    }
+
+    config
+      .plugin('integrity-plugin')
+      .use(SubresourceIntegrityPlugin, [integrityOptions])
+      .end()
+      // Plugin for transform integrity-plugin result into single integrities field in stats.json
+      .plugin('assets-integrity-plugin')
+      .use(AssetsIntegritiesPlugin, [{ filename: statsFileName }])
+      .end();
+  }
 
   return config;
 };
