@@ -63,7 +63,7 @@ You can read more about the need to add an `dynamic` condition to an action that
 
 :hourglass: Connect action to a page:
 
-```tsx title="pages/pokemon/index.tsx"
+```tsx title="routes/pokemon/[name]/index.tsx"
 import React from 'react';
 // highlight-next-line
 import { fetchPokemonAction } from '~entities/pokemon';
@@ -113,7 +113,7 @@ To get `PAGE_SERVICE_TOKEN` from the DI in the component, we'll use the `useDi` 
 
 :hourglass: Add code to get information about the pokemon in `PokemonView`:
 
-```tsx title="pages/pokemon/index.tsx"
+```tsx title="routes/pokemon/[name]/index.tsx"
 import React from 'react';
 // highlight-start
 import { useStoreSelector } from '@tramvai/state';
@@ -139,7 +139,7 @@ export default PokemonView;
 
 :hourglass: And render all the data on the page:
 
-```tsx title="pages/pokemon/index.tsx"
+```tsx title="routes/pokemon/[name]/index.tsx"
 import React from 'react';
 import { useStoreSelector } from '@tramvai/state';
 // highlight-next-line
