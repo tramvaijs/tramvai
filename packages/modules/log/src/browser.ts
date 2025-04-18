@@ -1,4 +1,5 @@
 import { BrowserReporter, createLoggerFactory } from '@tinkoff/logger';
+import type { LogObj } from '@tinkoff/logger';
 import { Module, Scope, optional, provide } from '@tramvai/core';
 import {
   LOGGER_TOKEN,
@@ -48,15 +49,25 @@ export { logger };
     provide({
       provide: LOGGER_INIT_HOOK,
       multi: true,
-      useFactory({ remoteReporter }) {
+      useFactory({ remoteReporter, loggerSharedContext }) {
         return (loggerInstance) => {
           if (remoteReporter) {
             loggerInstance.addReporter(remoteReporter);
           }
+
+          loggerInstance.addExtension({
+            extend(logObj: LogObj): LogObj {
+              return {
+                ...Object.fromEntries(loggerSharedContext as Map<string, unknown>),
+                ...logObj,
+              };
+            },
+          });
         };
       },
       deps: {
         remoteReporter: optional(LOGGER_REMOTE_REPORTER),
+        loggerSharedContext: LOGGER_SHARED_CONTEXT,
       },
     }),
   ],
