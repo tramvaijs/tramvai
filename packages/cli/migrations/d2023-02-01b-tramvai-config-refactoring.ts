@@ -34,7 +34,6 @@ const migrateCommands = (configWithCommands: {
             client: build.options?.outputClient,
             static: build.options?.outputStatic,
           },
-    modern: build.configurations?.modern,
     fileSystemPages: build.configurations?.fileSystemPages
       ? {
           enabled: build.configurations?.fileSystemPages?.enable,

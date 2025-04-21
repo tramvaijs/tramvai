@@ -73,7 +73,6 @@ describe('projectsConfig', () => {
     expect(JSON.stringify(api.tramvaiJSON.source, null, 2)).toMatchInlineSnapshot(`
       "{
         "projectsConfig": {
-          "modern": true,
           "externals": {
             "production": [
               "babel-runtime",
@@ -262,7 +261,6 @@ describe('configs', () => {
             "type": "application",
             "name": "app2",
             "root": "src/app2",
-            "modern": false,
             "experiments": {
               "minicss": {
                 "useImportModule": {}

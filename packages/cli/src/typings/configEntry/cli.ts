@@ -36,6 +36,15 @@ export type ReactCompilerOptions = {
   panicThreshold?: 'ALL_ERRORS' | 'CRITICAL_ERRORS' | 'NONE';
 };
 
+/**
+ * @see https://github.com/waysact/webpack-subresource-integrity/tree/main/webpack-subresource-integrity#options
+ */
+export interface IntegrityOptions {
+  enabled: boolean | 'auto';
+  hashFuncNames: ('sha256' | 'sha384' | 'sha512')[];
+  hashLoading: 'eager' | 'lazy';
+}
+
 export type WebpackExperiments = Omit<
   Configuration['experiments'],
   'buildHttp' | 'lazyCompilation' | 'css'
@@ -136,6 +145,11 @@ export interface CliConfigEntry extends ConfigEntry {
    * @default false
    */
   sourceMap: OverridableOption<boolean>;
+  /**
+   * @title Integrity generation options
+   * @default false
+   */
+  integrity: boolean | IntegrityOptions;
   /**
    * @title Change different experimental cli settings
    * @default {}
