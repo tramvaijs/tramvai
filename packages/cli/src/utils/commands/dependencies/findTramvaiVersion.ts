@@ -1,5 +1,5 @@
 import { parse, minVersion } from 'semver';
-import fs from 'fs';
+import fs from 'fs/promises';
 
 const getVersionFromDep = (dep?: string) => {
   if (dep) {
@@ -8,9 +8,11 @@ const getVersionFromDep = (dep?: string) => {
 };
 
 export const findTramvaiVersion = async () => {
-  const file = fs.readFileSync('package.json');
-  const content = JSON.parse(file.toString());
-  const currentVersion = getVersionFromDep(content.devDependencies['@tramvai/cli']);
+  const file = await fs.readFile('package.json', { encoding: 'utf-8' });
 
-  return currentVersion;
+  const content = JSON.parse(file);
+
+  return getVersionFromDep(
+    content.devDependencies['@tramvai/cli'] ?? content.dependencies['@tramvai/cli']
+  );
 };
