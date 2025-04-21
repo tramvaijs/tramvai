@@ -1,0 +1,6 @@
+{
+  "name": "integrity",
+  "sourceRoot": "examples/integrity/src",
+  "projectType": "library",
+  "targets": {}
+}

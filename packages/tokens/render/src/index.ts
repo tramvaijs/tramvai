@@ -228,6 +228,7 @@ export const REACT_STREAMING_RENDER_TIMEOUT = createToken<number>('react streami
 
 export interface WebpackStats {
   assetsByChunkName: Record<string, string[]>;
+  integrities?: Record<string, string>;
   namedChunkGroups?: Record<string, { name: string; chunks: string[]; assets: string[] }>;
   entrypoints: Record<string, { name: string; chunks: string[]; assets: string[] }>;
   publicPath: string;

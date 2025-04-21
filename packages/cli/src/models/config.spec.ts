@@ -97,6 +97,7 @@ it('should populate defaults for config', () => {
               "overlay": false,
             },
           },
+          "integrity": false,
           "name": "test-app",
           "notifications": {},
           "output": {
@@ -164,6 +165,7 @@ it('should populate defaults for config', () => {
               "overlay": false,
             },
           },
+          "integrity": false,
           "name": "test-child-app",
           "notifications": {},
           "output": "dist/child-app",
@@ -348,6 +350,7 @@ it('should populate defaults for overridable options', () => {
               "overlay": false,
             },
           },
+          "integrity": false,
           "name": "test-app",
           "notifications": {},
           "output": {
@@ -431,6 +434,7 @@ it('should populate defaults for overridable options', () => {
               "overlay": false,
             },
           },
+          "integrity": false,
           "name": "test-child-app",
           "notifications": {},
           "output": "dist/child-app",

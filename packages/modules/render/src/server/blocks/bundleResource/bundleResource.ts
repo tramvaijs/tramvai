@@ -50,7 +50,7 @@ export const bundleResource = async ({
     : last(bundle.split('/'));
 
   const webpackStats = await fetchWebpackStats();
-  const { publicPath, assetsByChunkName } = webpackStats;
+  const { publicPath, assetsByChunkName, integrities = {} } = webpackStats;
 
   const bundles: string[] = has('common-chunk', assetsByChunkName)
     ? ['common-chunk', chunkNameFromBundle]
@@ -82,12 +82,13 @@ export const bundleResource = async ({
   // https://github.com/reactwg/react-18/discussions/114
   const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
 
-  styles.map((style) =>
+  styles.forEach((style) =>
     result.push({
       type: ResourceType.style,
       slot: ResourceSlot.HEAD_CORE_STYLES,
       payload: genHref(style),
       attrs: {
+        ...(integrities[style] ? { integrity: integrities[style] } : {}),
         'data-critical': 'true',
         // looks like we don't need this scripts preload at all, but also it is official recommendation for streaming
         // https://github.com/reactwg/react-18/discussions/114
@@ -96,24 +97,26 @@ export const bundleResource = async ({
     })
   );
 
-  baseScripts.map((script) =>
+  baseScripts.forEach((script) =>
     result.push({
       type: ResourceType.script,
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
       payload: genHref(script),
       attrs: {
+        ...(integrities[script] ? { integrity: integrities[script] } : {}),
         'data-critical': 'true',
         ...scriptTypeAttr,
       },
     })
   );
 
-  scripts.map((script) =>
+  scripts.forEach((script) =>
     result.push({
       type: ResourceType.script,
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
       payload: genHref(script),
       attrs: {
+        ...(integrities[script] ? { integrity: integrities[script] } : {}),
         'data-critical': 'true',
         ...scriptTypeAttr,
       },

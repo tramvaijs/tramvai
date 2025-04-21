@@ -1,0 +1,24 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "integrity": {
+      "name": "integrity",
+      "root": "src",
+      "type": "application",
+      "integrity": {
+        "enabled": true
+      },
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "splitChunks": {
+        "mode": "granularChunks"
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      }
+    }
+  }
+}

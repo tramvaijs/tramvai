@@ -2,6 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import type Config from 'webpack-chain';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
+import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
@@ -28,9 +29,11 @@ import {
 } from '../../constants/stats';
 import { pwaBlock } from '../../blocks/pwa/client';
 import PolyfillConditionPlugin from '../../plugins/PolyfillCondition';
+import AssetsIntegritiesPlugin from '../../plugins/AssetsIntegritiesPlugin';
+import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
-  const { polyfill, modernPolyfill, fileSystemPages, env } = configManager;
+  const { polyfill, modernPolyfill, fileSystemPages, env, integrity } = configManager;
 
   const portal = path.resolve(configManager.rootDir, `packages/${process.env.APP_ID}/portal.js`);
   const polyfillPath = path.resolve(configManager.rootDir, polyfill ?? 'src/polyfill');
@@ -98,6 +101,33 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
         'process.env.SERVER': false,
       },
     ]);
+
+  if (integrity) {
+    const defaultIntegrityOptions: IntegrityOptions = {
+      enabled: 'auto',
+      hashFuncNames: ['sha256'],
+      hashLoading: 'eager',
+    };
+
+    let integrityOptions;
+    if (typeof integrity === 'object') {
+      integrityOptions = {
+        ...defaultIntegrityOptions,
+        ...integrity,
+      };
+    } else {
+      integrityOptions = defaultIntegrityOptions;
+    }
+
+    config
+      .plugin('integrity-plugin')
+      .use(SubresourceIntegrityPlugin, [integrityOptions])
+      .end()
+      // Plugin for transform integrity-plugin result into single integrities field in stats.json
+      .plugin('assets-integrity-plugin')
+      .use(AssetsIntegritiesPlugin, [{ filename: statsFileName }])
+      .end();
+  }
 
   return config;
 };

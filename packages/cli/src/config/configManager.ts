@@ -44,7 +44,7 @@ export interface Settings<E extends Env> {
   fileCache?: boolean;
 }
 
-const getOption = <T>(optionName: string, cfgs: any[], dflt: T): T => {
+const getOption = <T>(optionName: string, cfgs: any[], defaultValue: T): T => {
   const getter = prop(optionName);
 
   for (let i = 0; i < cfgs.length; i++) {
@@ -55,7 +55,7 @@ const getOption = <T>(optionName: string, cfgs: any[], dflt: T): T => {
     }
   }
 
-  return dflt;
+  return defaultValue;
 };
 
 type OmitOverridable<T extends Record<string, any>> = {

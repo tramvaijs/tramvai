@@ -1,6 +1,6 @@
 {
   "name": "assets",
-  "sourceRoot": "tinkoff-examples/assets/src",
+  "sourceRoot": "examples/assets/src",
   "projectType": "library",
   "targets": {}
 }

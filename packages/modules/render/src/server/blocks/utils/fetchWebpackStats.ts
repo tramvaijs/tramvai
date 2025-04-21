@@ -55,6 +55,7 @@ if (process.env.NODE_ENV === 'test') {
       publicPath: 'http://localhost:4000/',
       assetsByChunkName: {},
       entrypoints: {},
+      integrities: {},
     });
   };
 }
