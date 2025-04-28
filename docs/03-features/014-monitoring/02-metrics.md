@@ -196,7 +196,7 @@ fetch(url).then(() => {
 
 ### Use custom port for metrics endpoint
 
-It can be done with token `UTILITY_SERVER_PORT_TOKEN` as it works for any [utility path](references/modules/server.md#specify-port-for-utility-paths):
+It can be done with token `UTILITY_SERVER_PORT_TOKEN` or `UTILITY_SERVER_PORT` env as it works for any [utility path](references/modules/server.md#specify-port-for-utility-paths). When using this token, the metrics server will be started by a separate fastify instance.
 
 ## Debug
 

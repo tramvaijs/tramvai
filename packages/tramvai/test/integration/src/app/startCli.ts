@@ -89,12 +89,12 @@ export const startCli = async (
   const domain = getServerDomain(cliResult);
   // @FIXME: the utility port might be defined on the provider level and we don't have access to it
   // in this case. So the value might be inconsistent with actual utility server (actually, already inconsistent for tincoin)
-  const utilityServerUrl = getUtilityServerUrl(env, cliResult);
+  const utilityUrl = getUtilityServerUrl(env, cliResult);
   const appName = typeof targetOrConfig === 'string' ? targetOrConfig : targetOrConfig.name;
 
   try {
     await waitOn({
-      resources: [`${utilityServerUrl}/readyz`],
+      resources: [`${utilityUrl}/readyz`],
       timeout: 2 * 60 * 1000,
     });
   } catch (e) {
@@ -125,6 +125,7 @@ export const startCli = async (
     ...cliResult,
     serverUrl,
     staticUrl,
+    utilityUrl,
     domain,
     stdout,
     stderr,

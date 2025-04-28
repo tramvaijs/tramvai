@@ -26,7 +26,7 @@ createApp({
 
 ### Processing the users requests
 
-`ServerModule` creates [express.js](https://expressjs.com/) application, handles user requests, runs [commandLineRunner](concepts/command-line-runner.md), and sends responses to users with data, headers and status from `RESPONSE_MANAGER_TOKEN` token.
+`ServerModule` creates [fastify.js](https://fastify.dev/) application, handles user requests, runs [commandLineRunner](concepts/command-line-runner.md), and sends responses to users with data, headers and status from `RESPONSE_MANAGER_TOKEN` token.
 
 ### Request proxying
 
@@ -42,7 +42,7 @@ To enable proxying, create a file `proxy.conf.js` or `proxy.conf.json` in the ro
 const testStand = 'https://example.org';
 
 module.exports = {
-  // The key is the path pattern for the `express` to be passed to `app.use`
+  // The key is the path pattern for the `fastify` to be passed to `app.use`
   // value can be a string, in order to proxy all urls starting with `/login/`
   '/login/': testStand,
   // or can be a config object for [http-proxy](https://github.com/chimurai/http-proxy-middleware#http-proxy-options)

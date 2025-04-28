@@ -16,17 +16,20 @@ describe('modules/metrics/instantMetrics', () => {
 
     const { text: metrics } = await request('/metrics').expect(200);
 
-    return metrics.split('\n\n').reduce((acc, metric) => {
-      const lines = metric.split('\n');
-      const type = lines[1].split(' ')[2];
+    return metrics.split('\n\n').reduce(
+      (acc, metric) => {
+        const lines = metric.split('\n');
+        const type = lines[1].split(' ')[2];
 
-      acc[type] = lines
-        .slice(2, Infinity)
-        .map((line) => line.split(' ')[0])
-        .join('\n');
+        acc[type] = lines
+          .slice(2, Infinity)
+          .map((line) => line.split(' ')[0])
+          .join('\n');
 
-      return acc;
-    }, {} as Record<string, string>);
+        return acc;
+      },
+      {} as Record<string, string>
+    );
   };
 
   beforeEach(async () => {
@@ -42,7 +45,7 @@ describe('modules/metrics/instantMetrics', () => {
     });
   });
 
-  it('Отправляет instant метрику если event соответствует сущетсвующей метрике', async () => {
+  it('Отправляет instant метрику если event соответствует существующей метрике', async () => {
     await page.goto(`${getApp().serverUrl}/`, { waitUntil: 'networkidle' });
 
     expect(completedRequests).toEqual(

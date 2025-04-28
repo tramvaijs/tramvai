@@ -277,7 +277,9 @@ import { createPapiMethod } from '@tramvai/papi';
         return createPapiMethod({
           path: '/my/papi',
           method: 'post',
-          async handler({ httpClient }) {
+          async handler() {
+            const { httpClient } = this.deps;
+
             // use what was requested in deps from createPapiMethod
             if (cache.has('test')) {
               return 'test';

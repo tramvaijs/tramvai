@@ -2,7 +2,7 @@ import { createApp, commandLineListTokens } from '@tramvai/core';
 import { MetricsModule } from '@tramvai/module-metrics';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { METRICS_MODULE_TOKEN, REGISTER_INSTANT_METRIC_TOKEN } from '@tramvai/tokens-metrics';
-import { modules, bundles } from '../../../../test/shared/common';
+import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
 
 createApp({
   name: 'metrics',
