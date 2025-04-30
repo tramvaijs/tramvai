@@ -141,12 +141,6 @@ export const babelConfigFactory = ({
           legacy: true,
         },
       ],
-      [
-        '@babel/plugin-proposal-class-properties',
-        {
-          loose,
-        },
-      ],
       '@babel/plugin-proposal-export-default-from',
       removeTypeofWindow && [
         'transform-define',
