@@ -85,7 +85,7 @@ export const webpackProviders: Provider[] = [
             async build() {
               registerProviders(di, [
                 ...(shouldBuildClient ? buildClientSharedProviders : []),
-                ...(shouldBuildClient && buildClientProviders),
+                ...(shouldBuildClient ? buildClientProviders : []),
                 ...(shouldBuildServer ? buildServerProviders : []),
               ]);
 
