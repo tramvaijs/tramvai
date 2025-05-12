@@ -38,6 +38,9 @@ beforeAll(async () => {
       },
       type: 'application',
       root: './',
+      webpack: {
+        devtool: 'eval',
+      },
       experiments: {
         transpilation: {
           loader: 'swc',

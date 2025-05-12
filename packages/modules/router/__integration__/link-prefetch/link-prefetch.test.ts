@@ -18,6 +18,7 @@ describe('router/link-prefetch', () => {
       `\${STATIC_URL}/dist/client/pages-main.chunk.js`,
       `\${STATIC_URL}/dist/client/platform.js`,
       `\${STATIC_URL}/dist/client/react.js`,
+      `\${STATIC_URL}/dist/client/runtime.js`,
     ];
     const inViewportChunks = [
       `\${STATIC_URL}/dist/client/pages-third.chunk.js`,
@@ -36,6 +37,7 @@ describe('router/link-prefetch', () => {
 
     expect(initialAssets).toMatchInlineSnapshot(`
       [
+        "\${STATIC_URL}/dist/client/runtime.js",
         "\${STATIC_URL}/dist/client/mainDefault.chunk.js",
         "\${STATIC_URL}/dist/client/pages-main.chunk.js",
         "\${STATIC_URL}/dist/client/react.js",

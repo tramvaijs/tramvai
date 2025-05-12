@@ -11,6 +11,7 @@ import {
   RENDER_SLOTS,
   ResourceType,
   ResourceSlot,
+  INLINE_WEBPACK_RUNTIME,
 } from '@tramvai/tokens-render';
 
 import { Header } from './components/features/Header/Header';
@@ -77,6 +78,10 @@ createApp({
     {
       provide: DEFAULT_FOOTER_COMPONENT,
       useValue: Footer,
+    },
+    {
+      provide: INLINE_WEBPACK_RUNTIME,
+      useValue: true,
     },
     // регистрируем meta viewport, который будет добавлятся на каждую страницу
     {

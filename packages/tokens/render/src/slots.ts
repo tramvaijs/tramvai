@@ -1,6 +1,7 @@
 export const HEAD_META = 'head:meta' as const;
 export const HEAD_PERFORMANCE = 'head:performance' as const;
 export const HEAD_CORE_STYLES = 'head:core-styles' as const;
+export const HEAD_WEBPACK_RUNTIME = 'head:webpack-runtime' as const;
 export const HEAD_POLYFILLS = 'head:polyfills' as const;
 export const HEAD_CORE_SCRIPTS = 'head:core-scripts' as const;
 export const HEAD_DYNAMIC_SCRIPTS = 'head:dynamic-scripts' as const;

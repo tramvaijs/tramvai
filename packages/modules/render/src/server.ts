@@ -25,6 +25,7 @@ import {
   REACT_STREAMING_RENDER_TIMEOUT,
   ASSETS_PREFIX_TOKEN,
   DEFAULT_ASSETS_PREFIX_TOKEN,
+  INLINE_WEBPACK_RUNTIME,
 } from '@tramvai/tokens-render';
 import { Scope, optional } from '@tinkoff/dippy';
 import { satisfies } from '@tinkoff/user-agent';
@@ -263,6 +264,7 @@ Page Error Boundary will be rendered for the client`,
         renderFlowAfter: { token: RENDER_FLOW_AFTER_TOKEN, optional: true },
         logger: LOGGER_TOKEN,
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
+        inlineWebpackRuntime: INLINE_WEBPACK_RUNTIME,
         di: DI_TOKEN,
         renderMode: optional(REACT_SERVER_RENDER_MODE),
         assetsPrefixFactory: ASSETS_PREFIX_TOKEN,
@@ -354,6 +356,10 @@ Page Error Boundary will be rendered for the client`,
     provide({
       provide: BACK_FORWARD_CACHE_ENABLED,
       useValue: true,
+    }),
+    provide({
+      provide: INLINE_WEBPACK_RUNTIME,
+      useValue: false,
     }),
     provide({
       provide: REACT_SERVER_RENDER_MODE,

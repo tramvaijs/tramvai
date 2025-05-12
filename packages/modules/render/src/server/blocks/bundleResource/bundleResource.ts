@@ -12,6 +12,7 @@ import { isFileSystemPageComponent, fileSystemPageToWebpackChunkName } from '@tr
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { PRELOAD_JS } from '../../constants/performance';
 import { flushFiles } from '../utils/flushFiles';
+import { fetchWebpackRuntime } from '../utils/fetchWebpackRuntime';
 
 const asyncScriptAttrs = {
   defer: null,
@@ -34,6 +35,7 @@ export const bundleResource = async ({
   extractor,
   pageComponent,
   fetchWebpackStats,
+  inlineWebpackRuntime,
   renderMode,
   assetsPrefixFactory,
 }: {
@@ -41,6 +43,7 @@ export const bundleResource = async ({
   extractor: ChunkExtractor;
   pageComponent?: string;
   fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
+  inlineWebpackRuntime: boolean;
   renderMode: typeof REACT_SERVER_RENDER_MODE | null;
   assetsPrefixFactory: ExtractDependencyType<typeof ASSETS_PREFIX_TOKEN>;
 }) => {
@@ -62,7 +65,10 @@ export const bundleResource = async ({
   });
   const { scripts, styles } = flushFiles(
     [...bundles, ...lazyChunks, ...criticalChunks, 'platform'],
-    webpackStats
+    webpackStats,
+    {
+      exclude: ['runtime'],
+    }
   );
 
   const genHref = (href) => `${publicPath}${href}`;
@@ -75,6 +81,35 @@ export const bundleResource = async ({
       type: ResourceType.inlineScript,
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
       payload: `window.ap = ${`"${assetsPrefix}"`};`,
+    });
+  }
+
+  const { scripts: webpackRuntimeScript } = flushFiles(['runtime'], webpackStats);
+  // Webpack runtime is always single chunk
+  const webpackRuntimeScriptName = webpackRuntimeScript[0];
+
+  if (inlineWebpackRuntime) {
+    const webpackRuntime = await fetchWebpackRuntime(genHref(webpackRuntimeScriptName));
+
+    result.push({
+      type: ResourceType.inlineScript,
+      slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
+      payload: webpackRuntime,
+      attrs: {
+        id: 'webpack-runtime',
+      },
+    });
+  } else {
+    result.push({
+      type: ResourceType.script,
+      slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
+      payload: genHref(webpackRuntimeScriptName),
+      attrs: {
+        'data-critical': 'true',
+        ...(integrities[webpackRuntimeScriptName]
+          ? { integrity: integrities[webpackRuntimeScriptName] }
+          : {}),
+      },
     });
   }
 

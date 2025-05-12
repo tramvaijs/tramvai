@@ -29,6 +29,15 @@ test.describe('Script integrity tests', () => {
     }
   });
 
+  test('sri hashes should be inside runtime chunk', async ({ page, app }) => {
+    const { staticUrl } = app;
+    const src = `${staticUrl}/dist/client/runtime.js`;
+    const runtimeChunkResponse = await page.request.fetch(src);
+    const runtimeChunkContent = await runtimeChunkResponse.text();
+
+    test.expect(/__webpack_require__.sriHashes\s?=/m.test(runtimeChunkContent)).toBe(true);
+  });
+
   test('test integrity for async webpack chunks', async ({ I, page, app }) => {
     const addedScripts: { src: string; integrity: string | null }[] = [];
 

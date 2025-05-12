@@ -1,6 +1,7 @@
 export const REACT_RENDER = 'react:render';
 export const HEAD_PERFORMANCE = 'head:performance';
 export const HEAD_META = 'head:meta';
+export const HEAD_WEBPACK_RUNTIME = 'head:webpack-runtime';
 export const HEAD_POLYFILLS = 'head:polyfills';
 export const HEAD_CORE_STYLES = 'head:core-styles';
 export const HEAD_CORE_SCRIPTS = 'head:core-scripts';

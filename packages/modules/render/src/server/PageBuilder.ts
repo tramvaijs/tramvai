@@ -60,6 +60,8 @@ export class PageBuilder {
 
   private fetchWebpackStats: typeof FETCH_WEBPACK_STATS_TOKEN;
 
+  private inlineWebpackRuntime: boolean;
+
   private di: typeof DI_TOKEN;
 
   private renderMode: typeof REACT_SERVER_RENDER_MODE | null;
@@ -78,6 +80,7 @@ export class PageBuilder {
     renderFlowAfter,
     logger,
     fetchWebpackStats,
+    inlineWebpackRuntime,
     di,
     renderMode,
     assetsPrefixFactory,
@@ -93,6 +96,7 @@ export class PageBuilder {
     this.renderFlowAfter = renderFlowAfter || [];
     this.log = logger('page-builder');
     this.fetchWebpackStats = fetchWebpackStats;
+    this.inlineWebpackRuntime = inlineWebpackRuntime;
     this.di = di;
     this.renderMode = renderMode;
     this.assetsPrefixFactory = assetsPrefixFactory;
@@ -165,6 +169,7 @@ export class PageBuilder {
         extractor,
         pageComponent,
         fetchWebpackStats: this.fetchWebpackStats,
+        inlineWebpackRuntime: this.inlineWebpackRuntime,
         renderMode: this.renderMode,
         assetsPrefixFactory: this.assetsPrefixFactory,
       })

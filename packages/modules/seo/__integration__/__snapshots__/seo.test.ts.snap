@@ -27,6 +27,15 @@ exports[`seo ssr test common meta 1`] = `
     
 
     
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
+    
+
+    
 
     
 
@@ -85,6 +94,15 @@ exports[`seo ssr test default meta pack 1`] = `
       rel="stylesheet"
       href="\${STATIC_URL}/dist/client/root.chunk.css"
     >
+    
+
+    
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -256,6 +274,15 @@ exports[`seo ssr test og meta 1`] = `
     
 
     
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
+    
+
+    
 
     
 
@@ -318,6 +345,15 @@ exports[`seo ssr test twitter meta 1`] = `
     
     <style type="text/css"></style>
     <link crossorigin="anonymous" data-href="\${STATIC_URL}/dist/client/root.chunk.css" rel="stylesheet" >
+    
+
+    
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
