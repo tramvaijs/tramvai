@@ -1,7 +1,10 @@
 import isNil from '@tinkoff/utils/is/nil';
 import type { ChildApp } from '@tramvai/child-app-core';
 import { ServerLoader as LowLevelLoader } from '@tinkoff/module-loader-server';
-import type { ChildAppFinalConfig } from '@tramvai/tokens-child-app';
+import {
+  CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN,
+  type ChildAppFinalConfig,
+} from '@tramvai/tokens-child-app';
 import type {
   CREATE_CACHE_TOKEN,
   LOGGER_TOKEN,
@@ -27,16 +30,27 @@ export class ServerLoader extends Loader {
     logger,
     createCache,
     envManager,
+    cacheOptions,
   }: {
     logger: typeof LOGGER_TOKEN;
     createCache: typeof CREATE_CACHE_TOKEN;
     envManager: typeof ENV_MANAGER_TOKEN;
+    cacheOptions: typeof CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN | null;
   }) {
     super();
     const cache = createCache('memory', {
       name: 'child-app-loader',
       ttl: 1000 * 60 * 60 * 24 * 5,
-      max: 20,
+      // When Child App script is evicted from server loader cache, we get a small memory leak,
+      // because providers in singleton child DI, page components / actions, will store a reference to removed script,
+      // and server loader cache will contain a new instance of the same script.
+      //
+      // So, it is better to have bigger cache size to prevent evicting from cache,
+      // also for one Child App we need to save 3 elements - server JS, stats JSON and loadable stats JSON.
+      //
+      // TODO: cache cleanup for previous versions of Child Apps
+      max: 100,
+      ...cacheOptions,
     });
 
     this.internalLoadCache = cache;

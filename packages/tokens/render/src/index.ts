@@ -219,6 +219,8 @@ export const RENDER_FLOW_AFTER_TOKEN = createToken<() => Promise<void>>('render 
 
 export const BACK_FORWARD_CACHE_ENABLED = createToken<boolean>('back forward cache');
 
+export const INLINE_WEBPACK_RUNTIME = createToken<boolean>('inline webpack runtime');
+
 export type ReactServerRenderMode = 'sync' | 'streaming';
 
 // @todo ReactServerRenderMode or () => ReactServerRenderMode

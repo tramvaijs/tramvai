@@ -5,7 +5,12 @@ import { RenderModule } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
 import { ErrorInterceptorModule } from '@tramvai/module-error-interceptor';
 import { SeoModule } from '@tramvai/module-seo';
-import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
+import {
+  RENDER_SLOTS,
+  ResourceType,
+  ResourceSlot,
+  INLINE_WEBPACK_RUNTIME,
+} from '@tramvai/tokens-render';
 
 createApp({
   name: 'assets',
@@ -18,6 +23,10 @@ createApp({
     ErrorInterceptorModule,
   ],
   providers: [
+    {
+      provide: INLINE_WEBPACK_RUNTIME,
+      useValue: process.env.TEST_INLINE_RUNTIME === 'true',
+    },
     {
       provide: RENDER_SLOTS,
       multi: true,

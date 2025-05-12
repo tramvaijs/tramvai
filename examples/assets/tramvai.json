@@ -17,7 +17,7 @@
         "cssLocalIdentName": {}
       },
       "hotRefresh": {
-        "enabled": true
+        "enabled": false
       },
       "sourceMap": {
         "development": false,

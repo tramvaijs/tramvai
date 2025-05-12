@@ -64,6 +64,8 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .batch(pwaBlock(configManager))
     .when(fileSystemPages.enabled, (cfg) => cfg.batch(pagesResolve(configManager)));
 
+  config.optimization.set('runtimeChunk', 'single');
+
   config
     .entry('platform')
     .add(path.resolve(configManager.rootDir, `${configManager.root}/index`))

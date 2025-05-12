@@ -280,7 +280,7 @@ export class CommandLineRunner implements Interface {
         command: name,
       });
 
-      if (typeof error === 'object') {
+      if (process.env.NODE_ENV === 'development' && typeof error === 'object') {
         error.di = di;
       }
 

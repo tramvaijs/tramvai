@@ -23,8 +23,10 @@ export const flushFiles = (
   webpackStats: WebpackStats,
   {
     ignoreDependencies = false,
+    exclude,
   }: {
     ignoreDependencies?: boolean;
+    exclude?: string[];
   } = {}
 ) => {
   // при использовании namedChunkGroups во все entry-файлы как зависимость попадает runtimeChunk
@@ -43,8 +45,12 @@ export const flushFiles = (
     }
   }
 
+  const filteredChunks = exclude
+    ? resolvedChunks.filter((chunk) => !exclude.includes(chunk))
+    : resolvedChunks;
+
   const files = flatten<string>(
-    uniq(resolvedChunks).map((chunk) => {
+    uniq(filteredChunks).map((chunk) => {
       let assetFiles = assetsByChunkName[chunk];
 
       if (!assetFiles && allChunks) {

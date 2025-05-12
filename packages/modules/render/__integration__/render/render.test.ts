@@ -57,6 +57,7 @@ describe('render', () => {
     const { staticUrl } = getApp();
 
     expect(scripts).toEqual([
+      `${staticUrl}/dist/client/runtime.js`,
       `${staticUrl}/dist/client/root.chunk.js`,
       `${staticUrl}/dist/client/react.js`,
       `${staticUrl}/dist/client/platform.js`,

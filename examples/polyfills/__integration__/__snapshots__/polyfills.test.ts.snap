@@ -24,12 +24,8 @@ exports[`polyfills modern list of polyfills: modern 1`] = `
     "../../node_modules/core-js/modules/web.url-search-params.size.js",
     "../../node_modules/core-js/modules/web.url.can-parse.js",
     "../../node_modules/core-js/modules/web.url.parse.js",
-    "webpack/runtime/compat get default export",
-    "webpack/runtime/define property getters",
-    "webpack/runtime/global",
-    "webpack/runtime/hasOwnProperty shorthand",
   ],
-  "polyfillsCount": 25,
+  "polyfillsCount": 21,
 }
 `;
 
@@ -91,10 +87,7 @@ exports[`polyfills stable list of polyfills: default 1`] = `
     "../../node_modules/core-js/modules/web.url.to-json.js",
     "../../node_modules/intersection-observer/intersection-observer.js",
     "../../node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js",
-    "webpack/runtime/define property getters",
-    "webpack/runtime/global",
-    "webpack/runtime/hasOwnProperty shorthand",
   ],
-  "polyfillsCount": 58,
+  "polyfillsCount": 55,
 }
 `;
