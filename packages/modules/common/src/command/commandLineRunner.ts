@@ -217,7 +217,7 @@ export class CommandLineRunner implements Interface {
 
   // eslint-disable-next-line class-methods-use-this
   private throwError(err: any, di?: Container) {
-    if (typeof err === 'object') {
+    if (process.env.NODE_ENV === 'development' && typeof err === 'object') {
       // eslint-disable-next-line no-param-reassign
       err.di = di;
     }

@@ -204,6 +204,14 @@ export const CHILD_APP_STATE_MANAGER_TOKEN =
 export const CHILD_APP_LOADER_TOKEN = createToken<ChildAppLoader>('child-app loader');
 
 /**
+ * @public
+ * @description Provides Child Apps server loader LRU cache options
+ */
+export const CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN = createToken<{ max?: number; ttl?: number }>(
+  'child-app loader cache options'
+);
+
+/**
  * @private
  * @description Implements CommandLineRunner for child apps
  */

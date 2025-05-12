@@ -21,7 +21,7 @@ function runInAsyncContext({
 
     // prevent memory leaks, because async context can be destroyed after response,
     // all stored resources will be accumulated in memory, and peak memory allocation will be high
-    // `onResponse` is not used because is not fired when request was aborted by user (https://fastify.dev/docs/latest/Guides/Detecting-When-Clients-Abort/)
+    // `onResponse` is not enough because is not fired when request was aborted by user (https://fastify.dev/docs/latest/Guides/Detecting-When-Clients-Abort/)
     // TODO: can lead to errors because store will be cleared before reply, but maybe it's ok because response will be ignored?
     reply.raw.once('close', () => {
       const store = storage.getStore();
@@ -32,6 +32,18 @@ function runInAsyncContext({
         }
       }
     });
+  });
+
+  // we still need to clear store on response, because socket "close" event can not be executed for a long time,
+  // because we use `http.Agent` with `keepAlive` enabled, and socket can be reused.
+  app.addHook('onResponse', async () => {
+    const store = storage.getStore();
+
+    if (store) {
+      for (const key in store) {
+        delete store[key as keyof typeof store];
+      }
+    }
   });
 }
 
