@@ -49,9 +49,10 @@ export class ChildAppPageService implements IChildAppPageService {
       Object.keys(record).forEach((pageComponentName) => {
         const pageComponent = record[pageComponentName];
 
-        if (!this.componentRegistry.get(pageComponentName, componentsGroupName)) {
-          this.componentRegistry.add(pageComponentName, pageComponent, componentsGroupName);
-        }
+        // to prevent memory leaks, always register Child App components,
+        // because if Child App server JS is loaded again after eviction from server loader cache,
+        // we want to load new instance of components and actions and clear memory references to old server JS
+        this.componentRegistry.add(pageComponentName, pageComponent, componentsGroupName);
       });
     });
   }

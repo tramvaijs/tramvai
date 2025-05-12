@@ -21,6 +21,7 @@ import {
 } from '@tramvai/tokens-render';
 import {
   CHILD_APP_CONTRACT_MANAGER,
+  CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN,
   CHILD_APP_RENDER_MANAGER_TOKEN,
   CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   CHILD_APP_STATE_MANAGER_TOKEN,
@@ -63,6 +64,7 @@ export const serverProviders: Provider[] = [
     deps: {
       logger: LOGGER_TOKEN,
       createCache: CREATE_CACHE_TOKEN,
+      cacheOptions: optional(CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN),
       envManager: ENV_MANAGER_TOKEN,
     },
   }),

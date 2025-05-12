@@ -5,6 +5,7 @@ import { getModuleParameters, walkOfModules } from '@tramvai/core';
 import type {
   CHILD_APP_CONTRACT_MANAGER,
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
+  ChildApp,
   ChildAppDiManager,
   ChildAppFinalConfig,
   ChildAppLoader,
@@ -28,6 +29,8 @@ export class SingletonDiManager implements ChildAppDiManager {
   private rootDiAccessMode?: RootDiAccessMode | null;
   private contractManager: ContractManager;
   private cache = new Map<string, Container>();
+  private moduleCache = new WeakMap<ChildApp, string>();
+
   constructor({
     logger,
     appDi,
@@ -52,7 +55,18 @@ export class SingletonDiManager implements ChildAppDiManager {
     const { key, tag } = config;
 
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      const children = this.loader.get(config);
+
+      // When Child App script is evicted from server loader cache, we get a memory leak,
+      // because providers in singleton child DI will store a reference to removed script,
+      // and server loader cache will contain a new instance of the same script.
+      // To solve this case, we will try to create a new singleton child DI
+      // when new Child App script instance is fetched and compiled.
+      if (children && this.moduleCache.has(children) && this.moduleCache.get(children) === key) {
+        return this.cache.get(key);
+      }
+
+      this.cache.delete(key);
     }
 
     try {
@@ -84,6 +98,7 @@ export class SingletonDiManager implements ChildAppDiManager {
     if (!children) {
       return;
     }
+
     const { modules = [], providers = [], actions = [] } = children;
     const isolateDi = this.rootDiAccessMode
       ? shouldIsolateDi(config, this.rootDiAccessMode)
@@ -162,6 +177,8 @@ export class SingletonDiManager implements ChildAppDiManager {
         di.borrowToken(this.appDi, token);
       });
     }
+
+    this.moduleCache.set(children, config.key);
 
     return di;
   }
