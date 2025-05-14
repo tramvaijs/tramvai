@@ -584,12 +584,13 @@ export abstract class AbstractRouter {
   }
 
   registerGuard(guard: NavigationGuard) {
+    const index = this.guardsIndex++;
     const untap = this.guards.tapPromise(
-      guard.name ?? `guard-${this.guardsIndex++}`,
+      guard.name ?? `guard-${index}`,
       async (_, { allResults, navigation }) => {
         try {
           const result = await guard(navigation);
-          allResults.push(result);
+          allResults[index] = result;
         } catch (error) {
           logger.warn({
             event: 'guard.error',
