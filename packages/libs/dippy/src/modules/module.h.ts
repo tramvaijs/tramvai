@@ -4,13 +4,13 @@ import type { MODULE_PARAMETERS } from './module';
 export interface ModuleOptions<Providers extends Provider[]> {
   providers: Providers;
   deps?: ProviderDeps;
-  imports?: ModuleType[];
+  imports?: (ModuleType | ExtendedModule)[];
 }
 
 export interface ModuleParameters {
   providers: Provider[];
   deps: ProviderDeps;
-  imports?: ModuleType[];
+  imports?: (ModuleType | ExtendedModule)[];
   id: string;
   name: string;
 }
@@ -22,7 +22,7 @@ export interface ModuleSecretParameters {
 export type ExtendedModule = {
   mainModule: ModuleType;
   providers?: Provider[];
-  imports?: ModuleType[];
+  imports?: (ModuleType | ExtendedModule)[];
 };
 
 export interface ModuleClass {

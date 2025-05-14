@@ -21,9 +21,14 @@ const routes = [
     name: 'dynamic',
     path: '/dynamic/:id/:test?/',
   },
+  {
+    name: 'blocked',
+    path: '/blocked/',
+  },
 ];
 
 let currentNavigationObjectUuid = 0;
+const delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time));
 
 describe('router/server', () => {
   let router: Router;
@@ -311,6 +316,27 @@ describe('router/server', () => {
         );
         expect(mockNotFound).not.toHaveBeenCalled();
         expect(mockBlock).not.toHaveBeenCalled();
+      });
+
+      it('should call guards by register order', async () => {
+        const mockGuard = jest.fn(async () => {
+          await delay(100);
+          return '/child2/';
+        });
+        const mockGuard2 = jest.fn(async () => {
+          return '/blocked/';
+        });
+
+        router.registerGuard(mockGuard);
+        router.registerGuard(mockGuard2);
+
+        await router.navigate('/');
+
+        expect(mockRedirect).toHaveBeenCalledWith(
+          expect.objectContaining({
+            url: expect.objectContaining({ path: '/child2/' }),
+          })
+        );
       });
     });
   });
