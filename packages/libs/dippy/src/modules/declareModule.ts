@@ -1,5 +1,5 @@
 import type { Provider } from '../Provider';
-import type { ModuleType } from './module.h';
+import type { ExtendedModule, ModuleType } from './module.h';
 
 export const MODULE_PARAMETERS = '_module_parameters_';
 
@@ -18,7 +18,7 @@ export function declareModule<Extend extends ExtendType>({
 }: {
   name: string;
   providers?: Provider[];
-  imports?: ModuleType[];
+  imports?: (ModuleType | ExtendedModule)[];
   extend?: Extend;
 }): ModuleType & ModuleExtendType<Extend> {
   // use class for backward compatibility, will be called with new
