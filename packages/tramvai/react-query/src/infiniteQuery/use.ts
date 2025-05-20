@@ -24,6 +24,17 @@ type SafeUnpackUseInfiniteQueryResult<
 
 function useInfiniteQuery<Options extends void, PageParam, Result, Deps extends ProviderDeps>(
   query:
+    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey>
+    | InfiniteQuery<Options, PageParam, Result, Deps>
+): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
+function useInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>(
+  query:
+    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey>
+    | InfiniteQuery<Options, PageParam, Result, Deps>,
+  options: Options
+): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
+function useInfiniteQuery<Options extends void, PageParam, Result, Deps extends ProviderDeps>(
+  query:
     | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
     | InfiniteQuery<Options, PageParam, Result, Deps>
 ): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
