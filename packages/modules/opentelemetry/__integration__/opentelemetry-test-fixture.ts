@@ -6,11 +6,13 @@ import { buildAllureTree } from '@tramvai/internal-test-utils/fixtures/build-all
 import type { IAction } from '@tramvai/internal-test-utils/fixtures/overriding';
 import { IFixture } from '@tramvai/internal-test-utils/fixtures/overriding';
 import { dirname, resolve } from 'path';
+import { SpyRequests, SpyRequestsFixture } from '@tramvai/internal-test-utils/fixtures/spyRequest';
 
 type AppFixtures = {
   app: StartCliResult;
   buildAllureTree: void;
   I: IAction;
+  spyRequest: SpyRequests;
 };
 
 type WorkerFixture = {
@@ -18,6 +20,12 @@ type WorkerFixture = {
   optionsApp: CreateApp.OptionsApp;
   settingApp: CreateApp.SettingApp;
   createApp: CreateApp.CreateCustomApp;
+};
+
+const optionsApp: CreateApp.OptionsApp = {
+  env: {
+    MOCK_API: 'https://httpbin.org',
+  },
 };
 
 export const test = base.extend<AppFixtures, WorkerFixture>({
@@ -33,8 +41,9 @@ export const test = base.extend<AppFixtures, WorkerFixture>({
   ],
   settingApp,
   createApp,
-  optionsApp: [{}, { scope: 'worker', auto: true, option: true }],
+  optionsApp: [optionsApp, { scope: 'worker', auto: true, option: true }],
   app,
   buildAllureTree,
   I: IFixture,
+  spyRequest: SpyRequestsFixture,
 });

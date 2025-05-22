@@ -1,4 +1,5 @@
 import { RandomIdGenerator } from '@opentelemetry/sdk-trace-base';
+import { expect } from '@playwright/test';
 import { test } from './opentelemetry-test-fixture';
 
 const idGenerator = new RandomIdGenerator();
@@ -48,6 +49,33 @@ test.describe('packages/modules/opentelemetry', () => {
 
       test.expect(rootSpan).not.toBeUndefined();
       test.expect(rootSpan.parentSpanId).toBe(incomingSpanId);
+    });
+
+    test('should insert `traceparent` meta tag in resulting html', async ({ app }) => {
+      const response = await app.request(`/test/`);
+
+      test.expect(response.text).toMatch(/<meta name="traceparent" content="\S+">/);
+    });
+
+    test('should bypass `traceparent` header on client API call', async ({
+      app,
+      page,
+      spyRequest,
+    }) => {
+      await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
+
+      await expect
+        .poll(
+          async () => {
+            const request = await spyRequest.getFirstRequest('/json');
+
+            return request?.headers.traceparent;
+          },
+          {
+            timeout: 1000,
+          }
+        )
+        .toBeTruthy();
     });
 
     // todo http-client instrumentation

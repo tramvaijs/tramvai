@@ -27,7 +27,7 @@ import { OpenTelemetryModule } from '@tramvai/module-opentelemetry';
 
 createApp({
   name: 'tincoin',
-  modules: [ OpenTelemetryModule ],
+  modules: [OpenTelemetryModule],
 });
 ```
 
@@ -51,7 +51,7 @@ const provider = {
         // span will be ended automatically after `apiService.get` method resolves or rejects
         return apiService.get('/smth');
       });
-    }
+    };
   },
   deps: {
     // tracer exists only server-side
@@ -103,7 +103,7 @@ const provider = {
   useFactory: ({ appInfo }) => {
     return {
       [ATTR_SERVICE_NAME]: appInfo.appName,
-    }
+    };
   },
   deps: {
     appInfo: APP_INFO_TOKEN,
@@ -128,6 +128,7 @@ function doSmt({ tracer }) {
 ## Automatic instrumentation
 
 [OpenTelemetry instrumentation libraries](https://www.npmjs.com/package/@opentelemetry/instrumentation) is not supported, because of it limitations:
+
 - instrumentations are registered before the module to instrument is require'ed
 - modules are not included in a bundle
 
@@ -148,6 +149,30 @@ Naming and attributes follow [semantic conventions](https://opentelemetry.io/doc
 `OpenTelemetryModule` inject context for [logs correlation](https://opentelemetry.io/docs/specs/otel/logs/#log-correlation).
 
 All application logs will be extended with current span and trace ids in `spanId` and `traceId` properties.
+
+### Pass `traceparent` context
+
+`OpenTelemetryModule` inject `traceparent` header to all external API requests via Tramvai [HTTP Clients](03-features/09-data-fetching/02-http-client.md).
+
+On the server-side module includes `traceparent` meta-tag in resulting html according to [W3C](https://www.w3.org/TR/trace-context/) format. Also, it bypasses `traceparent` [header](https://www.w3.org/TR/trace-context/#traceparent-header) to external APIs.
+
+On the client-side, if `traceparent` meta-tag exists it will be used as header to all external API requests. You can extract in at follows:
+
+```typescript
+const extractTraceparent = (): string | undefined => {
+  const tags = Array.from(document.getElementsByTagName('meta')).filter(
+    (element) => element.name === 'traceparent'
+  );
+
+  if (tags.length !== 1) {
+    return undefined;
+  }
+
+  const [version, traceId, spanId, sampled] = tags[0].content.split('-');
+
+  return traceId;
+};
+```
 
 ## Debug and testing
 
