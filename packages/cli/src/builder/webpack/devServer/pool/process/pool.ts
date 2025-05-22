@@ -28,8 +28,6 @@ export const ProcessWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
           getDebugArg(configManager.debug),
           configManager.trace ? TRACE_ARGV : []
         ),
-        // устанавливаем в качестве дебага дефолтный порт мастера, т.к. у нас и так один процесс может работать
-        inspectPort: process.debugPort,
         silent: true,
         // @ts-ignore
         cwd: di.get(CONFIG_ROOT_DIR_TOKEN),
