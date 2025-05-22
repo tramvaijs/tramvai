@@ -77,3 +77,34 @@ describe('deps', () => {
     });
   });
 });
+
+describe('fork', () => {
+  it('with getNextPageParam', async () => {
+    type Response = { hasNext: boolean; nextCursor?: number };
+
+    const query = createInfiniteQuery({
+      initialPageParam: 0,
+      key: 'test',
+      fn: async () => {
+        return {} as Response;
+      },
+    });
+
+    const fork = query.fork({});
+
+    expectTypeOf(fork).toEqualTypeOf<ReturnType<typeof query.fork>>();
+  });
+
+  it('with empty query options', async () => {
+    const query = createInfiniteQuery({
+      key: 'test',
+      fn: async () => {
+        return 25;
+      },
+    });
+
+    const fork = query.fork({});
+
+    expectTypeOf(fork).toEqualTypeOf<ReturnType<typeof query.fork>>();
+  });
+});
