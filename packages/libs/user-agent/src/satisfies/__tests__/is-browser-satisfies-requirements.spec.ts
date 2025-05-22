@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import tinkoffBrowsersListConfig from '@tinkoff/browserslist-config';
-import { satisfies } from '../satisfies';
+import { isBrowserSatisfiesRequirements } from '../is-browser-satisfies-requirements';
 
 function readDataset(p: string) {
   return fs
@@ -30,7 +30,9 @@ function testDatasets(
 
       it(`${ua}`, () => {
         try {
-          expect(satisfies(ua, browsersListConfig, { forceMinimumUnknownVersions })).toBe(res);
+          expect(
+            isBrowserSatisfiesRequirements(ua, browsersListConfig, { forceMinimumUnknownVersions })
+          ).toBe(res);
         } catch (e: any) {
           e.message += `\n\n${ua}\n${getDatasetLineLink(i + 1, f)}\n`;
 
@@ -41,7 +43,7 @@ function testDatasets(
   });
 }
 
-describe('user-agent/satisfies', () => {
+describe('user-agent/isBrowserSatisfiesRequirements', () => {
   describe('default options from @tinkoff/browserslist-config', () => {
     describe('supported', () => {
       testDatasets(['supported.txt'], true);
@@ -62,7 +64,7 @@ describe('user-agent/satisfies', () => {
   });
 });
 
-describe('user-agent/satisfies modern2', () => {
+describe('user-agent/isBrowserSatisfiesRequirements modern2', () => {
   describe('supported modern', () => {
     testDatasets(['supported_modern.txt'], true, tinkoffBrowsersListConfig.modern);
   });

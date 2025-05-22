@@ -32,9 +32,9 @@ import type {
 import type { QuerySerializer } from '@tinkoff/request-plugin-protocol-http';
 import type { ExtractDependencyType, ExtractTokenType } from '@tinkoff/dippy';
 import { fillHeaderIp, fillHeaders } from '../utils';
-import { createUserAgent } from './createUserAgent';
+import { transformUserAgent } from './headers';
 
-const environmentDependentOptions =
+const environmentDependentOptions: TinkoffRequestOptions =
   typeof window === 'undefined'
     ? {
         defaultTimeout: 2000,
@@ -114,16 +114,10 @@ export const httpClientFactory = ({
       options
     ) as TinkoffRequestOptions & { name: string };
 
-    // по умолчанию, на сервере, библиотека https://github.com/node-fetch/node-fetch
-    // отправляет заголовок "User-Agent" вида "node-fetch".
-    // для улучшения логов сервисов, в которые делают запросы tramvai приложения,
-    // заменяем "User-Agent" на кастомный, содержащий название и версию приложения
-    if (typeof window === 'undefined') {
-      adapterOptions.headers = {
-        'User-Agent': createUserAgent({ appInfo, envManager }),
-        ...adapterOptions.headers,
-      };
-    }
+    adapterOptions.headers = {
+      ...transformUserAgent({ appInfo, envManager }),
+      ...adapterOptions.headers,
+    };
 
     if (!isNil(forceDisableCache)) {
       adapterOptions.disableCache = !!forceDisableCache;

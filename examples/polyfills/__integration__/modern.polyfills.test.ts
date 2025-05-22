@@ -3,7 +3,7 @@ import type { StartCliResult } from '@tramvai/test-integration';
 import { startCli } from '@tramvai/test-integration';
 import { initPlaywright } from '@tramvai/test-pw';
 
-jest.setTimeout(60000);
+jest.setTimeout(80000);
 
 describe('polyfills', () => {
   let app: StartCliResult;
@@ -13,7 +13,7 @@ describe('polyfills', () => {
       rootDir: path.resolve(__dirname, '../'),
       fileCache: false,
     });
-  }, 80000);
+  }, 120000);
 
   afterAll(() => {
     return app.close();

@@ -7,6 +7,8 @@ import {
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { RESOURCES_REGISTRY, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
+
 import {
   OPENTELEMETRY_PROVIDER_CONFIG_TOKEN,
   OPENTELEMETRY_PROVIDER_RESOURCE_ATTRIBUTES_TOKEN,
@@ -21,6 +23,7 @@ import { providers as httpClientInstrumentationProviders } from './instrumentati
 import { providers as logsIntegrationProviders } from './instrumentation/logs';
 import { providers as commandLineRunnerIntegrationProviders } from './instrumentation/commandLineRunner';
 import { providers as routerIntegrationProviders } from './instrumentation/router';
+import { getTraceparentHeader } from './tracer/get-traceparent-header';
 
 export * from './tokens';
 
@@ -60,6 +63,26 @@ export * from './tokens';
       deps: {
         provider: OPENTELEMETRY_PROVIDER_TOKEN,
         logger: LOGGER_TOKEN,
+      },
+    }),
+    provide({
+      provide: commandLineListTokens.customerStart,
+      useFactory: ({ tracer, resourcesRegistry }) => {
+        return function insertTraceIdToResourcesRegistry() {
+          const traceparent = getTraceparentHeader(tracer);
+
+          if (traceparent !== undefined) {
+            resourcesRegistry.register({
+              slot: ResourceSlot.HEAD_META,
+              type: ResourceType.meta,
+              payload: `<meta name="traceparent" content="${traceparent}">`,
+            });
+          }
+        };
+      },
+      deps: {
+        tracer: OPENTELEMETRY_TRACER_TOKEN,
+        resourcesRegistry: RESOURCES_REGISTRY,
       },
     }),
     provide({

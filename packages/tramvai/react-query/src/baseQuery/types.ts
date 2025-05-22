@@ -46,7 +46,7 @@ export type BaseCreateQueryOptions<Options, Deps extends ProviderDeps> =
 
 export interface BaseQuery<Options, TCreateQuery, TQuery, TUseQuery> {
   [QUERY_PARAMETERS]: TCreateQuery;
-  fork(options: TUseQuery): TQuery;
+  fork(options: Partial<TUseQuery>): TQuery;
   raw(di: Container, options?: Options): TUseQuery;
   /**
    * @deprecated pass di as first parameter instead of context

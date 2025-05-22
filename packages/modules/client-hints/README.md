@@ -223,7 +223,42 @@ const App = () => {
 
 ### USER_AGENT_TOKEN
 
-Object as a result of parsing user-agent string with [@tinkoff/user-agent](../libs/user-agent.md). Parsing happens only on server-side and parsed info is reused on client-side.
+Object as a result of parsing user-agent headers or string with [@tinkoff/user-agent](../libs/user-agent.md). Parsing happens only on server-side and parsed info is reused on client-side. If header info is unavailable then takes user-agent and parse it with ua-parser-js lib.
+
+### Example of usage
+
+Here userAgent is used to determine the mobile device.
+
+```tsx
+import { provide, Scope, Module, createToken } from '@tramvai/core';
+import { ClientHintsModule, USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
+
+export const IS_MOBILE_BANNER = createToken<boolean>('IS_MOBILE_BANNER');
+
+@Module({
+  imports: [ClientHintsModule],
+  providers: [
+    provide({
+      provide: IS_MOBILE_BANNER,
+      deps: {
+        userAgent: USER_AGENT_TOKEN,
+      },
+      useFactory({ userAgent }) {
+        const deviceType = userAgent?.device?.type ?? 'desktop';
+
+        return (
+          {
+            mobile: true,
+            wearable: true,
+          }[deviceType] || false
+        );
+      },
+      scope: Scope.REQUEST,
+    }),
+  ],
+})
+export class BannerModule {}
+```
 
 ## Env variables
 

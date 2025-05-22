@@ -8,7 +8,10 @@ const rootDir = resolve(__dirname, '..', '__fixtures__', 'dedupe');
 jest.setTimeout(160000);
 
 const runStart = async (target: string) => {
-  const cliResult = await start({ target, rootDir });
+  const cliResult = await start({
+    target,
+    rootDir,
+  });
   const staticUrl = getStaticUrl(cliResult);
 
   const [platformJSContent, platformCssContent] = await Promise.all([

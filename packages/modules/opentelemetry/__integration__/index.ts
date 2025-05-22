@@ -1,6 +1,6 @@
 import { Scope, commandLineListTokens, createApp, createToken, provide } from '@tramvai/core';
-import { CommonModule } from '@tramvai/module-common';
-import { RenderModule } from '@tramvai/module-render';
+import { CommonModule, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/module-common';
+import { RenderModule, ResourceSlot, ResourceType } from '@tramvai/module-render';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE, ServerModule } from '@tramvai/module-server';
 import { modules } from '@tramvai/internal-test-utils/shared/common';
 import {
@@ -11,6 +11,9 @@ import {
 import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { createPapiMethod } from '@tramvai/papi';
 import { safeStringifyJSON } from '@tramvai/safe-strings';
+import { HTTP_CLIENT_FACTORY } from '@tramvai/tokens-http-client';
+import { MockerModule } from '@tramvai/module-mocker';
+import { RESOURCES_REGISTRY } from '@tramvai/tokens-render';
 
 const IN_MEMORY_SPAN_EXPORTER = createToken<InMemorySpanExporter>(
   'opentelemetry in-memory span exporter',
@@ -26,6 +29,7 @@ createApp({
     CommonModule,
     RenderModule.forRoot({ useStrictMode: true }),
     ServerModule,
+    MockerModule,
     ...modules,
   ],
   bundles: {
@@ -97,6 +101,43 @@ createApp({
       },
       deps: {
         exporter: IN_MEMORY_SPAN_EXPORTER,
+      },
+    }),
+    provide({
+      provide: 'MOCK_HTTP_CLIENT',
+      useFactory: ({ factory, envManager }) => {
+        return factory({
+          name: 'httpbin',
+          baseUrl: envManager.get('MOCK_API'),
+        });
+      },
+      deps: {
+        factory: HTTP_CLIENT_FACTORY,
+        envManager: ENV_MANAGER_TOKEN,
+      },
+    }),
+    provide({
+      provide: ENV_USED_TOKEN,
+      useValue: [{ key: 'MOCK_API' }],
+    }),
+    provide({
+      provide: commandLineListTokens.customerStart,
+      useFactory:
+        ({ httpClient, resourcesRegistry }) =>
+        async () => {
+          const { payload } = await httpClient.get('/json');
+
+          if (typeof window === 'undefined') {
+            resourcesRegistry.register({
+              slot: ResourceSlot.HEAD_META,
+              type: ResourceType.asIs,
+              payload: `<script id="server-mock-request">${JSON.stringify(payload)}</script>`,
+            });
+          }
+        },
+      deps: {
+        httpClient: 'MOCK_HTTP_CLIENT',
+        resourcesRegistry: RESOURCES_REGISTRY,
       },
     }),
   ],

@@ -38,13 +38,13 @@ beforeAll(async () => {
       },
       type: 'application',
       root: './',
-      webpack: {
-        devtool: 'eval',
-      },
       experiments: {
         transpilation: {
           loader: 'swc',
         },
+        // for threads "chdir" is used, cwd is changed and it breaks some integration tests,
+        // because current "tsconfig.json" is used, where @tramvai/core and @tramvai/react is mocked in "paths"
+        serverRunner: 'process',
       },
     },
   });

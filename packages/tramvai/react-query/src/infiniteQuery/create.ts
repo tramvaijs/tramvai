@@ -85,7 +85,7 @@ export const createInfiniteQuery = <
     [QUERY_PARAMETERS]: queryParameters,
     actionNamePostfix: createUniqueActionKeyForQuery(queryParameters),
     fork: (
-      options: UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+      options: Partial<UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>>
     ) => {
       return createInfiniteQuery({
         ...queryParameters,

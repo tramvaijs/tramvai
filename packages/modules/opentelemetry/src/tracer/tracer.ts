@@ -1,9 +1,9 @@
 /* eslint-disable prefer-destructuring */
 import isPromise from '@tinkoff/utils/is/promise';
-import type { Context, Span, SpanOptions, Tracer } from '@opentelemetry/api';
+import { Context, propagation, Span, SpanOptions, Tracer } from '@opentelemetry/api';
 import { trace, context, SpanStatusCode, ROOT_CONTEXT } from '@opentelemetry/api';
 import { isSilentError } from '@tinkoff/errors';
-import type { TraceParams, TramvaiTracer } from '../tokens';
+import { PropagationCarrier, TraceParams, TramvaiTracer } from '../tokens';
 
 function recordAndThrowError(span: Span, error: any, { skipError = () => false }: TraceParams) {
   span.recordException(error);
@@ -111,6 +111,20 @@ export class TramvaiTracerImpl implements TramvaiTracer {
         recordAndThrowError(span, error, params);
       }
     });
+  }
+
+  /**
+   * Propagate context from outgoing request
+   * @param carrier
+   *
+   * @see https://opentelemetry.io/docs/languages/js/propagation/#manual-context-propagation
+   */
+  propagateContext(carrier?: PropagationCarrier): PropagationCarrier {
+    const payload = carrier ?? {};
+
+    propagation.inject(context.active(), payload);
+
+    return payload;
   }
 }
 /* eslint-enable prefer-destructuring */

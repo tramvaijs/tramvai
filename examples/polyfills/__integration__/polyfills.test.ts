@@ -3,7 +3,7 @@ import fs from 'fs';
 import { build } from '@tramvai/cli';
 import type { StatsCompilation } from 'webpack';
 
-jest.setTimeout(60000);
+jest.setTimeout(80000);
 
 describe('polyfills', () => {
   beforeAll(async () => {

@@ -1,6 +1,6 @@
 import { UAParser } from 'ua-parser-js';
 import { isSameSiteNoneCompatible } from './isSameSiteNoneCompatible';
-import { parseClientHintsUserAgentData } from './client-hints';
+import { parseClientHintsUserAgentData } from '../../../client-hints/parse-client-hints-user-agent-data/parseClientHintsUserAgentData';
 
 describe('isSameSiteNoneCompatible with user agent', () => {
   const negativeTestCases = {

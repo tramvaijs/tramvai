@@ -1,229 +1,5 @@
-import { parseClientHintsHeaders, parseClientHintsUserAgentData } from './client-hints';
-import { parseUserAgentHeader } from './userAgent';
-
-describe('low entropy headers only', () => {
-  it('desktop chrome', () => {
-    expect(
-      parseClientHintsHeaders({
-        'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-      })
-    ).toMatchInlineSnapshot(`
-      {
-        "browser": {
-          "browserEngine": "chrome",
-          "major": "106",
-          "name": "chrome",
-          "version": "106",
-        },
-        "cpu": {
-          "architecture": undefined,
-        },
-        "device": {
-          "model": undefined,
-          "type": "desktop",
-          "vendor": undefined,
-        },
-        "engine": {
-          "name": "Blink",
-          "version": "106",
-        },
-        "mobileOS": undefined,
-        "os": {
-          "name": "Windows",
-          "version": undefined,
-        },
-        "sameSiteNoneCompatible": true,
-      }
-    `);
-  });
-
-  it('mobile chrome', () => {
-    expect(
-      parseClientHintsHeaders({
-        'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
-        'sec-ch-ua-mobile': '?1',
-        'sec-ch-ua-platform': '"Android"',
-      })
-    ).toMatchInlineSnapshot(`
-      {
-        "browser": {
-          "browserEngine": "chrome",
-          "major": "106",
-          "name": "chrome",
-          "version": "106",
-        },
-        "cpu": {
-          "architecture": undefined,
-        },
-        "device": {
-          "model": undefined,
-          "type": "mobile",
-          "vendor": undefined,
-        },
-        "engine": {
-          "name": "Blink",
-          "version": "106",
-        },
-        "mobileOS": "android",
-        "os": {
-          "name": "Android",
-          "version": undefined,
-        },
-        "sameSiteNoneCompatible": true,
-      }
-    `);
-  });
-
-  it('desktop vivaldi', () => {
-    expect(
-      parseClientHintsHeaders({
-        'sec-ch-ua': '"Chromium";v="104", " Not A;Brand";v="99"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-      })
-    ).toMatchInlineSnapshot(`
-      {
-        "browser": {
-          "browserEngine": "chrome",
-          "major": undefined,
-          "name": "Blink",
-          "version": "104",
-        },
-        "cpu": {
-          "architecture": undefined,
-        },
-        "device": {
-          "model": undefined,
-          "type": "desktop",
-          "vendor": undefined,
-        },
-        "engine": {
-          "name": "Blink",
-          "version": "104",
-        },
-        "mobileOS": undefined,
-        "os": {
-          "name": "Windows",
-          "version": undefined,
-        },
-        "sameSiteNoneCompatible": true,
-      }
-    `);
-  });
-
-  it('mobile vivaldi', () => {
-    expect(
-      parseClientHintsHeaders({
-        'sec-ch-ua': '"Chromium";v="104", " Not A;Brand";v="99"',
-        'sec-ch-ua-mobile': '?1',
-        'sec-ch-ua-platform': '"Android"',
-      })
-    ).toMatchInlineSnapshot(`
-      {
-        "browser": {
-          "browserEngine": "chrome",
-          "major": undefined,
-          "name": "Blink",
-          "version": "104",
-        },
-        "cpu": {
-          "architecture": undefined,
-        },
-        "device": {
-          "model": undefined,
-          "type": "mobile",
-          "vendor": undefined,
-        },
-        "engine": {
-          "name": "Blink",
-          "version": "104",
-        },
-        "mobileOS": "android",
-        "os": {
-          "name": "Android",
-          "version": undefined,
-        },
-        "sameSiteNoneCompatible": true,
-      }
-    `);
-  });
-
-  it('desktop edge', () => {
-    expect(
-      parseClientHintsHeaders({
-        'sec-ch-ua': '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
-        'sec-ch-ua-mobile': '?0',
-        'sec-ch-ua-platform': '"Windows"',
-      })
-    ).toMatchInlineSnapshot(`
-      {
-        "browser": {
-          "browserEngine": "chrome",
-          "major": "105",
-          "name": "edge",
-          "version": "105",
-        },
-        "cpu": {
-          "architecture": undefined,
-        },
-        "device": {
-          "model": undefined,
-          "type": "desktop",
-          "vendor": undefined,
-        },
-        "engine": {
-          "name": "Blink",
-          "version": "105",
-        },
-        "mobileOS": undefined,
-        "os": {
-          "name": "Windows",
-          "version": undefined,
-        },
-        "sameSiteNoneCompatible": true,
-      }
-    `);
-  });
-
-  it('mobile edge', () => {
-    expect(
-      parseClientHintsHeaders({
-        'sec-ch-ua': '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
-        'sec-ch-ua-mobile': '?1',
-        'sec-ch-ua-platform': '"Android"',
-      })
-    ).toMatchInlineSnapshot(`
-      {
-        "browser": {
-          "browserEngine": "chrome",
-          "major": "105",
-          "name": "edge",
-          "version": "105",
-        },
-        "cpu": {
-          "architecture": undefined,
-        },
-        "device": {
-          "model": undefined,
-          "type": "mobile",
-          "vendor": undefined,
-        },
-        "engine": {
-          "name": "Blink",
-          "version": "105",
-        },
-        "mobileOS": "android",
-        "os": {
-          "name": "Android",
-          "version": undefined,
-        },
-        "sameSiteNoneCompatible": true,
-      }
-    `);
-  });
-});
+import { parseUserAgentHeader as parse } from '../../parse-user-agent-header/parseUserAgentHeader';
+import { parseClientHintsUserAgentData } from './parseClientHintsUserAgentData';
 
 describe('low entropy UADataValues only', () => {
   it('desktop chrome', () => {
@@ -700,7 +476,7 @@ describe('high entropy UADataValues only', () => {
 
 describe('difference between ua-string and ua-data', () => {
   it('should not have difference in Microsoft Edge (Windows)', () => {
-    const uaString = parseUserAgentHeader(
+    const uaString = parse(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0'
     );
     const uaData = parseClientHintsUserAgentData({
@@ -750,7 +526,7 @@ describe('difference between ua-string and ua-data', () => {
   });
 
   it('should not have difference in Chrome (macOS)', () => {
-    const uaString = parseUserAgentHeader(
+    const uaString = parse(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36'
     );
     const uaData = parseClientHintsUserAgentData({
@@ -803,7 +579,7 @@ describe('difference between ua-string and ua-data', () => {
   });
 
   it('should not have difference in Opera (macOS)', () => {
-    const uaString = parseUserAgentHeader(
+    const uaString = parse(
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 OPR/105.0.0.0 (Edition Yx 05)'
     );
     const uaData = parseClientHintsUserAgentData({

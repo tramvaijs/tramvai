@@ -1,4 +1,4 @@
-import { parseUserAgentHeader } from './userAgent';
+import { parseUserAgentHeader } from './parseUserAgentHeader';
 
 describe('modern browsers', () => {
   it('desktop chrome', () => {

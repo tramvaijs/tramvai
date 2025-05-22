@@ -2,7 +2,7 @@ import { provide } from '@tramvai/core';
 import { DEFAULT_HTTP_CLIENT_INTERCEPTORS } from '@tramvai/tokens-http-client';
 import { METRICS_SERVICES_REGISTRY_TOKEN } from '@tramvai/tokens-metrics';
 import type { Span } from '@opentelemetry/api';
-import { SpanKind, context, propagation } from '@opentelemetry/api';
+import { SpanKind } from '@opentelemetry/api';
 import {
   ATTR_HTTP_REQUEST_METHOD,
   ATTR_HTTP_RESPONSE_STATUS_CODE,
@@ -13,11 +13,6 @@ import {
   ATTR_URL_SCHEME,
 } from '@opentelemetry/semantic-conventions';
 import { OPENTELEMETRY_TRACER_TOKEN } from '../tokens';
-
-interface Carrier {
-  traceparent?: string;
-  tracestate?: string;
-}
 
 export const providers = [
   provide({
@@ -34,22 +29,22 @@ export const providers = [
         const serviceName = metricsServicesRegistry.getServiceName(url, request) ?? 'unknown';
         const method = request.method ?? 'GET';
 
-        // propagate context from outgoing request
-        // https://opentelemetry.io/docs/languages/js/propagation/#manual-context-propagation
-        const output: Carrier = {};
-        propagation.inject(context.active(), output);
+        const { traceparent, tracestate } = tracer.propagateContext();
 
-        if (output.traceparent) {
+        if (traceparent !== undefined) {
           if (!request.headers) {
             request.headers = {};
           }
-          request.headers.traceparent = output.traceparent;
+
+          request.headers.traceparent = traceparent;
         }
-        if (output.tracestate) {
+
+        if (tracestate !== undefined) {
           if (!request.headers) {
             request.headers = {};
           }
-          request.headers.tracestate = output.tracestate;
+
+          request.headers.tracestate = tracestate;
         }
 
         // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client

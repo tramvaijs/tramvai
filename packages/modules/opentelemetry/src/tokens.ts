@@ -11,6 +11,22 @@ export type TraceParams = {
   skipError?: (error: Error) => boolean;
 };
 
+export type PropagationCarrier = {
+  /**
+   * Traceparent context appropriate W3C format:
+   * `version-traceId-spanId-sampled`.
+   *
+   * version – There is only `00` version at the moment.
+   * sampled – Was trace sampled. We are sampling all the traces currently.
+   *
+   * @see https://www.w3.org/TR/trace-context/#version
+   * @see https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/plugins/web/opentelemetry-instrumentation-document-load#optional-send-a-trace-parent-from-your-server
+   */
+  traceparent?: string;
+
+  tracestate?: string;
+};
+
 /**
  * API inspired by:
  * - https://github.com/DataDog/dd-trace-js/blob/59e9a2a75f4256755b4e6c9951a0bdf8d39b4015/index.d.ts#L9
@@ -47,6 +63,8 @@ export interface TramvaiTracer {
   trace<T>(name: string, options: SpanOptions, fn: (span: Span) => T, params?: TraceParams): T;
 
   // wrap
+
+  propagateContext(carrier?: PropagationCarrier): PropagationCarrier;
 }
 
 export const OPENTELEMETRY_PROVIDER_TOKEN = createToken<BasicTracerProvider>(

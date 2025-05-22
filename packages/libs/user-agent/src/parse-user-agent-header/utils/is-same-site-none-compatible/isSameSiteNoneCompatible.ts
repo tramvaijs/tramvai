@@ -6,8 +6,13 @@ const splitUserAgentAttributeVersion = (attributeVersion = '-1.-1.-1') =>
   attributeVersion.split('.').map(Number);
 
 // https://www.chromium.org/updates/same-site/incompatible-clients
+/*
+  The SameSite mechanism=None for cookies allows you to send cookies in cross-domain requests, 
+  but there is an important point: some older browsers incorrectly handle this flag. 
+  They either ignore cookies with SameSite=None, or they discard such cookies altogether if they detect this flag.
+*/
 export const isSameSiteNoneCompatible = (userAgent: Omit<UAParser.IResult, 'ua'>) => {
-  // На случай неполных данных из ua-parser-js
+  // In case of incomplete data from ua-parser-js
   try {
     const browserName = processUserAgentAttributeName(userAgent.browser.name);
     const [browserMajor, browserMinor, browserBuild] = splitUserAgentAttributeVersion(

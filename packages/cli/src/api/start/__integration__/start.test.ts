@@ -157,6 +157,14 @@ describe('@tramvai/cli start command', () => {
           name: 'app',
           type: 'application',
           root,
+          experiments: {
+            // faster transpilation
+            transpilation: {
+              loader: 'swc',
+            },
+            // for threads "chdir" is used, cwd is changed and it can breaks some integration tests
+            serverRunner: 'process',
+          },
         },
       });
 

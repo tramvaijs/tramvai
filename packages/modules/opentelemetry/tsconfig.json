@@ -35,6 +35,9 @@
         },
         {
             "path": "../../tokens/router"
+        },
+        {
+            "path": "../../tokens/render"
         }
     ]
 }
