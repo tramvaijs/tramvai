@@ -17,6 +17,7 @@ const nodeArgs = paramsIndex > 0 ? args.slice(0, paramsIndex) : [];
 module.exports = function spawn(executePath) {
   const controller = new AbortController();
   const { signal } = controller;
+  let isAborted = false;
 
   const cliInstance = cpSpawn(
     'node',
@@ -31,10 +32,13 @@ module.exports = function spawn(executePath) {
 
   cliInstance.on('error', (err) => {
     if (err.code !== 'ABORT_ERR') {
-      console.error(err);
+      console.log(err);
       console.warn(`Process was exited with code "${err.code}"
 It's unexpected, please check available/used memory and cpu while running last command`);
       exit(1);
+    } else {
+      console.warn('Child process aborted!');
+      isAborted = true;
     }
   });
 
@@ -43,8 +47,10 @@ It's unexpected, please check available/used memory and cpu while running last c
       console.warn(`Process was exited with signal "${sig}"
 It's unexpected, please check available/used memory and cpu while running last command`);
       exit(1);
-    } else {
+    } else if (!isAborted) {
       exit(code);
+    } else {
+      isAborted = false;
     }
   });
 
