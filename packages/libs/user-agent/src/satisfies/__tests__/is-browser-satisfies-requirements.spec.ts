@@ -49,7 +49,6 @@ describe('user-agent/isBrowserSatisfiesRequirements', () => {
       testDatasets(['supported.txt'], true);
     });
 
-    // @todo - need to find any real Android 5 browser User-Agent
     describe('supported with force minimum unknown versions', () => {
       testDatasets(['supported_force.txt'], true, undefined, true);
     });
