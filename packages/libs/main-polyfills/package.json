@@ -17,11 +17,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "abort-controller": "^3.0.0",
     "core-js": "3.40.0",
-    "css-vars-ponyfill": "^2.3.2",
-    "intersection-observer": "^0.7.0",
-    "resize-observer-polyfill": "^1.5.1",
     "tslib": "^2.4.0"
   },
   "module": "lib/index.es.js",

@@ -114,22 +114,3 @@ import 'core-js/modules/web.url-search-params';
 
 import 'core-js/modules/web.url';
 import 'core-js/modules/web.url.to-json';
-
-import 'abort-controller/polyfill';
-
-import 'intersection-observer';
-
-// CSS variables
-
-import cssVars from 'css-vars-ponyfill';
-
-cssVars();
-
-// Web API
-
-if (typeof window !== 'undefined') {
-  // Polyfill doesn't add ResizeObserver to the window
-  if (!window.ResizeObserver) {
-    window.ResizeObserver = require('resize-observer-polyfill').default;
-  }
-}
