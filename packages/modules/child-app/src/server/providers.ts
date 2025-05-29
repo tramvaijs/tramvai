@@ -66,6 +66,7 @@ export const serverProviders: Provider[] = [
       createCache: CREATE_CACHE_TOKEN,
       cacheOptions: optional(CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN),
       envManager: ENV_MANAGER_TOKEN,
+      asyncLocalStorage: optional(ASYNC_LOCAL_STORAGE_TOKEN),
     },
   }),
   provide({

@@ -74,6 +74,44 @@ In addition, it is possible to set one of the following values for the `devtool`
 }
 ```
 
+## Known Issues
+
+### React Refresh Limitation: Only React Components Can Be Hot-Updated
+
+**Problem:**
+
+React Refresh only functions correctly for files that directly export React components. If the file exports even one non-component (e.g., an object or function), hot module replacement (HMR) may silently fail.
+
+If you want a deep dive into React Refresh and its logic, here’s an excellent [comment](https://github.com/facebook/react/issues/16604#issuecomment-528663101) from Dan Abramov explaining how it works.
+
+#### Example of non-working file
+
+```tsx
+// ❌ HMR won't work here
+const Cmp: PageComponent = () => {
+  return <div>Hello</div>;
+};
+
+export default createBundle({
+  name: 'base',
+  components: {
+    pageDefault: Cmp,
+  },
+});
+```
+
+#### How to fix problem
+
+Export the component separately to make it visible to React Refresh.
+
+```
+// ✅ HMR will now work
+export const Cmp: PageComponent = () => {
+  return <div>Hello</div>;
+};
+
+```
+
 ## How to
 
 ### Speed up development build

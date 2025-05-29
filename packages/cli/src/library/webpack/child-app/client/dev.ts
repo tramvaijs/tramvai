@@ -59,7 +59,7 @@ export const webpackClientConfig = ({
 
     extendEntry(config.entry(configManager.name), {
       import: [
-        'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr',
+        'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
       ],
     });
   }
