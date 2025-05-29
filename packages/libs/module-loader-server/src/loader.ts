@@ -127,6 +127,9 @@ export class ServerLoader {
 
   // eslint-disable-next-line class-methods-use-this
   protected getCacheKey(url: string, options?: LoadOptions) {
+    if (options?.debug) {
+      return `__DEBUG__${url}`;
+    }
     return url;
   }
 

@@ -47,4 +47,5 @@ export interface LoadOptions {
   type?: 'js' | 'json';
 
   silent?: boolean;
+  debug?: boolean;
 }

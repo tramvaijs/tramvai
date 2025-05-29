@@ -10,6 +10,7 @@ import type {
   LOGGER_TOKEN,
   Cache,
   ENV_MANAGER_TOKEN,
+  ASYNC_LOCAL_STORAGE_TOKEN,
 } from '@tramvai/tokens-common';
 import { Loader } from '../shared/loader';
 import type {
@@ -24,18 +25,19 @@ import type { ChildAppModuleWrapper } from '../shared/types/module';
 export class ServerLoader extends Loader {
   private readonly loader: LowLevelLoader;
   private readonly initializedMap = new WeakMap<ModuleFederationContainer, ChildAppModuleWrapper>();
-  private internalLoadCache: Cache; // used to clear cache for debug
   private log: ReturnType<typeof LOGGER_TOKEN>;
   constructor({
     logger,
     createCache,
     envManager,
     cacheOptions,
+    asyncLocalStorage,
   }: {
     logger: typeof LOGGER_TOKEN;
     createCache: typeof CREATE_CACHE_TOKEN;
     envManager: typeof ENV_MANAGER_TOKEN;
     cacheOptions: typeof CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN | null;
+    asyncLocalStorage: typeof ASYNC_LOCAL_STORAGE_TOKEN | null;
   }) {
     super();
     const cache = createCache('memory', {
@@ -52,11 +54,38 @@ export class ServerLoader extends Loader {
       max: 100,
       ...cacheOptions,
     });
+    let internalLoadCache = cache;
+    // Cache is not compatible with HMR (Hot Module Replacement) because after HMR and page reload,
+    // we get the page from the cache. To solve this, we use Async Local Storage to ensure the
+    // cache is only valid within the context of a single request.
+    if (process.env.NODE_ENV === 'development' && !!asyncLocalStorage) {
+      internalLoadCache = {
+        get(key: string) {
+          if (key?.startsWith('__DEBUG__')) {
+            const store = asyncLocalStorage.getStore() as { [key: string]: any } | undefined;
+            if (store) {
+              return store[key];
+            }
+          } else {
+            return cache.get(key);
+          }
+        },
+        set(key: string, module: any) {
+          if (key?.startsWith('__DEBUG__')) {
+            const store = asyncLocalStorage.getStore() as { [key: string]: any } | undefined;
+            if (store) {
+              store[key] = module;
+            }
+          } else {
+            cache.set(key, module);
+          }
+        },
+      } as Cache;
+    }
 
-    this.internalLoadCache = cache;
     this.log = logger('child-app:loader');
     this.loader = new LowLevelLoader({
-      cache,
+      cache: internalLoadCache,
       log: this.log,
       requestOptions: {
         circuitBreakerEnabled: isNil(envManager.get('HTTP_CLIENT_CIRCUIT_BREAKER_DISABLED')),
@@ -100,14 +129,6 @@ export class ServerLoader extends Loader {
     await Promise.all(promises);
 
     await this.init(config);
-
-    if (config.tag === 'debug') {
-      setTimeout(() => {
-        this.internalLoadCache.set(config.server.entry, null);
-        this.internalLoadCache.set(config.client.stats, null);
-        this.internalLoadCache.set(config.client.statsLoadable, null);
-      }, 10000);
-    }
 
     return this.get(config);
   }

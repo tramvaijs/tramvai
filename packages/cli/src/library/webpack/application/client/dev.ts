@@ -151,7 +151,7 @@ export const webpackClientConfig = ({
   if (hotRefresh?.enabled) {
     extendEntry(config.entry('platform'), {
       import: [
-        'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr',
+        'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
       ],
     });
 
