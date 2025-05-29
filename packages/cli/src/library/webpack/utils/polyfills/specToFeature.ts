@@ -103,8 +103,8 @@ export function getSpecToFeatureDict(): Record<string, string> {
 
     addGlobal(global);
 
-    const removeBaseMethodNames = (builtInName) =>
-      builtInName.replace('.constructor', '').replace('.to-string', '');
+    const removeBaseMethodNames = (name: string) =>
+      name.replace('.constructor', '').replace('.to-string', '');
 
     acc[removeBaseMethodNames(builtInName)] = `window.${builtInKey}`;
     acc[removeBaseMethodNames(builtInName).replace('es.', 'esnext.')] = `window.${builtInKey}`;

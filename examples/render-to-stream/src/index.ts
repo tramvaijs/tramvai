@@ -29,6 +29,9 @@ createApp({
     SeoModule,
     ServerModule,
     ErrorInterceptorModule,
+    ...(process.env.NODE_ENV === 'development'
+      ? [require('@tramvai/module-dev-tools').DevToolsModule]
+      : []),
   ],
   providers: [
     // регистрируем header, который будет использоваться для всех страниц по умолчанию

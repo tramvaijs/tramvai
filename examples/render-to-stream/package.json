@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@tramvai/cli": "0.0.0-stub",
+    "@tramvai/module-dev-tools": "0.0.0-stub",
     "@tramvai/test-integration": "0.0.0-stub",
     "@tramvai/test-integration-jest": "0.0.0-stub",
     "@types/jest": "^29.5.0",

@@ -17,6 +17,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@tinkoff/hook-runner": "0.0.0-stub",
     "@tinkoff/pubsub": "0.0.0-stub",
     "@tinkoff/router": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
@@ -24,7 +25,8 @@
     "@tramvai/module-common": "0.0.0-stub",
     "@tramvai/module-cookie": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",
-    "@tramvai/tokens-common": "0.0.0-stub"
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-core": "0.0.0-stub"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",

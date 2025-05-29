@@ -6,6 +6,7 @@ import { createAction, declareAction } from '@tramvai/core';
 import { throwRedirectFoundError } from '@tinkoff/errors';
 import { createContainer } from '@tinkoff/dippy';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import { Router } from '@tinkoff/router';
 import { ActionPageRunner } from './actionPageRunner.browser';
 import { ActionExecution } from './actionExecution';
@@ -17,6 +18,12 @@ const logger: any = (() => ({
   error: noop,
 })) as any as typeof LOGGER_TOKEN;
 
+const hookFactory = new TapableHooks();
+const hooks = {
+  startExecution: hookFactory.createSync<{}>('startActionExecution'),
+  endExecution: hookFactory.createSync<{}>('endActionExecution'),
+};
+
 describe('actionPageRunnerBrowser', () => {
   it('Базовое использование', async () => {
     const result: number[] = [];
@@ -24,6 +31,7 @@ describe('actionPageRunnerBrowser', () => {
     const executionContextManager = new ExecutionContextManager();
     const actionExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore
@@ -63,6 +71,7 @@ describe('actionPageRunnerBrowser', () => {
       const executionContextManager = new ExecutionContextManager();
       const instanceExecution = new ActionExecution({
         di: createContainer(),
+        hooks,
         store,
         actionConditionals: [],
         // @ts-ignore
@@ -100,6 +109,7 @@ describe('actionPageRunnerBrowser', () => {
       const executionContextManager = new ExecutionContextManager();
       const instanceExecution = new ActionExecution({
         di: createContainer(),
+        hooks,
         store,
         actionConditionals: [],
         // @ts-ignore
