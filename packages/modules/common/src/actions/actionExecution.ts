@@ -11,6 +11,7 @@ import type {
   EXECUTION_CONTEXT_MANAGER_TOKEN,
   ExecutionContext,
   DEFERRED_ACTIONS_MAP_TOKEN,
+  ACTION_EXECUTION_HOOKS_TOKEN,
 } from '@tramvai/tokens-common';
 import objectMap from '@tinkoff/utils/object/map';
 import type { TramvaiAction, TramvaiActionContext } from '@tramvai/types-actions-state-context';
@@ -44,6 +45,7 @@ export class ActionExecution implements Interface {
   private context: ExtractDependencyType<typeof CONTEXT_TOKEN>;
   private deferredActionsMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
   private store: ExtractDependencyType<typeof STORE_TOKEN>;
+  private hooks: ExtractDependencyType<typeof ACTION_EXECUTION_HOOKS_TOKEN>;
   private executionContextManager: ExtractDependencyType<typeof EXECUTION_CONTEXT_MANAGER_TOKEN>;
   private di: ExtractDependencyType<typeof DI_TOKEN>;
   private transformAction: TransformAction;
@@ -52,6 +54,7 @@ export class ActionExecution implements Interface {
     store,
     context,
     deferredActionsMap,
+    hooks,
     di,
     executionContextManager,
     actionConditionals,
@@ -60,6 +63,7 @@ export class ActionExecution implements Interface {
     actionConditionals: (ActionCondition | ActionCondition[])[] | null;
     store: ExtractDependencyType<typeof STORE_TOKEN>;
     context: ExtractDependencyType<typeof CONTEXT_TOKEN>;
+    hooks: ExtractDependencyType<typeof ACTION_EXECUTION_HOOKS_TOKEN>;
     deferredActionsMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
     di: ExtractDependencyType<typeof DI_TOKEN>;
     executionContextManager: ExtractDependencyType<typeof EXECUTION_CONTEXT_MANAGER_TOKEN>;
@@ -70,6 +74,7 @@ export class ActionExecution implements Interface {
     this.store = store;
     this.deferredActionsMap = deferredActionsMap;
     this.di = di;
+    this.hooks = hooks;
     this.executionContextManager = executionContextManager;
     this.execution = new Map();
     this.transformAction = transformAction || identity;
@@ -100,14 +105,33 @@ export class ActionExecution implements Interface {
       );
     }
 
+    const isDeferredAction = parameters.deferred;
+
+    this.hooks.startExecution.call({
+      action,
+      deferred: isDeferredAction,
+      context: executionContext,
+      start: Date.now(),
+    });
+
     const executionState = this.getExecutionState(parameters.name);
 
     if (!this.canExecuteAction(payload, parameters, executionState, type)) {
+      const conditionName = executionState.forbiddenBy ?? 'unknown';
+
+      this.hooks.endExecution.call({
+        action,
+        deferred: isDeferredAction,
+        context: executionContext,
+        forbidden: conditionName,
+        end: Date.now(),
+      });
+
       switch (parameters.conditionsFailResult) {
         case 'reject':
           return Promise.reject(
             new ConditionFailError({
-              conditionName: executionState.forbiddenBy ?? 'unknown',
+              conditionName,
               targetName: parameters.name,
             })
           );
@@ -115,8 +139,6 @@ export class ActionExecution implements Interface {
           return Promise.resolve();
       }
     }
-
-    const isDeferredAction = parameters.deferred;
 
     // will be created when spa run actions mode is "before"
     if (isDeferredAction && !this.deferredActionsMap.get(action.name)) {
@@ -142,6 +164,16 @@ export class ActionExecution implements Interface {
           parameters
         );
 
+        context.abortSignal.addEventListener('abort', () => {
+          this.hooks.endExecution.call({
+            action,
+            error: new Error('Action aborted'),
+            deferred: isDeferredAction,
+            context: executionContext,
+            end: Date.now(),
+          });
+        });
+
         return Promise.resolve()
           .then(() => {
             if (isTramvaiAction(action)) {
@@ -166,10 +198,25 @@ export class ActionExecution implements Interface {
           })
           .then((data) => {
             executionState.status = 'success';
+            this.hooks.endExecution.call({
+              action,
+              deferred: isDeferredAction,
+              context: executionContext,
+              end: Date.now(),
+            });
+
             return data;
           })
           .catch((err) => {
             executionState.status = 'failed';
+            this.hooks.endExecution.call({
+              action,
+              deferred: isDeferredAction,
+              context: executionContext,
+              error: err,
+              end: Date.now(),
+            });
+
             throw err;
           });
       }

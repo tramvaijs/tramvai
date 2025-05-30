@@ -5,7 +5,12 @@ import {
   ACTION_CONDITIONALS,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
+  ACTION_EXECUTION_HOOKS_TOKEN,
+  ActionStartHookData,
+  ActionEndHookData,
 } from '@tramvai/tokens-common';
+import { TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/tokens-core';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import {
   createConsumerContext,
   ActionExecution,
@@ -31,6 +36,8 @@ type Options = OptionsDi &
     di?: Container;
     useTramvaiActionsConditionals?: boolean;
   };
+
+const hookFactory = new TapableHooks();
 
 /**
  * Создаёт мок для consumerContext
@@ -60,6 +67,22 @@ export const createMockContext = ({
     useValue: store,
   });
 
+  di.register({
+    provide: TAPABLE_HOOK_FACTORY_TOKEN,
+    useClass: TapableHooks,
+  });
+
+  di.register({
+    provide: ACTION_EXECUTION_HOOKS_TOKEN,
+    useFactory: ({ hookFactory }) => ({
+      startExecution: hookFactory.createSync<ActionStartHookData>('startActionExecution'),
+      endExecution: hookFactory.createSync<ActionEndHookData>('endActionExecution'),
+    }),
+    deps: {
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
+    },
+  });
+
   if (!di.get({ token: ACTION_EXECUTION_TOKEN, optional: true })) {
     if (useTramvaiActionsConditionals) {
       di.register({
@@ -80,12 +103,14 @@ export const createMockContext = ({
 
     di.register({
       provide: ACTION_EXECUTION_TOKEN,
+      // @ts-ignore
       useClass: ActionExecution,
       deps: {
         actionConditionals: { token: ACTION_CONDITIONALS, optional: true },
         context: CONTEXT_TOKEN,
         store: STORE_TOKEN,
         di: DI_TOKEN,
+        hooks: ACTION_EXECUTION_HOOKS_TOKEN,
         transformAction: {
           token: 'actionTransformAction',
           optional: true,

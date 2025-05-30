@@ -1,6 +1,7 @@
 import type { TramvaiActionDefinition } from '@tramvai/core';
 import { createAction, declareAction, ACTION_PARAMETERS } from '@tramvai/core';
 import { createContainer } from '@tinkoff/dippy';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import { ActionExecution } from './actionExecution';
 import { alwaysCondition } from './conditions/always';
 import { ExecutionContextManager } from '../executionContext/executionContextManager';
@@ -15,6 +16,12 @@ const legacyActionNameFactory = (name: string, result: string[], conditions = {}
     name,
     conditions,
   });
+
+const hookFactory = new TapableHooks();
+const hooks = {
+  startExecution: hookFactory.createSync<{}>('startActionExecution'),
+  endExecution: hookFactory.createSync<{}>('endActionExecution'),
+};
 
 const actionNameFactory = (
   name: string,
@@ -35,6 +42,7 @@ describe('actionExecution in global page', () => {
 
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -93,6 +101,7 @@ describe('actionExecution in global page', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -157,6 +166,7 @@ describe('actionExecution in global page', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -225,6 +235,7 @@ describe('actionExecution in global page', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -282,6 +293,7 @@ describe('actionExecution in global page', () => {
         { provide: 'dep1', useValue: 'dep1 value' },
         { provide: 'dep2', useValue: 'dep2 value' },
       ]),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -340,6 +352,7 @@ describe('actionExecution in global page', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -405,6 +418,7 @@ describe('actionExecution in actions', () => {
     };
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -453,6 +467,7 @@ describe('actionExecution in actions', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -504,6 +519,7 @@ describe('action conditions', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -562,6 +578,7 @@ describe('action conditions', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: (reducer?: any) => {
           if (reducer) {
@@ -629,6 +646,7 @@ describe('cancelling actions', () => {
     const executionContextManager = new ExecutionContextManager();
     const instance = new ActionExecution({
       di: createContainer(),
+      hooks,
       store: {
         getState: () => {
           return {};

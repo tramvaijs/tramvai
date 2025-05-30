@@ -1,4 +1,12 @@
-import { Module, Scope, ACTIONS_LIST_TOKEN, DI_TOKEN, provide, optional } from '@tramvai/core';
+import {
+  Module,
+  Scope,
+  ACTIONS_LIST_TOKEN,
+  DI_TOKEN,
+  provide,
+  optional,
+  TAPABLE_HOOK_FACTORY_TOKEN,
+} from '@tramvai/core';
 import {
   LOGGER_TOKEN,
   CONTEXT_TOKEN,
@@ -12,6 +20,9 @@ import {
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
   LIMIT_ACTION_GLOBAL_TIME_RUN,
+  ACTION_EXECUTION_HOOKS_TOKEN,
+  ActionStartHookData,
+  ActionEndHookData,
 } from '@tramvai/tokens-common';
 import {
   SERVER_RESPONSE_STREAM,
@@ -43,7 +54,7 @@ export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser, dyna
       useValue: actionTramvaiReducer,
     }),
     provide({
-      // Регистер глобальных экшенов
+      // Регистр глобальных экшенов
       provide: ACTION_REGISTRY_TOKEN,
       scope: Scope.SINGLETON,
       useClass: ActionRegistry,
@@ -58,12 +69,23 @@ export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser, dyna
         context: CONTEXT_TOKEN,
         store: STORE_TOKEN,
         di: DI_TOKEN,
+        hooks: ACTION_EXECUTION_HOOKS_TOKEN,
         executionContextManager: EXECUTION_CONTEXT_MANAGER_TOKEN,
         transformAction: {
           token: 'actionTransformAction',
           optional: true,
         },
         deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
+      },
+    }),
+    provide({
+      provide: ACTION_EXECUTION_HOOKS_TOKEN,
+      useFactory: ({ hookFactory }) => ({
+        startExecution: hookFactory.createSync<ActionStartHookData>('startActionExecution'),
+        endExecution: hookFactory.createSync<ActionEndHookData>('endActionExecution'),
+      }),
+      deps: {
+        hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
       },
     }),
     provide({

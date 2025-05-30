@@ -2,6 +2,7 @@ import noop from '@tinkoff/utils/function/noop';
 import { createAction, declareAction } from '@tramvai/core';
 import { throwRedirectFoundError } from '@tinkoff/errors';
 import { createContainer } from '@tinkoff/dippy';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import { ActionExecution } from './actionExecution';
 import { ActionPageRunner } from './actionPageRunner';
 import { ExecutionContextManager } from '../executionContext/executionContextManager';
@@ -15,6 +16,12 @@ const logger: any = () => ({
 
 const delay = (time: number) => new Promise((resolve) => setTimeout(resolve, time));
 
+const hookFactory = new TapableHooks();
+const hooks = {
+  startExecution: hookFactory.createSync<{}>('startActionExecution'),
+  endExecution: hookFactory.createSync<{}>('endActionExecution'),
+};
+
 const exhaustPromiseQueue = async (times: number) => {
   for (let i = 0; i < times; i++) {
     await Promise.resolve();
@@ -27,6 +34,7 @@ describe('execution', () => {
     const executionContextManager = new ExecutionContextManager();
     const instanceExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore
@@ -83,6 +91,7 @@ describe('errors', () => {
     const executionContextManager = new ExecutionContextManager();
     const instanceExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore
@@ -132,6 +141,7 @@ describe('errors', () => {
     const executionContextManager = new ExecutionContextManager();
     const instanceExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore
@@ -173,6 +183,7 @@ describe('errors', () => {
     const executionContextManager = new ExecutionContextManager();
     const instanceExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore
@@ -227,6 +238,7 @@ describe('limits', () => {
     const executionContextManager = new ExecutionContextManager();
     const instanceExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore
@@ -294,6 +306,7 @@ describe('limits', () => {
     const executionContextManager = new ExecutionContextManager();
     const instanceExecution = new ActionExecution({
       di: createContainer(),
+      hooks,
       store,
       actionConditionals: [],
       // @ts-ignore

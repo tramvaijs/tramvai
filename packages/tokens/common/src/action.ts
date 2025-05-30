@@ -1,5 +1,5 @@
 import { createToken } from '@tinkoff/dippy';
-import type { Action } from '@tramvai/tokens-core';
+import { Action, type SyncTapableHookInstance } from '@tramvai/tokens-core';
 import type { TramvaiAction, PageAction } from '@tramvai/types-actions-state-context';
 import type { ExecutionContext } from './execution';
 
@@ -14,6 +14,31 @@ export const ACTION_REGISTRY_TOKEN = createToken<ActionsRegistry>('actionRegistr
  * Instance that executes actions
  */
 export const ACTION_EXECUTION_TOKEN = createToken<ActionExecution>('actionExecution');
+
+export interface ActionStartHookData {
+  action: Action | TramvaiAction<any, any, any>;
+  deferred?: boolean;
+  context: ExecutionContext | null;
+  start: number;
+}
+
+export interface ActionEndHookData {
+  action: Action | TramvaiAction<any, any, any>;
+  deferred?: boolean;
+  error?: Error & { originalMessage?: string };
+  context: ExecutionContext | null;
+  forbidden?: string;
+  end: number;
+}
+
+/**
+ * @description
+ * Hooks for action execution
+ */
+export const ACTION_EXECUTION_HOOKS_TOKEN = createToken<{
+  startExecution: SyncTapableHookInstance<ActionStartHookData>;
+  endExecution: SyncTapableHookInstance<ActionEndHookData>;
+}>('actionExecutionHooks');
 
 /**
  * @description

@@ -36,6 +36,12 @@
         },
         {
             "path": "../../../modules/cookie"
+        },
+        {
+            "path": "../../../libs/hooks"
+        },
+        {
+            "path": "../../../tokens/core"
         }
     ]
 }
