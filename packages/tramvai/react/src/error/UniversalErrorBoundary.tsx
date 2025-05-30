@@ -69,7 +69,7 @@ export class UniversalErrorBoundary extends Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.ReactNode {
     const { children, fallback: Fallback, fallbackFromDi } = this.props;
     const { url, error } = this.state;
 
