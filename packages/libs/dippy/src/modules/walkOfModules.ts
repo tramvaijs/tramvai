@@ -21,7 +21,7 @@ export const walkOfModules = (modules: Array<ModuleType | ExtendedModule>) => {
         if (modulesNameInitialized.has(moduleParameters.name)) {
           // eslint-disable-next-line no-console
           console.error(
-            `Module ${moduleParameters.id} has already been initialized. Most likely there are duplicate dependencies in the project:`,
+            `Module ${moduleParameters.id} has already been initialized. Please note that the duplicates are likely due to packages of different versions that contain the same module. Most likely there are duplicate dependencies in the project:`,
             module,
             moduleParameters
           );
