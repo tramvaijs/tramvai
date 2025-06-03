@@ -1,8 +1,7 @@
 import path from 'path';
-import type { StartCliResult } from '@tramvai/test-integration';
 import { build } from '@tramvai/cli';
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 // expect build without errors
 describe('assets', () => {

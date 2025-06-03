@@ -8,7 +8,7 @@
     "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
   },
   "scripts": {
-    "start:root": "cross-env MOCKER_ENABLED=true tramvai start root-app --resolveSymlinks=false",
+    "start:root": "npx cross-env MOCKER_ENABLED=true tramvai start root-app --resolveSymlinks=false",
     "start:children": "ts-node shared/serverResolver.ts"
   },
   "publishConfig": {

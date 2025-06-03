@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`assets runtime chunk snapshot 1`] = `
+"{
+  "assetsByChunkName": {
+    "platform": [
+      "platform.js"
+    ],
+    "runtime": [
+      "runtime.js"
+    ],
+    "@_routes_index": [
+      "@_routes_index.chunk.js"
+    ],
+    "react": [
+      "react.js"
+    ]
+  },
+  "namedChunkGroups": {
+    "platform": {
+      "name": "platform",
+      "chunks": [
+        "runtime",
+        "react",
+        "platform"
+      ],
+      "assets": [
+        {
+          "name": "runtime.js"
+        },
+        {
+          "name": "react.js"
+        },
+        {
+          "name": "platform.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0
+    },
+    "@_routes_index": {
+      "name": "@_routes_index",
+      "chunks": [
+        "@_routes_index"
+      ],
+      "assets": [
+        {
+          "name": "@_routes_index.chunk.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 2,
+      "auxiliaryAssetsSize": null
+    }
+  },
+  "entrypoints": {
+    "platform": {
+      "name": "platform",
+      "chunks": [
+        "runtime",
+        "react",
+        "platform"
+      ],
+      "assets": [
+        {
+          "name": "runtime.js"
+        },
+        {
+          "name": "react.js"
+        },
+        {
+          "name": "platform.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0
+    }
+  },
+  "chunks": [
+    {
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "names": [
+        "@_routes_index"
+      ],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "@_routes_index.chunk.js"
+      ],
+      "auxiliaryFiles": [
+        "bd514a4fdeae248aabd3844c43fa2cc1.svg",
+        "bf9fb7baf3f9985e84328ccf5eeef509.svg"
+      ],
+      "hash": "0",
+      "childrenByOrder": {},
+      "id": "@_routes_index"
+    },
+    {
+      "initial": true,
+      "entry": false,
+      "recorded": false,
+      "names": [
+        "platform"
+      ],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "platform.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "0",
+      "childrenByOrder": {},
+      "id": "platform"
+    },
+    {
+      "initial": true,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: reactCacheGroup) (name: react)",
+      "names": [
+        "react"
+      ],
+      "idHints": [
+        "reactCacheGroup"
+      ],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "react.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "0",
+      "childrenByOrder": {},
+      "id": "react"
+    },
+    {
+      "initial": true,
+      "entry": true,
+      "recorded": false,
+      "names": [
+        "runtime"
+      ],
+      "idHints": [],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "runtime.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "0",
+      "childrenByOrder": {},
+      "id": "runtime"
+    }
+  ]
+}"
+`;
