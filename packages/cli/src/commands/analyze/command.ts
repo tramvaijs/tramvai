@@ -1,10 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkApplication } from '../../validators/commands/checkBuild';
-import { checkConfigExists } from '../../validators/commands/checkConfigExists';
-import { checkPwaDependencies } from '../../validators/commands/checkPwaDependencies';
-import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigrationsAndCheckVersions';
-import { checkSwcDependencies } from '../../validators/commands/checkSwcDependencies';
-import { checkReactCompilerDependencies } from '../../validators/commands/checkReactCompilerDependencies';
 
 export type Params = {
   target: string;
@@ -46,14 +40,18 @@ class AnalyzeCommand extends CLICommand<Params> {
 
   alias = 'a';
 
-  validators = [
-    checkConfigExists,
-    checkApplication,
-    runMigrationsAndCheckVersions,
-    checkPwaDependencies,
-    checkSwcDependencies,
-    checkReactCompilerDependencies,
-  ];
+  validators() {
+    return [
+      require('../../validators/commands/checkConfigExists').checkConfigExists,
+      require('../../validators/commands/checkBuild').checkApplication,
+      require('../../validators/commands/runMigrationsAndCheckVersions')
+        .runMigrationsAndCheckVersions,
+      require('../../validators/commands/checkPwaDependencies').checkPwaDependencies,
+      require('../../validators/commands/checkSwcDependencies').checkSwcDependencies,
+      require('../../validators/commands/checkReactCompilerDependencies')
+        .checkReactCompilerDependencies,
+    ];
+  }
 
   action(parameters: Params) {
     // used require for lazy code execution

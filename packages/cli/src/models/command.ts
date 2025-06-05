@@ -23,8 +23,6 @@ type validator<TParams> = (
 ) => Promise<{ name: string; status: string; message?: string }>;
 
 export abstract class Command<TParams = any> {
-  readonly validators?: validator<TParams>[];
-
   abstract readonly name: string;
 
   abstract readonly description: string;
@@ -38,6 +36,8 @@ export abstract class Command<TParams = any> {
   abstract run(parameters: TParams): Promise<CommandResult>;
 
   help?(): string[];
+
+  validators?(): validator<TParams>[];
 
   protected abstract action(parameters: TParams): Promise<CommandResult>;
 
@@ -65,15 +65,7 @@ export abstract class CLICommand<
     });
 
     await this.validator(parameters);
-
-    const trackAfter = this.context.analytics.trackAfter({
-      name: this.name,
-      parameters: this.analyticEventLabel(parameters),
-      label: this.analyticCommandUsageLabel(parameters),
-      category: 'command',
-    });
-
-    return trackAfter(this.action(parameters));
+    return this.action(parameters);
   }
 
   protected async validator(parameters: TParams): Promise<void> {
@@ -81,7 +73,7 @@ export abstract class CLICommand<
       return;
     }
 
-    const result = await Promise.all(this.validators.map((fn) => fn(this.context, parameters)));
+    const result = await Promise.all(this.validators().map((fn) => fn(this.context, parameters)));
 
     result.forEach((item) => {
       if (item.message) {

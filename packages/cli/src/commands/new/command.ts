@@ -33,8 +33,6 @@ class NewCommand extends CLICommand<Params> {
 
   alias = 'n';
 
-  validators = [];
-
   action(parameters: Params) {
     // used require for lazy code execution
     return require('./new').default(this.context, parameters);

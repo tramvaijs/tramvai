@@ -1,5 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkPackage } from './checkPackageValidator';
 import type { Params } from './add';
 
 class AddCommand extends CLICommand {
@@ -23,7 +22,9 @@ class AddCommand extends CLICommand {
 
   alias = '';
 
-  validators = [checkPackage];
+  validators() {
+    return [require('./checkPackageValidator').checkPackage];
+  }
 
   async action(parameters: Params) {
     // used require for lazy code execution

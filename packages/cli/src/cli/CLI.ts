@@ -5,7 +5,6 @@ import type { Command, CommandMap, CommandResult } from '../models/command';
 import type { Logger } from '../models/logger';
 import type { Task, TaskMap } from '../models/task';
 import type { ConfigManager } from '../models/config';
-import type { Analytics } from '../models/analytics';
 
 export class CLI {
   context: Context;
@@ -47,7 +46,6 @@ export class CLI {
     tasksMap: TaskMap,
     logger: Logger,
     config: ConfigManager,
-    analytics: Analytics,
     cliRootDir: string,
     cliPackageManager: PackageManager,
     packageManager: PackageManager
@@ -55,7 +53,6 @@ export class CLI {
     this.context = new Context(
       config,
       logger,
-      analytics,
       cliRootDir,
       cliPackageManager,
       packageManager,

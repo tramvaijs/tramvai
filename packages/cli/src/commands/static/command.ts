@@ -1,6 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkApplication } from '../../validators/commands/checkBuild';
-import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigrationsAndCheckVersions';
 
 export type Params = {
   target: string;
@@ -67,7 +65,13 @@ export class StaticCommand extends CLICommand<Params> {
 
   alias = 'st';
 
-  validators = [checkApplication, runMigrationsAndCheckVersions];
+  validators() {
+    return [
+      require('../../validators/commands/checkBuild').checkApplication,
+      require('../../validators/commands/runMigrationsAndCheckVersions')
+        .runMigrationsAndCheckVersions,
+    ];
+  }
 
   action(parameters: Params) {
     // used require for lazy code execution

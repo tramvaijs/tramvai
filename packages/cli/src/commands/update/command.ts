@@ -1,5 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkVersion } from './checkVersionValidator';
 import type { Params } from './update';
 
 class UpdateCommand extends CLICommand {
@@ -14,7 +13,9 @@ class UpdateCommand extends CLICommand {
 
   alias = 'u';
 
-  validators = [checkVersion];
+  validators() {
+    return [require('./checkVersionValidator').checkVersion];
+  }
 
   async action(parameters: Params) {
     // used require for lazy code execution

@@ -1,8 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkApplication } from '../../validators/commands/checkBuild';
-import { checkConfigExists } from '../../validators/commands/checkConfigExists';
-import { checkDependencies } from '../../validators/commands/checkDependencies';
-import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigrationsAndCheckVersions';
 import type { Params as StartParams } from '../start/command';
 
 export type Params = StartParams & {
@@ -45,12 +41,15 @@ export class BenchmarkCommand extends CLICommand<Params> {
 
   alias = 'bench';
 
-  validators = [
-    checkConfigExists,
-    checkApplication,
-    runMigrationsAndCheckVersions,
-    checkDependencies,
-  ];
+  validators() {
+    return [
+      require('../../validators/commands/checkConfigExists').checkConfigExists,
+      require('../../validators/commands/checkBuild').checkApplication,
+      require('../../validators/commands/runMigrationsAndCheckVersions')
+        .runMigrationsAndCheckVersions,
+      require('../../validators/commands/checkDependencies').checkDependencies,
+    ];
+  }
 
   action(parameters) {
     // used require for lazy code execution

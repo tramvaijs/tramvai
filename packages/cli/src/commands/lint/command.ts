@@ -1,5 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkApplication } from '../../validators/commands/checkBuild';
 
 class LintCommand extends CLICommand {
   name = 'lint';
@@ -12,7 +11,9 @@ class LintCommand extends CLICommand {
 
   alias = 'l';
 
-  validators = [checkApplication];
+  validators() {
+    return [require('../../validators/commands/checkBuild').checkApplication];
+  }
 
   action() {
     return Promise.resolve({

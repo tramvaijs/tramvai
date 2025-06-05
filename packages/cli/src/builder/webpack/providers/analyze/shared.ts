@@ -10,10 +10,6 @@ import {
 } from '../../../../di/tokens';
 import { toWebpackConfig } from '../../../../library/webpack/utils/toWebpackConfig';
 import { npmRequire, npmRequireList } from '../../../../utils/npmRequire';
-import { BundleAnalyzePlugin } from '../../analyzePlugins/bundle';
-import { StatoscopeAnalyzePlugin } from '../../analyzePlugins/statoscope';
-import { WhyBundledAnalyzePlugin } from '../../analyzePlugins/whyBundled';
-import { RsdoctorAnalyzePlugin } from '../../analyzePlugins/rsdoctor';
 import {
   CLIENT_CONFIG_MANAGER_TOKEN,
   INIT_HANDLER_TOKEN,
@@ -31,18 +27,18 @@ interface Type<T> extends Function {
   new (...args: any[]): T;
 }
 
-const pluginMap: Record<string, Type<AnalyzePlugin>> = {
-  bundle: BundleAnalyzePlugin,
-  whybundled: WhyBundledAnalyzePlugin,
-  statoscope: StatoscopeAnalyzePlugin,
-  rsdoctor: RsdoctorAnalyzePlugin,
+const pluginMap: Record<string, () => Type<AnalyzePlugin>> = {
+  bundle: () => require('../../analyzePlugins/bundle').BundleAnalyzePlugin,
+  whybundled: () => require('../../analyzePlugins/whyBundled').WhyBundledAnalyzePlugin,
+  statoscope: () => require('../../analyzePlugins/statoscope').StatoscopeAnalyzePlugin,
+  rsdoctor: () => require('../../analyzePlugins/rsdoctor').RsdoctorAnalyzePlugin,
 };
 
 export const analyzeSharedProviders: Provider[] = [
   provide({
     provide: WEBPACK_ANALYZE_PLUGIN_TOKEN,
     useFactory: ({ pluginName }) => {
-      const PluginClass = pluginMap[pluginName];
+      const PluginClass = pluginMap[pluginName]();
 
       if (!PluginClass) {
         throw new Error('Set correct plugin option');

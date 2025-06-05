@@ -2,7 +2,6 @@ import exit from 'exit';
 
 import { fixYarnSettingsOverride } from '../utils/fixYarnSettingsOverride';
 import { handleErrors } from '../utils/handleErrors';
-import { enableCpuProfile } from '../utils/cpu-profile';
 
 // to use V8's code cache to speed up instantiation time
 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -12,6 +11,7 @@ handleErrors();
 fixYarnSettingsOverride();
 
 if (process.env.TRAMVAI_CPU_PROFILE) {
+  const { enableCpuProfile } = require('../utils/cpu-profile');
   enableCpuProfile('tramvai-cli');
 }
 

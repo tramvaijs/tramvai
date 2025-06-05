@@ -1,12 +1,5 @@
 import { CLICommand } from '../../models/command';
-import { checkApplication } from '../../validators/commands/checkBuild';
-import { checkConfigExists } from '../../validators/commands/checkConfigExists';
-import { checkDependencies } from '../../validators/commands/checkDependencies';
-import { runMigrationsAndCheckVersions } from '../../validators/commands/runMigrationsAndCheckVersions';
 import type { StartCommand as StartCommandType } from '../../api/start';
-import { checkPwaDependencies } from '../../validators/commands/checkPwaDependencies';
-import { checkSwcDependencies } from '../../validators/commands/checkSwcDependencies';
-import { checkReactCompilerDependencies } from '../../validators/commands/checkReactCompilerDependencies';
 
 export type Params = Parameters<StartCommandType>[0] & {
   target: string;
@@ -127,15 +120,19 @@ export class StartCommand extends CLICommand<Params> {
 
   alias = 's';
 
-  validators = [
-    checkConfigExists,
-    checkApplication,
-    runMigrationsAndCheckVersions,
-    checkDependencies,
-    checkPwaDependencies,
-    checkSwcDependencies,
-    checkReactCompilerDependencies,
-  ];
+  validators() {
+    return [
+      require('../../validators/commands/checkConfigExists').checkConfigExists,
+      require('../../validators/commands/checkBuild').checkApplication,
+      require('../../validators/commands/runMigrationsAndCheckVersions')
+        .runMigrationsAndCheckVersions,
+      require('../../validators/commands/checkDependencies').checkDependencies,
+      require('../../validators/commands/checkPwaDependencies').checkPwaDependencies,
+      require('../../validators/commands/checkSwcDependencies').checkSwcDependencies,
+      require('../../validators/commands/checkReactCompilerDependencies')
+        .checkReactCompilerDependencies,
+    ];
+  }
 
   action(parameters) {
     // used require for lazy code execution

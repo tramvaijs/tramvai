@@ -27,7 +27,6 @@ import {
   WEBPACK_DEBUG_STATS_OPTIONS,
   WEBPACK_DEBUG_STATS_FIELDS,
 } from '../../constants/stats';
-import { pwaBlock } from '../../blocks/pwa/client';
 import PolyfillConditionPlugin from '../../plugins/PolyfillCondition';
 import AssetsIntegritiesPlugin from '../../plugins/AssetsIntegritiesPlugin';
 import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
@@ -40,7 +39,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     fileSystemPages,
     env,
     integrity,
-    experiments: { runtimeChunk },
+    experiments: { runtimeChunk, pwa },
   } = configManager;
 
   const portal = path.resolve(configManager.rootDir, `packages/${process.env.APP_ID}/portal.js`);
@@ -69,10 +68,14 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .batch(css(configManager))
     .batch(nodeClient(configManager))
     .batch(postcssAssets(configManager))
-    .batch(pwaBlock(configManager))
     .when(fileSystemPages.enabled, (cfg) => cfg.batch(pagesResolve(configManager)));
 
   config.optimization.set('runtimeChunk', runtimeChunk);
+  // move require of pwa build part under if for performance
+  if (pwa.workbox?.enabled || pwa.webmanifest?.enabled) {
+    const { pwaBlock } = require('../../blocks/pwa/client');
+    config.batch(pwaBlock(configManager));
+  }
 
   config
     .entry('platform')

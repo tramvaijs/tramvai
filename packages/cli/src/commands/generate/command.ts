@@ -1,5 +1,4 @@
 import { CLICommand } from '../../models/command';
-import { checkConfigExists } from '../../validators/commands/checkConfigExists';
 
 export type GeneratorName = 'action' | 'reducer' | 'component' | 'page' | 'bundle' | 'module';
 export type Params = {
@@ -21,7 +20,9 @@ class GenerateCommand extends CLICommand<Params> {
 
   alias = 'g';
 
-  validators = [checkConfigExists];
+  validators() {
+    return [require('../../validators/commands/checkConfigExists').checkConfigExists];
+  }
 
   action(parameters: Params) {
     // used require for lazy code execution

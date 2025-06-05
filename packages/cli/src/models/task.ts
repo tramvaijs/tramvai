@@ -36,14 +36,8 @@ export abstract class Task {
     });
     const args = [...this.arguments, ...(parameters.arguments || [])];
     const options = { ...this.options, ...parameters.options };
-    const trackAfter = this.context.analytics.trackAfter({
-      name: this.name,
-      category: 'task',
-      parameters: args,
-      label: this.analyticTaskUsageLabel(args),
-    });
 
-    return trackAfter(this.execute(this.command, args, options))
+    return this.execute(this.command, args, options)
       .then((result) => ({
         status: 'ok',
         code: result.exitCode,

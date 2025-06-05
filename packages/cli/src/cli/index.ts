@@ -1,10 +1,8 @@
 import path from 'path';
 import { resolvePackageManager, NpmPackageManager } from '@tinkoff/package-manager-wrapper';
 import { CLI } from './CLI';
-import { Analytics } from '../models/analytics';
 import { Logger } from '../models/logger';
 import { ConfigManager } from '../models/config';
-import { initSentry } from '../utils/sentry';
 
 import type { CommandMap } from '../models/command';
 
@@ -53,14 +51,8 @@ const defaultPackageInfo = { name: 'init app', version: '0.0.1' };
 
 export async function cliInitialized(cliArgs = process.argv) {
   const logger = new Logger();
-  const sentry = initSentry();
 
   try {
-    const commandContext = {
-      command: cliArgs[2] || '',
-      argv: cliArgs,
-    };
-    sentry.setContext('command', commandContext);
     const commandsMap = await loadCommands();
     const tasksMap = await loadTasks();
 
@@ -69,12 +61,6 @@ export async function cliInitialized(cliArgs = process.argv) {
       version: string;
     }>('package.json');
     const { content: config } = getTramvaiConfig();
-
-    const analytic = new Analytics({
-      packageInfo,
-      trackingCode: 'UA-122261674-1',
-      enabled: process.env.TRAMVAI_ENABLE_ANALYTICS === 'true',
-    });
 
     const configManager = new ConfigManager({ config, syncConfigFile: syncJsonFile });
     const packageManager = resolvePackageManager({ rootDir: process.cwd() });
@@ -89,7 +75,6 @@ export async function cliInitialized(cliArgs = process.argv) {
       tasksMap,
       logger,
       configManager,
-      analytic,
       cliRootDir,
       cliPackageManager,
       packageManager
@@ -103,10 +88,7 @@ export async function cliInitialized(cliArgs = process.argv) {
       message: e.message || e,
       payload: e.details || e.stack,
     });
-    sentry.captureException(e);
 
     throw e;
-  } finally {
-    await sentry.close();
   }
 }

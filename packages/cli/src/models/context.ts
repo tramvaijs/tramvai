@@ -9,7 +9,6 @@ export class Context {
   constructor(
     public config: ConfigManager,
     public logger: Logger,
-    public analytics: Analytics,
     public cliRootDir: string,
     public cliPackageManager: PackageManager,
     public packageManager: PackageManager,

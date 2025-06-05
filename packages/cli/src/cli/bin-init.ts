@@ -1,9 +1,7 @@
 import resolve from 'resolve';
 import { clearExecArgv } from '../utils/clearExecArgv';
-import { initSentry } from '../utils/sentry';
 
 clearExecArgv();
-initSentry();
 
 resolve(
   '@tramvai/cli/lib/cli',
