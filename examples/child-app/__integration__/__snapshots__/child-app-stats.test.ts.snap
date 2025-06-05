@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`latest stats generation test stats should build stats.json 1`] = `
+"{
+  "name": "client",
+  "assetsByChunkName": {
+    "header": [
+      "header@0.0.0-stub.css",
+      "header_client@0.0.0-stub.js"
+    ]
+  },
+  "namedChunkGroups": {
+    "header": {
+      "name": "header",
+      "chunks": [
+        "header"
+      ],
+      "assets": [
+        {
+          "name": "header@0.0.0-stub.css"
+        },
+        {
+          "name": "header_client@0.0.0-stub.js"
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": null,
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {}
+    }
+  },
+  "generator": "loadable-components",
+  "chunks": [
+    {
+      "id": "header",
+      "files": [
+        "header@0.0.0-stub.css",
+        "header_client@0.0.0-stub.js"
+      ]
+    },
+    {
+      "id": "examples_child-app_child-apps_header_index_ts-examples_child-app_child-apps_header_logo_svg",
+      "files": [
+        "examples_child-app_child-apps_header_index_ts-examples_child-app_child-apps_header_logo_svg_client.chunk.js"
+      ]
+    },
+    {
+      "id": "libs_dippy_lib_di_js",
+      "files": [
+        "libs_dippy_lib_di_js_client.chunk.js"
+      ]
+    },
+    {
+      "id": "tramvai_core_lib_index_js",
+      "files": [
+        "tramvai_core_lib_index_js"
+      ]
+    },
+    {
+      "id": "tramvai_react_lib_react_js",
+      "files": [
+        "tramvai_react_lib_react_js"
+      ]
+    },
+    {
+      "id": "tramvai_react_lib_react_js",
+      "files": [
+        "tramvai_react_lib_react_js"
+      ]
+    },
+    {
+      "id": "tramvai_core_lib_index_js",
+      "files": [
+        "tramvai_core_lib_index_js"
+      ]
+    }
+  ]
+}"
+`;

@@ -31,6 +31,7 @@ import { pwaBlock } from '../../blocks/pwa/client';
 import PolyfillConditionPlugin from '../../plugins/PolyfillCondition';
 import AssetsIntegritiesPlugin from '../../plugins/AssetsIntegritiesPlugin';
 import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
+import { purifyStatsPluginFactory } from '../../plugins/PurifyStatsPlugin';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
   const {
@@ -134,9 +135,14 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
       .end()
       // Plugin for transform integrity-plugin result into single integrities field in stats.json
       .plugin('assets-integrity-plugin')
-      .use(AssetsIntegritiesPlugin, [{ filename: statsFileName }])
+      .use(AssetsIntegritiesPlugin, [{ fileName: statsFileName }])
       .end();
   }
+
+  config
+    .plugin('assets-purify-plugin')
+    .use(purifyStatsPluginFactory('application'), [{ fileName: statsFileName }])
+    .end();
 
   return config;
 };

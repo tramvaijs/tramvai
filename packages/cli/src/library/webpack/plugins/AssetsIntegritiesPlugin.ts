@@ -1,8 +1,8 @@
 const TARGET_PLUGIN_NAME = 'stats-writer-plugin';
 
-// Generate integrities field and remove assets field in stats.json file
+// Generate integrities field for stats.json
 export default class AssetsIntegritiesPlugin {
-  constructor(private options: { filename: string }) {
+  constructor(private options: { fileName: string }) {
     this.options = options;
   }
 
@@ -14,8 +14,8 @@ export default class AssetsIntegritiesPlugin {
           stage: compilation.constructor.PROCESS_ASSETS_STAGE_REPORT,
         },
         () => {
-          const { filename } = this.options;
-          const statsJSON = JSON.parse(compilation.assets[filename].source().toString());
+          const { fileName } = this.options;
+          const statsJSON = JSON.parse(compilation.assets[fileName].source().toString());
           const { assets } = statsJSON;
 
           statsJSON.integrities = assets.reduce((acc, item) => {
@@ -23,10 +23,8 @@ export default class AssetsIntegritiesPlugin {
             return acc;
           }, {});
 
-          delete statsJSON.assets;
-
           compilation.updateAsset(
-            filename,
+            fileName,
             new compiler.webpack.sources.RawSource(JSON.stringify(statsJSON))
           );
         }
