@@ -4,7 +4,6 @@ import { DI_TOKEN, Scope, optional } from '@tinkoff/dippy';
 import { commandLineListTokens, provide } from '@tramvai/core';
 import {
   ASYNC_LOCAL_STORAGE_TOKEN,
-  CREATE_CACHE_TOKEN,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
   LOGGER_TOKEN,
@@ -21,7 +20,7 @@ import {
 } from '@tramvai/tokens-render';
 import {
   CHILD_APP_CONTRACT_MANAGER,
-  CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN,
+  CHILD_APP_LOADER_CACHE_TOKEN,
   CHILD_APP_RENDER_MANAGER_TOKEN,
   CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   CHILD_APP_STATE_MANAGER_TOKEN,
@@ -44,8 +43,10 @@ import { RenderManager } from './render';
 import { registerChildAppRenderSlots } from './render-slots';
 import { GLOBAL_CHILD_STATE } from '../shared/constants';
 import { ChildAppContractManager } from '../contracts/contractManager.server';
+import { cache } from './cache/cache';
 
 export const serverProviders: Provider[] = [
+  ...cache,
   provide({
     provide: ENV_USED_TOKEN,
     multi: true,
@@ -57,16 +58,15 @@ export const serverProviders: Provider[] = [
       },
     ],
   }),
+
   provide({
     provide: CHILD_APP_LOADER_TOKEN,
     useClass: ServerLoader,
     scope: Scope.SINGLETON,
     deps: {
       logger: LOGGER_TOKEN,
-      createCache: CREATE_CACHE_TOKEN,
-      cacheOptions: optional(CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN),
+      cache: CHILD_APP_LOADER_CACHE_TOKEN,
       envManager: ENV_MANAGER_TOKEN,
-      asyncLocalStorage: optional(ASYNC_LOCAL_STORAGE_TOKEN),
     },
   }),
   provide({

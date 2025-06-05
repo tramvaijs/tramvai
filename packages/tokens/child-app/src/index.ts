@@ -3,7 +3,7 @@ import type { Container } from '@tinkoff/dippy';
 import { Scope, createToken } from '@tinkoff/dippy';
 import type { Route } from '@tinkoff/router';
 import type { Command, PageAction } from '@tramvai/core';
-import type { ActionsRegistry, INITIAL_APP_STATE_TOKEN } from '@tramvai/tokens-common';
+import type { ActionsRegistry, INITIAL_APP_STATE_TOKEN, Cache } from '@tramvai/tokens-common';
 import type { LazyComponentWrapper } from '@tramvai/react';
 import type { StoreClass } from '@tramvai/state';
 import type { ChunkExtractor } from '@loadable/server';
@@ -205,11 +205,26 @@ export const CHILD_APP_LOADER_TOKEN = createToken<ChildAppLoader>('child-app loa
 
 /**
  * @public
+ * @description Provides a token for Child App Loader
+ */
+export const CHILD_APP_LOADER_CACHE_TOKEN = createToken<Cache>('child-app loader cache');
+
+/**
+ * @public
+ * @description Provides Child Apps server loader LRU cache cleanup config
+ */
+export const CHILD_APP_LOADER_CACHE_CLEANUP_CONFIG_TOKEN = createToken<{
+  cleanupIntervalMs?: number;
+}>('child-app loader cache cleanup config');
+
+/**
+ * @public
  * @description Provides Child Apps server loader LRU cache options
  */
-export const CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN = createToken<{ max?: number; ttl?: number }>(
-  'child-app loader cache options'
-);
+export const CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN = createToken<{
+  max?: number;
+  ttl?: number;
+}>('child-app loader cache options');
 
 /**
  * @private
