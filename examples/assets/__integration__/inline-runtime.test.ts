@@ -25,9 +25,6 @@ describe('assets', () => {
   it('runtime chunk snapshot', async () => {
     const { browser, getPageWrapper } = await initPlaywright(app.serverUrl);
     const { page } = await getPageWrapper(app.serverUrl);
-
-    fs.writeFileSync('./response.html', await page.content());
-
     const webpackRuntimeScriptContent = await page.$eval(
       '#webpack-runtime',
       (node) => (node as HTMLElement).innerHTML

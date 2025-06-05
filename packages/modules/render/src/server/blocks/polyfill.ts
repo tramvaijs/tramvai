@@ -51,7 +51,8 @@ export const polyfillResources = async ({
   } catch (e) {
     con = true;
   }
-  if (con) { document.write('<script${
+  if (con) { window.TRAMVAI_POLLYFILL_LOADED = true;
+  document.write('<script${
     renderMode === 'streaming' ? '' : ' defer="defer"'
   } charset="utf-8" data-critical="true" crossorigin="anonymous" src="${href}"><\\/script>')}
 })()`,

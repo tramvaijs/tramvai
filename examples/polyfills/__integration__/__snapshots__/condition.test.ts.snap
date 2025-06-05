@@ -8,6 +8,7 @@ exports[`polyfill condition polyfill condition exists in html 1`] = `
   } catch (e) {
     con = true;
   }
-  if (con) { document.write('<script defer="defer" charset="utf-8" data-critical="true" crossorigin="anonymous" src="http://localhost:4000/dist/client/polyfill.js"><\\/script>')}
+  if (con) { window.TRAMVAI_POLLYFILL_LOADED = true;
+  document.write('<script defer="defer" charset="utf-8" data-critical="true" crossorigin="anonymous" src="http://localhost:4000/dist/client/polyfill.js"><\\/script>')}
 })()"
 `;

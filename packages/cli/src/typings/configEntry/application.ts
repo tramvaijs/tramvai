@@ -110,6 +110,13 @@ export interface ApplicationExperiments extends Experiments {
    * @default false
    */
   reactTransitions?: boolean;
+
+  /**
+   * @title Webpack Runtime Chunk settings
+   * @see https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
+   * @default false
+   */
+  runtimeChunk?: 'single' | 'multiple' | boolean;
 }
 
 export interface ApplicationConfigEntry extends CliConfigEntry {

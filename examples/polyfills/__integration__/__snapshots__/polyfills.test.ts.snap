@@ -24,8 +24,12 @@ exports[`polyfills modern list of polyfills: modern 1`] = `
     "../../node_modules/core-js/modules/web.url-search-params.size.js",
     "../../node_modules/core-js/modules/web.url.can-parse.js",
     "../../node_modules/core-js/modules/web.url.parse.js",
+    "webpack/runtime/compat get default export",
+    "webpack/runtime/define property getters",
+    "webpack/runtime/global",
+    "webpack/runtime/hasOwnProperty shorthand",
   ],
-  "polyfillsCount": 21,
+  "polyfillsCount": 25,
 }
 `;
 
@@ -43,7 +47,8 @@ exports[`polyfills stable list of polyfills: default 1`] = `
     "../../node_modules/core-js/modules/es.reflect.to-string-tag.js",
     "../../node_modules/core-js/modules/es.string.at-alternative.js",
     "../../node_modules/core-js/modules/es.string.replace-all.js",
+    "webpack/runtime/global",
   ],
-  "polyfillsCount": 11,
+  "polyfillsCount": 12,
 }
 `;

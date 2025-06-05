@@ -69,7 +69,6 @@ test.describe('packages/modules/pwa', () => {
           `\${STATIC_URL}/dist/client/@_routes_scope_index.chunk.js`,
           `\${STATIC_URL}/dist/client/platform.js`,
           `\${STATIC_URL}/dist/client/react.js`,
-          `\${STATIC_URL}/dist/client/runtime.js`,
           `\${STATIC_URL}/dist/client/tramvai-workbox-window.chunk.js`,
         ]);
     });

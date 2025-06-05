@@ -184,18 +184,6 @@ exports[`enmasse test react-app platform build react-app 1`] = `
     "type": "file",
   },
   {
-    "extension": ".js",
-    "name": "runtime.js",
-    "path": "dist/client/runtime.js",
-    "type": "file",
-  },
-  {
-    "extension": ".map",
-    "name": "runtime.js.map",
-    "path": "dist/client/runtime.js.map",
-    "type": "file",
-  },
-  {
     "extension": ".json",
     "name": "stats",
     "path": "dist/client/stats",

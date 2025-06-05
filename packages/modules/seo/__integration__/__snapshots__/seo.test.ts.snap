@@ -27,12 +27,7 @@ exports[`seo ssr test common meta 1`] = `
     
 
     
-    <script defer="defer"
-      charset="utf-8"
-      crossorigin="anonymous"
-      data-critical="true"
-      src="\${STATIC_URL}/dist/client/runtime.js"
-    ></script>
+
     
 
     
@@ -97,12 +92,7 @@ exports[`seo ssr test default meta pack 1`] = `
     
 
     
-    <script defer="defer"
-      charset="utf-8"
-      crossorigin="anonymous"
-      data-critical="true"
-      src="\${STATIC_URL}/dist/client/runtime.js"
-    ></script>
+
     
 
     
@@ -274,12 +264,7 @@ exports[`seo ssr test og meta 1`] = `
     
 
     
-    <script defer="defer"
-      charset="utf-8"
-      crossorigin="anonymous"
-      data-critical="true"
-      src="\${STATIC_URL}/dist/client/runtime.js"
-    ></script>
+
     
 
     
@@ -348,12 +333,7 @@ exports[`seo ssr test twitter meta 1`] = `
     
 
     
-    <script defer="defer"
-      charset="utf-8"
-      crossorigin="anonymous"
-      data-critical="true"
-      src="\${STATIC_URL}/dist/client/runtime.js"
-    ></script>
+
     
 
     

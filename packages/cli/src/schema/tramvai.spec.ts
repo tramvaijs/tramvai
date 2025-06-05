@@ -102,6 +102,7 @@ describe('JSON schema для tramvai.json', () => {
               },
               "reactCompiler": false,
               "reactTransitions": false,
+              "runtimeChunk": false,
               "serverRunner": "thread",
               "transpilation": {
                 "loader": "babel",
