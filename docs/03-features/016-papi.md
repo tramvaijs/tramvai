@@ -253,7 +253,32 @@ export const papi = createPapiMethod({
 
 For the example above with adding a route, the resulting url will look like this: `/${appInfo.appName}/papi/test` where appName is the name passed to `createApp`
 
-To make a request, you need to use `PAPI_SERVICE` from the module `@tramvai/module-http-client`, which automatically on the client will make an http request to papi and on the server will simply call the handler function
+To make a request, you need to use `PAPI_SERVICE` from the module `@tramvai/module-http-client`, which automatically on the client will make an http request to papi and on the server will simply call the handler function:
+
+```tsx
+import { commandLineListTokens, provide } from '@tramvai/core';
+import { PAPI_SERVICE } from '@tramvai/module-http-client';
+
+createApp({
+  providers: [
+    provide({
+      provide: commandLineListTokens.init,
+      useFactory: ({ papiService }) => {
+        return async function fetchApplicationRoutes() {
+          // this will work both on server and client sides
+          // use papi handler path and method as papiService request parameters
+          const { payload: routes } = await papiService.get<string[]>('bundleInfo');
+
+          console.log('application routes:', routes);
+        };
+      },
+      deps: {
+        papiService: PAPI_SERVICE,
+      },
+    }),
+  ],
+});
+```
 
 ### How can I get data from DI in papi routes?
 

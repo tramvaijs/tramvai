@@ -785,6 +785,16 @@
               "default": false,
               "type": "boolean"
             },
+            "runtimeChunk": {
+              "title": "Webpack Runtime Chunk settings",
+              "default": false,
+              "enum": [
+                false,
+                "multiple",
+                "single",
+                true
+              ]
+            },
             "webpack": {
               "title": "experiments configuration for [webpack](https://webpack.js.org/configuration/experiments/)",
               "default": {},
@@ -1278,23 +1288,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6886": {
+                        "__@match@6887": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6888": {
+                        "__@replace@6889": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6891": {
+                        "__@search@6892": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6893": {
+                        "__@split@6894": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6895": {
+                        "__@matchAll@6896": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2072,23 +2082,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6886": {
+                        "__@match@6887": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6888": {
+                        "__@replace@6889": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6891": {
+                        "__@search@6892": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6893": {
+                        "__@split@6894": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6895": {
+                        "__@matchAll@6896": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2866,23 +2876,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6886": {
+                        "__@match@6887": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6888": {
+                        "__@replace@6889": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6891": {
+                        "__@search@6892": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6893": {
+                        "__@split@6894": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6895": {
+                        "__@matchAll@6896": {
                           "type": "object",
                           "additionalProperties": false
                         }

@@ -73,6 +73,7 @@ it('should populate defaults for config', () => {
             },
             "reactCompiler": false,
             "reactTransitions": false,
+            "runtimeChunk": false,
             "serverRunner": "thread",
             "transpilation": {
               "loader": "babel",
@@ -321,6 +322,7 @@ it('should populate defaults for overridable options', () => {
             },
             "reactCompiler": false,
             "reactTransitions": false,
+            "runtimeChunk": false,
             "serverRunner": "thread",
             "transpilation": {
               "loader": {

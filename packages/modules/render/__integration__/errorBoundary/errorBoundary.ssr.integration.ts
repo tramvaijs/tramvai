@@ -2,10 +2,6 @@ import { expect } from '@playwright/test';
 import { ssrTest } from './test-fixture';
 import { SSRDocumentContentMocks } from './mocks/ssrDocumentContent';
 
-function getSnapshotName(test: typeof ssrTest) {
-  return [`something`];
-}
-
 ssrTest.describe('errorBoundary SSR', () => {
   ssrTest.describe('Success page render', () => {
     ssrTest('HTTP status', async ({ app }) => {

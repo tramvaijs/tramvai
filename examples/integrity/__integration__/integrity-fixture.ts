@@ -30,6 +30,9 @@ export const test = base.extend<AppFixtures, WorkerFixture>({
         fileSystemPages: {
           enabled: true,
         },
+        experiments: {
+          runtimeChunk: 'single',
+        },
       },
     },
     { scope: 'worker', auto: true },

@@ -52,6 +52,7 @@ export const DocsRating = ({ label }) => {
                   <textarea
                     className="textArea"
                     name="reply"
+                    // eslint-disable-next-line jsx-a11y/no-autofocus
                     autoFocus
                     placeholder="How can this page be improved?"
                     rows={5}

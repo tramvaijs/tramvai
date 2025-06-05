@@ -18,6 +18,9 @@
       "sourceMap": {
         "development": false,
         "production": true
+      },
+      "experiments": {
+        "runtimeChunk": "single"
       }
     }
   }

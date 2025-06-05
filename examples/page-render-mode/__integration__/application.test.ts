@@ -33,7 +33,6 @@ describe('page-render-mode', () => {
 
     expect(getScripts(app, renderResult.parsed)).toMatchInlineSnapshot(`
       [
-        "\${STATIC_URL}/dist/client/runtime.js",
         "\${STATIC_URL}/dist/client/@_routes_index.chunk.js",
         "\${STATIC_URL}/dist/client/react.js",
         "\${STATIC_URL}/dist/client/hmr.js",
@@ -66,7 +65,6 @@ describe('page-render-mode', () => {
 
     expect(getScripts(app, renderResult.parsed)).toMatchInlineSnapshot(`
       [
-        "\${STATIC_URL}/dist/client/runtime.js",
         "\${STATIC_URL}/dist/client/@_routes_second_index.chunk.js",
         "\${STATIC_URL}/dist/client/react.js",
         "\${STATIC_URL}/dist/client/hmr.js",

@@ -24,6 +24,7 @@
         "production": true
       },
       "experiments": {
+        "runtimeChunk": "single",
         "transpilation": {
           "loader": "swc"
         }

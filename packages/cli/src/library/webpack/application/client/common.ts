@@ -34,7 +34,14 @@ import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
 import { purifyStatsPluginFactory } from '../../plugins/PurifyStatsPlugin';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
-  const { polyfill, modernPolyfill, fileSystemPages, env, integrity } = configManager;
+  const {
+    polyfill,
+    modernPolyfill,
+    fileSystemPages,
+    env,
+    integrity,
+    experiments: { runtimeChunk },
+  } = configManager;
 
   const portal = path.resolve(configManager.rootDir, `packages/${process.env.APP_ID}/portal.js`);
   const polyfillPath = path.resolve(configManager.rootDir, polyfill ?? 'src/polyfill');
@@ -65,7 +72,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .batch(pwaBlock(configManager))
     .when(fileSystemPages.enabled, (cfg) => cfg.batch(pagesResolve(configManager)));
 
-  config.optimization.set('runtimeChunk', 'single');
+  config.optimization.set('runtimeChunk', runtimeChunk);
 
   config
     .entry('platform')

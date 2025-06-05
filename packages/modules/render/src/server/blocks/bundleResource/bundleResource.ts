@@ -85,32 +85,34 @@ export const bundleResource = async ({
   }
 
   const { scripts: webpackRuntimeScript } = flushFiles(['runtime'], webpackStats);
-  // Webpack runtime is always single chunk
+  // If webpack runtime is presented is always single chunk
   const webpackRuntimeScriptName = webpackRuntimeScript[0];
 
-  if (inlineWebpackRuntime) {
-    const webpackRuntime = await fetchWebpackRuntime(genHref(webpackRuntimeScriptName));
+  if (webpackRuntimeScriptName) {
+    if (inlineWebpackRuntime) {
+      const webpackRuntime = await fetchWebpackRuntime(genHref(webpackRuntimeScriptName));
 
-    result.push({
-      type: ResourceType.inlineScript,
-      slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
-      payload: webpackRuntime,
-      attrs: {
-        id: 'webpack-runtime',
-      },
-    });
-  } else {
-    result.push({
-      type: ResourceType.script,
-      slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
-      payload: genHref(webpackRuntimeScriptName),
-      attrs: {
-        'data-critical': 'true',
-        ...(integrities[webpackRuntimeScriptName]
-          ? { integrity: integrities[webpackRuntimeScriptName] }
-          : {}),
-      },
-    });
+      result.push({
+        type: ResourceType.inlineScript,
+        slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
+        payload: webpackRuntime,
+        attrs: {
+          id: 'webpack-runtime',
+        },
+      });
+    } else {
+      result.push({
+        type: ResourceType.script,
+        slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
+        payload: genHref(webpackRuntimeScriptName),
+        attrs: {
+          'data-critical': 'true',
+          ...(integrities[webpackRuntimeScriptName]
+            ? { integrity: integrities[webpackRuntimeScriptName] }
+            : {}),
+        },
+      });
+    }
   }
 
   // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible

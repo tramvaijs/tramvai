@@ -15,7 +15,7 @@ test.describe('ASSETS_PREFIX', () => {
 
     await page.goto(`http://localhost:${appServer.port}/`, { waitUntil: 'networkidle' });
 
-    test.expect(assets.length).toBe(5);
+    test.expect(assets.length).toBe(4);
   });
 
   test('custom ASSETS_PREFIX', async ({ page, appServer, proxyApp }) => {
@@ -34,6 +34,6 @@ test.describe('ASSETS_PREFIX', () => {
       waitUntil: 'networkidle',
     });
 
-    test.expect(assets.length).toBe(5);
+    test.expect(assets.length).toBe(4);
   });
 });

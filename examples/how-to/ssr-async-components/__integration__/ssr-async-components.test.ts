@@ -42,12 +42,7 @@ describe('ssr-async-components', () => {
           
 
           
-          <script defer="defer"
-            charset="utf-8"
-            crossorigin="anonymous"
-            data-critical="true"
-            src="\${STATIC_URL}/dist/client/runtime.js"
-          ></script>
+
           
 
           
