@@ -21,6 +21,8 @@ export {
   beforeResolveHooksToken,
   beforeUpdateCurrentHooksToken,
   afterUpdateCurrentHooksToken,
+  routerBundleInfoAdditionalToken,
+  routeTransformToken,
 } from './modules/tokens';
 
 declare module '@tinkoff/router' {
