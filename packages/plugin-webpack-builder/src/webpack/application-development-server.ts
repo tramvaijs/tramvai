@@ -49,10 +49,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     },
   });
 
-  const virtualModulesPlugin = new VirtualModulesPlugin({
-    'virtual:tramvai/config': `const appConfig = ${JSON.stringify(config.dehydrate())};
+  const virtualTramvaiConfig = `const appConfig = ${JSON.stringify(config.dehydrate())};
 export { appConfig };
-export default appConfig;`,
+export default appConfig;`;
+
+  const virtualModulesPlugin = new VirtualModulesPlugin({
+    'virtual:tramvai/config': virtualTramvaiConfig,
+    // backward compatibility for old @tramvai/cli config mechanism
+    '/node_modules/virtual:tramvai/config.js': virtualTramvaiConfig,
     // 'node_modules/@tramvai/api/lib/virtual/file-system-pages.js': '',
     // // for integration tests in tramvai repository, resolved symlink path
     // './packages/api/lib/virtual/file-system-pages.js': '',
