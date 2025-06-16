@@ -14,6 +14,8 @@ import { requireFunc } from './requireFunc';
 let appConfig: typeof AppConfig;
 
 try {
+  // appConfig = require('virtual:tramvai/config').appConfig;
+  // eslint-disable-next-line import/extensions, import/no-unresolved
   appConfig = require('@tramvai/cli/lib/external/config').appConfig;
 } catch (e) {
   if (process.env.NODE_ENV === 'development') {

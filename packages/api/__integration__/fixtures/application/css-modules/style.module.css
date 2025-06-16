@@ -1,0 +1,13 @@
+@value unit: 8px;
+
+.header {
+  color: red;
+}
+
+a {
+  user-select: none;
+}
+
+.my-component {
+  padding: unit;
+}

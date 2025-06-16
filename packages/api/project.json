@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/api",
+  "root": "packages/api",
+  "sourceRoot": "packages/api/src",
+  "projectType": "library",
+  "targets": {}
+}

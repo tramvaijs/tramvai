@@ -46,6 +46,7 @@ export default (configManager: ConfigManager) => (config: Config) => {
       'appointmentContext',
       path.resolve(rootDir, 'apps/accounts/packages/appointment/dependencies')
     )
+    .set('@tramvai/api/virtual/file-system-pages', '@tramvai/cli/lib/external/pages')
     .end()
     .modules.add('node_modules')
     .add(path.resolve(__dirname, '..', '..', '..', '..', 'node_modules'))

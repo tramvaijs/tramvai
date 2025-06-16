@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/plugin-webpack-builder",
+  "root": "packages/plugin-webpack-builder",
+  "sourceRoot": "packages/plugin-webpack-builder/src",
+  "projectType": "library",
+  "targets": {}
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/plugin-babel-transpiler",
+  "root": "packages/plugin-babel-transpiler",
+  "sourceRoot": "packages/plugin-babel-transpiler/src",
+  "projectType": "library",
+  "targets": {}
+}

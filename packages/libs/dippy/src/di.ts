@@ -36,3 +36,4 @@ export { walkOfModules, INVALID_MODULE_ERROR } from './modules/walkOfModules';
 export { isExtendedModule } from './modules/isExtendedModule';
 export { ModuleType, ExtendedModule, ModuleParameters } from './modules/module.h';
 export { declareModule } from './modules/declareModule';
+export { isValidModule } from './modules/isValidModule';

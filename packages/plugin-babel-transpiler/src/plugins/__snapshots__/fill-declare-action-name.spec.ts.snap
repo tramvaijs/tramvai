@@ -1,0 +1,264 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fill-declare-action-name import: do nothing: import: do nothing 1`] = `
+
+import { declareAction } from '@tramvai/core';
+
+const action = declareAction({
+  name: 'action',
+  fn: () => {
+    console.log('action');
+  },
+});
+
+const secondAction = declareAction({
+  name: 'secondAction',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+export default declareAction({
+  name: 'anonymousAction',
+  fn: () => {
+    console.log('anonymous action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { declareAction } from '@tramvai/core';
+const action = declareAction({
+  name: 'action',
+  fn: () => {
+    console.log('action');
+  },
+});
+const secondAction = declareAction({
+  name: 'secondAction',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+export default declareAction({
+  name: 'anonymousAction',
+  fn: () => {
+    console.log('anonymous action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+
+`;
+
+exports[`fill-declare-action-name import: fill absent name: import: fill absent name 1`] = `
+
+import { declareAction } from '@tramvai/core';
+
+const action = declareAction({
+  name: 'action',
+  fn: () => {
+    console.log('action');
+  },
+});
+
+const secondAction = declareAction({
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { declareAction } from '@tramvai/core';
+const action = declareAction({
+  name: 'action',
+  fn: () => {
+    console.log('action');
+  },
+});
+const secondAction = declareAction({
+  name: 'secondAction__-686ypu',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+
+`;
+
+exports[`fill-declare-action-name import: fill all actions: import: fill all actions 1`] = `
+
+import { declareAction } from '@tramvai/core';
+
+const action = declareAction({
+  fn: () => {
+    console.log('action');
+  },
+});
+
+const secondAction = declareAction({
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+export default declareAction({
+  fn: () => {
+    console.log('anonymous action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+import { declareAction } from '@tramvai/core';
+const action = declareAction({
+  name: 'action__-1vwsoc',
+  fn: () => {
+    console.log('action');
+  },
+});
+const secondAction = declareAction({
+  name: 'secondAction__-1vsyqf',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+export default declareAction({
+  name: 'import-without-name.ts__ciqoha',
+  fn: () => {
+    console.log('anonymous action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+
+`;
+
+exports[`fill-declare-action-name require: do nothing: require: do nothing 1`] = `
+
+// @ts-ignore
+const { declareAction } = require('@tramvai/core');
+
+// @ts-ignore
+const action = declareAction({
+  name: 'action',
+  fn: () => {
+    console.log('action');
+  },
+});
+
+// @ts-ignore
+const secondAction = declareAction({
+  name: 'secondAction',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-ignore
+const { declareAction } = require('@tramvai/core');
+
+// @ts-ignore
+const action = declareAction({
+  name: 'action',
+  fn: () => {
+    console.log('action');
+  },
+});
+
+// @ts-ignore
+const secondAction = declareAction({
+  name: 'secondAction',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+
+`;
+
+exports[`fill-declare-action-name require: fill all actions: require: fill all actions 1`] = `
+
+// @ts-ignore
+const { declareAction } = require('@tramvai/core');
+
+// @ts-ignore
+const action = declareAction({
+  fn: () => {
+    console.log('action');
+  },
+});
+
+// @ts-ignore
+const secondAction = declareAction({
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+      ↓ ↓ ↓ ↓ ↓ ↓
+
+// @ts-ignore
+const { declareAction } = require('@tramvai/core');
+
+// @ts-ignore
+const action = declareAction({
+  name: 'action__qfz4ju',
+  fn: () => {
+    console.log('action');
+  },
+});
+
+// @ts-ignore
+const secondAction = declareAction({
+  name: 'secondAction__-wofu95',
+  fn: () => {
+    console.log('second action');
+  },
+  conditions: {
+    onlyBrowser: true,
+  },
+});
+
+
+`;

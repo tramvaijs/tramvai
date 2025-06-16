@@ -1,0 +1,35 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "cli-rewrited": {
+      "name": "cli-rewrited",
+      "root": "src",
+      "type": "application",
+      "modern": true,
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "splitChunks": {
+        "mode": "granularChunks"
+      },
+      "postcss": {
+        "config": "src/postcss",
+        "cssLocalIdentName": {}
+      },
+      "hotRefresh": {
+        "enabled": true
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "reactCompiler": false,
+        "transpilation": {
+          "loader": "babel"
+        }
+      }
+    }
+  }
+}

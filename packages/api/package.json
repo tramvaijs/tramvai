@@ -1,0 +1,31 @@
+{
+  "name": "@tramvai/api",
+  "version": "0.0.0-stub",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "dependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.3",
+    "chalk": "^4.1.2",
+    "chrome-trace-event": "^1.0.4",
+    "cosmiconfig": "^9.0.0",
+    "cosmiconfig-typescript-loader": "^6.1.0",
+    "detect-port": "^1.5.1",
+    "find-cache-dir": "^3.3.2",
+    "fs-extra": "^9.1.0",
+    "proper-lockfile": "^4.1.2",
+    "resolve": "^1.22.4",
+    "semver": "^7.3.7"
+  },
+  "devDependencies": {
+    "@types/detect-port": "^1.3.5",
+    "@types/find-cache-dir": "^3.2.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/proper-lockfile": "^4.1.4",
+    "@types/resolve": "^1.20.2",
+    "@types/semver": "^7.3.12"
+  },
+  "optionalDependencies": {
+    "react": "*"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "cli-rewrited",
+  "sourceRoot": "examples/cli-rewrited/src",
+  "projectType": "app",
+  "targets": {}
+}
