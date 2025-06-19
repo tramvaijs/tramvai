@@ -2,7 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import webpack from 'webpack';
 import { FileSystemPagesOptions } from '@tramvai/api/lib/config';
-import { resolveAbsolutePathForEntry } from '../shared/path';
+import { resolveAbsolutePathForFile } from '@tramvai/api/lib/utils/path';
 
 export const LAYOUT_FILENAME = '_layout.tsx';
 export const ERROR_BOUNDARY_FILENAME = '_error.tsx';
@@ -68,8 +68,8 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
       isRoutes?: boolean;
       test: RegExp;
     }) => {
-      const pagesDir = resolveAbsolutePathForEntry({
-        entry: pagesRootDirectory,
+      const pagesDir = resolveAbsolutePathForFile({
+        file: pagesRootDirectory,
         sourceDir,
         rootDir,
       });

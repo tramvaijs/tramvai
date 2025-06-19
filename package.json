@@ -27,9 +27,11 @@
   },
   "workspaces": [
     "packages/cli",
+    "packages/api",
     "packages/swc",
-    "packages/!(cli|swc)/*",
-    "packages/!(cli|swc)/*/*",
+    "packages/plugin-*",
+    "packages/!(cli|api|swc)/*",
+    "packages/!(cli|api|swc)/*/*",
     "tools/!(docSite|nx-plugin)",
     "tools/monorepo/*",
     "examples/**"

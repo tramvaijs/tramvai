@@ -6,6 +6,10 @@ import VirtualModulesPlugin from 'webpack-virtual-modules';
 import WebpackBar from 'webpackbar';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import { optional } from '@tinkoff/dippy';
+import {
+  resolveAbsolutePathForFile,
+  resolveAbsolutePathForFolder,
+} from '@tramvai/api/lib/utils/path';
 import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
 import { resolvePublicPathDirectory } from './utils/publicPath';
 import {
@@ -14,7 +18,6 @@ import {
   resolveWebpackTranspilerParameters,
 } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
-import { resolveAbsolutePathForEntry, resolveAbsolutePathForOutput } from './shared/path';
 import { configToEnv } from './shared/config-to-env';
 import { WEBPACK_DEBUG_STATS_OPTIONS } from './shared/stats';
 import { DEVTOOL_OPTIONS_TOKEN } from './shared/sourcemaps';
@@ -66,6 +69,9 @@ export default appConfig;`;
     warmupThreadLoader(workerPoolConfig);
   }
 
+  const isRootErrorBoundaryEnabled =
+    typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
+
   // TODO: test cacheUnaffected, lazyCompilation
 
   return {
@@ -73,15 +79,15 @@ export default appConfig;`;
     // context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?
-      server: resolveAbsolutePathForEntry({
-        entry: config.entryFile,
+      server: resolveAbsolutePathForFile({
+        file: config.entryFile,
         sourceDir: config.sourceDir,
         rootDir: config.rootDir,
       }),
       // server: './src/index.ts',
     },
     output: {
-      path: resolveAbsolutePathForOutput({ output: config.outputServer, rootDir: config.rootDir }),
+      path: resolveAbsolutePathForFolder({ folder: config.outputServer, rootDir: config.rootDir }),
       publicPath: resolvePublicPathDirectory(config.outputServer),
       filename: 'server.js',
       libraryTarget: 'commonjs2',
@@ -97,6 +103,9 @@ export default appConfig;`;
         '@tramvai/cli/lib/external/pages': '@tramvai/api/lib/virtual/file-system-pages',
         // backward compatibility for old @tramvai/cli config mechanism
         '@tramvai/cli/lib/external/config': 'virtual:tramvai/config',
+        ...(isRootErrorBoundaryEnabled
+          ? { '@/__private__/error': config.fileSystemPages!.rootErrorBoundaryPath }
+          : {}),
       },
     },
     watchOptions: config.noServerRebuild

@@ -1,8 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import { createToken } from '@tinkoff/dippy';
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import type { TramvaiPlugin } from '../core/plugin';
+import { resolveAbsolutePathForFile } from '../utils/path';
 
 export type PostcssOptions = {
   /**
@@ -356,13 +359,20 @@ export class ConfigService {
     }
     const fileSystemPages = this.#project!.fileSystemPages ?? ({} as FileSystemPagesOptions);
 
+    const rootErrorBoundaryPath = resolveAbsolutePathForFile({
+      rootDir: this.rootDir,
+      sourceDir: this.sourceDir,
+      file: fileSystemPages.rootErrorBoundaryPath ?? 'error.tsx',
+    });
+
     return {
       enabled: fileSystemPages.enabled ?? false,
       routesDir: fileSystemPages.routesDir ?? 'routes',
       pagesDir: fileSystemPages.pagesDir ?? 'pages',
       componentsPattern: fileSystemPages.componentsPattern ?? undefined,
-      // TODO: check is rootErrorBoundaryPath exists
-      rootErrorBoundaryPath: fileSystemPages.rootErrorBoundaryPath ?? 'error.tsx',
+      rootErrorBoundaryPath: fs.existsSync(rootErrorBoundaryPath)
+        ? rootErrorBoundaryPath
+        : undefined,
     };
   }
 

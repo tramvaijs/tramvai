@@ -101,6 +101,15 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         reactTransitions: true,
       },
     },
+    'app-root-error-boundary': {
+      name: 'app-root-error-boundary',
+      type: 'application',
+      sourceDir: path.join(fixturesFolder, 'application', 'root-error-boundary'),
+      entryFile: 'index.ts',
+      fileSystemPages: {
+        rootErrorBoundaryPath: 'error.tsx',
+      },
+    },
   };
 
   jest.setTimeout(10000);
@@ -313,6 +322,29 @@ export default bar;`,
           // todo close in afterEach
           await devServer.close();
         });
+
+        it('root-error-boundary: should generate root error boundary', async () => {
+          const devServer = await start(
+            {
+              name: 'app-root-error-boundary',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+              noRebuild: true,
+            },
+            { plugins, projects }
+          );
+
+          await devServer.buildPromise;
+
+          const serverJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+          ).text();
+
+          expect(serverJs).toContain('Root Error Boundary');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
       });
 
       describe('browser', () => {
@@ -448,6 +480,30 @@ export default bar;`,
 
           expect(platformJs).toContain('isBrowser ${true}');
           expect(platformJs).toContain('isServer ${false}');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('root-error-boundary: should create new entry point with hydration logic', async () => {
+          const devServer = await start(
+            {
+              name: 'app-root-error-boundary',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            { plugins, projects }
+          );
+
+          await devServer.buildPromise;
+
+          const rootErrorBoundaryJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/rootErrorBoundary.js`)
+          ).text();
+
+          expect(rootErrorBoundaryJs).toContain('virtual/root-error-boundary.js');
+          expect(rootErrorBoundaryJs).toContain('hydrateRoot');
 
           // todo close in afterEach
           await devServer.close();

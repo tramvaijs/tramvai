@@ -8,6 +8,10 @@ import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
 import { optional } from '@tinkoff/dippy';
 import {
+  resolveAbsolutePathForFile,
+  resolveAbsolutePathForFolder,
+} from '@tramvai/api/lib/utils/path';
+import {
   WEBPACK_DEBUG_STATS_OPTIONS,
   WEBPACK_DEBUG_STATS_FIELDS,
   DEV_STATS_OPTIONS,
@@ -22,7 +26,6 @@ import {
 } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
 import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
-import { resolveAbsolutePathForEntry, resolveAbsolutePathForOutput } from './shared/path';
 import { configToEnv } from './shared/config-to-env';
 import { DEVTOOL_OPTIONS_TOKEN } from './shared/sourcemaps';
 import { WebpackConfigurationFactory } from './webpack-config';
@@ -66,6 +69,10 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     warmupThreadLoader(workerPoolConfig);
   }
 
+  const isRootErrorBoundaryEnabled =
+    typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
+  const virtualRootErrorBoundary = require.resolve('@tramvai/api/lib/virtual/root-error-boundary');
+
   // TODO: test cacheUnaffected, lazyCompilation
 
   return {
@@ -74,16 +81,17 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     // context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?
-      platform: resolveAbsolutePathForEntry({
-        entry: config.entryFile,
+      platform: resolveAbsolutePathForFile({
+        file: config.entryFile,
         sourceDir: config.sourceDir,
         rootDir: config.rootDir,
       }),
       // platform: './src/index.ts',
+      ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
     },
     output: {
-      path: resolveAbsolutePathForOutput({
-        output: config.outputClient,
+      path: resolveAbsolutePathForFolder({
+        folder: config.outputClient,
         rootDir: config.rootDir,
       }),
       publicPath: `${resolveUrl({
@@ -151,6 +159,18 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             extensions,
           },
         },
+        ...(isRootErrorBoundaryEnabled
+          ? [
+              {
+                test: new RegExp(virtualRootErrorBoundary),
+                loader: path.resolve(__dirname, './loaders/root-error-boundary'),
+                enforce: 'pre' as const,
+                options: {
+                  path: config.fileSystemPages!.rootErrorBoundaryPath,
+                },
+              },
+            ]
+          : []),
       ],
     },
     plugins: [
