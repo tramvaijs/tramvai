@@ -59,11 +59,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     },
   });
 
-  const virtualModulesPlugin = new VirtualModulesPlugin({
-    // 'node_modules/@tramvai/api/lib/virtual/file-system-pages.js': '',
-    // // for integration tests in tramvai repository, resolved symlink path
-    // './packages/api/lib/virtual/file-system-pages.js': '',
-  });
+  const virtualModulesPlugin = new VirtualModulesPlugin({});
 
   if (transpiler.warmupThreadLoader) {
     warmupThreadLoader(workerPoolConfig);
@@ -198,6 +194,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
         'process.env.NODE_ENV': JSON.stringify('development'),
+        // https://github.com/node-formidable/formidable/issues/295
+        'global.GENTLY': false,
         'process.env.APP_ID': JSON.stringify(config.projectName || 'tramvai'),
         'process.env.APP_VERSION': process.env.APP_VERSION
           ? JSON.stringify(process.env.APP_VERSION)

@@ -110,6 +110,12 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         rootErrorBoundaryPath: 'error.tsx',
       },
     },
+    'app-browserslist': {
+      name: 'app-browserslist',
+      type: 'application',
+      sourceDir: path.join(fixturesFolder, 'application', 'browserslist'),
+      entryFile: 'index.ts',
+    },
   };
 
   jest.setTimeout(10000);
@@ -188,6 +194,31 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           expect(serverJs).toContain('dist/server');
           expect(serverJs).toContain('dist/client');
           expect(serverJs).toContain('dist/static');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('virtual-modules: "virtual:tramvai/browserslist" import should work', async () => {
+          const devServer = await start(
+            {
+              name: 'app-browserslist',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+              noRebuild: true,
+            },
+            { plugins, projects }
+          );
+
+          await devServer.buildPromise;
+
+          const serverJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+          ).text();
+
+          expect(serverJs).toContain('last 2 years');
+          expect(serverJs).toContain('> 1%');
+          expect(serverJs).toContain('not dead');
 
           // todo close in afterEach
           await devServer.close();

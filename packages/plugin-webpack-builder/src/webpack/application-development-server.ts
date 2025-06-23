@@ -26,6 +26,7 @@ import { DEFINE_PLUGIN_OPTIONS_TOKEN } from './shared/define';
 import { WATCH_OPTIONS_TOKEN } from './shared/watch-options';
 import { createStylesConfiguration } from './shared/styles';
 import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
+import { normalizeBrowserslistConfig } from './shared/browserslist';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -56,13 +57,15 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 export { appConfig };
 export default appConfig;`;
 
+  const browserslistConfig = JSON.stringify(normalizeBrowserslistConfig(config));
+
   const virtualModulesPlugin = new VirtualModulesPlugin({
     'virtual:tramvai/config': virtualTramvaiConfig,
-    // backward compatibility for old @tramvai/cli config mechanism
+    // alias from @tramvai/cli/lib/external/config will be resolved to this request
     '/node_modules/virtual:tramvai/config.js': virtualTramvaiConfig,
-    // 'node_modules/@tramvai/api/lib/virtual/file-system-pages.js': '',
-    // // for integration tests in tramvai repository, resolved symlink path
-    // './packages/api/lib/virtual/file-system-pages.js': '',
+    'virtual:tramvai/browserslist': `export default ${browserslistConfig}`,
+    // alias from @tramvai/cli/lib/external/browserslist-normalized-file-config will be resolved to this request
+    '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
   });
 
   if (transpiler.warmupThreadLoader) {
@@ -90,12 +93,15 @@ export default appConfig;`;
       path: resolveAbsolutePathForFolder({ folder: config.outputServer, rootDir: config.rootDir }),
       publicPath: resolvePublicPathDirectory(config.outputServer),
       filename: 'server.js',
-      libraryTarget: 'commonjs2',
+      library: {
+        type: 'commonjs2',
+      },
     },
     mode: 'development',
     devtool,
     resolve: {
-      extensions,
+      // support for https://nodejs.org/api/addons.html
+      extensions: [...extensions, '.node'],
       mainFields: ['module', 'main'],
       symlinks: config.resolveSymlinks,
       alias: {
@@ -106,6 +112,9 @@ export default appConfig;`;
         ...(isRootErrorBoundaryEnabled
           ? { '@/__private__/error': config.fileSystemPages!.rootErrorBoundaryPath }
           : {}),
+        // backward compatibility for old @tramvai/cli normalized browserslist mechanism
+        '@tramvai/cli/lib/external/browserslist-normalized-file-config':
+          'virtual:tramvai/browserslist',
       },
     },
     watchOptions: config.noServerRebuild
@@ -174,6 +183,8 @@ export default appConfig;`;
         'process.env.BROWSER': false,
         'process.env.SERVER': true,
         'process.env.NODE_ENV': JSON.stringify('development'),
+        // https://github.com/node-formidable/formidable/issues/295
+        'global.GENTLY': false,
         'process.env.APP_ID': JSON.stringify(config.projectName || 'tramvai'),
         'process.env.APP_VERSION': process.env.APP_VERSION
           ? JSON.stringify(process.env.APP_VERSION)
