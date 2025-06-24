@@ -53,7 +53,7 @@ export const babelConfigFactory = ({
 }: Partial<TranspilerConfig>) => {
   const cfg = envConfig[env] || {};
 
-  const babelConfig = {
+  const babelConfig: Record<string, any> = {
     // по умолчанию sourceType: 'module' и тогда бабель рассматривает все файлы как es-модули, что может
     // вызвать проблемы в некоторых случаях когда бабель обрабатывает уже скомпиленный в commonjs файл
     // как модуль добавляя в него es-импорты и вводя этим вебпак в ступор на счет типа файла
@@ -138,6 +138,12 @@ export const babelConfigFactory = ({
       .concat(cfg.plugins || [])
       .filter(Boolean),
   };
+
+  if (typeof browsersListTargets !== 'undefined') {
+    // to prevent from reading browserslist config for every processed module (sometimes it is not cached in browserslist),
+    // don't know why, but target from preset-env plugin options is ignored from this process
+    babelConfig.targets = browsersListTargets;
+  }
 
   const loaderConfig = loader
     ? {
