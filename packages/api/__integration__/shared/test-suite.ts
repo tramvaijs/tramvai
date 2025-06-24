@@ -73,12 +73,20 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss': {
       name: 'app-postcss',
       type: 'application',
-      entryFile: path.join(fixturesFolder, 'application', 'postcss', 'index.ts'),
+      sourceDir: path.join(fixturesFolder, 'application', 'postcss'),
+      entryFile: 'index.ts',
+      postcss: {
+        config: 'postcss.config.js',
+      },
     },
     'app-postcss-fn': {
       name: 'app-postcss-fn',
       type: 'application',
-      entryFile: path.join(fixturesFolder, 'application', 'postcss-fn', 'index.ts'),
+      sourceDir: path.join(fixturesFolder, 'application', 'postcss-fn'),
+      entryFile: 'index.ts',
+      postcss: {
+        config: 'postcss.config.js',
+      },
     },
     'app-fs-routing': {
       name: 'app-fs-routing',
