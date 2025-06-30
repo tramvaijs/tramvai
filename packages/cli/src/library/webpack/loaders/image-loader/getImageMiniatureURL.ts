@@ -4,7 +4,7 @@ const BLUR_WIDTH = 10;
 const BLUR_HEIGHT = 10;
 
 export const getImageMiniatureDataURL = async (content: Buffer, extension: string) => {
-  const isSharpInstalled = Boolean(safeRequireResolve('sharp'));
+  const isSharpInstalled = Boolean(safeRequireResolve('sharp', __dirname));
   if (!isSharpInstalled) {
     return null;
   }

@@ -36,11 +36,18 @@ export const validate = (configManager: ConfigManager<any, any>) => {
 
   const isMissing = (path: string) => {
     try {
-      return !requireResolve(resolve(rootDir, path), {
+      return !requireResolve(path, {
         extensions,
         basedir: rootDir,
       });
     } catch (e) {
+      try {
+        return !requireResolve(resolve(rootDir, path), {
+          extensions,
+          basedir: rootDir,
+        });
+      } catch (_e) {}
+
       return true;
     }
   };
