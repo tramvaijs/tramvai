@@ -107,7 +107,7 @@ For example, you want to check some cookie, and if this cookie does not exist, a
 ```tsx
 import { commandLineListTokens, provide } from '@tramvai/core';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/tokens-common';
-import { RedirectFoundError } from '@tinkoff/errors';
+import { RedirectFoundError, makeErrorSilent } from '@tinkoff/errors';
 
 createApp({
   providers: [
@@ -116,7 +116,12 @@ createApp({
       useFactory: ({ cookieManager }) => {
         return function readCustomCookie() {
           if (!cookieManager.get('someSessionCookie')) {
-            throw new RedirectFoundError({ nextUrl: '/login/' });
+            const redirectError = new RedirectFoundError({ nextUrl: '/login/' });
+
+            // to prevent error logs spam if this case are expected
+            makeErrorSilent(redirectError);
+
+            throw redirectError;
           }
         };
       },

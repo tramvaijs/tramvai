@@ -10,7 +10,12 @@ import type {
   ACTION_EXECUTION_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
-import { ExecutionAbortError, isSilentError } from '@tinkoff/errors';
+import {
+  ExecutionAbortError,
+  isPageActionsAbortError,
+  isSilentError,
+  PageActionsAbortError,
+} from '@tinkoff/errors';
 import type {
   SERVER_RESPONSE_STREAM,
   SERVER_RESPONSE_TASK_MANAGER,
@@ -82,7 +87,12 @@ You can find more detailed information from "action-execution-error" logs, and f
               unfinishedActions,
             });
 
-            abortController.abort('Page actions were aborted because of timeout');
+            abortController.abort(
+              new PageActionsAbortError({
+                message: 'Page actions were aborted because of timeout',
+                unfinishedActions,
+              })
+            );
 
             // eslint-disable-next-line @typescript-eslint/no-use-before-define
             endChecker();
@@ -155,15 +165,20 @@ You can find more detailed information from "action-execution-error" logs, and f
                   const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
                   const actionName = parameters?.name ?? 'unknown';
                   const contextName = `${executionContext.name}.${actionName}`;
+                  const reasonIsObject = typeof executionContext.abortSignal.reason === 'object';
+                  const timeoutError =
+                    reasonIsObject && isPageActionsAbortError(executionContext.abortSignal.reason);
+                  const silentError =
+                    reasonIsObject && isSilentError(executionContext.abortSignal.reason);
 
-                  this.log.warn({
+                  this.log[silentError ? 'info' : 'warn']({
                     error: new ExecutionAbortError({
                       message: `Execution aborted in context "${contextName}"`,
                       contextName,
                       reason: executionContext.abortSignal.reason,
                     }),
                     event: `action-execution-error`,
-                    message: `${actionName} has exceeded timeout of ${this.deps.limitTime}ms, execution results will be ignored.
+                    message: `${timeoutError ? `${actionName} has exceeded timeout of ${this.deps.limitTime}ms, execution results will be ignored` : `${actionName} execution error`}.
 This action will be automatically executed on client - https://tramvai.dev/docs/features/data-fetching/action#synchronizing-between-server-and-client
 If the request in this action takes too long, you can move it to the client using "onlyBrowser" condition or use Deferred Actions.
 Also, the necessary network accesses may not be present.`,
@@ -173,33 +188,31 @@ Also, the necessary network accesses may not be present.`,
                 return payload;
               })
               .catch((error) => {
-                const isCriticalError = stopRunAtError(error);
+                const isStopCommandLineError = stopRunAtError(error);
 
                 if (process.env.NODE_ENV === 'development') {
-                  if (isCriticalError && this.isChildAppRunner) {
+                  if (isStopCommandLineError && this.isChildAppRunner) {
                     console.error(
                       `Throwing error ${error.errorName} is not supported in Child Apps, host application command line will not be aborted!`
                     );
                   }
                 }
 
-                if (!isSilentError(error)) {
-                  const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
+                const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
 
-                  this.log.warn({
-                    error,
-                    event: `action-execution-error`,
-                    message: `${parameters?.name ?? 'unknown'} execution error, ${
-                      isCriticalError
-                        ? `${error.name} error are expected and will stop actions execution and prevent page rendering`
-                        : `this action will be automatically executed on client - https://tramvai.dev/docs/features/data-fetching/action#synchronizing-between-server-and-client
+                this.log[isSilentError(error) ? 'info' : 'error']({
+                  error,
+                  event: `action-execution-error`,
+                  message: `${parameters?.name ?? 'unknown'} execution error, ${
+                    isStopCommandLineError
+                      ? `${error.name} error are expected and will stop actions execution and prevent page rendering`
+                      : `this action will be automatically executed on client - https://tramvai.dev/docs/features/data-fetching/action#synchronizing-between-server-and-client
 If the request in this action takes too long, you can move it to the client using "onlyBrowser" condition or use Deferred Actions.
 Also, the necessary network accesses may not be present.`
-                    }`,
-                  });
-                }
+                  }`,
+                });
 
-                if (isCriticalError) {
+                if (isStopCommandLineError) {
                   clearTimeout(timeoutMarker);
                   reject(error);
                 }
