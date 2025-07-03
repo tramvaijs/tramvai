@@ -51,6 +51,7 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
         isTransitioning: true,
         currentRoute: navigation.from,
         nextRoute: navigation.to,
+        types: navigation.viewTransitionTypes,
       });
 
       return;
@@ -76,14 +77,22 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       if (renderDeferred !== null && pendingState !== null) {
-        const transition = document.startViewTransition(async () => {
+        const update = async () => {
           startReactTransition(() => {
             setState(pendingState);
           });
 
           await renderDeferred.promise;
-        });
-
+        };
+        let transition: ViewTransition;
+        if (window.ViewTransition && 'types' in window.ViewTransition.prototype) {
+          transition = document.startViewTransition({
+            update,
+            types: viewTransitionState.isTransitioning ? viewTransitionState.types : undefined,
+          });
+        } else {
+          transition = document.startViewTransition(update);
+        }
         // eslint-disable-next-line promise/catch-or-return
         transition.finished.finally(() => {
           setRenderDeferred(null);
@@ -91,7 +100,7 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
           setViewTransitionState({ isTransitioning: false });
         });
       }
-    }, [pendingState, renderDeferred]);
+    }, [pendingState, renderDeferred, viewTransitionState]);
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {

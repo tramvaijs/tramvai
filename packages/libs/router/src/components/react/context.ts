@@ -15,6 +15,7 @@ export type ViewTransitionState =
       isTransitioning: true;
       currentRoute: NavigationRoute;
       nextRoute: NavigationRoute;
+      types?: string[];
     };
 
 export const ViewTransitionContext = createContext<ViewTransitionState>({

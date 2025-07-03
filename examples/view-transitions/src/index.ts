@@ -1,6 +1,10 @@
 import { createApp, provide } from '@tramvai/core';
 import { CommonModule } from '@tramvai/module-common';
-import { SpaRouterModule, ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN } from '@tramvai/module-router';
+import {
+  SpaRouterModule,
+  ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
+  ROUTER_VIEW_TRANSITIONS_ENABLED,
+} from '@tramvai/module-router';
 import {
   DEFAULT_FOOTER_COMPONENT,
   DEFAULT_HEADER_COMPONENT,
@@ -36,6 +40,10 @@ createApp({
     ServerModule,
   ],
   providers: [
+    provide({
+      provide: ROUTER_VIEW_TRANSITIONS_ENABLED,
+      useValue: true,
+    }),
     provide({
       provide: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
       useValue: 'before',

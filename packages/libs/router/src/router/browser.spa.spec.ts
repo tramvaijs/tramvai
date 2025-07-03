@@ -74,6 +74,8 @@ describe('router/browser-spa', () => {
     beforeEach(() => {
       currentNavigationObjectUuid = 0;
 
+      router?.unsubscribe();
+
       router = new Router({
         routes,
       });
@@ -97,7 +99,7 @@ describe('router/browser-spa', () => {
           },
           url: parse('http://localhost/dynamic/1/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should navigate to external page', async () => {
@@ -141,7 +143,7 @@ describe('router/browser-spa', () => {
           },
           url: parse('http://localhost/dynamic/1/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should update dynamic parameters', async () => {
@@ -258,7 +260,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should navigate to url', async () => {
@@ -348,7 +350,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should redirect by route', async () => {
@@ -461,7 +463,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should run hooks for navigate', async () => {
@@ -498,7 +500,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should run sync hooks for navigate', async () => {
@@ -551,7 +553,7 @@ describe('router/browser-spa', () => {
         expect(mockPush).toHaveBeenCalledWith(expect.anything(), '', '/child1');
       });
 
-      // TODO: подумать как лучше работать с таким кейсом: блокировать навигацию или делать жёсткий переход?
+      // TODO: подумать как лучше работать с таким кейсом: блокировать навигацию или делать жёсткий переход? Сейчас возвращаем бесконечный промис.
       it.skip('guards can block navigation', async () => {
         const mockGuard = jest.fn(async () => false);
 
@@ -617,6 +619,8 @@ describe('router/browser-spa', () => {
 
         expect(customRouter.getCurrentRoute()).toMatchObject({ name: 'child2' });
         expect(mockPush).toHaveBeenCalledWith(expect.anything(), '', '/child2/');
+
+        customRouter.unsubscribe();
       });
     });
 
@@ -630,7 +634,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('does not cancel if method called outside of navigation flow', () => {
@@ -934,6 +938,8 @@ describe('router/browser-spa', () => {
     beforeEach(() => {
       currentNavigationObjectUuid = 0;
 
+      router?.unsubscribe();
+
       router = new Router({
         trailingSlash: true,
         routes,
@@ -957,7 +963,7 @@ describe('router/browser-spa', () => {
           },
           url: parse('http://localhost/dynamic/1/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should update dynamic parameters', async () => {
@@ -1049,7 +1055,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should navigate to url', async () => {
@@ -1131,7 +1137,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should navigate to external page without forcing slashes', async () => {
@@ -1156,7 +1162,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should run hooks for navigate', async () => {
@@ -1197,7 +1203,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should run sync hooks for navigate', async () => {
@@ -1230,7 +1236,7 @@ describe('router/browser-spa', () => {
           url: parse('http://localhost/'),
         });
 
-        router.start();
+        await router.start();
       });
 
       it('should call guards', async () => {
@@ -1253,7 +1259,7 @@ describe('router/browser-spa', () => {
         expect(mockPush).toHaveBeenCalledWith(expect.anything(), '', '/child1/');
       });
 
-      // TODO: подумать как лучше работать с таким кейсом: блокировать навигацию или делать жёсткий переход?
+      // TODO: подумать как лучше работать с таким кейсом: блокировать навигацию или делать жёсткий переход? Сейчас возвращаем бесконечный промис.
       it.skip('guards can block navigation', async () => {
         const mockGuard = jest.fn(async () => false);
 
@@ -1302,6 +1308,8 @@ describe('router/browser-spa', () => {
     beforeEach(() => {
       currentNavigationObjectUuid = 0;
 
+      router?.unsubscribe();
+
       router = new Router({
         trailingSlash: false,
         routes,
@@ -1324,7 +1332,7 @@ describe('router/browser-spa', () => {
           },
           url: parse('http://localhost/dynamic/1'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should update dynamic parameters', async () => {
@@ -1416,7 +1424,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should navigate to url', async () => {
@@ -1498,7 +1506,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should navigate to external page without forcing slashes', async () => {
@@ -1524,7 +1532,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should run hooks for navigate', async () => {
@@ -1565,7 +1573,7 @@ describe('router/browser-spa', () => {
           to: { name: 'root', path: '/', actualPath: '/', params: {} },
           url: parse('http://localhost/'),
         });
-        router.start();
+        await router.start();
       });
 
       it('should run sync hooks for navigate', async () => {
@@ -1597,7 +1605,7 @@ describe('router/browser-spa', () => {
           url: parse('http://localhost/'),
         });
 
-        router.start();
+        await router.start();
       });
 
       it('should call guards', async () => {
@@ -1620,7 +1628,7 @@ describe('router/browser-spa', () => {
         expect(mockPush).toHaveBeenCalledWith(expect.anything(), '', '/child1');
       });
 
-      // TODO: подумать как лучше работать с таким кейсом: блокировать навигацию или делать жёсткий переход?
+      // TODO: подумать как лучше работать с таким кейсом: блокировать навигацию или делать жёсткий переход? Сейчас возвращаем бесконечный промис.
       it.skip('guards can block navigation', async () => {
         const mockGuard = jest.fn(async () => false);
 
@@ -1667,6 +1675,8 @@ describe('router/browser-spa', () => {
 
   describe('mergeSlashes enabled', () => {
     beforeEach(() => {
+      router?.unsubscribe();
+
       router = new Router({
         trailingSlash: true,
         mergeSlashes: true,
@@ -1710,6 +1720,8 @@ describe('router/browser-spa', () => {
 
   describe('history', () => {
     beforeEach(() => {
+      router?.unsubscribe();
+
       router = new Router({
         routes,
       });
@@ -1750,11 +1762,16 @@ describe('router/browser-spa', () => {
 
   describe('view-transitions', () => {
     beforeEach(async () => {
+      router?.unsubscribe();
+
       router = new Router({
         routes,
         enableViewTransitions: true,
       });
 
+      mockPush.mockClear();
+      mockReplace.mockClear();
+      window.history.replaceState({}, '', '/');
       window.location.href = 'http://localhost/';
 
       await router.rehydrate({
@@ -1798,7 +1815,7 @@ describe('router/browser-spa', () => {
       );
     });
 
-    it('should enable view transition on subsequent navigation if it was previously enabled', async () => {
+    it("shouldn't enable view transition on subsequent navigation if it was previously enabled", async () => {
       const mockChange = jest.fn();
 
       router.registerSyncHook('change', mockChange);
@@ -1811,7 +1828,198 @@ describe('router/browser-spa', () => {
         3,
         expect.objectContaining({
           to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: false,
+        })
+      );
+    });
+
+    it('should apply view transition types if they were passed in options', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({
+        url: '/child1/',
+        viewTransition: true,
+        viewTransitionTypes: ['test 1', 'test 2'],
+      });
+
+      expect(mockChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
           viewTransition: true,
+          viewTransitionTypes: ['test 1', 'test 2', 'tramvai_vt_forward'],
+        })
+      );
+    });
+
+    it('should apply view transition types on back', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/' });
+      await router.back({ viewTransition: true, viewTransitionTypes: ['test_back'] });
+
+      expect(mockChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['test_back', 'tramvai_vt_back'],
+        })
+      );
+    });
+
+    it('should detect forward transition when navigation to new page with viewTransition enabled', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+
+      expect(mockChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_forward'],
+        })
+      );
+    });
+
+    it('should detect forward transition when redirecting to new page with viewTransition enabled', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      // @ts-ignore
+      await router.redirect({ url: '/' }, { url: '/child1/', viewTransition: true });
+
+      expect(mockChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_forward'],
+        })
+      );
+    });
+
+    it('should identify back transition when using browser back button', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+      await router.back();
+
+      expect(mockChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_back'],
+        })
+      );
+    });
+
+    it('should identify back transition when using history api', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+      await router.navigate({ url: '/child2/' });
+      await router.navigate({ url: '/dynamic/1/' });
+      await router.go(-3);
+
+      expect(mockChange).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_back'],
+        })
+      );
+    });
+
+    it('should maintain correct transition types when mixing viewTransition enabled/disabled states', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/dynamic/0/', viewTransition: true });
+      await router.back();
+      await router.navigate({ url: '/dynamic/1/' });
+      await router.back();
+      await router.navigate({ url: '/dynamic/2/', viewTransition: true });
+      await router.back({ viewTransition: true });
+      await router.navigate({ url: '/dynamic/3/' });
+      await router.back({ viewTransition: true });
+      await router.navigate({ url: '/dynamic/4/' });
+
+      expect(mockChange).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/dynamic/0/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_forward'],
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_back'],
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        3,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/dynamic/1/' }),
+          viewTransition: false,
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        4,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: false,
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        5,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/dynamic/2/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_forward'],
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        6,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_back'],
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        7,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/dynamic/3/' }),
+          viewTransition: false,
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        8,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_back'],
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        9,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/dynamic/4/' }),
+          viewTransition: false,
         })
       );
     });

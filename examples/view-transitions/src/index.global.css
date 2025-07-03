@@ -51,6 +51,18 @@
     }
 }
 
+@keyframes reverse-slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+}
+
+@keyframes reverse-slide-out{
+    to {
+      transform: translateX(100%);
+    }
+}
+
 .vinyl-animation-in {
     animation: appear 600ms ease-in-out 300ms forwards;
 }
@@ -85,10 +97,32 @@
     view-transition-name: route-slide
 }
 
-::view-transition-old(route-slide) {
+/* Animation styles for forwards type only */
+html:active-view-transition-type(forwards) {
+  &::view-transition-old(route-slide) {
     animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-out;
+  }
+  &::view-transition-new(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-in;
+  }
 }
 
-::view-transition-new(route-slide) {
-    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-in;
+/* Animation styles for backwards type only */
+html:active-view-transition-type(backwards) {
+  &::view-transition-old(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-out;
+  }
+  &::view-transition-new(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-in;
+  }
+}
+
+/* Animation styles for standard tramvai types */
+html:active-view-transition-type(tramvai_vt_back) {
+  &::view-transition-old(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-out;
+  }
+  &::view-transition-new(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-in;
+  }
 }

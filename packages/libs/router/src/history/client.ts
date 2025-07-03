@@ -9,6 +9,8 @@ interface HistoryState {
   type: NavigationType;
   navigateState?: any;
   index: number;
+  viewTransition?: boolean;
+  viewTransitionTypes?: string[];
 }
 
 const isHistoryState = (state: any): state is HistoryState => {
@@ -92,6 +94,7 @@ export class ClientHistory extends History {
   private goPromiseReject: (err: Error) => void;
   private currentIndex = 0;
   private currentState: HistoryState;
+  private historyUnsubscribeCallback: () => void | undefined;
 
   protected historyWrapper: Wrapper<HistoryState>;
 
@@ -116,43 +119,54 @@ export class ClientHistory extends History {
       : generateState(navigation);
     this.currentIndex = this.currentState.index;
     this.historyWrapper.init(this.currentState);
-    this.historyWrapper.subscribe(async ({ path, state }) => {
-      try {
-        let navigationType: NavigationType;
-        let navigateState;
+    this.historyUnsubscribeCallback = this.historyWrapper.subscribe(
+      async ({ path, state, hasUAVisualTransition }) => {
+        try {
+          let navigationType: NavigationType;
+          let navigateState;
+          const { viewTransition, viewTransitionTypes } = this.currentState;
+          const isBack = state.index < this.currentState.index;
+          if (isHistoryState(state)) {
+            const { key: prevKey, type: prevType } = this.currentState;
+            const { key, type } = state;
 
-        if (isHistoryState(state)) {
-          const { key: prevKey, type: prevType } = this.currentState;
-          const { key, type } = state;
+            this.currentState = state;
+            navigateState = state.navigateState;
 
-          this.currentState = state;
-          navigateState = state.navigateState;
-
-          if (
-            key === prevKey &&
-            (type === 'updateCurrentRoute' || prevType === 'updateCurrentRoute')
-          ) {
-            navigationType = 'updateCurrentRoute';
+            if (
+              key === prevKey &&
+              (type === 'updateCurrentRoute' || prevType === 'updateCurrentRoute')
+            ) {
+              navigationType = 'updateCurrentRoute';
+            } else {
+              navigationType = 'navigate';
+            }
           } else {
-            navigationType = 'navigate';
+            // if it is not HistoryState than it is probably not a state from @tinkoff/router so reset it
+            this.currentIndex = 0;
           }
-        } else {
-          // if it is not HistoryState than it is probably not a state from @tinkoff/router so reset it
-          this.currentIndex = 0;
+
+          await this.listener({
+            type: navigationType,
+            history: true,
+            url: path,
+            navigateState,
+            hasUAVisualTransition,
+            viewTransition,
+            viewTransitionTypes,
+            isBack,
+          });
+
+          this.goPromiseResolve?.();
+        } catch (err) {
+          this.goPromiseReject?.(err);
         }
-
-        await this.listener({
-          type: navigationType,
-          history: true,
-          url: path,
-          navigateState,
-        });
-
-        this.goPromiseResolve?.();
-      } catch (err) {
-        this.goPromiseReject?.(err);
       }
-    });
+    );
+  }
+
+  unsubscribe(): void {
+    this.historyUnsubscribeCallback?.();
   }
 
   save(navigation: Navigation): void {
@@ -199,7 +213,8 @@ export class ClientHistory extends History {
       this.goPromiseResolve = resolve;
       this.goPromiseReject = reject;
     });
-
+    this.currentState.viewTransition = options?.viewTransition;
+    this.currentState.viewTransitionTypes = options?.viewTransitionTypes;
     this.historyWrapper.history(to);
 
     return promise;

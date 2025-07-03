@@ -23,6 +23,7 @@ import {
   beforeUpdateCurrentHooksToken,
   afterUpdateCurrentHooksToken,
   routeTransformToken,
+  ROUTER_VIEW_TRANSITIONS_ENABLED,
 } from './tokens';
 import { RouterStore } from '../stores/RouterStore';
 import { commonGuards } from './guards/common';
@@ -36,6 +37,10 @@ export const providers: Provider[] = [
   ...commonTokens,
   ...fsPagesProviders,
   provide({
+    provide: ROUTER_VIEW_TRANSITIONS_ENABLED,
+    useValue: false,
+  }),
+  provide({
     provide: ROUTER_TOKEN,
     useFactory: ({
       RouterClass,
@@ -44,12 +49,14 @@ export const providers: Provider[] = [
       routeResolve,
       additionalParameters,
       plugins,
+      viewTransitionsEnabled,
     }) => {
       const router = new RouterClass({
         ...additionalParameters,
         trailingSlash: true,
         mergeSlashes: true,
-        enableViewTransitions: process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true',
+        enableViewTransitions:
+          process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true' && viewTransitionsEnabled,
         routes: flatten(routes ?? []).map(routeTransform),
         plugins,
       });
@@ -88,6 +95,7 @@ export const providers: Provider[] = [
         optional: true,
       },
       plugins: optional(ROUTER_PLUGIN),
+      viewTransitionsEnabled: ROUTER_VIEW_TRANSITIONS_ENABLED,
     },
   }),
   provide({

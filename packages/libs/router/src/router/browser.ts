@@ -1,11 +1,15 @@
 import type { Options } from './abstract';
 import { ClientRouter } from './client';
-import type { Navigation, HookName } from '../types';
+import type { HookName, Navigation } from '../types';
 import { logger } from '../logger';
 import { RouteTree } from '../tree/tree';
+import { NAVIGATION_TYPE } from './constants';
 
 const DELAY_CHECK_INTERVAL = 50;
 const APPLIED_VIEW_TRANSITIONS_KEY = '_t_view_transitions';
+
+type NavigationTypeKeys = keyof typeof NAVIGATION_TYPE;
+type NavigationType = (typeof NAVIGATION_TYPE)[NavigationTypeKeys];
 
 export class Router extends ClientRouter {
   protected delayedNavigation: Navigation;
@@ -14,7 +18,7 @@ export class Router extends ClientRouter {
   protected delayedReject: (error: Error) => void;
 
   // Store applied view transitions, so we can apply them on back navigations
-  private appliedViewTransitions: Map<string, Set<string>>;
+  private appliedViewTransitions: Map<number, string>;
 
   constructor(options: Options) {
     super(options);
@@ -50,8 +54,27 @@ export class Router extends ClientRouter {
   protected async run(payload: Navigation) {
     const navigation: Navigation = { ...payload };
 
-    if (this.viewTransitionsEnabled) {
-      navigation.viewTransition = this.shouldApplyViewTransition(payload);
+    const to =
+      (navigation.to.redirect !== undefined
+        ? this.resolve(navigation.to.redirect)?.actualPath
+        : navigation.to?.actualPath) ?? '';
+    const from = navigation.from?.actualPath ?? '';
+
+    if (this.viewTransitionsEnabled && to !== from) {
+      navigation.viewTransition = this.shouldApplyViewTransition(navigation, to);
+      const hasNavigationType =
+        !!navigation.viewTransitionTypes &&
+        navigation.viewTransitionTypes.some((type) =>
+          Object.values(NAVIGATION_TYPE).includes(type as NavigationType)
+        );
+      // add a navigation type only if it has not been provided
+      if (navigation.viewTransition && !hasNavigationType) {
+        const navigationType = this.getNavigationType(navigation);
+        // add a navigation type to transition types
+        navigation.viewTransitionTypes = navigation.viewTransitionTypes
+          ? [...(navigation.viewTransitionTypes ?? []), navigationType]
+          : [navigationType];
+      }
     }
 
     // if router is not started yet delay current navigation without blocking promise resolving
@@ -222,38 +245,50 @@ export class Router extends ClientRouter {
       });
   }
 
-  private shouldApplyViewTransition(navigation: Navigation) {
-    const from = navigation.from.actualPath;
-    const to =
-      navigation.to.redirect !== undefined
-        ? this.resolve(navigation.to.redirect)?.actualPath
-        : navigation.to?.actualPath;
+  private getNavigationType(navigation: Navigation): NavigationType {
+    // if it is back navigation
+    if (navigation.history && navigation.isBack) {
+      return NAVIGATION_TYPE.BACK;
+    }
 
-    // If View Transition enabled to current navigation, save it
+    return NAVIGATION_TYPE.FORWARD;
+  }
+
+  private shouldApplyViewTransition(navigation: Navigation, to: string) {
+    const from = navigation.from?.actualPath ?? '';
+
+    const historyIndex = window.history.state.index;
+    const prevTransitionFrom = this.getPrevTransition(navigation);
+
+    // handle back navigation when prev navigation was with VT enabled
+    if (navigation.history && prevTransitionFrom === to) {
+      return true;
+    }
+
     if (navigation.viewTransition) {
-      const toPaths = this.appliedViewTransitions.get(from);
-
-      if (this.appliedViewTransitions.get(from)) {
-        toPaths.add(to);
-      } else {
-        this.appliedViewTransitions.set(from, new Set([to]));
-      }
-
+      // add transition except history navigations with VT enabled
+      !navigation.history && this.appliedViewTransitions.set(historyIndex, from);
       return true;
     }
 
-    const priorPaths = this.appliedViewTransitions.get(from);
-
-    // If we were on the route with view transition previously,
-    // then there must be back navigation with view transition also
-    if (priorPaths !== undefined && priorPaths.has(to)) {
-      return true;
+    // handle forward navigation
+    if (navigation.history && !navigation.isBack) {
+      // returns true if prev navigation was with VT enabled
+      return !!prevTransitionFrom;
     }
 
-    // If we don't have a previous forward navigation, assume we are
-    // going back from the new route and enable view transition if it
-    // was previously enabled
-    return this.appliedViewTransitions.has(to);
+    // if we have forward navigation without VT enabled and stored val for this index
+    if (!navigation.history && this.appliedViewTransitions.has(historyIndex)) {
+      this.appliedViewTransitions.delete(historyIndex);
+    }
+
+    return false;
+  }
+
+  private getPrevTransition(navigation: Navigation) {
+    const historyIndex = window.history.state.index;
+    const index = navigation.history && navigation.isBack ? historyIndex : historyIndex - 1;
+    return this.appliedViewTransitions.get(index);
   }
 
   private restoreAppliedViewTransitions() {
@@ -264,7 +299,10 @@ export class Router extends ClientRouter {
         const parsedValue = JSON.parse(valueFromStorage);
 
         this.appliedViewTransitions = new Map(
-          Object.entries(parsedValue).map(([key, value]) => [key, new Set(value as Array<string>)])
+          Object.entries(parsedValue).map(([key, value]) => [
+            Number.parseInt(key, 10),
+            value as string,
+          ])
         );
 
         return;
@@ -282,7 +320,7 @@ export class Router extends ClientRouter {
         const valueToSave = {};
 
         for (const [key, value] of this.appliedViewTransitions) {
-          valueToSave[key] = [...value];
+          valueToSave[key] = value;
         }
 
         sessionStorage.setItem(APPLIED_VIEW_TRANSITIONS_KEY, JSON.stringify(valueToSave));

@@ -23,6 +23,7 @@ export {
   afterUpdateCurrentHooksToken,
   routerBundleInfoAdditionalToken,
   routeTransformToken,
+  ROUTER_VIEW_TRANSITIONS_ENABLED,
 } from './modules/tokens';
 
 declare module '@tinkoff/router' {
