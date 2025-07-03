@@ -8,7 +8,9 @@ export interface Wrapper<T> {
   navigate(arg: { path: string; replace: boolean; state: T }): void;
   history(delta: number): void;
 
-  subscribe(handler: (arg: { path: string; state: T }) => void): void;
+  subscribe(
+    handler: (arg: { path: string; state: T; hasUAVisualTransition?: boolean }) => void
+  ): () => void;
 }
 
 interface NavigateHandler {
@@ -30,7 +32,7 @@ export const wrapHistory = <T>({ onNavigate }: { onNavigate: NavigateHandler }):
         throw new Error('Method not implemented');
       },
       init: noop,
-      subscribe: noop,
+      subscribe: () => noop,
     };
   }
 
@@ -81,12 +83,19 @@ export const wrapHistory = <T>({ onNavigate }: { onNavigate: NavigateHandler }):
       replaceState(state, '');
     },
     subscribe: (handler) => {
-      window.addEventListener('popstate', ({ state }) => {
+      const listener = ({ state, hasUAVisualTransition }) => {
         handler({
           path: window.location.pathname + window.location.search + window.location.hash,
           state,
+          hasUAVisualTransition,
         });
-      });
+      };
+
+      window.addEventListener('popstate', listener);
+
+      return () => {
+        window.removeEventListener('popstate', listener);
+      };
     },
   };
 };

@@ -42,7 +42,16 @@ Usage of the View Transition API is completely safe and do not require much step
 
 It will enable a special router provider for React and removes the default one from your bundle.
 
-Second, you should pass property named `viewTransion` to your navigation. It can be either prop of a `Link` component or a navigation parameter:
+Second, you should enable it through di
+
+```js
+provide({
+  provide: ROUTER_VIEW_TRANSITIONS_ENABLED,
+  useValue: true,
+});
+```
+
+Third, you should pass property named `viewTransion` to your navigation. It can be either prop of a `Link` component or a navigation parameter:
 
 :::tip
 
@@ -121,14 +130,19 @@ const TargetComponent: React.FC = () => {
 
 ### useViewTransition
 
-Also, you can use special hook which will tell you when a transition is in progress, and you can use that to apply classes or styles:
+Also, you can use special hook which will tell you when a transition is in progress, current type of navigation and applied view transition types. You can use that to apply classes or styles:
 
 ```tsx
-import { useNavigate, useViewTransition } from '@tinkoff/router';
+import { useViewTransition } from '@tinkoff/router';
 
 // route 1
 const Component: React.FC = (props) => {
-  const isTransitioning = useViewTransition(`/item/${props.id}`);
+  const {
+    isTransitioning,
+    types, // view transition types with navigation type (forward/back)
+    isForward, // tells you what type of navigation is taking place
+    isBack, // tells you what type of navigation is taking place
+  } = useViewTransition(`/item/${props.id}`);
 
   return (
     <section style={isTransitioning ? { viewTransitionName: 'card-expand' } : undefined}>
@@ -172,6 +186,60 @@ You can customize your animations in any way, for example `slide` animations wil
 
 We recommend to see at this [article](https://developer.chrome.com/docs/web-platform/view-transitions) by Google, containing a lot of nice examples.
 
+### View transition types
+
+You can assign one or more types to an active view transition. For example, when transitioning to a higher page in a pagination sequence use the forwards type and when going to a lower page use the backwards type.
+
+```tsx
+import { useViewTransition, Link } from '@tinkoff/router';
+
+const Component: React.FC = (props) => {
+  const { isTransitioning } = useViewTransition(`/item/${props.id}`);
+
+  const currentItemId = parseInt(props.id, 10);
+  const nextRouteUrl = `/item/${currentItemId + 1}`;
+  const prevRouteUrl = `/item/${currentItemId - 1}`;
+
+  return (
+    <section style={isTransitioning ? { viewTransitionName: 'route-slide' } : undefined}>
+      <Link url={prevRouteUrl} viewTransition viewTransitionTypes={['backwards']}>
+        <button type="button">Previous item</button>
+      </Link>
+      Preview of a current item
+      <Link url={nextRouteUrl} viewTransition viewTransitionTypes={['forwards']}>
+        <button type="button">Next item</button>
+      </Link>
+    </section>
+  );
+};
+```
+
+These types are only active when capturing or performing a transition, and each type can be customized through CSS to use different animations.
+
+```css
+/* Animation styles for forwards type only */
+html:active-view-transition-type(forwards) {
+  &::view-transition-old(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-out;
+  }
+  &::view-transition-new(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-in;
+  }
+}
+
+/* Animation styles for backwards type only */
+html:active-view-transition-type(backwards) {
+  &::view-transition-old(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-out;
+  }
+  &::view-transition-new(route-slide) {
+    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-in;
+  }
+}
+```
+
+We recommend to see at this [article](https://developer.chrome.com/docs/web-platform/view-transitions/same-document#view-transition-types) by Google, containing an explanation of this concept.
+
 ### Prefers reduced motion
 
 Tramvai includes CSS to [preserve](https://developer.mozilla.org/ru/docs/Web/CSS/@media/prefers-reduced-motion) user settings about animations behavior.
@@ -183,7 +251,12 @@ So, if a user select to prefer reduced motions, view transitions will not be wor
 Supported browsers are:
 
 - Chromium-based >= 111.0
-- Opera >=97.0
+- Opera >= 97.0
+
+For View transition types functionality:
+
+- Chromium-based >= 125.0
+- Safari >= 18.2
 
 But it is safe to use it anywhere, no polyfill required.
 

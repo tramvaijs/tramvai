@@ -36,3 +36,7 @@ export const routeTransformToken = createToken<RouteTransform>('router finalRout
 export const routerBundleInfoAdditionalToken = createToken<() => Promise<Route[]>>(
   'router bundleInfoAdditional'
 );
+
+export const ROUTER_VIEW_TRANSITIONS_ENABLED = createToken<boolean>(
+  'router viewTransitionsEnabled'
+);

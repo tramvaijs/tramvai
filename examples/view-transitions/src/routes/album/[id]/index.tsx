@@ -13,9 +13,11 @@ const Album: PageComponent = () => {
 
   const currentAlbumId = parseInt(params.id, 10);
   const isNextVisible = currentAlbumId < 8;
+  const isPreviousVisible = currentAlbumId > 1;
   const nextRouteUrl = `/album/${currentAlbumId + 1}`;
+  const prevRouteUrl = `/album/${currentAlbumId - 1}`;
 
-  const isTransitioning = useViewTransition(nextRouteUrl);
+  const { isTransitioning } = useViewTransition(nextRouteUrl);
 
   if (album === null) {
     return null;
@@ -34,6 +36,16 @@ const Album: PageComponent = () => {
           <h1 className="text-5xl font-bold tracking-tight text-gray-900">{album.name}</h1>
           <p className="mt-3 text-3xl">{album.artist}</p>
           <div className="mt-3 flex">
+            {isPreviousVisible && (
+              <Link url={prevRouteUrl} viewTransition viewTransitionTypes={['backwards']}>
+                <button
+                  type="button"
+                  className="text-pink-600 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-full text-lg px-5 py-3 text-center inline-flex items-center dark:focus:ring-gray-500 mr-4"
+                >
+                  &larr;
+                </button>
+              </Link>
+            )}
             <PlayButton
               tracks={album.tracks}
               albumId={album.id}
@@ -61,14 +73,14 @@ const Album: PageComponent = () => {
             </button>
 
             {isNextVisible && (
-              <button
-                type="button"
-                className="text-pink-600 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-lg text-lg px-10 py-3 text-center inline-flex items-center dark:focus:ring-gray-500 mr-4"
-              >
-                <Link url={nextRouteUrl} viewTransition>
-                  Next
-                </Link>
-              </button>
+              <Link url={nextRouteUrl} viewTransition viewTransitionTypes={['forwards']}>
+                <button
+                  type="button"
+                  className="text-pink-600 bg-gray-100 hover:bg-gray-200 focus:ring-4 focus:outline-none focus:ring-gray-100 font-medium rounded-full text-lg px-5 py-3 text-center inline-flex items-center dark:focus:ring-gray-500 mr-4"
+                >
+                  &rarr;
+                </button>
+              </Link>
             )}
           </div>
         </div>

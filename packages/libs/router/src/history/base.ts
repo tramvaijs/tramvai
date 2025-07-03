@@ -7,6 +7,10 @@ export type Listener = (arg: {
   navigateState?: any;
   replace?: boolean;
   history?: boolean;
+  isBack?: boolean;
+  hasUAVisualTransition?: boolean;
+  viewTransition?: boolean;
+  viewTransitionTypes?: string[];
 }) => Promise<void>;
 
 export abstract class History {
@@ -14,6 +18,8 @@ export abstract class History {
   protected tree?: RouteTree;
 
   init(navigation: Navigation): void {}
+
+  unsubscribe(): void {}
 
   abstract save(navigation: Navigation): void;
 

@@ -1,10 +1,10 @@
 import type { FastifyRequest, FastifyReply, HookHandlerDoneFunction } from 'fastify';
 import fp from 'fastify-plugin';
+import { DoubleLinkedList } from '@tramvai/core';
 import { HttpError } from '@tinkoff/errors';
 import onFinished from 'on-finished';
 import type { IntervalHistogram } from 'perf_hooks';
 import { monitorEventLoopDelay } from 'perf_hooks';
-import { DoubleLinkedList } from './utils/doubleLinkedList';
 
 export const DEFAULT_OPTIONS = {
   limit: 10,

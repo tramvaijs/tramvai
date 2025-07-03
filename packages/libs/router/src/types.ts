@@ -36,14 +36,19 @@ export interface BaseNavigateOptions {
 
 export interface NavigateOptions extends BaseNavigateOptions {
   url?: string;
+  isBack?: boolean;
   viewTransition?: boolean;
+  viewTransitionTypes?: string[];
+  hasUAVisualTransition?: boolean;
 }
 
 export type UpdateCurrentRouteOptions = BaseNavigateOptions;
 
 export interface HistoryOptions {
-  historyFallback: string;
+  historyFallback?: string;
   replace?: boolean;
+  viewTransition?: boolean;
+  viewTransitionTypes?: string[];
 }
 
 export type NavigationType = 'navigate' | 'updateCurrentRoute';
@@ -60,6 +65,7 @@ export interface Navigation {
   cancelled?: boolean;
   skipped?: boolean;
   code?: number;
+  isBack?: boolean;
 
   redirect?: boolean;
 
@@ -75,6 +81,7 @@ export interface Navigation {
    * Activates View Transition to this navigation
    */
   viewTransition?: boolean;
+  viewTransitionTypes?: string[];
 }
 
 export type NavigationGuard = (

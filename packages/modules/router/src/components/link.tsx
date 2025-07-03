@@ -34,6 +34,11 @@ interface Props extends Partial<AnchorLinkProps> {
    * @default false
    */
   viewTransition?: boolean;
+
+  /**
+   * @description allows you to assign one or more types to an active view transition
+   */
+  viewTransitionTypes?: string[];
 }
 
 function Link(props: Props) {
@@ -47,9 +52,17 @@ function Link(props: Props) {
     navigateOptions,
     prefetch = true,
     viewTransition = false,
+    viewTransitionTypes,
     ...otherProps
   } = props;
-  const navigate = useNavigate({ url, query, replace, viewTransition, ...navigateOptions });
+  const navigate = useNavigate({
+    url,
+    query,
+    replace,
+    viewTransition,
+    viewTransitionTypes,
+    ...navigateOptions,
+  });
   const [linkElement, setLinkElement] = useState(null);
 
   usePrefetch({

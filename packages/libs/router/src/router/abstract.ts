@@ -321,7 +321,17 @@ export abstract class AbstractRouter {
     navigateOptions: NavigateOptions,
     { history, redirect }: InternalOptions
   ) {
-    const { url, replace, params, navigateState, code, viewTransition } = navigateOptions;
+    const {
+      url,
+      replace,
+      params,
+      navigateState,
+      code,
+      isBack,
+      viewTransition,
+      viewTransitionTypes,
+      hasUAVisualTransition,
+    } = navigateOptions;
     const prevNavigation = redirect
       ? this.lastNavigation
       : (this.currentNavigation ?? this.lastNavigation);
@@ -334,7 +344,7 @@ export abstract class AbstractRouter {
 
     const resolvedUrl = this.resolveUrl(navigateOptions);
     const { to: from, url: fromUrl } = prevNavigation ?? {};
-    const redirectFrom = redirect ? this.currentNavigation.to : undefined;
+    const redirectFrom = redirect ? this.getCurrentRoute() : undefined;
 
     let navigation: Navigation = {
       type: 'navigate',
@@ -347,11 +357,13 @@ export abstract class AbstractRouter {
       code,
       redirect,
       redirectFrom,
+      isBack,
       key: this.uuid(),
     };
 
-    if (this.viewTransitionsEnabled && viewTransition !== undefined) {
+    if (this.viewTransitionsEnabled && viewTransition !== undefined && !hasUAVisualTransition) {
       navigation.viewTransition = viewTransition;
+      navigation.viewTransitionTypes = viewTransitionTypes;
     }
 
     await this.runHooks('beforeResolve', navigation);
@@ -430,6 +442,8 @@ export abstract class AbstractRouter {
   async rehydrate(navigation: Partial<Navigation>) {
     throw new Error('Not implemented');
   }
+
+  unsubscribe(): void {}
 
   addRoute(route: Route) {
     this.tree?.addRoute(route);
