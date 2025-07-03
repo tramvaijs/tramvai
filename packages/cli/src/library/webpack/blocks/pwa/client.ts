@@ -25,7 +25,7 @@ export const pwaBlock =
     config.batch(pwaSharedBlock(configManager));
 
     if (
-      !safeRequireResolve('@tramvai/module-progressive-web-app', true) &&
+      !safeRequireResolve('@tramvai/module-progressive-web-app', rootDir, true) &&
       (pwa.workbox?.enabled || pwa.webmanifest?.enabled)
     ) {
       throw Error('PWA functional requires @tramvai/module-progressive-web-app installed');

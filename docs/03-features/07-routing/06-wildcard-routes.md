@@ -94,7 +94,7 @@ Not working in Child Apps!
 :::
 
 ```tsx title="routes/products/[id]/index.tsx"
-import { NotFoundError } from '@tinkoff/errors';
+import { NotFoundError, makeErrorSilent } from '@tinkoff/errors';
 import { declareAction } from '@tramvai/core';
 import type { PageComponent } from '@tramvai/react';
 import { PAGE_SERVICE_TOKEN, setPageErrorEvent } from '@tramvai/module-router';
@@ -109,6 +109,10 @@ const fetchProductAction = declareAction({
     } catch (e) {
       // this error provide 404 status by default
       const error = new NotFoundError();
+
+      // to prevent error logs spam if this case are expected
+      makeErrorSilent(redirectError);
+
       this.dispatch(setPageErrorEvent(error));
     }
   },

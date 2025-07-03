@@ -1,4 +1,4 @@
-import { isSilentError } from '@tinkoff/errors';
+import { isPageActionsAbortError, isSilentError, PageActionsAbortError } from '@tinkoff/errors';
 import type { Action, ExtractDependencyType, TramvaiAction } from '@tramvai/core';
 import { isTramvaiAction } from '@tramvai/core';
 import { ACTION_PARAMETERS } from '@tramvai/core';
@@ -44,7 +44,11 @@ export class ActionPageRunner {
           'beforeNavigate',
           function abortPageActionsOnNavigation() {
             unregisterAbortPageActionsHookOnNavigate();
-            abortController.abort('Page actions were aborted because of route changing');
+            abortController.abort(
+              new PageActionsAbortError({
+                message: 'Page actions were aborted because of route changing',
+              })
+            );
             return Promise.resolve();
           }
         );
@@ -60,17 +64,17 @@ export class ActionPageRunner {
               return promise;
             })
             .catch((error) => {
-              if (!isSilentError(error)) {
-                const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
+              const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
+              const pageActionsAbortedError =
+                typeof error?.reason === 'object' && isPageActionsAbortError(error?.reason);
 
-                this.log.error({
-                  error,
-                  event: `action-execution-error`,
-                  message: `An error occurred during "${
-                    parameters?.name ?? 'unknown'
-                  }" action execution`,
-                });
-              }
+              this.log[isSilentError(error) || pageActionsAbortedError ? 'info' : 'error']({
+                error,
+                event: `action-execution-error`,
+                message: `An error occurred during "${
+                  parameters?.name ?? 'unknown'
+                }" action execution`,
+              });
 
               if (stopRunAtError(error)) {
                 if (process.env.NODE_ENV === 'development') {

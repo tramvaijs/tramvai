@@ -87,10 +87,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
         // It may be missing in cases when cli is running programmaticaly
         config: filterNonExisted([path.resolve(configManager.rootDir, 'tramvai.json')]),
         css: filterNonExisted([
-          safeRequireResolve(
-            path.resolve(configManager.rootDir, getPostcssConfigPath(configManager)),
-            true
-          ),
+          safeRequireResolve(getPostcssConfigPath(configManager), configManager.rootDir, true),
         ]),
       },
       // https://github.com/vercel/next.js/commit/ff5338ce03a3240a97a5c84f5ad5c31c0f53a6ce

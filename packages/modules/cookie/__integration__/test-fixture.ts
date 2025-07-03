@@ -63,9 +63,9 @@ export const testSafari = base.extend<TestFixture, WorkerFixture>({
   proxyStaticServer: proxyHttpsStaticServerFixture,
   I: IFixture,
   Cookie: CookieFixture,
-  browserName: 'webkit',
   userAgent:
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
+  browserName: 'webkit',
 });
 
 export const testSafariHttps = base.extend<TestFixture, WorkerFixture>({
@@ -90,5 +90,21 @@ export const testSafariHttps = base.extend<TestFixture, WorkerFixture>({
   browserName: 'webkit',
   userAgent:
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
+  ignoreHTTPSErrors: true,
+});
+
+export const testFirefox = base.extend<TestFixture, WorkerFixture>({
+  optionsApp: [undefined, { scope: 'worker', auto: true, option: true }],
+  targetApp: [targetApp, { scope: 'worker', auto: true }],
+  settingApp,
+  createApp,
+  buildAllureTree,
+  app,
+  proxyServer: proxyHttpsServerFixture,
+  proxyStaticServer: proxyHttpsStaticServerFixture,
+  I: IFixture,
+  Cookie: CookieFixture,
+  browserName: 'firefox',
+  userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:133.0) Gecko/20100101 Firefox/133.0',
   ignoreHTTPSErrors: true,
 });

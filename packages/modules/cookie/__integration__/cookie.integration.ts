@@ -1,4 +1,4 @@
-import { testChrome, testSafari, testSafariHttps } from './test-fixture';
+import { testChrome, testSafari, testSafariHttps, testFirefox } from './test-fixture';
 
 testChrome.describe('packages/modules/cookie', async () => {
   testChrome('Check that the cookie module in Chrome is working', async ({ app, I, Cookie }) => {
@@ -82,6 +82,35 @@ testSafariHttps.describe('packages/modules/cookie', async () => {
       await Cookie.setTestCookie();
 
       await testSafariHttps.expect(await Cookie.getTestCookie()).toBe('true');
+    }
+  );
+});
+
+testFirefox.describe('packages/modules/cookie', async () => {
+  testFirefox('Check that the cookie module in Firefox is working', async ({ app, I, Cookie }) => {
+    await I.gotoPage(app.serverUrl);
+
+    testFirefox.expect(await Cookie.getTestCookie()).toBe(undefined);
+
+    await Cookie.setTestCookie();
+
+    testFirefox.expect(await Cookie.getTestCookie()).toBe('true');
+  });
+
+  testFirefox(
+    'Check that the cookie module in Firefox can set and remove cookies',
+    async ({ app, I, Cookie }) => {
+      await I.gotoPage(app.serverUrl);
+
+      testFirefox.expect(await Cookie.getTestCookie()).toBe(undefined);
+
+      await Cookie.setTestCookie();
+
+      testFirefox.expect(await Cookie.getTestCookie()).toBe('true');
+
+      await Cookie.removeTestCookie();
+
+      testFirefox.expect(await Cookie.getTestCookie()).toBe(undefined);
     }
   );
 });

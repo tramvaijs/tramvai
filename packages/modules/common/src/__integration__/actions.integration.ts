@@ -138,19 +138,14 @@ import { ActionStatus } from './stores/actionTestReducer';
     test('action should preserve abort reason', async ({ I, app, page, actionPages }) => {
       await I.gotoPage(`${app.serverUrl}/preserve-abort-reason/`);
 
-      const errors: Array<ConsoleMessage> = [];
-      page.on('console', (message) => {
-        if (message.type() === 'error') errors.push(message);
-      });
-
       // Waiting for actions
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      expect(errors.length).toBe(1);
+      const nestedActionExecuted = await page.evaluate(
+        () => (window as any).__nested_action_executed
+      );
 
-      const reason = await actionPages.getReasonFrom(errors[0]);
-
-      expect(reason).toBe('Page actions were aborted because of route changing');
+      expect(nestedActionExecuted).toBe(false);
     });
   });
 });

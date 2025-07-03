@@ -43,15 +43,16 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
   } = configManager;
 
   const portal = path.resolve(configManager.rootDir, `packages/${process.env.APP_ID}/portal.js`);
-  const polyfillPath = path.resolve(configManager.rootDir, polyfill ?? 'src/polyfill');
-  const modernPolyfillPath = path.resolve(
-    configManager.rootDir,
-    modernPolyfill ?? 'src/modern.polyfill'
-  );
   const portalExists = fs.existsSync(portal);
-  const polyfillExists = !!safeRequireResolve(polyfillPath, typeof polyfill === 'undefined');
-  const modernPolyfillExists = !!safeRequireResolve(
-    modernPolyfillPath,
+
+  const polyfillPath = safeRequireResolve(
+    polyfill ?? './src/polyfill',
+    configManager.rootDir,
+    typeof polyfill === 'undefined'
+  );
+  const modernPolyfillPath = safeRequireResolve(
+    modernPolyfill ?? './src/modern.polyfill',
+    configManager.rootDir,
     typeof modernPolyfill === 'undefined'
   );
 
@@ -82,8 +83,10 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
     .add(path.resolve(configManager.rootDir, `${configManager.root}/index`))
     .end()
     .when(portalExists, (cfg) => cfg.entry('portal').add(portal))
-    .when(polyfillExists, (cfg) => cfg.entry('polyfill').add(polyfillPath))
-    .when(modernPolyfillExists, (cfg) => cfg.entry('modern.polyfill').add(modernPolyfillPath));
+    .when(Boolean(polyfillPath), (cfg) => cfg.entry('polyfill').add(polyfillPath))
+    .when(Boolean(modernPolyfillPath), (cfg) =>
+      cfg.entry('modern.polyfill').add(modernPolyfillPath)
+    );
 
   const statsFileName = 'stats.json';
 
