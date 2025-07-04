@@ -80,6 +80,8 @@ export const convertRawUrl = (url: URL): Url => {
   Object.defineProperty(result, 'toString', {
     value: () => str,
     enumerable: false,
+    configurable: true,
+    writable: true,
   });
 
   return result as Url;

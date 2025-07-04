@@ -99,6 +99,8 @@ export class HttpClientAdapter extends BaseHttpClient implements HttpClient {
       Object.defineProperty(resToModify, '__meta', {
         value: meta,
         enumerable: false,
+        configurable: true,
+        writable: true,
       });
 
       return modifyResponse ? modifyResponse(resToModify) : resToModify;
