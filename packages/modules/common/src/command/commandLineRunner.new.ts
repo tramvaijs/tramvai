@@ -283,10 +283,6 @@ export class CommandLineRunner implements Interface {
         command: name,
       });
 
-      if (process.env.NODE_ENV === 'development' && typeof error === 'object') {
-        error.di = di;
-      }
-
       throw error;
     }
   }
