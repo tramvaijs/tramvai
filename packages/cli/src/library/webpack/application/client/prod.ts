@@ -105,7 +105,7 @@ export const webpackClientConfig = ({
   }
 
   if (sourceMap) {
-    config.batch(sourcemaps(configManager));
+    config.batch(sourcemaps(configManager, 'client'));
   }
 
   if (process.env.TRAMVAI_REACT_PROFILE) {

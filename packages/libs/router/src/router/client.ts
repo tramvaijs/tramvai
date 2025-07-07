@@ -174,7 +174,7 @@ export abstract class ClientRouter extends AbstractRouter {
     // on CSR fallback initialization, if we found a redirect,
     // we need to make hard reload for prevent current page rendering
     if (this.fullRehydrationInProcess) {
-      window.location.replace(target.url);
+      window.location.replace(this.resolveUrl(target).href);
 
       // prevent routing from any continues navigation returning promise which will be not resolved
       return new Promise<void>(() => {});

@@ -6,6 +6,7 @@ import commonDev from '../../common/dev';
 import type { UI_SHOW_PROGRESS_TOKEN } from '../../../../di/tokens';
 import type { ChildAppConfigEntry } from '../../../../typings/configEntry/child-app';
 import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
+import sourcemaps from '../../blocks/sourcemaps';
 
 export const webpackServerConfig = ({
   configManager,
@@ -21,6 +22,10 @@ export const webpackServerConfig = ({
 
   config.mode('development');
   config.devtool(configManager.webpack.devtool ?? false);
+
+  if (configManager.sourceMap) {
+    config.batch(sourcemaps(configManager, 'server'));
+  }
 
   if (showProgress) {
     config.plugin('progress').use(WebpackBar, [
