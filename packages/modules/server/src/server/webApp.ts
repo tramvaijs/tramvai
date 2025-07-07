@@ -208,9 +208,11 @@ export const webAppInitCommand = ({
             }
           });
         } catch (err) {
-          if (err.di) {
+          const storage = asyncLocalStorage.getStore();
+
+          if (storage && storage.tramvaiRequestDi) {
             const responseManager: typeof RESPONSE_MANAGER_TOKEN =
-              err.di.get(RESPONSE_MANAGER_TOKEN);
+              storage.tramvaiRequestDi.get(RESPONSE_MANAGER_TOKEN);
 
             if (responseManager && !reply.sent) {
               reply.headers(responseManager.getHeaders());
