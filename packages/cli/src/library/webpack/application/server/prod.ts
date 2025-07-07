@@ -101,7 +101,7 @@ export const webpackServerConfig = ({
   ]);
 
   if (sourceMap) {
-    config.batch(sourcemaps(configManager));
+    config.batch(sourcemaps(configManager, 'server'));
   }
 
   return config;

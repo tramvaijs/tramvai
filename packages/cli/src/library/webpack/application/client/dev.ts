@@ -48,7 +48,7 @@ export const webpackClientConfig = ({
   config.devtool(configManager.webpack.devtool ?? false);
 
   if (configManager.sourceMap) {
-    config.batch(sourcemaps(configManager));
+    config.batch(sourcemaps(configManager, 'client'));
   }
 
   if (configManager.noClientRebuild) {

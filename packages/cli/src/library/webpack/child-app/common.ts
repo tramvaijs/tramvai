@@ -14,7 +14,6 @@ import nodeClient from '../blocks/nodeClient';
 import type { SplitChunksOptions, UniversalFederationPluginOptions } from '../types/webpack';
 import { getSharedModules } from './moduleFederationShared';
 import { configToEnv } from '../blocks/configToEnv';
-import sourcemaps from '../blocks/sourcemaps';
 import type { ChildAppConfigEntry } from '../../../typings/configEntry/child-app';
 import { extractCssPluginFactory } from '../blocks/extractCssPlugin';
 import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
@@ -24,8 +23,7 @@ import { PatchAutoPublicPathPlugin } from '../plugins/AutoPublicPathPlugin';
 
 // eslint-disable-next-line max-statements
 export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: Config) => {
-  const { name, root, rootDir, sourceMap, buildType, shared, env, hotRefresh, target } =
-    configManager;
+  const { name, root, rootDir, buildType, shared, env, target } = configManager;
 
   const cssLocalIdentName =
     configManager.env === 'production'
@@ -53,10 +51,6 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
         localIdentName: cssLocalIdentName,
       })
     );
-
-  if (sourceMap) {
-    config.batch(sourcemaps(configManager));
-  }
 
   config.batch(
     extractCssPluginFactory(configManager, {
