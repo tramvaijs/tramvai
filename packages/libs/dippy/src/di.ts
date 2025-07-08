@@ -10,8 +10,8 @@ export {
   ProviderDep,
   ProviderDeps,
   ProvideDepsIterator,
-  OptionsType,
   ScopeVariants,
+  OptionsType,
 } from './Provider';
 
 export {
