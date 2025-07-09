@@ -1,0 +1,1 @@
+import "@tinkoff/pack-polyfills";

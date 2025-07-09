@@ -1,0 +1,14 @@
+{
+  "name": "custom-pack-polyfills",
+  "scripts": {
+    "build:imports": "node build.js"
+  },
+  "browserslist": {
+    "node": [
+      "extends @tinkoff/browserslist-config"
+    ],
+    "defaults": [
+      "chrome > 90"
+    ]
+  }
+}

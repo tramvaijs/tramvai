@@ -3,6 +3,13 @@ import type { ROUTES_TOKEN } from '@tramvai/module-router';
 
 export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
   {
+    name: 'preload-error',
+    path: '/preload-error',
+    config: {
+      bundle: 'preload-error',
+    },
+  },
+  {
     name: 'base',
     path: '/base',
     config: {

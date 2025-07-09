@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../../../../node_modules/@tramvai/cli/schema.json",
+  "projects": {
+    "default-polyfills": {
+      "name": "default-polyfill-fixture",
+      "root": "src",
+      "type": "application"
+    }
+  }
+}

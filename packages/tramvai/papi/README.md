@@ -7,7 +7,7 @@ sidebar_position: 4
 
 Library for creating and working with papi handlers.
 
-Complete information about papi feature you can find [here](03-features/016-papi.md)
+Complete information about papi feature you can find [here](03-features/017-papi.md)
 
 ## Installation
 

@@ -2,7 +2,7 @@ import { useDi } from '@tramvai/react';
 import { CHILD_APP_BASE_TOKEN } from './tokens';
 import { InnerCmp } from './innerCmp';
 
-export const BaseCmp = ({ fromRoot }: { fromRoot: string }) => {
+export const BaseCmp = () => {
   const val = useDi(CHILD_APP_BASE_TOKEN);
 
   return (

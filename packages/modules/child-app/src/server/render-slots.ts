@@ -34,7 +34,7 @@ const deferScriptAttrs = {
 // and Child App initialization logic executed after that, we need to get script loading status
 const entryAttrs = {
   onload: `this.setAttribute('loaded', 'true')`,
-  onerror: `this.setAttribute('loaded', 'false')`,
+  onerror: `this.setAttribute('loaded', 'error')`,
 };
 // for cases when preloaded chunk loading is failed before webpack add this script loading handlers,
 // we need to remove script and webpack will try to load it itself https://github.com/webpack/webpack/issues/14874

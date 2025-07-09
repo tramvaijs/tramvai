@@ -2,7 +2,7 @@
 
 Progressiwe Web App module.
 
-Complete documentation is available in [PWA page](03-features/017-pwa.md).
+Complete documentation is available in [PWA page](03-features/018-pwa.md).
 
 ## Installation
 

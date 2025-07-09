@@ -20,15 +20,27 @@
     "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
   },
   "dependencies": {
-    "@tinkoff/utils": "^2.1.2"
+    "@automattic/eslint-config-target-es": "^3.0.0",
+    "@tinkoff/utils": "^2.1.2",
+    "dependency-cruiser": "^16.10.3",
+    "eslint-plugin-compat": "^6.0.2",
+    "eslint-plugin-es-x": "^8.7.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.26.8",
+    "@tinkoff/browserslist-config": "0.0.0-stub",
+    "@tinkoff/pack-polyfills": "0.0.0-stub",
     "@types/eslint": "^8.38.0",
     "@typescript-eslint/parser": "^8.24.1",
-    "eslint": "^8.38.0"
+    "browserslist": "^4.0.0",
+    "eslint": "^8.38.0",
+    "find-cache-dir": "^3.2.1",
+    "typescript": "~5.1.0"
   },
   "peerDependencies": {
+    "@tinkoff/browserslist-config": "*",
+    "@tinkoff/pack-polyfills": "*",
+    "browserslist": "*",
     "eslint": ">=7.0.0"
   },
   "engines": {

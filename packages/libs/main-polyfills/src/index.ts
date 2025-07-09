@@ -27,6 +27,8 @@ import 'core-js/modules/es.array.splice';
 import 'core-js/modules/es.array.unscopables.flat-map';
 import 'core-js/modules/es.array.unscopables.flat';
 
+import 'core-js/modules/es.global-this';
+
 import 'core-js/modules/es.json.stringify';
 import 'core-js/modules/es.json.to-string-tag';
 

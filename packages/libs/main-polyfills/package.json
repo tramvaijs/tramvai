@@ -17,7 +17,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "core-js": "3.40.0",
+    "core-js": "3.43.0",
     "tslib": "^2.4.0"
   },
   "module": "lib/index.es.js",

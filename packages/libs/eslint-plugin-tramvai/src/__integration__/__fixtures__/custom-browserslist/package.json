@@ -1,0 +1,11 @@
+{
+  "name": "custom-browserslist",
+  "browserslist": {
+    "node": [
+      "extends @tinkoff/browserslist-config"
+    ],
+    "defaults": [
+      "chrome > 90"
+    ]
+  }
+}

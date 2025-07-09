@@ -12,7 +12,7 @@ import type { REACT_SERVER_RENDER_MODE } from '@tramvai/module-render';
 import { RenderModule } from '@tramvai/module-render';
 import { ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
-import type { TypedContracts, ContractsValidation } from '@tramvai/module-child-app';
+import type { ContractsValidation } from '@tramvai/module-child-app';
 import {
   ChildAppModule,
   CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
@@ -32,6 +32,7 @@ import {
   TEST_CHILD_CONTRACT,
 } from '../shared/tokens';
 import { globalStore } from './stores/global';
+import { preloadedChildAppInfoStore } from './stores/preload';
 
 if (typeof window === 'undefined') {
   const { setDefaultResultOrder } = require('dns');
@@ -65,6 +66,8 @@ if (typeof Assert === 'function') {
 createApp({
   name: 'root-app',
   bundles: {
+    'preload-error': () =>
+      import(/* webpackChunkName: "preload-error" */ './bundles/preload-error'),
     base: () => import(/* webpackChunkName: "base" */ './bundles/base'),
     'base-not-preloaded': () =>
       import(/* webpackChunkName: "base-not-preloaded" */ './bundles/base-not-preloaded'),
@@ -132,7 +135,7 @@ createApp({
     provide({
       provide: COMBINE_REDUCERS,
       multi: true,
-      useValue: [globalStore],
+      useValue: [globalStore, preloadedChildAppInfoStore],
     }),
     provide({
       provide: ACTION_CONDITIONALS,

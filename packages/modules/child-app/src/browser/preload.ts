@@ -8,12 +8,15 @@ import {
   type CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
   type CHILD_APP_DI_MANAGER_TOKEN,
   CHILD_APP_PAGE_SERVICE_TOKEN,
+  ChildAppPreloadManagerPlugin,
 } from '@tramvai/tokens-child-app';
 import type { STORE_TOKEN } from '@tramvai/tokens-common';
-import { optional } from '@tinkoff/dippy';
+import { ExtractDependencyType, optional } from '@tinkoff/dippy';
 import type { Route } from '@tinkoff/router';
+import { AsyncTapableHookInstance, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/core';
 import { ChildAppStore } from '../shared/store';
 import { getModuleFromGlobal } from './loader';
+import { setChildAppPreloadStatusOnClient } from '../shared/store';
 
 export class PreloadManager implements ChildAppPreloadManager {
   private loader: ChildAppLoader;
@@ -26,10 +29,19 @@ export class PreloadManager implements ChildAppPreloadManager {
   private pageHasRendered = false;
   private pageHasLoaded = false;
   private currentlyPreloaded = new Map<string, ChildAppFinalConfig>();
+
   private hasPreloadBefore = new Set<string>();
   private notPreloadedForCurrentSpaNavigation = new Set<string>();
   private hasInitialized = false;
   private map = new Map<string, Promise<void>>();
+
+  private plugins: ChildAppPreloadManagerPlugin[] | null;
+  private hookFactory: ExtractDependencyType<typeof TAPABLE_HOOK_FACTORY_TOKEN>;
+
+  public hooks: {
+    childAppPreload: AsyncTapableHookInstance<{ config: ChildAppFinalConfig; route?: Route }>;
+    childAppPrefetch: AsyncTapableHookInstance<{ config: ChildAppFinalConfig; route?: Route }>;
+  };
 
   constructor({
     loader,
@@ -38,6 +50,8 @@ export class PreloadManager implements ChildAppPreloadManager {
     resolveExternalConfig,
     store,
     diManager,
+    childAppPreloadPlugin,
+    hookFactory,
   }: {
     loader: ChildAppLoader;
     runner: ChildAppCommandLineRunner;
@@ -45,6 +59,8 @@ export class PreloadManager implements ChildAppPreloadManager {
     resolveExternalConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
     store: typeof STORE_TOKEN;
     diManager: typeof CHILD_APP_DI_MANAGER_TOKEN;
+    childAppPreloadPlugin: ChildAppPreloadManagerPlugin[] | null;
+    hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
   }) {
     this.loader = loader;
     this.runner = runner;
@@ -52,23 +68,60 @@ export class PreloadManager implements ChildAppPreloadManager {
     this.resolutionConfigManager = resolutionConfigManager;
     this.resolveExternalConfig = resolveExternalConfig;
     this.diManager = diManager;
+    this.plugins = childAppPreloadPlugin;
+    this.hookFactory = hookFactory;
+
+    this.hooks = {
+      childAppPrefetch: this.hookFactory.createAsync('childAppPrefetch'),
+      childAppPreload: this.hookFactory.createAsync('childAppPrefetch'),
+    };
+
+    this.hooks.childAppPreload.tapPromise(
+      'childAppPreload',
+      async (_context, { config, route }) => {
+        await this.loader.load(config);
+        await this.resolveComponent(config, route);
+
+        await this.run('customer', config);
+
+        // do not block Child App preloading by "clear" stage (where actions executed),
+        // because in will delay Child App rendering
+        // TODO: do we need to wait this Child App stage in "afterSpaTransition"?
+        // TODO: Can be a race condition between Child App render and actions?
+        this.run('clear', config).catch((error) => {
+          if (process.env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error('Child App command line error', error);
+          }
+        });
+        this.hasPreloadBefore.add(config.key);
+      }
+    );
+
+    this.hooks.childAppPrefetch.tapPromise(
+      'childAppPrefetch',
+      async (_config, { config, route }) => {
+        await this.loader.load(config);
+        await this.resolveComponent(config, route);
+      }
+    );
+
+    this.plugins?.forEach((plugin) => {
+      plugin.apply(this);
+    });
   }
 
   async preload(request: ChildAppRequestConfig, route?: Route): Promise<void> {
     await this.init();
-
     const config = this.resolveExternalConfig(request);
-
     if (!config) {
       return;
     }
 
     const { key } = config;
-
     if (this.pageHasRendered) {
       this.currentlyPreloaded.set(key, config);
     }
-
     if (!this.isPreloaded(config)) {
       if (this.map.has(key)) {
         return this.map.get(key);
@@ -78,35 +131,36 @@ export class PreloadManager implements ChildAppPreloadManager {
       // as it will lead to markup mismatch on markup hydration
       if (this.pageHasRendered) {
         // but in case render has happened load child-app as soon as possible
+
         const promise = (async () => {
           try {
-            await this.loader.load(config);
-            await this.resolveComponent(config, route);
-
-            await this.run('customer', config);
-
-            // do not block Child App preloading by "clear" stage (where actions executed),
-            // because in will delay Child App rendering
-            // TODO: do we need to wait this Child App stage in "afterSpaTransition"?
-            // TODO: Can be a race condition between Child App render and actions?
-            this.run('clear', config).catch((error) => {
-              if (process.env.NODE_ENV === 'development') {
-                // eslint-disable-next-line no-console
-                console.error('Child App command line error', error);
-              }
-            });
+            await this.hooks.childAppPreload.callPromise({ config, route });
+            this.store.dispatch(
+              setChildAppPreloadStatusOnClient({
+                [key]: {
+                  status: 'loaded',
+                },
+              })
+            );
           } catch (error) {
             if (process.env.NODE_ENV === 'development') {
               // eslint-disable-next-line no-console
               console.error('Child App loading error', error);
             }
+            this.hasPreloadBefore.delete(config.key);
+            this.map.delete(config.key);
+            this.store.dispatch(
+              setChildAppPreloadStatusOnClient({
+                [key]: {
+                  status: 'error',
+                },
+              })
+            );
+            return Promise.reject(error);
           }
-
-          this.hasPreloadBefore.add(key);
         })();
 
         this.map.set(key, promise);
-
         return promise;
       }
     } else {
@@ -126,13 +180,13 @@ export class PreloadManager implements ChildAppPreloadManager {
 
     if (!this.isPreloaded(config)) {
       try {
-        await this.loader.load(config);
-        await this.resolveComponent(config, route);
+        await this.hooks.childAppPrefetch.callPromise({ config, route });
       } catch (error) {
         if (process.env.NODE_ENV === 'development') {
           // eslint-disable-next-line no-console
           console.error('Child App prefetch error', error);
         }
+        return Promise.reject(error);
       }
     }
   }

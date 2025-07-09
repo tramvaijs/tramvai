@@ -500,8 +500,8 @@ if (rootAppVersion !== 'v2.0.0') {
               info: expect.any(Object),
               childApp: {
                 name: 'error',
-                tag: undefined,
-                version: undefined,
+                tag: 'latest',
+                version: '0.0.0-stub',
               },
             });
           });

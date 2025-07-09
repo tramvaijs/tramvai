@@ -20,6 +20,10 @@ export function checkMonorepoVersionsMatch(allPkgs: Package[], pkg: Package, res
         const depRange = depsSection[depName];
         let minVersion;
 
+        if (depRange === '*') {
+          return;
+        }
+
         try {
           minVersion = semver.minVersion(semver.validRange(depRange) || '', true);
         } catch (e) {

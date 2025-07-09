@@ -3,8 +3,7 @@ id: styling
 title: Styling
 ---
 
-For styling, we recommend using `CSS Modules` and `CSS variables` (powered by `postcss`).
-In this tutorial, we'll update the Header and decorate our `Pokedex` pages a bit.
+For styling, we recommend using `CSS Modules` and `CSS variables` (powered by `postcss`). In this tutorial, we'll update the Header and decorate our `Pokedex` pages a bit.
 
 For the `Header` component, replace the header with **Pokedex** and add a pokeball image.
 
@@ -21,9 +20,7 @@ export const Header = () => (
       width={25}
       height={25}
     />
-    <h1>
-      Pokedex
-    </h1>
+    <h1>Pokedex</h1>
   </div>
 );
 ```
@@ -32,8 +29,7 @@ Let's work with CSS Modules on the example of our `Header` component.
 
 :hourglass: Add styles to the header:
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from '@theme/Tabs'; import TabItem from '@theme/TabItem';
 
 <Tabs>
   <TabItem value="css" label="Header.module.css" default>
@@ -66,9 +62,7 @@ export const Header = () => (
       width={25}
       height={25}
     />
-    <h1>
-      Pokedex
-    </h1>
+    <h1>Pokedex</h1>
   </div>
 );
 ```
@@ -76,17 +70,12 @@ export const Header = () => (
   </TabItem>
 </Tabs>
 
-Let's try to change the fonts in our application.
-You can add new resources to the pages of the application through the `RENDER_SLOTS` token, alternative ways and examples can be found in the [module render](references/modules/render.md) documentation.
+Let's try to change the fonts in our application. You can add new resources to the pages of the application through the `RENDER_SLOTS` token, alternative ways and examples can be found in the [module render](references/modules/render.md) documentation.
 
 :hourglass: Connect Lato from Google Fonts in the `createApp` providers:
 
 ```tsx title="index.ts"
-import {
-  RENDER_SLOTS,
-  ResourceType,
-  ResourceSlot,
-} from '@tramvai/tokens-render';
+import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 
 createApp({
   name: 'pokedex',
@@ -101,12 +90,12 @@ createApp({
         type: ResourceType.style,
         slot: ResourceSlot.HEAD_CORE_STYLES,
         payload: 'https://fonts.googleapis.com/css2?family=Lato&display=swap',
-      }
+      },
     },
     // highlight-end
   ],
   actions: [...actions],
-  bundles: {...bundles},
+  bundles: { ...bundles },
 });
 ```
 
@@ -134,7 +123,7 @@ createApp({
   modules: [...modules],
   providers: [...providers],
   actions: [...actions],
-  bundles: {...bundles},
+  bundles: { ...bundles },
 });
 ```
 
@@ -145,22 +134,22 @@ createApp({
 
 For more efficient font loading and no layout shifting after downloading the required font, we recommend keeping these fonts in the application itself, and adding `preload` tags for the main fonts, for example:
 
-  ```tsx
-  const provider = {
-    provide: RENDER_SLOTS,
-    multi: true,
-    useValue: {
-      type: ResourceType.preloadLink,
-      slot: ResourceSlot.HEAD_CORE_SCRIPTS,
-      payload: 'https://fonts.gstatic.com/s/lato/v20/S6uyw4BMUTPHjx4wXiWtFCc.woff2',
-      attrs: {
-        as: 'font',
-        type: 'font/woff2',
-        crossOrigin: 'anonymous',
-      },
+```tsx
+const provider = {
+  provide: RENDER_SLOTS,
+  multi: true,
+  useValue: {
+    type: ResourceType.preloadLink,
+    slot: ResourceSlot.HEAD_CORE_SCRIPTS,
+    payload: 'https://fonts.gstatic.com/s/lato/v20/S6uyw4BMUTPHjx4wXiWtFCc.woff2',
+    attrs: {
+      as: 'font',
+      type: 'font/woff2',
+      crossOrigin: 'anonymous',
     },
-  };
-  ```
+  },
+};
+```
 
 :::
 
@@ -178,7 +167,6 @@ It remains to add CSS variables, for demonstration we will add a variable with t
 html {
   font-family: 'Lato', sans-serif;
 }
-
 ```
 
 :hourglass: Use a new variable in `Header.module.css`:
@@ -200,18 +188,15 @@ html {
 // highlight-end
 ```
 
-By default, tramvai has [postcss-custom-properties](https://github.com/postcss/postcss-custom-properties) plugin, which can do fallback for CSS variables.
-Unfortunately, `postcss-loader` + `css-loader` process the files one by one, and in our example the plugin will just cut variables from `global.module.css` as not used. This behavior can be changed with option `preserve: true`, but in this case the plugin will not perform its main functions.
+By default, tramvai has [postcss-custom-properties](https://github.com/postcss/postcss-custom-properties) plugin, which can do fallback for CSS variables. Unfortunately, `postcss-loader` + `css-loader` process the files one by one, and in our example the plugin will just cut variables from `global.module.css` as not used. This behavior can be changed with option `preserve: true`, but in this case the plugin will not perform its main functions.
 
 An alternative option - add global variables directly to the plugin, through the property `importFrom`, where you can pass a js or css file with a list of variables.
 
 :::tip
 
-An alternative for CSS variables is to use a variable syntax created specifically for CSS Modules, [documentation](https://github.com/css-modules/css-modules/blob/master/docs/values-variables.md).
-But such variables are completely static.
+An alternative for CSS variables is to use a variable syntax created specifically for CSS Modules, [documentation](https://github.com/css-modules/css-modules/blob/master/docs/values-variables.md). But such variables are completely static.
 
 :::
-
 
 :hourglass: Update the `postcss-custom-properties` plugin settings in `postcss.js`:
 
@@ -231,7 +216,6 @@ module.exports = {
     }),
   ],
 };
-
 ```
 
 After refreshing the page, we will see the dark blue header `Pokedex'!
@@ -242,4 +226,4 @@ That's all for now!
 
 We learned how to create a new `tramvai` application, work with `depencency injection`, routing and global state, load data and style the application.
 
-You can familiarize yourself with framework features like [API routing](03-features/016-papi.md), try integration with [react-query](references/modules/react-query.md), integrate our awesome test utilities for [unit](references/tramvai/test/unit.md) and [e2e](references/tramvai/test/integration.md) testing into the application.
+You can familiarize yourself with framework features like [API routing](03-features/017-papi.md), try integration with [react-query](references/modules/react-query.md), integrate our awesome test utilities for [unit](references/tramvai/test/unit.md) and [e2e](references/tramvai/test/integration.md) testing into the application.
