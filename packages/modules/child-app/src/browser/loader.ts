@@ -27,7 +27,6 @@ export class BrowserLoader extends Loader {
   async load(config: ChildAppFinalConfig): Promise<ChildApp | undefined> {
     const moduleName = config.name;
     const childApp = await this.get(config);
-
     if (childApp) {
       this.log.debug({
         event: 'load-cache',
@@ -45,7 +44,6 @@ export class BrowserLoader extends Loader {
     if (container && !childApp && this.map.has(config.key)) {
       return this.map.get(config.key);
     }
-
     if (!container) {
       this.log.debug({
         event: 'load-fetch',

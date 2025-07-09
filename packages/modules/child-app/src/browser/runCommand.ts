@@ -11,7 +11,6 @@ export const runCommand = async ({
   forcePreload,
   runner,
   preloader,
-  diManager,
   pageService,
   logger,
 }: {
@@ -25,7 +24,6 @@ export const runCommand = async ({
 }) => {
   const childApps = preloader.getPreloadedList();
   const log = logger('child-app:run-preloaded');
-
   await Promise.all(
     childApps.map(async (config) => {
       if (forcePreload) {

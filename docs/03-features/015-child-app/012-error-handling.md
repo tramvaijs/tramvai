@@ -46,7 +46,11 @@ const provider = provide({
   useFactory: () => {
     const log = logger('child-app-error-boundary');
 
-    return function logErrorBoundary(error: Error, info: React.ErrorInfo, config: ChildAppRequestConfig) {
+    return function logErrorBoundary(
+      error: Error,
+      info: React.ErrorInfo,
+      config: ChildAppRequestConfig
+    ) {
       log.error({
         event: 'component-did-catch',
         error,

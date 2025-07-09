@@ -44,6 +44,7 @@ If specific child-app was not preloaded on server but used on current page then 
 Used on client for subsequent navigations without page reloading.
 
 Child App is considered not preloaded on SPA-navigation for next page, when:
+
 - it is not [automatically preloaded](03-features/015-child-app/010-connect.md#preload-automatically-for-page-or-layout)
 - it is not [manually preloaded](03-features/015-child-app/010-connect.md#preload-manually)
 - or it is preloaded first time at client-side (or you can [force Child App loading before navigation](#how-to-preload-child-app-before-spa-navigation))
@@ -163,7 +164,6 @@ const provider = provide({
     let isSpaNavigation = false;
 
     return function preloadFancyChildApp() {
-
       // for SPA-navigation to specific page with this Child App
       if (isSpaNavigation && pageService.getCurrentUrl().pathname === '/fancy-child/') {
         if (!preloadManager.isPreloaded(config)) {

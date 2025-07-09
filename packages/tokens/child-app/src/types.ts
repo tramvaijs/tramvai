@@ -8,6 +8,7 @@ import type {
   Action,
   TramvaiAction,
 } from '@tramvai/core';
+import type { AsyncTapableHookInstance } from '@tramvai/tokens-core';
 import type { Route } from '@tinkoff/router';
 
 export interface ChildApp {
@@ -161,9 +162,12 @@ export type HostContractsFallback = (report: {
   missedContracts: Contract[];
   hostDi: Container;
 }) => void;
-
 export type ChildAppErrorBoundaryHandler = (
   error: Error,
   errorInfo: ErrorInfo,
   config: ChildAppRequestConfig
 ) => void;
+
+export type ChildAppPreloadManagerPlugin = {
+  apply(preloadManager: ChildAppPreloadManager): void;
+};

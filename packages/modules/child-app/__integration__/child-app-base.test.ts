@@ -347,6 +347,116 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       });
     }
   });
+  if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
+    describe('retry render', () => {
+      it('should be possible retry render on client fail', async () => {
+        const { serverUrl } = rootApp;
+
+        const { page } = await getPageWrapper('/preload-error?renderChildApp=true');
+
+        await page.route('**/*', async (route) => {
+          if (route.request().url().includes('/base/base_client@0.0.0-stub.js')) {
+            return route.abort();
+          }
+          return route.continue();
+        });
+        await page.goto(`${serverUrl}/preload-error?renderChildApp=true`);
+
+        await page.unroute('**/*');
+        const childAppCount = await page.locator('#cmp').count();
+        expect(childAppCount).toBe(0);
+        await page.waitForFunction((text) => {
+          return document.querySelector('.preloaded')?.textContent?.trim() === text;
+        }, 'Preloaded:');
+        await page
+          .locator('button', {
+            hasText: 'Preload child-app: base',
+          })
+          .click();
+
+        await page.waitForFunction((text) => {
+          return document.querySelector('.preloaded')?.textContent === text;
+        }, 'Preloaded: base');
+        const childAppBaseCount = await page.locator('#cmp').count();
+        expect(childAppBaseCount).toBe(1);
+      });
+    });
+
+    describe('retry on failed preload', () => {
+      it('should be possible to retry failed prefetched child-app', async () => {
+        const { serverUrl } = rootApp;
+        const { page } = await getPageWrapper('/preload-error');
+        await page.route('**/*', async (route) => {
+          if (route.request().url().includes('/client-hints/client-hints_client@0.0.0-stub.js')) {
+            return route.abort();
+          }
+          return route.continue();
+        });
+        await page.goto(`${serverUrl}/preload-error`);
+        await page
+          .locator('button', {
+            hasText: 'Prefetch child-app: client-hints',
+          })
+          .click();
+        await page.unroute('**/*');
+        await page.waitForFunction((text) => {
+          const failedPreloadChildAppText = document.querySelector('.failed')?.textContent;
+          return failedPreloadChildAppText === text;
+        }, 'Failed: client-hints');
+        await page
+          .locator('button', {
+            hasText: 'Prefetch child-app: client-hints',
+          })
+          .click();
+        await page.waitForFunction((text) => {
+          const preloadedChildAppTextContent = document.querySelector('.preloaded')?.textContent;
+          return preloadedChildAppTextContent === text;
+        }, 'Preloaded: client-hints');
+      });
+      it('should be possible to retry failed preloaded child-app', async () => {
+        const { serverUrl } = rootApp;
+        const { page } = await getPageWrapper('/preload-error');
+        await page.route('**/*', async (route) => {
+          if (route.request().url().includes('/base/base_client@0.0.0-stub.js')) {
+            return route.abort();
+          }
+          return route.continue();
+        });
+
+        await page.goto(`${serverUrl}/preload-error`);
+
+        await page
+          .locator('button', {
+            hasText: 'Preload child-app: base',
+          })
+          .click();
+        await page.unroute('**/*');
+
+        await page.waitForFunction((text) => {
+          const failedPreloadChildAppText = document.querySelector('.failed')?.textContent;
+          return failedPreloadChildAppText === text;
+        }, 'Failed: base');
+
+        await page
+          .locator('button', {
+            hasText: 'Preload child-app: base',
+          })
+          .click();
+        await page.waitForFunction((text) => {
+          return document.querySelector('.preloaded')?.textContent === text;
+        }, 'Preloaded: base');
+
+        const scriptLocator = page.locator(
+          `script[src="http://localhost:${mockerPort}/base/base_client@0.0.0-stub.js"]`
+        );
+        const scriptCount = await scriptLocator.count();
+        const scriptLoaded = await scriptLocator.getAttribute('loaded');
+
+        expect(scriptCount).toBe(1);
+        expect(scriptLoaded).toBe('true');
+      });
+    });
+  }
 
   describe('react-query', () => {
     it('should work with react-query', async () => {

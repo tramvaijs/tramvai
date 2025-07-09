@@ -1,6 +1,6 @@
 import type { Provider } from '@tinkoff/dippy';
 import { DI_TOKEN, Scope, optional } from '@tinkoff/dippy';
-import { commandLineListTokens, provide } from '@tramvai/core';
+import { commandLineListTokens, provide, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/core';
 import {
   CHILD_APP_CONTRACT_MANAGER,
   CHILD_APP_DI_MANAGER_TOKEN,
@@ -10,6 +10,7 @@ import {
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
   HOST_PROVIDED_CONTRACTS,
   HOST_REQUIRED_CONTRACTS,
+  CHILD_APP_PRELOAD_MANAGER_PLUGIN,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMON_INITIAL_STATE_TOKEN,
@@ -38,6 +39,11 @@ export const browserProviders: Provider[] = [
     provide: CHILD_APP_PRELOAD_MANAGER_TOKEN,
     useClass: PreloadManager,
     deps: {
+      childAppPreloadPlugin: {
+        optional: true,
+        token: CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+      },
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
       loader: CHILD_APP_LOADER_TOKEN,
       runner: CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
       resolutionConfigManager: CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,

@@ -28,6 +28,7 @@ import type {
   ChildContractsFallback,
   HostContractsFallback,
   ChildAppErrorBoundaryHandler,
+  ChildAppPreloadManagerPlugin,
 } from './types';
 
 export * from './types';
@@ -272,6 +273,11 @@ export const CHILD_APP_RENDER_CHILDREN_TOKEN = createToken<ComponentType<{ di: C
 export const CHILD_APP_PRELOAD_SOURCE_LIST_TOKEN = createToken<
   (options: { route?: Route }) => ChildAppRequestConfig[] | Promise<ChildAppRequestConfig[]>
 >('child-app preload source list', { multi: true });
+
+export const CHILD_APP_PRELOAD_MANAGER_PLUGIN = createToken<ChildAppPreloadManagerPlugin>(
+  'child-app preload plugin',
+  { multi: true }
+);
 
 export interface ChildAppPageService {
   resolveComponent(route?: Route): Promise<void>;

@@ -4,7 +4,10 @@ import type { ExtractDependencyType } from '@tinkoff/dippy';
 import type { ChildAppReactConfig } from '@tramvai/tokens-child-app';
 import { CHILD_APP_ERROR_BOUNDARY_TOKEN } from '@tramvai/tokens-child-app';
 import type { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
-import { useDi, UniversalErrorBoundary } from '@tramvai/react';
+import { useDi } from '@tramvai/react';
+import { useStoreSelector } from '@tramvai/state';
+import { ChildAppErrorBoundary } from './ChildAppErrorBoundary/ChildAppErrorBoundary';
+import { ChildAppStore } from '../store';
 
 type ErrorBoundaryHandler = ExtractDependencyType<typeof ERROR_BOUNDARY_TOKEN>[0];
 
@@ -12,9 +15,14 @@ type Props = {
   config: ChildAppReactConfig;
 };
 
-export const ChildAppErrorBoundary = (props: PropsWithChildren<Props>) => {
+export const ChildAppErrorBoundaryWrapper = (props: PropsWithChildren<Props>) => {
   const { children, config } = props;
   const { fallback, name, version, tag } = config;
+  const childAppLoadingStatus = useStoreSelector(ChildAppStore, (state) => {
+    const key = `${name}@${version}`;
+    const childAppState = state?.childAppPreloadStatusOnClient?.[key];
+    return childAppState?.status;
+  });
 
   const errorHandlers = useDi({ token: CHILD_APP_ERROR_BOUNDARY_TOKEN, optional: true });
 
@@ -25,10 +33,13 @@ export const ChildAppErrorBoundary = (props: PropsWithChildren<Props>) => {
       ),
     [errorHandlers, name, version, tag]
   );
-
   return (
-    <UniversalErrorBoundary fallback={fallback as any} errorHandlers={decoratedErrorHandlers}>
+    <ChildAppErrorBoundary
+      childAppLoadingStatus={childAppLoadingStatus}
+      fallback={fallback as any}
+      errorHandlers={decoratedErrorHandlers}
+    >
       {children}
-    </UniversalErrorBoundary>
+    </ChildAppErrorBoundary>
   );
 };

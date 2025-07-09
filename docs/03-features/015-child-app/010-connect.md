@@ -163,6 +163,102 @@ MainPage.childApps = [{ name: 'fancy-child' }];
 export default MainPage;
 ```
 
+### Hook into child app prefetch process
+
+You can connect to the `childAppPrefetch` hook exposed by the PreloadManager to listen for and handle Child App prefetch events. This allows you to run custom logic whenever a Child App starts prefetch. For example, you can use this hook for monitoring purposes, logging prefetch activity, or adding custom error handling logic to catch and process errors during prefetch. By subscribing to this hook, you can extend or modify the prefetch behavior from outside the PreloadManager class.
+
+Visualized preloadManager.prefetch flow: ![prefetch flow](/img/child-app/prefetch.drawio.svg)
+
+Example of how you can use `childAppPrefetchHook` to handle errors and add retry logic
+
+```ts
+[
+  {
+    provide: CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+    useFactory: () => {
+      return (hook: any) => {
+        return {
+          apply(preloadManager) {
+            preloadManager.hooks.childAppPrefetch.wrap(async (_context, payload, next) => {
+              let attempt = 0;
+              const maxAttempts = 3;
+
+              const execute = async () => {
+                try {
+                  return await next(payload);
+                } catch (e) {
+                  if (attempt >= maxAttempts) {
+                    throw e;
+                  }
+
+                  const delayMs = 1000;
+                  await new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      resolve();
+                    }, delayMs);
+                  });
+                  attempt++;
+                  return execute();
+                }
+              };
+              await execute();
+            });
+          },
+        };
+      };
+    },
+  },
+];
+```
+
+### Hook into child app preload process
+
+You can connect to the `childAppPreload` hook exposed by the PreloadManager to listen for and handle Child App preload events. This allows you to run custom logic whenever a Child App starts preloading. For example, you can use this hook for monitoring purposes, logging preload activity, or adding custom error handling logic to catch and process errors during preload. By subscribing to this hook, you can extend or modify the preload behavior from outside the PreloadManager class.
+
+Visualized preloadManager.preload flow: ![prefetch flow](/img/child-app/preload.drawio.svg)
+
+Example of how you can use `childAppPreloadHook` to handle errors and add retry logic
+
+```ts
+[
+  {
+    provide: CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+    useFactory: () => {
+      return (hook: any) => {
+        return {
+          apply(preloadManager) {
+            preloadManager.hooks.childAppPreload.wrap(async (_context, payload, next) => {
+              let attempt = 0;
+              const maxAttempts = 3;
+
+              const execute = async () => {
+                try {
+                  return await next(payload);
+                } catch (e) {
+                  if (attempt >= maxAttempts) {
+                    throw e;
+                  }
+
+                  const delayMs = 1000;
+                  await new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      resolve();
+                    }, delayMs);
+                  });
+                  attempt++;
+                  return execute();
+                }
+              };
+              await execute();
+            });
+          },
+        };
+      };
+    },
+  },
+];
+```
+
 ### Extend preload source list
 
 You can provide additional source for Child Apps list, for example, to get it from some remote configuration.
@@ -181,9 +277,7 @@ const providers = [
       if (route.path !== '/fancy-child/') {
         return [];
       }
-      return [
-        { name: 'fancy-child' },
-      ];
+      return [{ name: 'fancy-child' }];
     },
   }),
   // remote source of Child Apps
@@ -208,6 +302,7 @@ const providers = [
 :::warning
 
 Use manual preload carefully:
+
 - Preloaded Child App will be treated as used on current page and lifecycle for this Child App will be triggered
 - Preloading will work properly in all cases (Child App actions, `spa` and `afterSpa` lines) only on `resolvePageDeps` command line, because internal `@tramvai/module-child-app` logic expect that all required Child Apps is already preloaded after
 - For future navigations prefer [`preloadManager.prefetch`](#prefetch-manually) method instead of `preloadManager.preload`
@@ -269,7 +364,7 @@ import { LINK_PREFETCH_HANDLER_TOKEN } from '@tramvai/tokens-router';
 const provider = provide({
   provide: LINK_PREFETCH_HANDLER_TOKEN,
   useFactory: ({ preloadManager }) => {
-    return function preloadFancyChildApp(route) {
+    return function prefetchFancyChildApp(route) {
       return preloadManager.prefetch({ name: 'fancy-child' }, route);
     };
   },
@@ -376,7 +471,7 @@ export default createChildApp({
       deps: {
         analytics: SOME_ANALYTICS_TOKEN,
         config: CHILD_APP_INTERNAL_CONFIG_TOKEN,
-      }
+      },
     }),
   ],
 });

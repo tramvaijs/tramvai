@@ -1,12 +1,15 @@
 import noop from '@tinkoff/utils/function/noop';
 import { useMemo, useContext, useState, useEffect, Suspense, memo } from 'react';
 import type { ChildAppReactConfig } from '@tramvai/tokens-child-app';
-import { CHILD_APP_INTERNAL_RENDER_TOKEN } from '@tramvai/tokens-child-app';
+import {
+  CHILD_APP_INTERNAL_RENDER_TOKEN,
+  CHILD_APP_RESOLVE_CONFIG_TOKEN,
+} from '@tramvai/tokens-child-app';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { useDi } from '@tramvai/react';
 import { RenderContext } from './render-context';
 import { Extractor } from './extractor';
-import { ChildAppErrorBoundary } from './childAppErrorBoundary';
+import { ChildAppErrorBoundaryWrapper } from './childAppErrorBoundaryWrapper';
 
 const FailedChildAppFallback = ({ config }: { config: ChildAppReactConfig }) => {
   const { name, version, tag, fallback: Fallback } = config;
@@ -119,10 +122,29 @@ const ChildAppWrapper = ({
 
 export const ChildApp = memo((config: ChildAppReactConfig) => {
   let result = <ChildAppWrapper {...config} />;
+  const resolveExternalConfig = useDi(CHILD_APP_RESOLVE_CONFIG_TOKEN);
+  const { name, version, tag } = config;
+  const resolvedExternalConfig = useMemo(() => {
+    return resolveExternalConfig({
+      name,
+      tag,
+      version,
+    });
+  }, [name, version, tag, resolveExternalConfig]);
+
+  const resultConfig = {
+    ...config,
+    version: resolvedExternalConfig?.version,
+    tag: resolvedExternalConfig?.tag ?? 'latest',
+  };
 
   if (process.env.__TRAMVAI_CONCURRENT_FEATURES) {
-    result = <Suspense fallback={<FailedChildAppFallback config={config} />}>{result}</Suspense>;
+    result = (
+      <Suspense fallback={<FailedChildAppFallback config={resultConfig} />}>{result}</Suspense>
+    );
   }
 
-  return <ChildAppErrorBoundary config={config}>{result}</ChildAppErrorBoundary>;
+  return (
+    <ChildAppErrorBoundaryWrapper config={resultConfig}>{result}</ChildAppErrorBoundaryWrapper>
+  );
 });

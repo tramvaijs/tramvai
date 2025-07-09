@@ -54,7 +54,7 @@ export const sharedProviders: Provider[] = [
   provide({
     provide: COMBINE_REDUCERS,
     multi: true,
-    useValue: ChildAppStore,
+    useValue: [ChildAppStore],
   }),
   provide({
     provide: commandLineListTokens.init,

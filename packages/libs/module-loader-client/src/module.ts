@@ -32,14 +32,22 @@ export function loadModule(jsUrl: string, options: LoadModuleOptions = {}): Prom
 
   if (script) {
     const loadedAttr = script.getAttribute('loaded');
-    if (loadedAttr) {
-      return loadedAttr === 'true' ? Promise.resolve() : Promise.reject();
+    if (loadedAttr === 'true') {
+      return Promise.resolve();
     }
+    if (loadedAttr === 'error') {
+      const loadingStyleNode = findLoadingStyle(options.cssUrl ?? '');
+      const lazyLoadingStyle = findLazyLoadingStyle(options.cssUrl ?? '');
 
-    return new Promise((resolve, reject) => {
-      script.addEventListener('load', resolve);
-      script.addEventListener('error', reject);
-    });
+      script.remove();
+      loadingStyleNode?.ownerNode?.remove();
+      lazyLoadingStyle?.remove();
+    } else {
+      return new Promise((resolve, reject) => {
+        script.addEventListener('load', resolve);
+        script.addEventListener('error', reject);
+      });
+    }
   }
 
   const addHandlers = (scriptElement: HTMLScriptElement) => {
