@@ -36,6 +36,7 @@
     "@types/cosmiconfig": "^6.0.0",
     "@types/depcheck": "^0.9.1",
     "@types/find-up": "^4.0.0",
+    "@types/minimatch": "^3.0.5",
     "@types/semver": "^7.2.0",
     "@types/signale": "^1.4.1",
     "@types/yargs": "^15.0.5"
