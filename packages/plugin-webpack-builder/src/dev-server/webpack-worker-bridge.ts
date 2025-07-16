@@ -3,26 +3,32 @@ import { Worker } from 'node:worker_threads';
 import { ConfigService } from '@tramvai/api/lib/config';
 import {
   EXIT,
+  PROGRESS,
   WebpackWorkerData,
   WebpackWorkerIncomingEventsPayload,
   WebpackWorkerOutgoingEventsPayload,
 } from '../workers/webpack.events';
+import { ProgressBar } from '../utils/progress-bar';
 
 export class WebpackWorkerBridge {
   #worker: Worker | null = null;
   #workerPath: string;
   #workerData: WebpackWorkerData;
   #config: ConfigService;
+  #progressBar: ProgressBar;
 
   constructor({
     config,
     workerPath,
+    progressBar,
     workerData,
   }: {
     config: ConfigService;
     workerPath: string;
+    progressBar: ProgressBar;
     workerData: WebpackWorkerData;
   }) {
+    this.#progressBar = progressBar;
     this.#workerPath = workerPath;
     this.#workerData = workerData;
     this.#config = config;
@@ -69,6 +75,12 @@ export class WebpackWorkerBridge {
       // eslint-disable-next-line no-console
       console.log(`[webpack-worker-bridge] ${this.#workerData.target} worker error`, err);
     });
+
+    if (this.#config.showProgress) {
+      this.subscribe(PROGRESS, (message) => {
+        this.#progressBar[message.type](message.state);
+      });
+    }
 
     this.#worker.on('exit', (code) => {
       if (code !== 0) {

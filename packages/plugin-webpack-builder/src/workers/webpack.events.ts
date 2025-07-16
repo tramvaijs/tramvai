@@ -1,5 +1,6 @@
 import { Configuration, InputParameters } from '@tramvai/api/lib/config';
 import { BuildTarget, BuildType } from '../webpack/webpack-config';
+import { ProgressState } from '../utils/progress-bar/types';
 
 export const DEV_SERVER_STARTED = 'dev-server-started';
 export const BUILD_DONE = 'build-done';
@@ -22,6 +23,8 @@ export type WebpackWorkerIncomingEventsPayload = {
   };
 };
 
+export type ProgressType = 'start' | 'update' | 'done';
+
 export type WebpackWorkerOutgoingEventsPayload = {
   [DEV_SERVER_STARTED]: {
     event: typeof DEV_SERVER_STARTED;
@@ -35,8 +38,8 @@ export type WebpackWorkerOutgoingEventsPayload = {
   };
   [PROGRESS]: {
     event: typeof PROGRESS;
-    percentage: number;
-    message: string;
+    type: ProgressType;
+    state: ProgressState;
   };
   [WATCH_RUN]: {
     event: typeof WATCH_RUN;

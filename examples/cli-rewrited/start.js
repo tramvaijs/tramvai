@@ -23,6 +23,7 @@ async function main() {
   const devServer = await start({
     name: 'cli-rewrited',
     port: 3000,
+    showProgress: true,
     staticPort: 4000,
   });
 

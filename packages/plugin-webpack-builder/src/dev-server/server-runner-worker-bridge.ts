@@ -13,7 +13,7 @@ export type ServerRunnerkWorkerData = {
   port: number;
 };
 
-export class ServerRunnerkWorkerBridge {
+export class ServerRunnerWorkerBridge {
   #worker: Worker | null = null;
   #workerPath: string;
   #workerData: ServerRunnerkWorkerData;

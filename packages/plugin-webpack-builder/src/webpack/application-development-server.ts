@@ -2,8 +2,6 @@ import path from 'node:path';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
-// @ts-expect-error `"types"` is missing in package exports field, not compatible with `"moduleResolution": "nodenext"`
-import WebpackBar from 'webpackbar';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import { optional } from '@tinkoff/dippy';
 import {
@@ -27,6 +25,7 @@ import { WATCH_OPTIONS_TOKEN } from './shared/watch-options';
 import { createStylesConfiguration } from './shared/styles';
 import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
 import { normalizeBrowserslistConfig } from './shared/browserslist';
+import { WorkerProgressPlugin } from './plugins/progress-plugin';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -75,6 +74,7 @@ export default appConfig;`;
   const isRootErrorBoundaryEnabled =
     typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
 
+  const { showProgress } = config;
   // TODO: test cacheUnaffected, lazyCompilation
 
   return {
@@ -170,15 +170,7 @@ export default appConfig;`;
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,
-      // new webpack.ProgressPlugin((percentage, message, ...args) => {
-      //   // e.g. Output each progress message directly to the console:
-      //   console.info(percentage, message, ...args);
-      // }),
-      // TODO: multi progress bar
-      new WebpackBar({
-        name: 'server',
-        color: 'orange',
-      }),
+      showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': false,
         'process.env.SERVER': true,

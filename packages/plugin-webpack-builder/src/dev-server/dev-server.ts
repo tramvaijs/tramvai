@@ -10,8 +10,9 @@ import type { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/
 import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
 import { BUILD_DONE, BUILD_FAILED, WATCH_RUN } from '../workers/webpack.events';
 import { WebpackWorkerBridge } from './webpack-worker-bridge';
-import { ServerRunnerkWorkerBridge } from './server-runner-worker-bridge';
+import { ServerRunnerWorkerBridge } from './server-runner-worker-bridge';
 import { createProxy } from './proxy';
+import { ProgressBar } from '../utils/progress-bar';
 
 type DevServerApi = ExtractTokenType<typeof DEV_SERVER_TOKEN>;
 
@@ -65,11 +66,12 @@ export function createDevServer({
       const webpackWorkerPath = path.resolve(__dirname, '..', 'workers', 'webpack.js');
       const serverRunnerWorkerPath = path.resolve(__dirname, '..', 'workers', 'server-runner.js');
       const serverPublicPath = resolvePublicPathDirectory(config.outputServer);
+      const progressBar = new ProgressBar();
       let serverRunnerAbortController: AbortController | undefined;
       let initialServerBuild = true;
       let initialClientBuild = true;
 
-      const serverRunnerWorker = new ServerRunnerkWorkerBridge({
+      const serverRunnerWorker = new ServerRunnerWorkerBridge({
         config,
         workerPath: serverRunnerWorkerPath,
         workerData: {
@@ -78,6 +80,7 @@ export function createDevServer({
       });
       const serverWebpackWorker = new WebpackWorkerBridge({
         config,
+        progressBar,
         workerPath: webpackWorkerPath,
         workerData: {
           type: config.projectType,
@@ -89,6 +92,7 @@ export function createDevServer({
       });
       const clientWebpackWorker = new WebpackWorkerBridge({
         config,
+        progressBar,
         workerPath: webpackWorkerPath,
         workerData: {
           type: config.projectType,

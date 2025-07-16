@@ -2,8 +2,6 @@ import path from 'node:path';
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
-// @ts-expect-error `"types"` is missing in package exports field, not compatible with `"moduleResolution": "nodenext"`
-import WebpackBar from 'webpackbar';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
 import { optional } from '@tinkoff/dippy';
@@ -33,6 +31,7 @@ import { DEFINE_PLUGIN_OPTIONS_TOKEN } from './shared/define';
 import { WATCH_OPTIONS_TOKEN } from './shared/watch-options';
 import { createStylesConfiguration } from './shared/styles';
 import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
+import { WorkerProgressPlugin } from './plugins/progress-plugin';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -68,6 +67,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const isRootErrorBoundaryEnabled =
     typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
   const virtualRootErrorBoundary = require.resolve('@tramvai/api/lib/virtual/root-error-boundary');
+
+  const { showProgress } = config;
 
   // TODO: test cacheUnaffected, lazyCompilation
 
@@ -181,15 +182,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         },
         fields: [...DEV_STATS_FIELDS, ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_FIELDS : [])],
       }) as any as WebpackPluginInstance,
-      // new webpack.ProgressPlugin((percentage, message, ...args) => {
-      //   // e.g. Output each progress message directly to the console:
-      //   console.info(percentage, message, ...args);
-      // }),
-      // TODO: multi progress bar
-      new WebpackBar({
-        name: 'client',
-        color: 'green',
-      }),
+      showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
@@ -208,6 +201,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           };
         }, {}),
       }),
-    ],
+    ].filter(Boolean),
   };
 };

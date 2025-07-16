@@ -141,6 +141,11 @@ export type InputParameters = {
    * @default false
    */
   verboseLogging?: boolean;
+  /**
+   * @description Show progressbar of build process
+   * @default false
+   */
+  showProgress?: boolean;
 };
 
 export type Project = ApplicationProject | ChildAppProject;
@@ -322,6 +327,10 @@ export class ConfigService {
 
   get entryFile() {
     return this.#project!.entryFile ?? 'index.ts';
+  }
+
+  get showProgress() {
+    return this.#parameters.showProgress;
   }
 
   get projectName() {
