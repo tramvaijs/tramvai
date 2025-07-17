@@ -330,8 +330,8 @@ exports[`custom eslint plugin tramvai should return default config with tramvai 
     "es-x/no-weakrefs": 2,
   },
   "settings": {
-    "lintAllEsApis": false,
     "polyfills": [
+      "es:all",
       "Promise",
       "URL",
       "URLSearchParams",

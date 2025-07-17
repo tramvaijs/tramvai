@@ -43,8 +43,14 @@ function getCompatConfig(
     },
     settings: {
       ...(browserslist.length > 0 ? { targets: browserslist } : {}),
-      lintAllEsApis: false,
-      polyfills: ['Promise', 'URL', 'URLSearchParams', ...customEslintConfig.settings.polyfills],
+      polyfills: [
+        // https://github.com/amilajack/eslint-plugin-compat/blob/main/src/rules/compat.ts#L178
+        'es:all',
+        'Promise',
+        'URL',
+        'URLSearchParams',
+        ...customEslintConfig.settings.polyfills,
+      ],
     },
   };
 }
