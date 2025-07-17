@@ -74,6 +74,7 @@
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/build": "0.0.0-stub",
     "@tramvai/plugin-babel-transpiler": "0.0.0-stub",
+    "@tramvai/plugin-webpack-builder": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/tools-check-versions": "0.0.0-stub",
     "@tramvai/tools-migrate": "0.0.0-stub",
@@ -89,7 +90,6 @@
     "commander": "^6.2.1",
     "compression": "^1.7.4",
     "core-js": "3.43.0",
-    "core-js-compat": "3.40.0",
     "css-class-generator": "^2.0.0",
     "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^5.0.1",
@@ -196,7 +196,7 @@
     "@types/webpack-dev-middleware": "^5.0.2",
     "@types/webpack-stats-plugin": "^0.3.2",
     "react": "19.0.0",
-    "sharp": "0.32.6"
+    "sharp": "0.34.3"
   },
   "peerDependencies": {
     "babel-plugin-react-compiler": "*"
@@ -208,7 +208,7 @@
   },
   "hiddenDependencies": {
     "image-webpack-loader": "^6.0.0",
-    "sharp": "0.32.6"
+    "sharp": "0.34.3"
   },
   "license": "Apache-2.0",
   "engines": {

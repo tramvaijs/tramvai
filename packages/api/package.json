@@ -23,7 +23,8 @@
     "@types/fs-extra": "^9.0.13",
     "@types/proper-lockfile": "^4.1.4",
     "@types/resolve": "^1.20.2",
-    "@types/semver": "^7.3.12"
+    "@types/semver": "^7.3.12",
+    "core-js": "3.43.0"
   },
   "optionalDependencies": {
     "react": "*"

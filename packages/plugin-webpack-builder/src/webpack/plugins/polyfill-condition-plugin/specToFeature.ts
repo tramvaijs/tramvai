@@ -19,7 +19,7 @@ const newPrimitivies = {
 };
 
 // A list of primitives for which there are no polyfills, but they are needed as a base for methods like JSON.stringify
-const missingBuiltIns = {
+const missingBuiltIns: Record<string, string> = {
   ...newPrimitivies,
   'typed-array': 'window.Int8Array',
   'uint8-array': 'window.Uint8Array',
@@ -33,15 +33,15 @@ const missingBuiltIns = {
 
 // Exclude fetch builtin, because its treated as object.constructor
 const excludedBuiltIns = ['fetch'];
-const isBuiltInExcluded = (builtInName) => excludedBuiltIns.includes(builtInName);
+const isBuiltInExcluded = (builtInName: string) => excludedBuiltIns.includes(builtInName);
 
 // Exclude iterators
 // we do not provide polyfills for them and their support check is much more complicated
 // es.iterator, es.async-iterator, esnext.async-iterator, esnext.iterator
-const isSpecExcluded = (specName) =>
+const isSpecExcluded = (specName: string) =>
   /(es(next)?)?\.(async-)?iterator/.test(specName) || ignoredPolyfills.includes(specName);
 
-const specToFeatureDict = {};
+const specToFeatureDict: Record<string, string> = {};
 function _addFeature(specName: string, primitive: string, method: string, isInstance: boolean) {
   if (specToFeatureDict[specName]) {
     return;
@@ -68,13 +68,13 @@ const addStaticFeature = (specName: string, primitive: string, method: string) =
 const addInstanceFeature = (specName: string, primitive: string, method: string) =>
   _addFeature(specName, primitive, method, true);
 
-const methods = {};
-function addMethod(specName, expression) {
+const methods: Record<string, string> = {};
+function addMethod(specName: string, expression: string) {
   methods[specName] = expression;
 }
 
 const instanceMethods = new Set(['web.url.to-json']);
-const globals = new Set();
+const globals = new Set<string>();
 function _addGlobal(globalList: string[], isInstance: boolean) {
   globalList.forEach((globalSpecName) => {
     globals.add(globalSpecName);
@@ -96,7 +96,7 @@ export function getSpecToFeatureDict(): Record<string, string> {
   const { BuiltIns, InstanceProperties, StaticProperties } = definitions;
 
   // JS primitives: Number, Reflect, Set, Map...
-  const builtIns = Object.keys(BuiltIns).reduce((acc, builtInKey) => {
+  const builtIns = Object.keys(BuiltIns).reduce<Record<string, string>>((acc, builtInKey) => {
     const { name: builtInName, global } = BuiltIns[builtInKey];
 
     if (isBuiltInExcluded(builtInKey)) return acc;
@@ -142,7 +142,10 @@ export function getSpecToFeatureDict(): Record<string, string> {
 
     const { primitiveExpr, methodName } = parseSpec(instanceSpecName);
 
-    addMethod(methodName, instancePropertyName);
+    if (methodName) {
+      addMethod(methodName, instancePropertyName);
+    }
+
     addInstanceGlobal(global);
 
     // Some instance methods have no parent
@@ -162,7 +165,10 @@ export function getSpecToFeatureDict(): Record<string, string> {
 
       const { methodName } = parseSpec(staticSpecName);
       addGlobal(global);
-      addMethod(methodName, staticPropertyName);
+
+      if (methodName) {
+        addMethod(methodName, staticPropertyName);
+      }
 
       // For some reason, several static properties have names that match a builtin
       // we ignore such properties since their support in browsers appeared at the same time as the builtin itself
@@ -173,7 +179,7 @@ export function getSpecToFeatureDict(): Record<string, string> {
     });
   });
 
-  function isFeatureExists(specName) {
+  function isFeatureExists(specName: string) {
     return Boolean(builtIns[specName]) || Boolean(specToFeatureDict[specName]);
   }
 
@@ -184,6 +190,10 @@ export function getSpecToFeatureDict(): Record<string, string> {
       if (isSpecExcluded(globalSpecName)) return;
 
       const { methodName, primitiveExpr, builtInName } = parseSpec(globalSpecName);
+
+      if (!methodName) {
+        return;
+      }
 
       // es.array-buffer.from
       const globalNameSplit = globalSpecName.split('.');
@@ -196,8 +206,8 @@ export function getSpecToFeatureDict(): Record<string, string> {
       // every, filter, map can be left as it is, the method in the language is called the same way
       const isMethodSimple = !/-/.test(methodName);
 
-      // Primitives don't have a method, so its length is 2
-      // for example es.symbol или es.string
+      // Primitives doesn't has a method, so its length is 2
+      // for example es.symbol or es.string
       const isPrimitive = globalNameSplit.length === 2;
       if (isPrimitive) {
         builtIns[globalSpecName] = `${BuiltIns[globalSpecName]}`;
@@ -217,7 +227,7 @@ export function getSpecToFeatureDict(): Record<string, string> {
       const isInstanceMethod =
         globalInstancePrimitives.includes(builtInName) || instanceMethods.has(globalSpecName);
 
-      let method: string;
+      let method;
       if (featureMethod) {
         method = featureMethod;
       } else if (isMethodSimple) {
@@ -228,9 +238,11 @@ export function getSpecToFeatureDict(): Record<string, string> {
         method = camelCaseName(methodName);
       }
 
-      isInstanceMethod
-        ? addInstanceFeature(globalSpecName, primitiveExpr, method)
-        : addStaticFeature(globalSpecName, primitiveExpr, method);
+      if (method) {
+        isInstanceMethod
+          ? addInstanceFeature(globalSpecName, primitiveExpr, method)
+          : addStaticFeature(globalSpecName, primitiveExpr, method);
+      }
     }
   });
 

@@ -8,6 +8,7 @@ import {
 import { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/lib/config';
 import { createDevServer } from './dev-server/dev-server';
 
+export { PolyfillConditionPlugin } from './webpack/plugins/polyfill-condition-plugin';
 export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN } from './webpack/webpack-config';
 export {
   WEBPACK_TRANSPILER_TOKEN,

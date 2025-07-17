@@ -21,14 +21,17 @@ export function getMaxBrowserVersionsByFeatures(usedFeatures: string[]) {
     }
 
     browsers.forEach((browserName) => {
-      const maxBrowserVersion = specBrowsers[browserName];
+      const specVersion = specBrowsers[browserName];
+      const coercedMaxVersion =
+        browserVersions[browserName] && coerce(browserVersions[browserName].version);
+      const coercedSpecVersion = specVersion && coerce(specVersion);
+      const successfullyCoerced = coercedMaxVersion && coercedSpecVersion;
 
       if (
-        maxBrowserVersion &&
-        (!browserVersions[browserName] ||
-          compare(coerce(browserVersions[browserName].version), coerce(maxBrowserVersion)) === -1)
+        !browserVersions[browserName] ||
+        (successfullyCoerced && compare(coercedMaxVersion, coercedSpecVersion) === -1)
       ) {
-        browserVersions[browserName] = { version: maxBrowserVersion, spec };
+        browserVersions[browserName] = { version: specVersion!, spec };
       }
     });
   });
@@ -53,8 +56,8 @@ export function getPolyfillCondition(browserVersions: BrowserVersions) {
  * es.string.at => String.prototype.at
  * es.object.assign => Object.assign
  */
-let specToFeatureDictCache;
-function getSpecToFeature(spec) {
+let specToFeatureDictCache: Record<string, string>;
+function getSpecToFeature(spec: string) {
   if (!specToFeatureDictCache) {
     specToFeatureDictCache = getSpecToFeatureDict();
   }

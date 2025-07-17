@@ -177,6 +177,8 @@ export type ApplicationProject = {
   fileSystemPages?: FileSystemPagesOptions;
   experiments?: ApplicationExperiments;
   postcss?: PostcssOptions;
+  polyfill?: string;
+  modernPolyfill?: string;
 };
 
 export type ChildAppProject = {
@@ -339,6 +341,22 @@ export class ConfigService {
 
   get projectType() {
     return this.#project!.type;
+  }
+
+  get polyfill() {
+    if (this.#project!.type === 'child-app') {
+      return null;
+    }
+
+    return this.#project!.polyfill;
+  }
+
+  get modernPolyfill() {
+    if (this.#project!.type === 'child-app') {
+      return null;
+    }
+
+    return this.#project!.modernPolyfill;
   }
 
   get outputServer() {

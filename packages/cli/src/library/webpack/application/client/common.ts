@@ -3,6 +3,7 @@ import fs from 'fs';
 import type Config from 'webpack-chain';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
+import { PolyfillConditionPlugin } from '@tramvai/plugin-webpack-builder';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
@@ -27,7 +28,6 @@ import {
   WEBPACK_DEBUG_STATS_OPTIONS,
   WEBPACK_DEBUG_STATS_FIELDS,
 } from '../../constants/stats';
-import PolyfillConditionPlugin from '../../plugins/PolyfillCondition';
 import AssetsIntegritiesPlugin from '../../plugins/AssetsIntegritiesPlugin';
 import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
 import { purifyStatsPluginFactory } from '../../plugins/PurifyStatsPlugin';

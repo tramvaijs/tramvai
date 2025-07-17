@@ -124,6 +124,20 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       sourceDir: path.join(fixturesFolder, 'application', 'browserslist'),
       entryFile: 'index.ts',
     },
+    'app-polyfills': {
+      name: 'app-polyfills',
+      type: 'application',
+      sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
+      entryFile: 'index.ts',
+    },
+    'app-polyfills-custom': {
+      name: 'app-polyfills',
+      type: 'application',
+      polyfill: path.join(fixturesFolder, 'application', 'polyfills', 'polyfill.ts'),
+      modernPolyfill: path.join(fixturesFolder, 'application', 'polyfills', 'modern.polyfill.ts'),
+      sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
+      entryFile: 'index.ts',
+    },
   };
 
   jest.setTimeout(10000);
@@ -420,6 +434,46 @@ export default bar;`,
           // todo close in afterEach
           await devServer.close();
         });
+
+        ['app-polyfills', 'app-polyfills-custom'].map((projectName) =>
+          it(`build: ${projectName} should build polyfills in separate chunks`, async () => {
+            const devServer = await start(
+              {
+                name: projectName,
+                rootDir: testSuiteFolder,
+                buildType: 'client',
+                noRebuild: true,
+              },
+              {
+                plugins,
+                projects,
+              }
+            );
+
+            await devServer.buildPromise;
+
+            const polyfillJsResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/polyfill.js`
+            );
+            const polyfillJs = await polyfillJsResponse.text();
+            const modernPolyfillJsResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/modern.polyfill.js`
+            );
+            const modernPolyfillJs = await modernPolyfillJsResponse.text();
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            expect(modernPolyfillJsResponse.status).toBe(200);
+            expect(modernPolyfillJs).toMatch('core-js/modules/web.structured-clone');
+            expect(polyfillJsResponse.status).toBe(200);
+            expect(polyfillJs).toContain('core-js/modules/es.promise.with-resolvers');
+            expect(statsJson.polyfillCondition).toBeTruthy();
+
+            // todo close in afterEach
+            await devServer.close();
+          })
+        );
 
         it('output: should respect output.client', async () => {
           const devServer = await start(

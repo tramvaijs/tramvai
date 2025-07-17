@@ -1,3 +1,5 @@
+import compat from 'core-js-compat';
+
 // List of ignore polyfills
 // they are impossible or very difficult to support check in the browser
 export const ignoredPolyfills = [
@@ -33,7 +35,9 @@ export const ignoredPolyfills = [
   'es.set.union.v2',
 ];
 
-export const browsers = [
+type BrowserName = keyof (typeof compat)['data'][string];
+
+export const browsers: BrowserName[] = [
   'chrome',
   'safari',
   'firefox',

@@ -10,6 +10,8 @@ export const DEFAULT_STATS_OPTIONS: StatsOptions = {
   entrypoints: true, // нужно, чтобы узнать чанки для каждой точки входа
 };
 
+export const STATS_FILE_NAME = 'stats.json';
+
 export const DEFAULT_STATS_FIELDS: string[] = [
   'publicPath',
   'outputPath',

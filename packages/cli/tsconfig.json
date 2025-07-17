@@ -49,6 +49,9 @@
         },
         {
             "path": "../api"
+        },
+        {
+            "path": "../plugin-webpack-builder"
         }
     ]
 }

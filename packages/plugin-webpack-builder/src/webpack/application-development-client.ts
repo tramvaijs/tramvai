@@ -9,11 +9,13 @@ import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
 } from '@tramvai/api/lib/utils/path';
+import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import {
   WEBPACK_DEBUG_STATS_OPTIONS,
   WEBPACK_DEBUG_STATS_FIELDS,
   DEV_STATS_OPTIONS,
   DEV_STATS_FIELDS,
+  STATS_FILE_NAME,
 } from './shared/stats';
 import { resolvePublicPathDirectory } from './utils/publicPath';
 import { resolveUrl } from '../utils/url';
@@ -32,6 +34,7 @@ import { WATCH_OPTIONS_TOKEN } from './shared/watch-options';
 import { createStylesConfiguration } from './shared/styles';
 import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
+import { PolyfillConditionPlugin } from './plugins/polyfill-condition-plugin';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -68,7 +71,24 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
   const virtualRootErrorBoundary = require.resolve('@tramvai/api/lib/virtual/root-error-boundary');
 
-  const { showProgress } = config;
+  const { polyfill, modernPolyfill, sourceDir, rootDir, showProgress } = config;
+
+  const polyfillPath = safeRequireResolve(
+    resolveAbsolutePathForFile({
+      file: polyfill ?? './src/polyfill',
+      sourceDir,
+      rootDir,
+    }),
+    typeof polyfill === 'undefined'
+  );
+  const modernPolyfillPath = safeRequireResolve(
+    resolveAbsolutePathForFile({
+      file: modernPolyfill ?? './src/modern.polyfill',
+      sourceDir,
+      rootDir,
+    }),
+    typeof modernPolyfill === 'undefined'
+  );
 
   // TODO: test cacheUnaffected, lazyCompilation
 
@@ -83,6 +103,16 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         sourceDir: config.sourceDir,
         rootDir: config.rootDir,
       }),
+      ...(polyfillPath
+        ? {
+            polyfill: polyfillPath,
+          }
+        : {}),
+      ...(modernPolyfillPath
+        ? {
+            'modern.polyfill': modernPolyfillPath,
+          }
+        : {}),
       // platform: './src/index.ts',
       ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
     },
@@ -175,7 +205,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,
       new StatsWriterPlugin({
-        filename: 'stats.json',
+        filename: STATS_FILE_NAME,
         stats: {
           ...DEV_STATS_OPTIONS,
           ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
@@ -183,6 +213,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         fields: [...DEV_STATS_FIELDS, ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_FIELDS : [])],
       }) as any as WebpackPluginInstance,
       showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
+      new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,

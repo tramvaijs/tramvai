@@ -1,21 +1,20 @@
-import {
-  getPolyfillCondition,
-  getMaxBrowserVersionsByFeatures,
-} from '../utils/polyfills/polyfillCondition';
+import { getPolyfillCondition, getMaxBrowserVersionsByFeatures } from './polyfillCondition';
+
+import { Compiler, Compilation } from 'webpack';
 
 const TARGET_PLUGIN_NAME = 'stats-writer-plugin';
 
-export default class PolyfillConditionPlugin {
+export class PolyfillConditionPlugin {
   constructor(private options: { filename: string }) {
     this.options = options;
   }
 
-  apply(compiler) {
-    compiler.hooks.thisCompilation.tap(TARGET_PLUGIN_NAME, (compilation) => {
+  apply(compiler: Compiler) {
+    compiler.hooks.thisCompilation.tap(TARGET_PLUGIN_NAME, (compilation: Compilation) => {
       compilation.hooks.processAssets.tap(
         {
           name: TARGET_PLUGIN_NAME,
-          stage: compilation.constructor.PROCESS_ASSETS_STAGE_REPORT,
+          stage: Compilation.PROCESS_ASSETS_STAGE_REPORT,
         },
         () => {
           const { entrypoints } = compilation;
@@ -29,14 +28,19 @@ export default class PolyfillConditionPlugin {
           const coreJsModules = [];
 
           for (const module of polyfillModules) {
+            // @ts-ignore
             if (module.resource && /\/core-js\/modules\//.test(module.resource)) {
               coreJsModules.push(module);
             }
           }
 
-          const features = coreJsModules.map((module) =>
-            getFeatureNameFromModulePath(module.resource)
-          );
+          const features: string[] = coreJsModules
+            .map(
+              (module) =>
+                // @ts-ignore
+                getFeatureNameFromModulePath(module.resource)!
+            )
+            .filter(Boolean);
 
           const browserVersionsByFeatures = getMaxBrowserVersionsByFeatures(features);
           const polyfillCondition = getPolyfillCondition(browserVersionsByFeatures);
@@ -57,6 +61,6 @@ export default class PolyfillConditionPlugin {
 }
 
 // node_modules/core-js/modules/es.array.push.js => es.array.push
-function getFeatureNameFromModulePath(modulePath) {
-  return modulePath.split('/').at(-1).replace(/\.js$/, '');
+function getFeatureNameFromModulePath(modulePath: string) {
+  return modulePath.split('/').at(-1)?.replace(/\.js$/, '');
 }
