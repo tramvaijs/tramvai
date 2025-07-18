@@ -232,7 +232,6 @@ const featureToRuleMap: Record<string, string | string[]> = {
   // 'es-x/no-regexp-prototype-compile' - rule deprecated
   'core-js/modules/es.regexp.flags': 'es-x/no-regexp-prototype-flags',
   'core-js/modules/es.regexp.dot-all': 'es-x/no-regexp-s-flag',
-  // 'es-x/no-regexp-unicode-property-escapes' - abstract
   // 'es-x/no-regexp-unicode-property-escapes-2019' - abstract
   // 'es-x/no-regexp-unicode-property-escapes-2020' - abstract
   // 'es-x/no-regexp-unicode-property-escapes-2021' - abstract
@@ -355,6 +354,7 @@ export const disabledRules = [
   'es-x/no-numeric-separators',
   'es-x/no-proxy',
   'es-x/no-regexp-d-flag',
+  'es-x/no-regexp-unicode-property-escapes',
   'es-x/no-regexp-duplicate-named-capturing-groups',
   'es-x/no-regexp-lookbehind-assertions',
   'es-x/no-regexp-modifiers',
