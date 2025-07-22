@@ -1,11 +1,13 @@
 import fs from 'node:fs';
-import path from 'node:path';
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import { createToken } from '@tinkoff/dippy';
+import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
+import type { Config as SvgoConfig } from 'svgo';
 import type { TramvaiPlugin } from '../core/plugin';
 import { resolveAbsolutePathForFile } from '../utils/path';
+import { packageVersion } from '../utils/package-version';
 
 export type PostcssOptions = {
   /**
@@ -91,10 +93,38 @@ export type ApplicationExperiments = {
 };
 
 /**
+ * @title Enable DedupePlugin
+ * @default {}
+ */
+export type DedupeOptions = {
+  /**
+   * @title Strategy for DedupePlugin
+   * @default true
+   */
+  enabled: boolean;
+  /**
+   * @title Does DedupePlugin should be enabled in development mode
+   * Why it might be useful see [issue](https://github.com/Tinkoff/tramvai/issues/11)
+   * @default false
+   */
+  enabledDev: boolean;
+  /**
+   * @title Strategy for DedupePlugin
+   * @default "equality"
+   */
+  strategy: DeduplicateStrategy;
+  /**
+   * @title Sets ignore to DedupePlugin
+   */
+  ignore?: string[];
+};
+
+/**
  * @description Serializable parameters from CLI arguments or JS API parameters
  */
 export type InputParameters = {
   name: string;
+  mode?: 'development' | 'production';
   port?: number;
   staticPort?: number;
   staticHost?: string;
@@ -150,7 +180,16 @@ export type InputParameters = {
 
 export type Project = ApplicationProject | ChildAppProject;
 
-export type ApplicationProject = {
+export interface BaseProject {
+  /**
+   * [svgo](https://github.com/svg/svgo) configuration, used for SVG and [SVGR](https://react-svgr.com/) optimization
+   */
+  svgo?: {
+    plugins?: SvgoConfig['plugins'];
+  };
+}
+
+export interface ApplicationProject extends BaseProject {
   name: string;
   type: 'application';
   /**
@@ -179,9 +218,10 @@ export type ApplicationProject = {
   postcss?: PostcssOptions;
   polyfill?: string;
   modernPolyfill?: string;
-};
+  dedupe?: DedupeOptions;
+}
 
-export type ChildAppProject = {
+export interface ChildAppProject extends BaseProject {
   name: string;
   type: 'child-app';
   /**
@@ -202,7 +242,8 @@ export type ChildAppProject = {
    */
   entryFile?: string;
   output?: string;
-};
+  dedupe?: DedupeOptions;
+}
 
 export type Configuration = {
   projects: Record<string, Project>;
@@ -221,9 +262,30 @@ export type SerializableConfig = {
   };
 };
 
+export type Extension<Value> = ({
+  config,
+  parameters,
+  project,
+}: {
+  config: Configuration;
+  parameters: InputParameters;
+  project: Project;
+}) => Value;
+
+type ExtensionToken = Record<string, Extension<any>>;
+
+export interface ConfigurationExtensions {}
+
 export const CONFIG_SERVICE_TOKEN = createToken<ConfigService>('tramvai config service');
 
 export const INPUT_PARAMETERS_TOKEN = createToken<InputParameters>('tramvai input parameters');
+
+export const CONFIGURATION_EXTENSION_TOKEN = createToken<ExtensionToken>(
+  'tramvai configuration extension',
+  {
+    multi: true,
+  }
+);
 
 // TODO: как выделить типы для приложения или Child App'а?
 // фабрика отдельной сущности AppProject / ChildAppProject?
@@ -233,6 +295,7 @@ export class ConfigService {
   #extraConfig: Partial<Configuration>;
   #project: Project | null;
   #configPath: string | null;
+  #extensions: ExtensionToken[] = [];
 
   constructor(parameters: InputParameters, extraConfiguration?: Partial<Configuration>) {
     this.#parameters = parameters;
@@ -260,6 +323,27 @@ export class ConfigService {
         )}`
       );
     }
+  }
+
+  loadExtensions(extensions: ExtensionToken[]) {
+    this.#extensions = extensions;
+  }
+
+  get extensions(): {
+    [key in keyof ConfigurationExtensions]: () => ReturnType<ConfigurationExtensions[key]>;
+  } {
+    // TODO: memoize
+    return this.#extensions.reduce((extensions, currentExtension) => {
+      for (const key in currentExtension) {
+        extensions[key] = () =>
+          currentExtension[key]({
+            config: this.#config!,
+            parameters: this.#parameters,
+            project: this.#project!,
+          });
+      }
+      return extensions;
+    }, {});
   }
 
   get rawConfiguration() {
@@ -316,6 +400,7 @@ export class ConfigService {
   }
 
   get inspectBuildProcess() {
+    // TODO: respect process.env.TRAMVAI_INSPECT_BUILD_PROCESS here?
     return this.#parameters.inspectBuildProcess ?? false;
   }
 
@@ -335,8 +420,19 @@ export class ConfigService {
     return this.#parameters.showProgress;
   }
 
+  get mode() {
+    return this.#parameters.mode ?? 'development';
+  }
+
   get projectName() {
     return this.#project!.name;
+  }
+
+  get projectVersion() {
+    return (
+      packageVersion({ mode: this.mode, sourceDir: this.sourceDir, rootDir: this.rootDir }) ||
+      'unknown'
+    );
   }
 
   get projectType() {
@@ -421,6 +517,21 @@ export class ConfigService {
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
     };
+  }
+
+  get dedupe(): DedupeOptions {
+    const {
+      enabled = true,
+      enabledDev = false,
+      strategy = 'equality',
+      ignore,
+    } = this.#project!.dedupe ?? {};
+
+    return { enabled, enabledDev, strategy, ignore };
+  }
+
+  get svgo(): BaseProject['svgo'] {
+    return this.#project!.svgo ?? {};
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {

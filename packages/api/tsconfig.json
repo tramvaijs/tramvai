@@ -18,6 +18,9 @@
     "references": [
         {
             "path": "../libs/dippy"
+        },
+        {
+            "path": "../libs/webpack-dedupe-plugin"
         }
     ]
 }

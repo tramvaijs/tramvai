@@ -5,7 +5,12 @@ import {
   TRACER_TOKEN,
   DEV_SERVER_CLOSE_HANDLER_TOKEN,
 } from '@tramvai/api/lib/tokens';
-import { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/lib/config';
+import {
+  CONFIGURATION_EXTENSION_TOKEN,
+  CONFIG_SERVICE_TOKEN,
+  Extension,
+  INPUT_PARAMETERS_TOKEN,
+} from '@tramvai/api/lib/config';
 import { createDevServer } from './dev-server/dev-server';
 
 export { PolyfillConditionPlugin } from './webpack/plugins/polyfill-condition-plugin';
@@ -20,6 +25,63 @@ export { DEVTOOL_OPTIONS_TOKEN } from './webpack/shared/sourcemaps';
 export { WATCH_OPTIONS_TOKEN } from './webpack/shared/watch-options';
 export { RESOLVE_EXTENSIONS } from './webpack/shared/resolve';
 
+/**
+ * @title Configure the options on webpack splitChunks
+ * @default {}
+ */
+export type SplitChunksConfig = {
+  /**
+   * @default "granularChunks"
+   */
+  mode?: 'granularChunks' | false;
+  /**
+   * @title Move tramvai packages into a separate chunk
+   * @default true
+   */
+  frameworkChunk?: boolean;
+  /**
+   * @title Move module to shared chunk if used at least as many times in other chunks
+   * @default 2
+   */
+  granularChunksSplitNumber?: number;
+  /**
+   * @title Minimum shared chunk size in bytes
+   * @default 20000
+   */
+  granularChunksMinSize?: number;
+};
+
+const splitChunksConfigExtension = {
+  splitChunks: ({ project }: Parameters<Extension<any>>[0]): SplitChunksConfig | undefined => {
+    if (project.type === 'child-app') {
+      return undefined;
+    }
+
+    const {
+      mode = 'granularChunks',
+      frameworkChunk = true,
+      granularChunksSplitNumber = 2,
+      granularChunksMinSize = 20000,
+    } = project.splitChunks ?? {};
+
+    return {
+      mode,
+      frameworkChunk,
+      granularChunksSplitNumber,
+      granularChunksMinSize,
+    } satisfies SplitChunksConfig;
+  },
+};
+
+type SplitChunksConfigExtensionType = typeof splitChunksConfigExtension;
+
+declare module '@tramvai/api/lib/config' {
+  export interface ApplicationProject {
+    splitChunks?: SplitChunksConfig;
+  }
+  export interface ConfigurationExtensions extends SplitChunksConfigExtensionType {}
+}
+
 export const WebpackBuilderPlugin = declareModule({
   name: 'WebpackBuilderPlugin',
   providers: [
@@ -33,6 +95,10 @@ export const WebpackBuilderPlugin = declareModule({
         tracer: TRACER_TOKEN,
         closeHandlers: DEV_SERVER_CLOSE_HANDLER_TOKEN,
       },
+    }),
+    provide({
+      provide: CONFIGURATION_EXTENSION_TOKEN,
+      useValue: splitChunksConfigExtension,
     }),
   ],
 });

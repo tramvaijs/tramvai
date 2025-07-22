@@ -5,6 +5,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpack from 'webpack';
 import express from 'express';
 import {
+  CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
   ConfigService,
   INPUT_PARAMETERS_TOKEN,
@@ -26,12 +27,19 @@ import {
 } from './webpack.events';
 import { BUILD_TARGET_TOKEN } from '../webpack/webpack-config';
 
+// eslint-disable-next-line max-statements
 async function runWebpackDevServer() {
   const { type, target, port, inputParameters, extraConfiguration } =
     workerData as WebpackWorkerData;
   const app = express();
 
-  const config = new ConfigService(inputParameters, extraConfiguration);
+  const config = new ConfigService(
+    {
+      mode: 'development',
+      ...inputParameters,
+    },
+    extraConfiguration
+  );
   await config.initialize();
 
   const plugins: Array<ModuleType | ExtendedModule> = config.plugins.map((plugin) => {
@@ -77,11 +85,16 @@ async function runWebpackDevServer() {
   });
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN));
+  const configExtensions = di.get(optional(CONFIGURATION_EXTENSION_TOKEN));
 
   if (!transpiler) {
     throw Error(
       `Transpiler not found, make sure you add "@tramvai/plugin-babel-transpiler" plugin to tramvai config file`
     );
+  }
+
+  if (Array.isArray(configExtensions)) {
+    config.loadExtensions(configExtensions);
   }
 
   let webpackConfig: webpack.Configuration;

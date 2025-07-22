@@ -2,8 +2,8 @@
 
 import path from 'node:path';
 import fs from 'node:fs';
+import { ApplicationProject } from '@tramvai/api/lib/config';
 import { start } from '../../src/api/start';
-import { Project } from '../../src/config/config-service';
 
 // TODO: mock in default tramvai presets
 // jest.mock(
@@ -29,7 +29,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
   const fixturesFolder = path.resolve(__dirname, '..', 'fixtures');
   // todo check `testSuiteFolder` folder exists
 
-  const projects: Record<string, Project> = {
+  const projects: Record<string, ApplicationProject> = {
     'app-bundle': {
       name: 'app-bundle',
       type: 'application',
@@ -137,6 +137,27 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       modernPolyfill: path.join(fixturesFolder, 'application', 'polyfills', 'modern.polyfill.ts'),
       sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
       entryFile: 'index.ts',
+    },
+    'app-tramvai-vendor': {
+      name: 'app-tramvai-vendor',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'tramvai-vendor', 'index.ts'),
+    },
+    'app-granular-chunks': {
+      name: 'app-granular-chunks',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'granular-chunks', 'index.ts'),
+      splitChunks: {
+        mode: 'granularChunks',
+        frameworkChunk: false,
+        granularChunksSplitNumber: 2,
+        granularChunksMinSize: 1000,
+      },
+    },
+    'app-assets': {
+      name: 'app-assets',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
   };
 
@@ -398,6 +419,59 @@ export default bar;`,
           // todo close in afterEach
           await devServer.close();
         });
+
+        it('assets: should inline url for woff2 fonts', async () => {
+          const devServer = await start(
+            {
+              name: 'app-assets',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const serverJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+          ).text();
+
+          expect(serverJs).toContain('CascadiaCodePL.woff2');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('assets: should inline svg import', async () => {
+          const devServer = await start(
+            {
+              name: 'app-assets',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const serverJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+          ).text();
+
+          expect(serverJs).toContain('<svg xmlns=');
+          expect(serverJs).toContain('svg-plus-icon');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
       });
 
       describe('browser', () => {
@@ -430,6 +504,98 @@ export default bar;`,
           expect(platformJs).toContain('ENTRY');
           expect(dynamicJs).toContain('DYNAMIC');
           expect(Object.keys(statsJson.namedChunkGroups).length).toBe(2);
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('output: should generate unique chunkLoadingGlobal', async () => {
+          const devServer = await start(
+            {
+              name: 'app-bundle',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const platformJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+          ).text();
+
+          expect(platformJs).toContain('chunkLoadingGlobal');
+          expect(platformJs).toContain('webpackChunkapplication_app_bundle_0_0_0_stub');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('splitChunks: should create tramvai vendor chunk', async () => {
+          const devServer = await start(
+            {
+              name: 'app-tramvai-vendor',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const tramvaiJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/tramvai.js`)
+          ).text();
+
+          expect(tramvaiJs).toContain('createToken');
+          expect(tramvaiJs).toContain('createApp');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('splitChunks: should create granular chunks', async () => {
+          const devServer = await start(
+            {
+              name: 'app-granular-chunks',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const statsJson = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+          ).json();
+
+          const chunks = statsJson.chunks.map((chunk: any) => chunk.files[0]);
+
+          expect(chunks).toEqual([
+            'packages_api___integration___fixtures_application_granular-chunks_pages_bar_tsx.chunk.js',
+            'packages_api___integration___fixtures_application_granular-chunks_pages_baz_tsx.chunk.js',
+            'packages_api___integration___fixtures_application_granular-chunks_pages_foo_tsx.chunk.js',
+            'platform.js',
+            'react.chunk.js',
+            'shared-node_modules_tinkoff_logger_lib_index_browser_js.chunk.js',
+            'shared-node_modules_tinkoff_utils_function_noop_js-node_modules_tinkoff_utils_is_object_js-no-38cf93.chunk.js',
+            // chunk name depends on the builder - different for `tsc` (locally) or `@tramvai/build` (CI)
+            expect.stringMatching('shared-packages_libs_router_lib_index_'),
+          ]);
 
           // todo close in afterEach
           await devServer.close();
@@ -597,6 +763,83 @@ export default bar;`,
 
           expect(rootErrorBoundaryJs).toContain('virtual/root-error-boundary.js');
           expect(rootErrorBoundaryJs).toContain('hydrateRoot');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('assets: should inline url for woff2 fonts and emit file', async () => {
+          const devServer = await start(
+            {
+              name: 'app-assets',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const platformJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+          ).text();
+          const statsJson = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+          ).json();
+
+          const fontName = statsJson.chunks[0].auxiliaryFiles.find((file: string) =>
+            file.endsWith('.woff2')
+          );
+          expect(platformJs).toContain(fontName);
+
+          const fontResponse = await fetch(
+            `http://localhost:${devServer.staticPort}/dist/client/${fontName}`
+          );
+
+          expect(fontResponse.headers.get('content-type')).toBe('font/woff2');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('assets: should inline url for svg image and emit file', async () => {
+          const devServer = await start(
+            {
+              name: 'app-assets',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const platformJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+          ).text();
+          const statsJson = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+          ).json();
+
+          const iconName = statsJson.chunks[0].auxiliaryFiles.find((file: string) =>
+            file.endsWith('.svg')
+          );
+
+          expect(platformJs).toContain(iconName);
+
+          const iconResponse = await fetch(
+            `http://localhost:${devServer.staticPort}/dist/client/${iconName}`
+          );
+
+          expect(iconResponse.headers.get('content-type')).toBe('image/svg+xml');
 
           // todo close in afterEach
           await devServer.close();
@@ -876,6 +1119,37 @@ export default Cmp;`,
           expect(serverJs).toContain("enableReactTransitions ${'true'}");
           expect(serverJs).toContain('development');
           expect(serverJs).toContain('app-config-to-env');
+
+          // todo close in afterEach
+          await devServer.close();
+        });
+
+        it('assets: should support svgr and inline React components from .svg?react import', async () => {
+          const devServer = await start(
+            {
+              name: 'app-assets',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            {
+              plugins,
+              projects,
+            }
+          );
+
+          await devServer.buildPromise;
+
+          const serverJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+          ).text();
+          const platformJs = await (
+            await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+          ).text();
+
+          expect(serverJs).toContain('SvgPlus');
+          expect(serverJs).toContain('\"data-qa-file\": \"plus\"');
+          expect(platformJs).toContain('SvgPlus');
+          expect(platformJs).toContain('\"data-qa-file\": \"plus\"');
 
           // todo close in afterEach
           await devServer.close();

@@ -1,7 +1,5 @@
 import { sync as resolve } from 'resolve';
-
-// TODO: use default extensions, move them from webpack plugin to api package
-const extensions = ['.mjs', '.js', '.jsx', '.ts', '.tsx'];
+import { extensions } from '../config';
 
 export const safeRequire = (path: string, silent?: boolean) => {
   try {

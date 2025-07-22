@@ -1,5 +1,6 @@
 import { provide, isValidModule } from '@tinkoff/dippy';
 import {
+  CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
   ConfigService,
   Configuration,
@@ -22,7 +23,7 @@ export async function start(
 ): Promise<DevServer> {
   const logger = new Logger();
 
-  const config = new ConfigService(inputParameters, extraConfiguration);
+  const config = new ConfigService({ mode: 'development', ...inputParameters }, extraConfiguration);
   await config.initialize();
 
   const portManager = new PortManager({
@@ -83,11 +84,16 @@ export async function start(
   });
 
   const devServer = tramvai.resolve(DEV_SERVER_TOKEN);
+  const configExtensions = tramvai.resolve(CONFIGURATION_EXTENSION_TOKEN);
 
   if (!devServer) {
     throw Error(
       `Development server not found, make sure you add "@tramvai/plugin-webpack-builder" plugin to tramvai config file`
     );
+  }
+
+  if (Array.isArray(configExtensions)) {
+    config.loadExtensions(configExtensions);
   }
 
   const server = await tracer.wrap(

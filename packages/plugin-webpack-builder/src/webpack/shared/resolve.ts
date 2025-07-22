@@ -1,7 +1,7 @@
 import { createToken } from '@tinkoff/dippy';
+import { extensions } from '@tramvai/api/lib/config';
 
-// TODO: move to @tramvai/api?
-export const defaultExtensions = ['.ts', '.tsx', '.js', '.jsx'];
+export { extensions as defaultExtensions };
 
 /**
  * @description Webpack [resolve.extensions](https://webpack.js.org/configuration/resolve/#resolveextensions)

@@ -8,6 +8,7 @@ import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
 } from '@tramvai/api/lib/utils/path';
+import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
 import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
 import { resolvePublicPathDirectory } from './utils/publicPath';
 import {
@@ -26,6 +27,8 @@ import { createStylesConfiguration } from './shared/styles';
 import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
 import { normalizeBrowserslistConfig } from './shared/browserslist';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
+import { createSnapshot } from './shared/snapshot';
+import { createAssetsRules } from './shared/assets';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -74,8 +77,9 @@ export default appConfig;`;
   const isRootErrorBoundaryEnabled =
     typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
 
-  const { showProgress } = config;
   // TODO: test cacheUnaffected, lazyCompilation
+
+  // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
   return {
     target: 'node',
@@ -96,6 +100,13 @@ export default appConfig;`;
       library: {
         type: 'commonjs2',
       },
+      // uniqueName are used for various webpack internals
+      // currently, we use that value in the ModuleFederation glue code
+      uniqueName: `${config.projectType}:${config.projectName}:${config.projectVersion}`,
+      // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
+      devtoolNamespace: '@tramvai/cli',
+      // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
+      pathinfo: config.inspectBuildProcess,
     },
     mode: 'development',
     devtool,
@@ -143,12 +154,19 @@ export default appConfig;`;
       ...(config.verboseLogging ? { level: 'verbose', debug: true } : {}),
       // ...(configManager.verboseLogging
       //   ? {}
+      // TODO: TCORE-5273
       //   : { stream: stderrWithWarningFilters }),
     },
+    // TODO: pass as experiments.webpack parameter for fast researches
+    experiments: {
+      futureDefaults: true,
+    },
+    snapshot: createSnapshot({ config }),
     module: {
       rules: [
         ...createTranspilerRules({ transpiler, transpilerParameters, workerPoolConfig }),
         ...stylesConfiguration.rules,
+        ...createAssetsRules({ di }),
         {
           // test: /[\\/]cli[\\/]lib[\\/]external[\\/]pages.js$/,
           test: /[\\/]api[\\/]lib[\\/]virtual[\\/]file-system-pages.js$/,
@@ -162,6 +180,7 @@ export default appConfig;`;
           },
         },
       ],
+      // TODO: unsafeCache - TCORE-5274
     },
     plugins: [
       new webpack.optimize.LimitChunkCountPlugin({
@@ -170,7 +189,7 @@ export default appConfig;`;
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,
-      showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
+      config.showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': false,
         'process.env.SERVER': true,
@@ -191,6 +210,12 @@ export default appConfig;`;
           };
         }, {}),
       }),
-    ],
+      config.dedupe.enabledDev &&
+        new DedupePlugin({
+          strategy: config.dedupe.strategy,
+          ignorePackages: config.dedupe.ignore?.map((ignore) => new RegExp(`^${ignore}`)),
+          showLogs: false,
+        }),
+    ].filter(Boolean),
   };
 };

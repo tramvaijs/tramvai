@@ -18,13 +18,15 @@
     "semver": "^7.3.7"
   },
   "devDependencies": {
+    "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",
     "@types/detect-port": "^1.3.5",
     "@types/find-cache-dir": "^3.2.1",
     "@types/fs-extra": "^9.0.13",
     "@types/proper-lockfile": "^4.1.4",
     "@types/resolve": "^1.20.2",
     "@types/semver": "^7.3.12",
-    "core-js": "3.43.0"
+    "core-js": "3.43.0",
+    "svgo": "^3.0.2"
   },
   "optionalDependencies": {
     "react": "*"

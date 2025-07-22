@@ -22,6 +22,9 @@
         },
         {
             "path": "../api"
+        },
+        {
+            "path": "../libs/webpack-dedupe-plugin"
         }
     ]
 }

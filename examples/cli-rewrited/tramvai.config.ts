@@ -12,6 +12,10 @@ export default defineTramvaiConfig({
         enabled: true,
         pagesDir: false,
       },
+      splitChunks: {
+        mode: 'granularChunks',
+        frameworkChunk: false,
+      },
     },
   },
 });
