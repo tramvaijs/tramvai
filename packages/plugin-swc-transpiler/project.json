@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/plugin-swc-transpiler",
+  "root": "packages/plugin-swc-transpiler",
+  "sourceRoot": "packages/plugin-swc-transpiler/src",
+  "projectType": "library",
+  "targets": {}
+}

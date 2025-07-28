@@ -5,6 +5,7 @@
   "types": "./lib/index.d.ts",
   "dependencies": {
     "@svgr/webpack": "^8.1.0",
+    "@tinkoff/browserslist-config": "0.0.0-stub",
     "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.3",
     "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",

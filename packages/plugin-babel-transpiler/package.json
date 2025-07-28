@@ -40,6 +40,6 @@
   },
   "peerDependencies": {
     "@tramvai/api": "0.0.0-stub",
-    "core-js": "3.40.0"
+    "core-js": "3.43.0"
   }
 }

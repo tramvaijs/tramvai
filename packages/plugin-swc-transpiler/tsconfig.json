@@ -1,0 +1,29 @@
+{
+    "extends": "../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "module": "CommonJS",
+        "moduleResolution": "nodenext",
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true,
+        "types": [
+            "node",
+            "jest"
+        ]
+    },
+    "references": [
+        {
+            "path": "../libs/dippy"
+        },
+        {
+            "path": "../plugin-webpack-builder"
+        },
+        {
+            "path": "../api"
+        }
+    ]
+}

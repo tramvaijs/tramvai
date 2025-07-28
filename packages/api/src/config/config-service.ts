@@ -187,6 +187,10 @@ export interface BaseProject {
   svgo?: {
     plugins?: SvgoConfig['plugins'];
   };
+  /**
+   * Enables data-qa-tag plugin for transpiler
+   */
+  generateDataQaTag?: boolean;
 }
 
 export interface ApplicationProject extends BaseProject {
@@ -532,6 +536,10 @@ export class ConfigService {
 
   get svgo(): BaseProject['svgo'] {
     return this.#project!.svgo ?? {};
+  }
+
+  get generateDataQaTag() {
+    return this.#project!.generateDataQaTag ?? false;
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {

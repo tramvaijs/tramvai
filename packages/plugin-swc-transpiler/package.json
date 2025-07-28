@@ -1,0 +1,22 @@
+{
+  "name": "@tramvai/plugin-swc-transpiler",
+  "version": "0.0.0-stub",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "typings": "./lib/index.d.ts",
+  "dependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.3",
+    "@tramvai/plugin-webpack-builder": "0.0.0-stub",
+    "find-cache-dir": "^3.3.2",
+    "resolve": "^1.22.4"
+  },
+  "devDependencies": {
+    "@tramvai/api": "0.0.0-stub"
+  },
+  "peerDependencies": {
+    "@tramvai/api": "0.0.0-stub",
+    "@tramvai/swc-integration": "0.0.0-stub",
+    "core-js": "3.43.0"
+  }
+}

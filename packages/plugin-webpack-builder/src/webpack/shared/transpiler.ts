@@ -1,7 +1,9 @@
 import { createToken } from '@tinkoff/dippy';
 import type { Container } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN, ReactCompilerOptions } from '@tramvai/api/lib/config';
+import envTargets from '@tinkoff/browserslist-config';
 import type webpack from 'webpack';
+import browserslist from 'browserslist';
 import { WorkerPoolConfig } from './thread-loader';
 import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from '../webpack-config';
 
@@ -79,34 +81,23 @@ export const resolveWebpackTranspilerParameters = (
   const buildTarget = di.get(BUILD_TARGET_TOKEN);
   const buildEnv = di.get(BUILD_MODE_TOKEN);
 
-  // const {
-  //   generateDataQaTag,
-  //   target,
-  //   rootDir,
-  //   enableFillActionNamePlugin,
-  //   excludesPresetEnv,
-  //   experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
-  // } = configManager;
+  const {
+    generateDataQaTag,
+    //   target,
+    //   rootDir,
+    //   enableFillActionNamePlugin,
+    //   excludesPresetEnv,
+    //   experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
+  } = config;
   // const { env, modern } = configManager;
   const isServer = buildTarget === 'server';
   const actualTarget = isServer ? 'node' : 'defaults';
-
-  // const browserslistConfigRaw = browserslist.findConfig(rootDir);
-
-  // // Set defaults if the explicit config for browserslist was not found or the config does not contain the necessary targets
-  // const browserslistQuery =
-  //   browserslistConfigRaw?.[actualTarget] ?? envTargets[actualTarget] ?? envTargets.defaults;
-
-  // const browsersListTargets = browserslist(browserslistQuery, {
-  //   mobileToDesktop: true,
-  //   env: actualTarget,
-  // });
 
   // @ts-expect-error TODO
   return {
     isServer,
     env: buildEnv,
-    // generateDataQaTag,
+    generateDataQaTag,
     tramvai: true,
     removeTypeofWindow: true,
     // hot: !!configManager.hotRefresh.enabled,
@@ -114,7 +105,7 @@ export const resolveWebpackTranspilerParameters = (
     // enableFillActionNamePlugin,
     rootDir: config.rootDir,
     actualTarget,
-    // browsersListTargets,
+    browsersListTargets: getBrowserslistConfig(config.rootDir, actualTarget),
     loader: true,
     modules: false,
     typescript: false,
@@ -123,6 +114,20 @@ export const resolveWebpackTranspilerParameters = (
     // ...overrideOptions,
   };
 };
+
+function getBrowserslistConfig(rootDir: string, actualTarget: 'node' | 'defaults') {
+  const browserslistConfigRaw = browserslist.findConfig(rootDir);
+
+  // Set defaults if the explicit config for browserslist was not found or the config does not contain the necessary targets
+  const browserslistQuery =
+    browserslistConfigRaw?.[actualTarget] ?? envTargets[actualTarget] ?? envTargets.defaults;
+  const browsersListTargets = browserslist(browserslistQuery, {
+    mobileToDesktop: true,
+    env: actualTarget,
+  });
+
+  return browsersListTargets;
+}
 
 export const createTranspilerRules = ({
   transpiler,

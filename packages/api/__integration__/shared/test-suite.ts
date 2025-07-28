@@ -62,6 +62,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     },
     'app-jsx': {
       name: 'app-jsx',
+      generateDataQaTag: true,
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'jsx', 'index.ts'),
     },
@@ -156,6 +157,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     },
     'app-assets': {
       name: 'app-assets',
+      generateDataQaTag: true,
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
@@ -873,7 +875,6 @@ export default bar;`,
           expect(serverJs).toContain('foo');
           expect(serverJs).toContain('bar');
 
-          // react-element-info-unique plugin
           expect(platformJs).toContain('data-qa-file');
           expect(serverJs).toContain('data-qa-file');
 
@@ -1147,8 +1148,9 @@ export default Cmp;`,
           ).text();
 
           expect(serverJs).toContain('SvgPlus');
-          expect(serverJs).toContain('\"data-qa-file\": \"plus\"');
           expect(platformJs).toContain('SvgPlus');
+
+          expect(serverJs).toContain('\"data-qa-file\": \"plus\"');
           expect(platformJs).toContain('\"data-qa-file\": \"plus\"');
 
           // todo close in afterEach

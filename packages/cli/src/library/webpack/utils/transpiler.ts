@@ -3,7 +3,7 @@ import { sync as resolve } from 'resolve';
 import envTargets from '@tinkoff/browserslist-config';
 import browserslist from 'browserslist';
 import type { ConfigManager } from '../../../config/configManager';
-import { getSwcOptions } from '../../swc';
+import { swcConfigFactory } from '../../swc';
 import { babelConfigFactory } from '../../babel';
 import type { Env } from '../../../typings/Env';
 import type { Target } from '../../../typings/target';
@@ -55,7 +55,7 @@ Please run "npx tramvai add --dev @tramvai/swc-integration" to fix the problem
       `);
       }
 
-      return rule.loader('swc-loader').options(getSwcOptions(transpilerConfig)).end();
+      return rule.loader('swc-loader').options(swcConfigFactory(transpilerConfig)).end();
     }
 
     if (loader === 'babel') {

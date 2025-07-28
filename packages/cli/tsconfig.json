@@ -52,6 +52,9 @@
         },
         {
             "path": "../plugin-webpack-builder"
+        },
+        {
+            "path": "../plugin-swc-transpiler"
         }
     ]
 }
