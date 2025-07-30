@@ -1,4 +1,4 @@
-import { createTestSuite } from './shared/test-suite';
+import { createTestSuite } from './shared/application-development.test-suite';
 
 createTestSuite({
   key: 'webpack-babel',

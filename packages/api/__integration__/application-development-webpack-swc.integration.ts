@@ -1,6 +1,6 @@
-import { createTestSuite } from './shared/test-suite';
+import { createTestSuite } from './shared/application-development.test-suite';
 
 createTestSuite({
-  key: 'webpack-swc',
+  key: 'webpack-babel',
   plugins: ['@tramvai/plugin-webpack-builder', '@tramvai/plugin-swc-transpiler'],
 });

@@ -21,22 +21,28 @@ export async function start(
   inputParameters: StartParameters,
   extraConfiguration?: Partial<Configuration>
 ): Promise<DevServer> {
-  const logger = new Logger();
-
-  const config = new ConfigService({ mode: 'development', ...inputParameters }, extraConfiguration);
-  await config.initialize();
-
-  const portManager = new PortManager({
-    logger,
-    config,
-    inputParameters,
-  });
-
   tracer.init();
 
   tracer.mark({
     event: 'start-command.started',
     category: ['api'],
+  });
+
+  const logger = new Logger();
+  const config = new ConfigService({ mode: 'development', ...inputParameters }, extraConfiguration);
+
+  await tracer.wrap(
+    {
+      event: 'start-command.config.initialize',
+      category: ['api'],
+    },
+    () => config.initialize()
+  );
+
+  const portManager = new PortManager({
+    logger,
+    config,
+    inputParameters,
   });
 
   const plugins: TramvaiPlugin[] = config.plugins.map((plugin) => {

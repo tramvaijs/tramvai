@@ -183,7 +183,6 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
     },
   }`;
 
-    console.error('wtf loader code', code);
     return code;
   };
 

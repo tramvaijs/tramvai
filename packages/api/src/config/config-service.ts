@@ -544,6 +544,7 @@ export class ConfigService {
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {
     return cosmiconfig('tramvai', {
+      searchStrategy: 'none',
       loaders: {
         // TODO: resolve only .ts files
         '.ts': TypeScriptLoader(),
