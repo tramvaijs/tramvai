@@ -28,6 +28,9 @@ test.describe('View Transitions', async () => {
     await ViewTransitions.mockStartViewTransition();
 
     await page.click(`#${getAlbumId(1)}`);
+    await page.waitForFunction(() => {
+      return window.location.pathname === '/album/1/';
+    });
 
     await page.goBack();
 
@@ -54,11 +57,17 @@ test.describe('View Transitions', async () => {
     await ViewTransitions.mockStartViewTransition();
 
     await page.click(`#${getAlbumId(1)}`);
+    await page.waitForFunction(() => {
+      return window.location.pathname === '/album/1/';
+    });
 
     await page.goBack();
 
     await page.click(`#${getAlbumId(1)}`);
     await page.click(`#${getAlbumId(2)}`);
+    await page.waitForFunction(() => {
+      return window.location.pathname === '/album/2/';
+    });
 
     await page.goBack();
 
@@ -100,6 +109,9 @@ test.describe('View Transitions', async () => {
     await page.click(`#${getAlbumId(2)}`);
     await page.click(`#${getAlbumId(3)}`);
     await page.click(`#${getAlbumId(4)}`);
+    await page.waitForFunction(() => {
+      return window.location.pathname === '/album/4/';
+    });
     await page.goBack();
     await page.goBack();
     await page.goBack();
