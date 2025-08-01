@@ -47,8 +47,7 @@
     "wsrun": "^5.2.0"
   },
   "resolutions": {
-    "webpack": "^5",
-    "@types/webpack": "5.28.1",
+    "webpack": "5.87.0",
     "@types/mime": "3.0.4",
     "@types/react": "^18.0.0",
     "@types/express-serve-static-core": "^4.17.18"

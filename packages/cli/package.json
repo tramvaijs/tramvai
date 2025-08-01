@@ -193,7 +193,6 @@
     "@types/semver": "^7.3.12",
     "@types/stoppable": "^1.1.1",
     "@types/universal-analytics": "^0.4.5",
-    "@types/webpack": ">=5.28",
     "@types/webpack-dev-middleware": "^5.0.2",
     "@types/webpack-stats-plugin": "^0.3.2",
     "react": "19.0.0",
