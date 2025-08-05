@@ -218,6 +218,11 @@ export interface ApplicationProject extends BaseProject {
     static?: string;
   };
   fileSystemPages?: FileSystemPagesOptions;
+  /**
+   * @title File-System Papi Routes source directory
+   * @default "api"
+   */
+  fileSystemPapiDir?: string;
   experiments?: ApplicationExperiments;
   postcss?: PostcssOptions;
   polyfill?: string;
@@ -501,6 +506,13 @@ export class ConfigService {
         ? rootErrorBoundaryPath
         : undefined,
     };
+  }
+
+  get fileSystemPapiDir(): string | null {
+    if (this.#project!.type === 'child-app') {
+      return null;
+    }
+    return this.#project!.fileSystemPapiDir ?? 'api';
   }
 
   get postcss(): PostcssOptions | null {

@@ -1,4 +1,5 @@
 import path from 'node:path';
+import flatten from '@tinkoff/utils/array/flatten';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
@@ -11,6 +12,7 @@ import {
 import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
 import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
 import { resolvePublicPathDirectory } from './utils/publicPath';
+import { resolveUrl } from '../utils/url';
 import {
   WEBPACK_TRANSPILER_TOKEN,
   createTranspilerRules,
@@ -29,6 +31,8 @@ import { normalizeBrowserslistConfig } from './shared/browserslist';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createSnapshot } from './shared/snapshot';
 import { createAssetsRules } from './shared/assets';
+import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
+import { createServerInlineRules } from './shared/server-inline';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -36,6 +40,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const config = di.get(CONFIG_SERVICE_TOKEN);
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const devtool = di.get(optional(DEVTOOL_OPTIONS_TOKEN)) ?? false;
   const watchOptions = di.get(optional(WATCH_OPTIONS_TOKEN));
   const extensions = di.get(optional(RESOLVE_EXTENSIONS)) ?? defaultExtensions;
@@ -95,7 +100,11 @@ export default appConfig;`;
     },
     output: {
       path: resolveAbsolutePathForFolder({ folder: config.outputServer, rootDir: config.rootDir }),
-      publicPath: resolvePublicPathDirectory(config.outputServer),
+      publicPath: `${resolveUrl({
+        host: config.staticHost,
+        port: config.staticPort,
+        protocol: config.httpProtocol,
+      })}${resolvePublicPathDirectory(config.outputClient)}`,
       filename: 'server.js',
       library: {
         type: 'commonjs2',
@@ -110,6 +119,10 @@ export default appConfig;`;
     },
     mode: 'development',
     devtool,
+    node: {
+      // TODO https://github.com/tramvaijs/tramvai/-/commit/c3f3db838fd711ee7a53a84f5bd832cdeebc293a
+      // __dirname: false
+    },
     resolve: {
       // support for https://nodejs.org/api/addons.html
       extensions: [...extensions, '.node'],
@@ -118,6 +131,8 @@ export default appConfig;`;
       alias: {
         // backward compatibility for old @tramvai/cli file-system pages mechanism
         '@tramvai/cli/lib/external/pages': '@tramvai/api/lib/virtual/file-system-pages',
+        // backward compatibility for old @tramvai/cli file-system papi mechanism
+        '@tramvai/cli/lib/external/api': '@tramvai/api/lib/virtual/file-system-papi',
         // backward compatibility for old @tramvai/cli config mechanism
         '@tramvai/cli/lib/external/config': 'virtual:tramvai/config',
         ...(isRootErrorBoundaryEnabled
@@ -162,18 +177,39 @@ export default appConfig;`;
       futureDefaults: true,
     },
     snapshot: createSnapshot({ config }),
+    // TODO: research why this list?
+    externals: [
+      'react$',
+      'react-dom',
+      'prop-types',
+      'fastify',
+      'core-js',
+      ...flatten<RegExp>(externals),
+    ].map((s) => new RegExp(`^${s}`)),
     module: {
       rules: [
+        // *.inline files rules should be before the transpiler rules
+        ...createServerInlineRules({ di }),
         ...createTranspilerRules({ transpiler, transpilerParameters, workerPoolConfig }),
         ...stylesConfiguration.rules,
         ...createAssetsRules({ di }),
         {
-          // test: /[\\/]cli[\\/]lib[\\/]external[\\/]pages.js$/,
           test: /[\\/]api[\\/]lib[\\/]virtual[\\/]file-system-pages.js$/,
           loader: path.resolve(__dirname, './loaders/file-system-pages'),
           enforce: 'pre',
           options: {
             fileSystemPages: config.fileSystemPages!,
+            rootDir: config.rootDir,
+            sourceDir: config.sourceDir,
+            extensions,
+          },
+        },
+        {
+          test: /[\\/]api[\\/]lib[\\/]virtual[\\/]file-system-papi.js$/,
+          loader: path.resolve(__dirname, './loaders/file-system-papi'),
+          enforce: 'pre',
+          options: {
+            fileSystemPapiDir: config.fileSystemPapiDir!,
             rootDir: config.rootDir,
             sourceDir: config.sourceDir,
             extensions,

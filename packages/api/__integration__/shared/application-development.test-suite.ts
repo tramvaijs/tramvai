@@ -147,12 +147,31 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
+    'app-externals': {
+      name: 'app-externals',
+      generateDataQaTag: true,
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'externals', 'index.ts'),
+    },
+    'app-papi': {
+      name: 'app-papi',
+      type: 'application',
+      sourceDir: path.join(fixturesFolder, 'application', 'papi'),
+      entryFile: path.join(fixturesFolder, 'application', 'papi', 'index.ts'),
+      fileSystemPapiDir: 'papi',
+    },
+    'app-server-inline': {
+      name: 'app-server-inline',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'server-inline', 'index.ts'),
+    },
   };
 
   const [builder, transpiler] = key.split('-');
 
   test.describe(`@tramvai/api @builder:${builder} @transpiler:${transpiler} @type:application @mode:development`, async () => {
     test.describe('api: application start', () => {
+      // MARK: SERVER
       test.describe('server', () => {
         // nested describe + use is the only way to set different options for fixtures in the same test file
         // https://github.com/microsoft/playwright/issues/27138
@@ -260,9 +279,8 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(serverJs).toContain('last 2 years');
-            test.expect(serverJs).toContain('> 1%');
-            test.expect(serverJs).toContain('not dead');
+            test.expect(serverJs).toContain('Chrome >= 80');
+            test.expect(serverJs).toContain('ios_saf >= 14.0');
           });
         });
 
@@ -473,8 +491,123 @@ export default bar;`,
             test.expect(serverJs).toContain('svg-plus-icon');
           });
         });
+
+        test.describe('app-papi', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-papi',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          const papiFile = path.resolve(fixturesFolder, `application`, 'papi', 'papi', 'pong.ts');
+
+          test.afterEach(async () => {
+            await fs.promises.unlink(papiFile);
+          });
+
+          test('file-system-papi: "virtual/file-system-papi" import should be updated after changes in "api" directory', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            let serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('hello');
+            test.expect(serverJs).not.toContain('unknown');
+            test.expect(serverJs).not.toContain('world');
+
+            // MARK: NEW FILE
+
+            // TODO: support concurrent tests
+            await fs.promises.mkdir(path.dirname(papiFile), { recursive: true });
+            await fs.promises.writeFile(
+              papiFile,
+              `import { createPapiMethod } from '@tramvai/papi';
+
+export default createPapiMethod({
+  async handler() {
+    return 'unknown';
+  },
+});`,
+              'utf-8'
+            );
+
+            await sleep(100);
+
+            serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('hello');
+            test.expect(serverJs).toContain('unknown');
+            test.expect(serverJs).not.toContain('world');
+
+            // MARK: CHANGED FILE
+
+            // TODO: support concurrent tests
+            // Force update file content by overwriting it
+            await fs.promises.writeFile(
+              papiFile,
+              `import { createPapiMethod } from '@tramvai/papi';
+
+export default createPapiMethod({
+  async handler() {
+    return 'world';
+  },
+});`,
+              'utf-8'
+            );
+
+            await sleep(100);
+
+            serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('hello');
+            test.expect(serverJs).not.toContain('unknown');
+            test.expect(serverJs).toContain('world');
+          });
+        });
+
+        test.describe('app-server-inline', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-server-inline',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('server-inline: should transpile *.inline.ts files as client-side code', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('ForBrowser');
+            test.expect(serverJs).toContain('this.property');
+          });
+        });
       });
 
+      // MARK: BROWSER
       test.describe('browser', () => {
         test.describe('app-bundle', () => {
           test.use({
@@ -830,6 +963,7 @@ export default bar;`,
         });
       });
 
+      // MARK: UNIVERSAL
       test.describe('universal', () => {
         test.describe('app-jsx', () => {
           test.use({
@@ -1157,6 +1291,36 @@ export default Cmp;`,
             test.expect(platformJs).toContain('SvgPlus');
             test.expect(serverJs).toContain('\"data-qa-file\": \"plus\"');
             test.expect(platformJs).toContain('\"data-qa-file\": \"plus\"');
+          });
+        });
+
+        test.describe('app-externals', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-externals',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('externals: should prevent externals for bundling', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('require(\"@sotqa/mountebank-fork\")');
+            // TODO: with current API for browser build externals technically useful,
+            // because you can'y specify global variable for external client package
+            test.expect(platformJs).toContain('module.exports = @sotqa/mountebank-fork;');
           });
         });
       });

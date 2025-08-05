@@ -29,6 +29,8 @@ export const createStylesConfiguration = ({
     // TODO: getLocalIdent
   };
 
+  // TODO: PostcssAssetsPlugin integration from packages/cli/src/library/webpack/blocks/postcssAssets.ts?
+
   const postcssConfig: Config | ((loaderContext: any) => Config) =
     safeRequire(
       resolveAbsolutePathForFile({

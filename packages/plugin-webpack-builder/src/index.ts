@@ -21,6 +21,7 @@ export {
   WebpackTranspilerInputParameters,
 } from './webpack/shared/transpiler';
 export { DEFINE_PLUGIN_OPTIONS_TOKEN } from './webpack/shared/define';
+export { WEBPACK_EXTERNALS_TOKEN } from './webpack/shared/externals';
 export { DEVTOOL_OPTIONS_TOKEN } from './webpack/shared/sourcemaps';
 export { WATCH_OPTIONS_TOKEN } from './webpack/shared/watch-options';
 export { RESOLVE_EXTENSIONS } from './webpack/shared/resolve';

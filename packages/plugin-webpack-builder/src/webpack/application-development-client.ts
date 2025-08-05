@@ -1,4 +1,5 @@
 import path from 'node:path';
+import flatten from '@tinkoff/utils/array/flatten';
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
@@ -39,6 +40,7 @@ import { createSplitChunksOptions } from './shared/split-chunks';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { PolyfillConditionPlugin } from './plugins/polyfill-condition-plugin';
 import { createAssetsRules } from './shared/assets';
+import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -46,6 +48,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const config = di.get(CONFIG_SERVICE_TOKEN);
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const devtool = di.get(optional(DEVTOOL_OPTIONS_TOKEN)) ?? false;
   const watchOptions = di.get(optional(WATCH_OPTIONS_TOKEN));
   const extensions = di.get(optional(RESOLVE_EXTENSIONS)) ?? defaultExtensions;
@@ -190,6 +193,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       futureDefaults: true,
     },
     snapshot: createSnapshot({ config }),
+    externals: [...flatten<RegExp>(externals)].map((s) => new RegExp(`^${s}`)),
     module: {
       rules: [
         ...createTranspilerRules({ transpiler, transpilerParameters, workerPoolConfig }),
@@ -260,6 +264,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           ignorePackages: config.dedupe.ignore?.map((ignore) => new RegExp(`^${ignore}`)),
           showLogs: false,
         }),
+      // TODO: PurifyStatsPlugin
     ].filter(Boolean),
   };
 };

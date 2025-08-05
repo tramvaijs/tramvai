@@ -12,6 +12,7 @@ import {
 } from '@tramvai/api/lib/config';
 import { initContainer, isValidModule, optional, provide } from '@tinkoff/dippy';
 import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
+import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
 import { BUILD_MODE_TOKEN, BUILD_TYPE_TOKEN, WEBPACK_TRANSPILER_TOKEN } from '../index';
@@ -157,7 +158,14 @@ async function runWebpackDevServer() {
   });
 
   // TODO: parameter to configure { writeToDisk: true } - can be much less memory consumption
-  app.use(webpackDevMiddleware(compiler, { writeToDisk: false }));
+  app.use(
+    webpackDevMiddleware(compiler, {
+      writeToDisk: false,
+      publicPath: resolvePublicPathDirectory(
+        target === 'server' ? config.outputServer : config.outputClient
+      ),
+    })
+  );
 
   app.listen(port, () => {
     // TODO: replace with logger from di?

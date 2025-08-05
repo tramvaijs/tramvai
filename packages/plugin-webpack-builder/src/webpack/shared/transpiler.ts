@@ -72,14 +72,16 @@ export const WEBPACK_TRANSPILER_TOKEN = createToken<WebpackTranspiler>(
 export const resolveWebpackTranspilerParameters = (
   {
     di,
+    buildTarget = di.get(BUILD_TARGET_TOKEN),
+    buildEnv = di.get(BUILD_MODE_TOKEN),
   }: {
     di: Container;
+    buildTarget?: 'server' | 'client';
+    buildEnv?: 'development' | 'production';
   }
   // overrideOptions: Partial<WebpackTranspilerInputParameters> = {}
 ): WebpackTranspilerInputParameters => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
-  const buildTarget = di.get(BUILD_TARGET_TOKEN);
-  const buildEnv = di.get(BUILD_MODE_TOKEN);
 
   const {
     generateDataQaTag,
