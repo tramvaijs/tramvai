@@ -2,11 +2,12 @@ import path from 'path';
 import type Config from 'webpack-chain';
 import { InjectManifest } from 'workbox-webpack-plugin';
 import fs from 'fs';
+
+import { PwaIconsPlugin, WebManifestPlugin, getWorkboxOptions } from '@tramvai/plugin-webpack-pwa';
+
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
 import { safeRequireResolve } from '../../../../utils/safeRequire';
-import { PwaIconsPlugin } from '../../plugins/PwaIconsPlugin';
-import { WebManifestPlugin } from '../../plugins/WebManifestPlugin';
 import { pwaSharedBlock } from './shared';
 
 export const pwaBlock =
@@ -41,68 +42,16 @@ export const pwaBlock =
         );
       }
 
-      // @todo: static HTML caching ??? full offline mode for tramvai static ???
-      const workboxOptions: InjectManifest['config'] = {
-        swSrc,
-        swDest,
-        exclude: [/hmr\.js$/, /\.map$/, /\.hot-update\./],
-        maximumFileSizeToCacheInBytes: env === 'production' ? 5 * 1024 * 1024 : 10 * 1024 * 1024,
-        chunks: pwa.workbox.chunks,
-        excludeChunks: pwa.workbox.excludeChunks,
-        additionalManifestEntries: [
-          // @todo CSR fallback or all static pages?
-          // do not forget about revision and possible conflict with modifyURLPrefix
-        ],
-        manifestTransforms: [
-          (manifest, compilation: any) => {
-            return {
-              // we need to have a relative webmanifest url for precaching
-              manifest: manifest.map((asset) => {
-                const assetName = asset.url.replace(assetsPrefix, '');
-                // in development build `publicPath` is localhost, in production is empty string
-                const publicPath = compilation.outputOptions?.publicPath || assetsPrefix;
-                const assetInfo = compilation.assetsInfo.get(asset.url.replace(publicPath, ''));
-
-                if (assetInfo?._webmanifestFilename) {
-                  return {
-                    ...asset,
-                    url: `${pwa.sw.scope}${assetName}`,
-                  };
-                }
-                return asset;
-              }),
-            };
-          },
-        ],
-      };
-
-      if (pwa.workbox.include) {
-        workboxOptions.include = pwa.workbox.include.map((expr) => new RegExp(expr));
-      }
-      if (pwa.workbox.exclude) {
-        workboxOptions.exclude = [
-          ...workboxOptions.exclude,
-          ...pwa.workbox.exclude.map((expr) => new RegExp(expr)),
-        ];
-      }
-      if (pwa.workbox.additionalManifestEntries) {
-        workboxOptions.additionalManifestEntries = [
-          ...workboxOptions.additionalManifestEntries,
-          ...pwa.workbox.additionalManifestEntries,
-        ];
-      }
-
-      if (env === 'production') {
-        workboxOptions.dontCacheBustURLsMatching = /\/\w+?\.[\w\d]+?\.(js|css|gif|png|jpe?g|svg)$/;
-
-        workboxOptions.modifyURLPrefix = {
-          '': assetsPrefix,
-        };
-      }
-
-      // @todo: break hmr on client when sw.ts is changed - infinity loop !!!
-
-      const workboxPlugin = new InjectManifest(workboxOptions);
+      const workboxPlugin = new InjectManifest(
+        getWorkboxOptions({
+          swSrc,
+          swDest,
+          workbox: pwa.workbox,
+          mode: env,
+          scope: pwa.sw.scope!,
+          assetsPrefix: assetsPrefix!,
+        })
+      );
 
       // https://github.com/GoogleChrome/workbox/issues/1790#issuecomment-1241356293
       if (env === 'development') {

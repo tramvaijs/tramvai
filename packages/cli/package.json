@@ -76,6 +76,7 @@
     "@tramvai/plugin-babel-transpiler": "0.0.0-stub",
     "@tramvai/plugin-swc-transpiler": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
+    "@tramvai/plugin-webpack-pwa": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/tools-check-versions": "0.0.0-stub",
     "@tramvai/tools-migrate": "0.0.0-stub",

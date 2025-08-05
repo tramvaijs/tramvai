@@ -86,14 +86,13 @@ async function runWebpackDevServer() {
   });
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN));
-  const configExtensions = di.get(optional(CONFIGURATION_EXTENSION_TOKEN));
-
   if (!transpiler) {
     throw Error(
-      `Transpiler not found, make sure you add "@tramvai/plugin-babel-transpiler" plugin to tramvai config file`
+      `Transpiler not found, make sure you add "@tramvai/plugin-babel-transpiler" or "@tramvai/plugin-swc-transpiler" to tramvai config file`
     );
   }
 
+  const configExtensions = di.get(optional(CONFIGURATION_EXTENSION_TOKEN));
   if (Array.isArray(configExtensions)) {
     config.loadExtensions(configExtensions);
   }

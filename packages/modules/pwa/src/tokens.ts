@@ -1,6 +1,6 @@
 import { createToken } from '@tinkoff/dippy';
 import type { Workbox } from 'workbox-window';
-import type { PwaMetaOptions } from '@tramvai/cli/lib/typings/public';
+import type { PwaMetaOptions } from '@tramvai/plugin-webpack-pwa';
 import type { commandLineListTokens } from '@tramvai/core';
 
 export type WebManifest = {

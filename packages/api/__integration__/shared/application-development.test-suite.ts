@@ -2,7 +2,6 @@
 
 import path from 'node:path';
 import fs from 'node:fs';
-import * as allure from 'allure-js-commons';
 import { ApplicationProject } from '@tramvai/api/lib/config';
 import { test } from './test.fixture';
 
@@ -164,6 +163,51 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       name: 'app-server-inline',
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'server-inline', 'index.ts'),
+    },
+    'app-pwa': {
+      name: 'app-pwa',
+      pwa: {
+        sw: {
+          scope: '/',
+        },
+        workbox: {
+          enabled: true,
+        },
+        webmanifest: {
+          enabled: true,
+        },
+      },
+      type: 'application',
+      sourceDir: path.join(fixturesFolder, 'application', 'app-pwa'),
+    },
+    'custom-pwa': {
+      name: 'custom-pwa',
+      pwa: {
+        sw: {
+          src: './custom-sw.ts',
+          scope: '/scope/',
+          dest: 'custom-sw.js',
+        },
+        workbox: {
+          enabled: true,
+          include: ['react\\.([\\w\\d]+?\\.)?js$'],
+        },
+        webmanifest: {
+          enabled: true,
+          name: 'my manifest',
+          short_name: 'also my manifest but short',
+          // TODO: сделать проверку на генерацию hash в названии для bulid
+          dest: '/manifest.webmanifest',
+          theme_color: '#ffdd2d',
+        },
+        icon: {
+          src: './images/pwa-icon.png',
+          dest: 'images',
+          sizes: [36, 512],
+        },
+      },
+      type: 'application',
+      sourceDir: path.join(fixturesFolder, 'application', 'app-pwa'),
     },
   };
 
@@ -603,6 +647,104 @@ export default createPapiMethod({
 
             test.expect(serverJs).toContain('ForBrowser');
             test.expect(serverJs).toContain('this.property');
+          });
+        });
+      });
+
+      test.describe('pwa', () => {
+        test.describe('default settings', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-pwa',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('service worker', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const swResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/sw.js`
+            );
+
+            test.expect(swResponse.status).toBe(200);
+          });
+        });
+
+        test.describe('custom settings', () => {
+          test.use({
+            inputParameters: {
+              name: 'custom-pwa',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('service worker with custom path and include', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            const chunks = ['react'].map((chunkname) => {
+              return statsJson.assetsByChunkName[chunkname][0];
+            });
+
+            const swResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/custom-sw.js`
+            );
+
+            test.expect(swResponse.status).toBe(200);
+            const swContent = await swResponse.text();
+
+            chunks.forEach((chunkname) => {
+              test.expect(swContent.includes(chunkname)).toBe(true);
+            });
+          });
+
+          test('webmanifest', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            test.expect(webmanifestResponse.status).toBe(200);
+
+            test.expect(webmanifestContent.theme_color).toBe('#ffdd2d');
+            test.expect(webmanifestContent.name).toBe('my manifest');
+            test.expect(webmanifestContent.short_name).toBe('also my manifest but short');
+            test.expect(webmanifestContent.scope).toBe('/scope/');
+          });
+
+          test('Should generate icons', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            test.expect(webmanifestContent.icons.length).toBe(2);
+
+            for (const { src } of webmanifestContent.icons) {
+              const iconSrc = src.replace('4000', devServer.staticPort);
+              const iconResponse = await fetch(iconSrc);
+              test.expect(iconResponse.status).toBe(200);
+            }
           });
         });
       });

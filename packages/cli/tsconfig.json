@@ -55,6 +55,9 @@
         },
         {
             "path": "../plugin-swc-transpiler"
+        },
+        {
+            "path": "../plugin-webpack-pwa"
         }
     ]
 }

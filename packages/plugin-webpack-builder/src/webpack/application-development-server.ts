@@ -33,6 +33,7 @@ import { createSnapshot } from './shared/snapshot';
 import { createAssetsRules } from './shared/assets';
 import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { createServerInlineRules } from './shared/server-inline';
+import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -41,6 +42,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
+  const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const devtool = di.get(optional(DEVTOOL_OPTIONS_TOKEN)) ?? false;
   const watchOptions = di.get(optional(WATCH_OPTIONS_TOKEN));
   const extensions = di.get(optional(RESOLVE_EXTENSIONS)) ?? defaultExtensions;
@@ -252,6 +254,7 @@ export default appConfig;`;
           ignorePackages: config.dedupe.ignore?.map((ignore) => new RegExp(`^${ignore}`)),
           showLogs: false,
         }),
+      ...plugins.flat(),
     ].filter(Boolean),
   };
 };

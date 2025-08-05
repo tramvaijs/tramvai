@@ -1,12 +1,11 @@
 import type webpack from 'webpack';
-import type { Compiler } from 'webpack';
 import type Sharp from 'sharp';
-import type { PwaIconOptions } from '../../../typings/pwa';
+import { PwaIconOptions } from '../types';
 
 const pluginName = 'PwaIconsPlugin';
 
 export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
-  private hash: string;
+  private hash: string | undefined;
 
   constructor(
     private options: PwaIconOptions & {
@@ -16,7 +15,7 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
     this.options = options;
   }
 
-  apply(compiler: Compiler) {
+  apply(compiler: webpack.Compiler) {
     const { webpack } = compiler;
     const { Compilation } = webpack;
     const { RawSource } = webpack.sources;
@@ -40,7 +39,7 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
             // check icon source file updates
             const nextHash = await new Promise<string>((resolve) => {
               compilation.fileSystemInfo.getFileHash(src, (_, hash) => {
-                resolve(hash);
+                resolve(hash!);
               });
             });
 
@@ -52,7 +51,7 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
             }
 
             // @todo persistent cache between builds !!!
-            const promises = sizes.map((size) => {
+            const promises = sizes?.map((size) => {
               return sharp(src)
                 .resize({ width: size, height: size })
                 .png({
@@ -71,16 +70,16 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
                 }));
             });
 
-            const results = await Promise.all(promises);
+            const results = await Promise.all(promises ?? []);
 
             results.forEach(({ filename, content }, i) => {
               const source = new RawSource(content);
               const asset = compilation.getAsset(filename);
 
               if (asset) {
-                compilation.updateAsset(filename, source, { _pwaIconSize: sizes[i] });
+                compilation.updateAsset(filename, source, { _pwaIconSize: sizes![i] });
               } else {
-                compilation.emitAsset(filename, source, { _pwaIconSize: sizes[i] });
+                compilation.emitAsset(filename, source, { _pwaIconSize: sizes![i] });
               }
             });
           } catch (e) {

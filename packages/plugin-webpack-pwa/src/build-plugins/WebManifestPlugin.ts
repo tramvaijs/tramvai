@@ -1,6 +1,6 @@
 import type webpack from 'webpack';
 import type { Compiler } from 'webpack';
-import type { PwaIconOptions, WebManifestOptions } from '../../../typings/pwa';
+import { PwaIconOptions, WebManifestOptions } from '../types';
 
 const pluginName = 'WebManifestPlugin';
 
@@ -34,7 +34,7 @@ export class WebManifestPlugin implements webpack.WebpackPluginInstance {
             assets.forEach((asset) => {
               const assetInfo = compilation.assetsInfo.get(asset);
               // asset info `_pwaIconSize` added in PwaIconsPlugin
-              const size = assetInfo._pwaIconSize;
+              const size = assetInfo?._pwaIconSize;
 
               if (size) {
                 if (!content.icons) {
@@ -50,7 +50,7 @@ export class WebManifestPlugin implements webpack.WebpackPluginInstance {
             });
           }
 
-          const manifestFilename = dest.replace(/^\//, '');
+          const manifestFilename = dest!.replace(/^\//, '');
 
           compilation.emitAsset(manifestFilename, new RawSource(JSON.stringify(content, null, 2)), {
             _webmanifestFilename: manifestFilename,

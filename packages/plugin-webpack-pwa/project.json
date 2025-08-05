@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/plugin-webpack-pwa",
+  "root": "packages/plugin-webpack-pwa",
+  "sourceRoot": "packages/plugin-webpack-pwa/src",
+  "projectType": "library",
+  "targets": {}
+}

@@ -1,7 +1,11 @@
 // eslint-disable-next-line no-restricted-imports
 import type { ForkTsCheckerWebpackPluginOptions } from 'fork-ts-checker-webpack-plugin/lib/plugin-options';
 import type { ManifestEntry } from 'workbox-build';
-import type { PwaIconOptions, PwaMetaOptions, WebManifestOptions } from '../pwa';
+import type {
+  PwaIconOptions,
+  PwaMetaOptions,
+  WebManifestOptions,
+} from '@tramvai/plugin-webpack-pwa';
 import type { CliConfigEntry, Experiments } from './cli';
 import type { OverridableOption } from './common';
 

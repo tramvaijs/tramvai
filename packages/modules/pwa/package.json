@@ -28,10 +28,14 @@
     "@tramvai/tokens-server": "0.0.0-stub",
     "workbox-window": "^6.6.1"
   },
+  "devDependencies": {
+    "@tramvai/plugin-webpack-pwa": "0.0.0-stub"
+  },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
+    "@tramvai/plugin-webpack-pwa": "0.0.0-stub",
     "tslib": "^2.4.0"
   }
 }

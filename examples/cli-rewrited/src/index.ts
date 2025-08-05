@@ -6,6 +6,7 @@ import { ServerModule } from '@tramvai/module-server';
 import { ErrorInterceptorModule } from '@tramvai/module-error-interceptor';
 import { SeoModule } from '@tramvai/module-seo';
 import { DEFAULT_HEADER_COMPONENT } from '@tramvai/tokens-render';
+import { TramvaiPwaModule } from '@tramvai/module-progressive-web-app';
 
 import { Header } from './components/features/Header/Header';
 
@@ -19,6 +20,7 @@ createApp({
     RenderModule.forRoot({ useStrictMode: true }),
     SeoModule,
     ServerModule,
+    TramvaiPwaModule,
     ErrorInterceptorModule,
   ],
   providers: [

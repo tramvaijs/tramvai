@@ -228,6 +228,7 @@ export interface ApplicationProject extends BaseProject {
   polyfill?: string;
   modernPolyfill?: string;
   dedupe?: DedupeOptions;
+  assetsPrefix?: string;
 }
 
 export interface ChildAppProject extends BaseProject {
@@ -264,6 +265,7 @@ export type SerializableConfig = {
   staticPort: number;
   staticHost: string;
   httpProtocol: string;
+  assetsPrefix: string | null;
   output: {
     server: string;
     client: string;
@@ -448,6 +450,18 @@ export class ConfigService {
     return this.#project!.type;
   }
 
+  get assetsPrefix() {
+    if (this.#project!.type === 'child-app') {
+      return null;
+    }
+
+    return process.env.ASSETS_PREFIX && process.env.ASSETS_PREFIX !== 'static'
+      ? process.env.ASSETS_PREFIX
+      : `${this.httpProtocol}://${this.staticHost}:${
+          this.staticPort
+        }/${this.outputClient.replace(/\/$/, '')}/`;
+  }
+
   get polyfill() {
     if (this.#project!.type === 'child-app') {
       return null;
@@ -578,6 +592,7 @@ export class ConfigService {
       staticPort: this.staticPort,
       staticHost: this.staticHost,
       httpProtocol: this.httpProtocol,
+      assetsPrefix: this.assetsPrefix,
       output: {
         server: this.outputServer,
         client: this.outputClient,

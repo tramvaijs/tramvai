@@ -14,7 +14,7 @@ import {
 import { createDevServer } from './dev-server/dev-server';
 
 export { PolyfillConditionPlugin } from './webpack/plugins/polyfill-condition-plugin';
-export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN } from './webpack/webpack-config';
+export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from './webpack/webpack-config';
 export {
   WEBPACK_TRANSPILER_TOKEN,
   WebpackTranspiler,
@@ -25,6 +25,7 @@ export { WEBPACK_EXTERNALS_TOKEN } from './webpack/shared/externals';
 export { DEVTOOL_OPTIONS_TOKEN } from './webpack/shared/sourcemaps';
 export { WATCH_OPTIONS_TOKEN } from './webpack/shared/watch-options';
 export { RESOLVE_EXTENSIONS } from './webpack/shared/resolve';
+export { WEBPACK_PLUGINS_TOKEN } from './webpack/shared/plugins';
 
 /**
  * @title Configure the options on webpack splitChunks
