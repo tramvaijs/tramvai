@@ -102,7 +102,7 @@ export const resolveWebpackTranspilerParameters = (
     generateDataQaTag,
     tramvai: true,
     removeTypeofWindow: true,
-    // hot: !!configManager.hotRefresh.enabled,
+    hot: !!config.hotRefresh?.enabled,
     // excludesPresetEnv,
     // enableFillActionNamePlugin,
     rootDir: config.rootDir,

@@ -203,16 +203,15 @@ export const createSplitChunksOptions = ({
     };
   }
 
-  // TODO: TCORE-5277
-  // if (config.hotRefresh?.enabled && webpackSplitChunks) {
-  //   webpackSplitChunks.cacheGroups!.hmr = {
-  //     name: 'hmr',
-  //     enforce: true,
-  //     test: /[\\/]node_modules[\\/](react-refresh|webpack-hot-middleware|@pmmmwh[\\/]react-refresh-webpack-plugin)[\\/]/,
-  //     chunks: 'all',
-  //     priority: 20,
-  //   };
-  // }
+  if (config.hotRefresh?.enabled && webpackSplitChunks) {
+    webpackSplitChunks.cacheGroups!.hmr = {
+      name: 'hmr',
+      enforce: true,
+      test: /[\\/]node_modules[\\/](react-refresh|webpack-hot-middleware|@pmmmwh[\\/]react-refresh-webpack-plugin)[\\/]/,
+      chunks: 'all',
+      priority: 20,
+    };
+  }
 
   return {
     splitChunks: webpackSplitChunks,

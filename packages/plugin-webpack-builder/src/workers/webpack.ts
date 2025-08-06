@@ -2,6 +2,7 @@ import '../utils/inspector';
 import '@tramvai/api/lib/utils/cpu-profile';
 import { parentPort, workerData } from 'node:worker_threads';
 import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
 import webpack from 'webpack';
 import express from 'express';
 import {
@@ -166,6 +167,14 @@ async function runWebpackDevServer() {
     })
   );
 
+  if (config.hotRefresh?.enabled) {
+    app.use(
+      getHotModulePrefix(config),
+      // @ts-ignore - https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73338
+      webpackHotMiddleware(compiler, { log: false, statsOptions: { cached: false } })
+    );
+  }
+
   app.listen(port, () => {
     // TODO: replace with logger from di?
     // eslint-disable-next-line no-console
@@ -196,6 +205,18 @@ async function runWebpackDevServer() {
 }
 
 runWebpackDevServer();
+
+function getHotModulePrefix(config: ConfigService): string {
+  if (config.projectType === 'application') {
+    return `/${config.outputClient}`;
+  }
+
+  if (config.projectType === 'child-app') {
+    return `/${config.projectName}`;
+  }
+
+  throw new Error(`${config.projectType} is not supported`);
+}
 
 process.on('unhandledRejection', (error) => {
   // TODO: replace with logger from di?

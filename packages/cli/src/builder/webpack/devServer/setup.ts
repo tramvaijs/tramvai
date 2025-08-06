@@ -84,6 +84,7 @@ export const createDevServer = ({
     if (configManager.hotRefresh.enabled) {
       app.use(
         getHotModulePrefix(configManager),
+        // @ts-ignore - https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73338
         webpackHotMiddleware(compiler, { log: false, statsOptions: { cached: false } })
       );
     }

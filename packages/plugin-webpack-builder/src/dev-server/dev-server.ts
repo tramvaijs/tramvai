@@ -47,6 +47,10 @@ export function createDevServer({
         portManager.resolveFreePort(0),
       ]);
 
+      if (!inputParameters.staticPort) {
+        inputParameters.staticPort = portManager.staticPort!;
+      }
+
       const proxy = createProxy({
         port: portManager.port!,
         staticPort: portManager.staticPort!,

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import { createToken } from '@tinkoff/dippy';
+import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
@@ -62,6 +63,19 @@ export type FileSystemPagesOptions = {
    * @default "error.tsx"
    */
   rootErrorBoundaryPath?: string;
+};
+
+export type HotRefreshOptions = {
+  /**
+   * @title Enable react hot-refresh
+   * @default true
+   */
+  enabled?: boolean;
+  /**
+   * @title Configure react hot-refresh https://github.com/pmmmwh/react-refresh-webpack-plugin#options
+   * @default {}
+   */
+  options?: ConstructorParameters<typeof ReactRefreshPlugin>[0];
 };
 
 export type ReactCompilerOptions = {
@@ -187,10 +201,16 @@ export interface BaseProject {
   svgo?: {
     plugins?: SvgoConfig['plugins'];
   };
+
   /**
    * Enables data-qa-tag plugin for transpiler
    */
   generateDataQaTag?: boolean;
+
+  /**
+   * React hot-refresh options
+   */
+  hotRefresh?: HotRefreshOptions;
 }
 
 export interface ApplicationProject extends BaseProject {
@@ -302,18 +322,15 @@ export const CONFIGURATION_EXTENSION_TOKEN = createToken<ExtensionToken>(
 // фабрика отдельной сущности AppProject / ChildAppProject?
 export class ConfigService {
   #parameters: InputParameters;
-  #config: Configuration | null;
+  #config!: Configuration;
   #extraConfig: Partial<Configuration>;
-  #project: Project | null;
-  #configPath: string | null;
+  #project!: Project;
+  #configPath: string | null = null;
   #extensions: ExtensionToken[] = [];
 
   constructor(parameters: InputParameters, extraConfiguration?: Partial<Configuration>) {
     this.#parameters = parameters;
-    this.#config = null;
     this.#extraConfig = extraConfiguration ?? {};
-    this.#project = null;
-    this.#configPath = null;
   }
 
   async initialize() {
@@ -350,7 +367,7 @@ export class ConfigService {
           currentExtension[key]({
             config: this.#config!,
             parameters: this.#parameters,
-            project: this.#project!,
+            project: this.#project,
           });
       }
       return extensions;
@@ -420,11 +437,11 @@ export class ConfigService {
   }
 
   get sourceDir() {
-    return this.#project!.sourceDir ?? 'src';
+    return this.#project.sourceDir ?? 'src';
   }
 
   get entryFile() {
-    return this.#project!.entryFile ?? 'index.ts';
+    return this.#project.entryFile ?? 'index.ts';
   }
 
   get showProgress() {
@@ -436,7 +453,7 @@ export class ConfigService {
   }
 
   get projectName() {
-    return this.#project!.name;
+    return this.#project.name;
   }
 
   get projectVersion() {
@@ -447,7 +464,7 @@ export class ConfigService {
   }
 
   get projectType() {
-    return this.#project!.type;
+    return this.#project.type;
   }
 
   get assetsPrefix() {
@@ -463,47 +480,47 @@ export class ConfigService {
   }
 
   get polyfill() {
-    if (this.#project!.type === 'child-app') {
+    if (this.#project.type === 'child-app') {
       return null;
     }
 
-    return this.#project!.polyfill;
+    return this.#project.polyfill;
   }
 
   get modernPolyfill() {
-    if (this.#project!.type === 'child-app') {
+    if (this.#project.type === 'child-app') {
       return null;
     }
 
-    return this.#project!.modernPolyfill;
+    return this.#project.modernPolyfill;
   }
 
   get outputServer() {
-    if (this.#project!.type === 'child-app') {
-      return this.#project!.output ?? 'dist/child-app';
+    if (this.#project.type === 'child-app') {
+      return this.#project.output ?? 'dist/child-app';
     }
-    return this.#project!.output?.server ?? 'dist/server';
+    return this.#project.output?.server ?? 'dist/server';
   }
 
   get outputClient() {
-    if (this.#project!.type === 'child-app') {
-      return this.#project!.output ?? 'dist/child-app';
+    if (this.#project.type === 'child-app') {
+      return this.#project.output ?? 'dist/child-app';
     }
-    return this.#project!.output?.client ?? 'dist/client';
+    return this.#project.output?.client ?? 'dist/client';
   }
 
   get outputStatic() {
-    if (this.#project!.type === 'child-app') {
-      return this.#project!.output ?? 'dist/child-app';
+    if (this.#project.type === 'child-app') {
+      return this.#project.output ?? 'dist/child-app';
     }
-    return this.#project!.output?.static ?? 'dist/static';
+    return this.#project.output?.static ?? 'dist/static';
   }
 
   get fileSystemPages(): FileSystemPagesOptions | null {
-    if (this.#project!.type === 'child-app') {
+    if (this.#project.type === 'child-app') {
       return null;
     }
-    const fileSystemPages = this.#project!.fileSystemPages ?? ({} as FileSystemPagesOptions);
+    const fileSystemPages = this.#project.fileSystemPages ?? ({} as FileSystemPagesOptions);
 
     const rootErrorBoundaryPath = resolveAbsolutePathForFile({
       rootDir: this.rootDir,
@@ -530,18 +547,18 @@ export class ConfigService {
   }
 
   get postcss(): PostcssOptions | null {
-    if (this.#project!.type === 'child-app') {
+    if (this.#project.type === 'child-app') {
       return null;
     }
-    return this.#project!.postcss ?? {};
+    return this.#project.postcss ?? {};
   }
 
   get experiments(): ApplicationExperiments | null {
-    if (this.#project!.type === 'child-app') {
+    if (this.#project.type === 'child-app') {
       return null;
     }
 
-    const experiments = this.#project!.experiments ?? {};
+    const experiments = this.#project.experiments ?? {};
 
     return {
       viewTransitions: experiments.viewTransitions ?? false,
@@ -555,13 +572,23 @@ export class ConfigService {
       enabledDev = false,
       strategy = 'equality',
       ignore,
-    } = this.#project!.dedupe ?? {};
+    } = this.#project.dedupe ?? {};
 
     return { enabled, enabledDev, strategy, ignore };
   }
 
   get svgo(): BaseProject['svgo'] {
-    return this.#project!.svgo ?? {};
+    return this.#project.svgo ?? {};
+  }
+
+  get hotRefresh(): BaseProject['hotRefresh'] {
+    return {
+      enabled: this.#project.hotRefresh?.enabled ?? true,
+      options: {
+        overlay: false,
+        ...this.#project.hotRefresh?.options,
+      },
+    };
   }
 
   get generateDataQaTag() {

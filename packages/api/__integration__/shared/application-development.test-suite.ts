@@ -2,6 +2,7 @@
 
 import path from 'node:path';
 import fs from 'node:fs';
+import { outputFile } from 'fs-extra';
 import { ApplicationProject } from '@tramvai/api/lib/config';
 import { test } from './test.fixture';
 
@@ -18,11 +19,17 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-bundle': {
       name: 'app-bundle',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
     },
     'app-output-relative': {
       name: 'app-bundle',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
       output: {
         server: 'custom/server',
@@ -33,22 +40,34 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-virtual-module-config': {
       name: 'app-virtual-module-config',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'virtual-module-config', 'index.ts'),
     },
     'app-broken': {
       name: 'app-broken',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'broken', 'index.ts'),
     },
     'app-broken-ssr': {
       name: 'app-broken-ssr',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'broken-ssr', 'index.ts'),
     },
     'app-jsx': {
       name: 'app-jsx',
-      generateDataQaTag: true,
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'jsx', 'index.ts'),
     },
     'app-css-modules': {
@@ -59,6 +78,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss': {
       name: 'app-postcss',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'postcss'),
       entryFile: 'index.ts',
       postcss: {
@@ -68,6 +90,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss-fn': {
       name: 'app-postcss-fn',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'postcss-fn'),
       entryFile: 'index.ts',
       postcss: {
@@ -77,12 +102,18 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-fs-routing': {
       name: 'app-fs-routing',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'fs-routing'),
       entryFile: 'index.ts',
     },
     'app-config-to-env': {
       name: 'app-config-to-env',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'config-to-env'),
       entryFile: 'index.ts',
       fileSystemPages: {
@@ -98,6 +129,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-root-error-boundary': {
       name: 'app-root-error-boundary',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'root-error-boundary'),
       entryFile: 'index.ts',
       fileSystemPages: {
@@ -107,18 +141,27 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-browserslist': {
       name: 'app-browserslist',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'browserslist'),
       entryFile: 'index.ts',
     },
     'app-polyfills': {
       name: 'app-polyfills',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
       entryFile: 'index.ts',
     },
     'app-polyfills-custom': {
       name: 'app-polyfills',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       polyfill: path.join(fixturesFolder, 'application', 'polyfills', 'polyfill.ts'),
       modernPolyfill: path.join(fixturesFolder, 'application', 'polyfills', 'modern.polyfill.ts'),
       sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
@@ -127,11 +170,17 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-tramvai-vendor': {
       name: 'app-tramvai-vendor',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'tramvai-vendor', 'index.ts'),
     },
     'app-granular-chunks': {
       name: 'app-granular-chunks',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'granular-chunks', 'index.ts'),
       splitChunks: {
         mode: 'granularChunks',
@@ -142,19 +191,28 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     },
     'app-assets': {
       name: 'app-assets',
-      generateDataQaTag: true,
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
     'app-externals': {
       name: 'app-externals',
-      generateDataQaTag: true,
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'externals', 'index.ts'),
     },
     'app-papi': {
       name: 'app-papi',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       sourceDir: path.join(fixturesFolder, 'application', 'papi'),
       entryFile: path.join(fixturesFolder, 'application', 'papi', 'index.ts'),
       fileSystemPapiDir: 'papi',
@@ -162,10 +220,17 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-server-inline': {
       name: 'app-server-inline',
       type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'server-inline', 'index.ts'),
     },
     'app-pwa': {
       name: 'app-pwa',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       pwa: {
         sw: {
           scope: '/',
@@ -177,11 +242,14 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           enabled: true,
         },
       },
-      type: 'application',
       sourceDir: path.join(fixturesFolder, 'application', 'app-pwa'),
     },
     'custom-pwa': {
       name: 'custom-pwa',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
       pwa: {
         sw: {
           src: './custom-sw.ts',
@@ -206,8 +274,25 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           sizes: [36, 512],
         },
       },
-      type: 'application',
       sourceDir: path.join(fixturesFolder, 'application', 'app-pwa'),
+    },
+    'app-refresh': {
+      name: 'app-refresh',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'refresh', 'index.tsx'),
+    },
+    'app-hmr': {
+      name: 'app-hmr',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
+    },
+    'app-refresh-disabled': {
+      name: 'app-refresh-disabled',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'refresh-disabled', 'index.tsx'),
     },
   };
 
@@ -521,7 +606,7 @@ export default bar;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(serverJs).toContain('CascadiaCodePL.woff2');
+            test.expect(serverJs.includes('CascadiaCodePL.woff2')).toBeTruthy();
           });
 
           test('assets: should inline svg import', async ({ devServer }) => {
@@ -1068,7 +1153,10 @@ export default bar;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
             ).json();
 
-            const fontName = statsJson.chunks[0].auxiliaryFiles.find((file: string) =>
+            const platformChunk = statsJson.chunks.find(
+              (chunk: { id: string }) => chunk.id === 'platform'
+            );
+            const fontName = platformChunk.auxiliaryFiles.find((file: string) =>
               file.endsWith('.woff2')
             );
             test.expect(platformJs).toContain(fontName);
@@ -1090,7 +1178,10 @@ export default bar;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
             ).json();
 
-            const iconName = statsJson.chunks[0].auxiliaryFiles.find((file: string) =>
+            const platformChunk = statsJson.chunks.find(
+              (chunk: { id: string }) => chunk.id === 'platform'
+            );
+            const iconName = platformChunk.auxiliaryFiles.find((file: string) =>
               file.endsWith('.svg')
             );
 
@@ -1356,6 +1447,138 @@ export default Cmp;`,
 
             test.expect(platformJs).not.toContain('bar');
             test.expect(serverJs).not.toContain('bar');
+          });
+        });
+
+        test.describe('enabled react refresh', () => {
+          const refreshPath = path.join(fixturesFolder, 'application', 'refresh', 'App.tsx');
+          const initialContent = `export const App = () => {
+  return <div id="container">hello world</div>;
+};
+`;
+          const outputPromise = outputFile(refreshPath, initialContent);
+
+          test.use({
+            inputParameters: {
+              name: 'app-refresh',
+              rootDir: testSuiteFolder,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should work', async ({ devServer, page }) => {
+            await outputPromise;
+            await devServer.buildPromise;
+
+            let loadCounter = 0;
+            page.on('load', () => loadCounter++);
+
+            const updatedContent = `export const App = () => {
+  return <div id="container">super hello world</div>;
+};
+`;
+
+            await page.goto(`http://localhost:${devServer.port}`);
+
+            test.expect(await page.locator('#container').textContent()).toEqual('hello world');
+
+            await outputFile(refreshPath, updatedContent);
+            await page.waitForFunction(
+              () => {
+                return document.getElementById('container')?.innerHTML !== 'hello world';
+              },
+              { polling: 2000, timeout: 10000 }
+            );
+
+            test
+              .expect(await page.locator('#container').textContent())
+              .toEqual('super hello world');
+
+            test.expect(loadCounter).toEqual(1);
+          });
+
+          test.afterEach(async () => {
+            await outputFile(refreshPath, initialContent);
+          });
+        });
+
+        test.describe('hmr assets', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-hmr',
+              rootDir: testSuiteFolder,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should generate separate hmr chunk', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            const chunks = statsJson.chunks.map((chunk: any) => chunk.files[0]);
+
+            test.expect(chunks.includes('hmr.js')).toBeTruthy();
+          });
+        });
+
+        test.describe('disabled react refresh', () => {
+          const refreshPath = path.join(
+            fixturesFolder,
+            'application',
+            'refresh-disabled',
+            'App.tsx'
+          );
+          const initialContent = `export const App = () => {
+  return <div id="container">hello world</div>;
+};
+`;
+          const outputPromise = outputFile(refreshPath, initialContent);
+
+          test.use({
+            inputParameters: {
+              name: 'app-refresh-disabled',
+              rootDir: testSuiteFolder,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should reload page', async ({ devServer, page }) => {
+            await outputPromise;
+            await devServer.buildPromise;
+
+            const updatedContent = `export const App = () => {
+  return <div id="container">super hello world</div>;
+};
+`;
+
+            await page.goto(`http://localhost:${devServer.port}`);
+
+            test.expect(await page.locator('#container').textContent()).toEqual('hello world');
+
+            await outputFile(refreshPath, updatedContent);
+            await sleep(300);
+            test.expect(await page.locator('#container').textContent()).toEqual('hello world');
+
+            await page.reload();
+            test
+              .expect(await page.locator('#container').textContent())
+              .toEqual('super hello world');
+          });
+
+          test.afterEach(async () => {
+            await outputFile(refreshPath, initialContent);
           });
         });
 

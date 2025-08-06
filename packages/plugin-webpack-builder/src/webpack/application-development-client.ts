@@ -1,3 +1,4 @@
+/* eslint-disable complexity */
 import path from 'node:path';
 import flatten from '@tinkoff/utils/array/flatten';
 import webpack from 'webpack';
@@ -5,6 +6,7 @@ import type { Configuration, WebpackPluginInstance } from 'webpack';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
+import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import { optional } from '@tinkoff/dippy';
 import {
   resolveAbsolutePathForFile,
@@ -103,17 +105,25 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
+  const { hotRefresh } = config;
+
   return {
     // todo browserslist?
     target: 'web',
     // context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?
-      platform: resolveAbsolutePathForFile({
-        file: config.entryFile,
-        sourceDir: config.sourceDir,
-        rootDir: config.rootDir,
-      }),
+      platform: {
+        import: [
+          resolveAbsolutePathForFile({
+            file: config.entryFile,
+            sourceDir: config.sourceDir,
+            rootDir: config.rootDir,
+          }),
+          hotRefresh?.enabled &&
+            'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
+        ].filter(Boolean) as string[],
+      },
       ...(polyfillPath
         ? {
             polyfill: polyfillPath,
@@ -260,6 +270,20 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           };
         }, {}),
       }),
+      ...(hotRefresh?.enabled
+        ? [
+            new webpack.HotModuleReplacementPlugin(),
+            new ReactRefreshPlugin({
+              ...hotRefresh.options,
+              overlay:
+                typeof hotRefresh.options?.overlay === 'boolean'
+                  ? hotRefresh.options.overlay
+                  : {
+                      ...hotRefresh.options?.overlay,
+                    },
+            }),
+          ]
+        : []),
       config.dedupe.enabledDev &&
         new DedupePlugin({
           strategy: config.dedupe.strategy,
