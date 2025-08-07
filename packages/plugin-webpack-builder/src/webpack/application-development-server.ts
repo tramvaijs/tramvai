@@ -34,6 +34,7 @@ import { createAssetsRules } from './shared/assets';
 import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { createServerInlineRules } from './shared/server-inline';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
+import { createOptimizeOptions } from './shared/optimization';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -157,6 +158,7 @@ export default appConfig;`;
         }),
     optimization: {
       emitOnErrors: false,
+      ...createOptimizeOptions({ config }),
     },
     // TODO: check is it configuration optimal?
     stats: {

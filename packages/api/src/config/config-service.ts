@@ -5,10 +5,23 @@ import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
+import type { PluginOptions, sharpGenerate } from 'image-minimizer-webpack-plugin';
+import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
+
 import type { Config as SvgoConfig } from 'svgo';
 import type { TramvaiPlugin } from '../core/plugin';
 import { resolveAbsolutePathForFile } from '../utils/path';
 import { packageVersion } from '../utils/package-version';
+
+export interface SharpEncodeOptions {
+  encodeOptions?: {
+    jpeg?: JpegOptions;
+    png?: PngOptions;
+    gif?: GifOptions;
+    webp?: WebpOptions;
+    avif?: AvifOptions;
+  };
+}
 
 export type PostcssOptions = {
   /**
@@ -198,9 +211,7 @@ export interface BaseProject {
   /**
    * [svgo](https://github.com/svg/svgo) configuration, used for SVG and [SVGR](https://react-svgr.com/) optimization
    */
-  svgo?: {
-    plugins?: SvgoConfig['plugins'];
-  };
+  svgo?: SvgoConfig;
 
   /**
    * Enables data-qa-tag plugin for transpiler
@@ -211,6 +222,20 @@ export interface BaseProject {
    * React hot-refresh options
    */
   hotRefresh?: HotRefreshOptions;
+
+  /**
+   * Image optimization options
+   */
+  imageOptimization?: {
+    /**
+     * Enable image-minimizer-webpack-plugin
+     */
+    enabled?: boolean;
+    /**
+     * Options to image-minimizer-webpack-plugin
+     */
+    options?: PluginOptions<any, any>;
+  };
 }
 
 export interface ApplicationProject extends BaseProject {
@@ -589,6 +614,10 @@ export class ConfigService {
         ...this.#project.hotRefresh?.options,
       },
     };
+  }
+
+  get imageOptimization() {
+    return this.#project!.imageOptimization ?? {};
   }
 
   get generateDataQaTag() {

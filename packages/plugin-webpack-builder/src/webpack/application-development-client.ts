@@ -44,6 +44,7 @@ import { PolyfillConditionPlugin } from './plugins/polyfill-condition-plugin';
 import { createAssetsRules } from './shared/assets';
 import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
+import { createOptimizeOptions } from './shared/optimization';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -183,6 +184,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     optimization: {
       emitOnErrors: false,
       ...createSplitChunksOptions({ config }),
+      ...createOptimizeOptions({ config }),
     },
     // TODO: check is it configuration optimal?
     stats: {

@@ -616,8 +616,8 @@ export default bar;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(serverJs).toContain('<svg xmlns=');
-            test.expect(serverJs).toContain('svg-plus-icon');
+            test.expect(serverJs).toContain('xmlns=');
+            test.expect(serverJs).toContain('<svg id=');
           });
         });
 
@@ -1192,6 +1192,32 @@ export default bar;`,
             );
 
             test.expect(iconResponse.headers.get('content-type')).toBe('image/svg+xml');
+          });
+
+          // TODO: test for images compressing
+          test('assets: should generate blur image with asset', async ({ devServer, page }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            test.expect(platformJs).toContain('blurDataURL');
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            const imageName = statsJson.chunks[0].auxiliaryFiles.find((file: string) =>
+              file.endsWith('.png')
+            );
+
+            test.expect(platformJs).toContain(imageName);
+
+            const iconResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/${imageName}`
+            );
+
+            test.expect(iconResponse.headers.get('content-type')).toBe('image/png');
           });
         });
       });

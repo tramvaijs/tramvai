@@ -1,9 +1,13 @@
+import path from 'node:path';
+
+import SparkMD5 from 'spark-md5';
+import type webpack from 'webpack';
+import type { Config as SvgoConfig } from 'svgo';
+
 import { Container, optional } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN, ConfigService } from '@tramvai/api/lib/config';
-import type webpack from 'webpack';
-import type { PluginConfig, Config as SvgoConfig } from 'svgo';
-import SparkMD5 from 'spark-md5';
-import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from '../webpack-config';
+
+import { BUILD_TARGET_TOKEN } from '../webpack-config';
 import { WEBPACK_TRANSPILER_TOKEN, resolveWebpackTranspilerParameters } from './transpiler';
 
 export const getSvgoOptions = (config: ConfigService): SvgoConfig & { configFile?: boolean } => {
@@ -56,24 +60,12 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
           return `${SparkMD5.hash(pathInfo.module.originalSource().source().toString())}.svg`;
         },
       },
-      use: [
-        {
-          loader: 'svgo-loader',
-          options: svgoOptions,
-        },
-      ],
     });
   } else {
     rules.push({
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
       type: 'asset/source',
-      use: [
-        {
-          loader: 'svgo-loader',
-          options: svgoOptions,
-        },
-      ],
     });
   }
 
@@ -94,7 +86,10 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
     ],
   });
 
-  // TODO: tramvai-image TCORE-4877
+  rules.push({
+    test: /\.(png|jpe?g|gif|webp)$/,
+    loader: path.resolve(__dirname, '../loaders/image-loader'),
+  });
 
   rules.push({
     test: /\.(mp4|webm|avif)$/,
@@ -103,8 +98,6 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
       emit: buildTarget === 'client',
     },
   });
-
-  // TODO: image optimization TCORE-5278
 
   return rules;
 };
