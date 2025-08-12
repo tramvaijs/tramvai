@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@tinkoff/url": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
     "tslib": "^2.4.0"
   },
   "gitHead": "8e826a214c87b188fc4d254cdd8f2a2b2c55f3a8",
