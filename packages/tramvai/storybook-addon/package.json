@@ -30,7 +30,7 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@tanstack/react-query": "5.72.1",
-    "webpack": "5.87.0"
+    "webpack": "5.101.1"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",

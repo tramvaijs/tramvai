@@ -65,15 +65,15 @@ exports[`latest stats generation test stats should build stats.json 1`] = `
       ]
     },
     {
-      "id": "tramvai_react_lib_react_js",
-      "files": [
-        "tramvai_react_lib_react_js"
-      ]
-    },
-    {
       "id": "tramvai_core_lib_index_js",
       "files": [
         "tramvai_core_lib_index_js"
+      ]
+    },
+    {
+      "id": "tramvai_react_lib_react_js",
+      "files": [
+        "tramvai_react_lib_react_js"
       ]
     }
   ]

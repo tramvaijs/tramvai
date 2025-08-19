@@ -111,7 +111,7 @@ async function runWebpackDevServer() {
     }
   }
 
-  const compiler = webpack(webpackConfig!);
+  const compiler = webpack(webpackConfig!)!;
 
   compiler.hooks.done.tap('worker-dev-server', async (stats) => {
     if (stats.hasErrors()) {

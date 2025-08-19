@@ -16,7 +16,7 @@ const normalizeCode = (code: string) => {
 };
 
 const getModuleCode = (code: string, name: string) => {
-  const regexp = new RegExp(`swc/__integration__/${name}":.+?eval\\("(.+?)//# sourceURL=`, 's');
+  const regexp = new RegExp(`swc/__integration__/${name}":.+?eval\\("{(.+?)//# sourceURL=`, 's');
 
   const match = code.match(regexp);
 

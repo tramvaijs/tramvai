@@ -857,6 +857,10 @@
                       "topLevelAwait": {
                         "description": "Allow using top-level-await in EcmaScript Modules.",
                         "type": "boolean"
+                      },
+                      "deferImport": {
+                        "description": "Enable experimental tc39 proposal https://github.com/tc39/proposal-defer-import-eval. This allows to defer execution of a module until it's first use.",
+                        "type": "boolean"
                       }
                     },
                     "additionalProperties": false
@@ -1310,23 +1314,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@9919": {
+                              "__@match@10460": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@9921": {
+                              "__@replace@10462": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@9924": {
+                              "__@search@10465": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@9926": {
+                              "__@split@10467": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@9928": {
+                              "__@matchAll@10469": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1767,6 +1771,10 @@
                         "topLevelAwait": {
                           "description": "Allow using top-level-await in EcmaScript Modules.",
                           "type": "boolean"
+                        },
+                        "deferImport": {
+                          "description": "Enable experimental tc39 proposal https://github.com/tc39/proposal-defer-import-eval. This allows to defer execution of a module until it's first use.",
+                          "type": "boolean"
                         }
                       },
                       "additionalProperties": false
@@ -2113,23 +2121,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@9919": {
+                                "__@match@10460": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@9921": {
+                                "__@replace@10462": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@9924": {
+                                "__@search@10465": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@9926": {
+                                "__@split@10467": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@9928": {
+                                "__@matchAll@10469": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2570,6 +2578,10 @@
                           "topLevelAwait": {
                             "description": "Allow using top-level-await in EcmaScript Modules.",
                             "type": "boolean"
+                          },
+                          "deferImport": {
+                            "description": "Enable experimental tc39 proposal https://github.com/tc39/proposal-defer-import-eval. This allows to defer execution of a module until it's first use.",
+                            "type": "boolean"
                           }
                         },
                         "additionalProperties": false
@@ -2916,23 +2928,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@9919": {
+                                  "__@match@10460": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@9921": {
+                                  "__@replace@10462": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@9924": {
+                                  "__@search@10465": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@9926": {
+                                  "__@split@10467": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@9928": {
+                                  "__@matchAll@10469": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
