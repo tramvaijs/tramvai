@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import type { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
+import { ChildAppReactConfig } from '@tramvai/tokens-child-app';
 import { FallbackError } from './FallbackError';
+import { ChildAppFallbackWrapper } from '../ChildAppFallbackWrapper';
 
 type AnyError = Error & { [key: string]: any };
 
@@ -10,6 +12,7 @@ export interface ChildAppErrorBoundaryFallbackProps {
 }
 
 export interface ChildAppErrorBoundaryProps {
+  config: ChildAppReactConfig;
   childAppLoadingStatus?: string;
   error?: AnyError | null;
   fallback?: React.ComponentType<ChildAppErrorBoundaryFallbackProps>;
@@ -74,13 +77,13 @@ export class ChildAppErrorBoundary extends Component<Props, State> {
   }
 
   render(): React.ReactNode {
-    const { children, fallback: Fallback, fallbackFromDi } = this.props;
+    const { children, fallback: Fallback, fallbackFromDi, config } = this.props;
     const { error } = this.state;
     if (!error) {
       return children;
     }
     if (Fallback) {
-      return <Fallback error={error} />;
+      return <ChildAppFallbackWrapper fallback={Fallback as any} {...config} error={error} />;
     }
     if (fallbackFromDi) {
       return fallbackFromDi;

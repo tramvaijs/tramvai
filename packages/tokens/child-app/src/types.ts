@@ -8,8 +8,9 @@ import type {
   Action,
   TramvaiAction,
 } from '@tramvai/core';
-import type { AsyncTapableHookInstance } from '@tramvai/tokens-core';
+import type { AsyncTapableHookInstance, SyncTapableHookInstance } from '@tramvai/tokens-core';
 import type { Route } from '@tinkoff/router';
+import { CHILD_APP_RESOLUTION_CONFIGS_TOKEN } from '.';
 
 export interface ChildApp {
   name: string;
@@ -84,6 +85,7 @@ export interface ChildAppRenderManager {
     request: ChildAppRequestConfig
   ): [Container | undefined, Promise<Container | undefined> | undefined];
   clear(): void;
+  hooks: ChildAppRenderHooks;
 }
 
 export interface ChildAppLoader {
@@ -168,6 +170,57 @@ export type ChildAppErrorBoundaryHandler = (
   config: ChildAppRequestConfig
 ) => void;
 
+export type ChildAppConfigArgs = {
+  name: string;
+  version: string | undefined;
+  tag: string | undefined;
+};
+
+export type PreloadArgs = {
+  config: ChildAppFinalConfig;
+  route: Route | undefined;
+};
+
+export type RunChildAppCommandLineArgs = {
+  config: ChildAppFinalConfig;
+  status: string;
+  line: keyof CommandLines;
+};
+
+export type ChildAppConfigResolutionHooks = {
+  fetchConfig: AsyncTapableHookInstance<
+    {},
+    ExtractDependencyType<typeof CHILD_APP_RESOLUTION_CONFIGS_TOKEN>
+  >;
+};
+
+export type ChildAppRenderHooks = {
+  mounted: SyncTapableHookInstance<ChildAppConfigArgs>;
+  mountFailed: SyncTapableHookInstance<ChildAppConfigArgs>;
+};
+
+export type ChildAppLoaderHooks = {
+  loadModule: AsyncTapableHookInstance<{ config: ChildAppFinalConfig }, ChildApp | undefined>;
+};
+
+export type ChildAppPreloadHooks = {
+  preloadChildApp: AsyncTapableHookInstance<PreloadArgs>;
+  prefetchChildApp: AsyncTapableHookInstance<PreloadArgs>;
+  runChildAppCommandLine: AsyncTapableHookInstance<RunChildAppCommandLineArgs>;
+};
+
+export type ChildAppRenderPlugin = {
+  apply(hooks: ChildAppRenderHooks): void;
+};
+
+export type ChildAppConfigResolutionPlugin = {
+  apply(hooks: ChildAppConfigResolutionHooks): void;
+};
+
 export type ChildAppPreloadManagerPlugin = {
-  apply(preloadManager: ChildAppPreloadManager): void;
+  apply(hooks: ChildAppPreloadHooks): void;
+};
+
+export type ChildAppLoaderPlugin = {
+  apply(hooks: ChildAppLoaderHooks): void;
 };

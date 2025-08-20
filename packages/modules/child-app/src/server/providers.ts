@@ -1,7 +1,7 @@
 import type { Provider } from '@tinkoff/dippy';
 import { isUrl, endsWith, combineValidators } from '@tinkoff/env-validators';
 import { DI_TOKEN, Scope, optional } from '@tinkoff/dippy';
-import { commandLineListTokens, provide } from '@tramvai/core';
+import { commandLineListTokens, provide, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/core';
 import {
   ASYNC_LOCAL_STORAGE_TOKEN,
   ENV_MANAGER_TOKEN,
@@ -26,6 +26,8 @@ import {
   CHILD_APP_STATE_MANAGER_TOKEN,
   HOST_PROVIDED_CONTRACTS,
   HOST_REQUIRED_CONTRACTS,
+  CHILD_APP_LOADER_PLUGIN,
+  CHILD_APP_PRELOAD_MANAGER_PLUGIN,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
@@ -64,6 +66,11 @@ export const serverProviders: Provider[] = [
     useClass: ServerLoader,
     scope: Scope.SINGLETON,
     deps: {
+      plugins: {
+        optional: true,
+        token: CHILD_APP_LOADER_PLUGIN,
+      },
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
       logger: LOGGER_TOKEN,
       cache: CHILD_APP_LOADER_CACHE_TOKEN,
       envManager: ENV_MANAGER_TOKEN,
@@ -82,6 +89,11 @@ export const serverProviders: Provider[] = [
     provide: CHILD_APP_PRELOAD_MANAGER_TOKEN,
     useClass: PreloadManager,
     deps: {
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
+      plugins: {
+        optional: true,
+        token: CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+      },
       loader: CHILD_APP_LOADER_TOKEN,
       runner: CHILD_APP_COMMAND_LINE_RUNNER_TOKEN,
       stateManager: CHILD_APP_STATE_MANAGER_TOKEN,
@@ -138,6 +150,7 @@ export const serverProviders: Provider[] = [
     provide: CHILD_APP_RENDER_MANAGER_TOKEN,
     useClass: RenderManager,
     deps: {
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
       logger: LOGGER_TOKEN,
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
       preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,

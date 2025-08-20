@@ -10,7 +10,9 @@ import {
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
   HOST_PROVIDED_CONTRACTS,
   HOST_REQUIRED_CONTRACTS,
+  CHILD_APP_LOADER_PLUGIN,
   CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+  CHILD_APP_RENDER_PLUGIN,
 } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_COMMON_INITIAL_STATE_TOKEN,
@@ -32,6 +34,11 @@ export const browserProviders: Provider[] = [
     useClass: BrowserLoader,
     scope: Scope.SINGLETON,
     deps: {
+      plugins: {
+        optional: true,
+        token: CHILD_APP_LOADER_PLUGIN,
+      },
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
       logger: LOGGER_TOKEN,
     },
   }),
@@ -39,7 +46,7 @@ export const browserProviders: Provider[] = [
     provide: CHILD_APP_PRELOAD_MANAGER_TOKEN,
     useClass: PreloadManager,
     deps: {
-      childAppPreloadPlugin: {
+      plugins: {
         optional: true,
         token: CHILD_APP_PRELOAD_MANAGER_PLUGIN,
       },
@@ -60,6 +67,11 @@ export const browserProviders: Provider[] = [
     provide: CHILD_APP_RENDER_MANAGER_TOKEN,
     useClass: RenderManager,
     deps: {
+      plugins: {
+        optional: true,
+        token: CHILD_APP_RENDER_PLUGIN,
+      },
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
       logger: LOGGER_TOKEN,
       diManager: CHILD_APP_DI_MANAGER_TOKEN,
       preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,

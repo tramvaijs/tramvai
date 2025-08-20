@@ -9,9 +9,5 @@ export const ErrorCmp = () => {
     throw new Error(`error during render on ${env}`);
   }
 
-  return (
-    <>
-      <div id="error">Child App</div>
-    </>
-  );
+  return <div id="error">Child App</div>;
 };
