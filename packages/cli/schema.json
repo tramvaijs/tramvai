@@ -1310,23 +1310,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@6887": {
+                              "__@match@6892": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@6889": {
+                              "__@replace@6894": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@6892": {
+                              "__@search@6897": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@6894": {
+                              "__@split@6899": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@6896": {
+                              "__@matchAll@6901": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -2113,23 +2113,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@6887": {
+                                "__@match@6892": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@6889": {
+                                "__@replace@6894": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@6892": {
+                                "__@search@6897": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@6894": {
+                                "__@split@6899": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@6896": {
+                                "__@matchAll@6901": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2916,23 +2916,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@6887": {
+                                  "__@match@6892": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@6889": {
+                                  "__@replace@6894": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@6892": {
+                                  "__@search@6897": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@6894": {
+                                  "__@split@6899": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@6896": {
+                                  "__@matchAll@6901": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
@@ -3241,6 +3241,20 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "analytics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "title": "enable @tramvai/cli monitoring",
+          "type": "boolean"
+        },
+        "endpoint": {
+          "title": "@tramvai/cli monitoring collector endpoint",
+          "type": "string"
         }
       }
     }

@@ -2,7 +2,6 @@ import type { Provider } from '@tinkoff/dippy';
 import { createChildContainer } from '@tinkoff/dippy';
 import { initRootContainer } from '../di/root';
 import {
-  analyticsProviders,
   builderProviders,
   commandsProviders,
   configProviders,
@@ -20,7 +19,6 @@ export const createApp = ({
   providers: Provider[];
 }): typeof COMMAND_RUNNER_TOKEN => {
   const rootContainer = initRootContainer([
-    ...analyticsProviders,
     ...stdProviders,
     ...configProviders,
     ...commandsProviders,

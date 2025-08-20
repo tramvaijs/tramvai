@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`enmasse test module platform --help module 1`] = `
+exports[`enmasse test module platform --help module: result.stdout 1`] = `
 "Usage: bin-init <command> [options]
 
 Options:
@@ -29,7 +29,144 @@ Commands:
 "
 `;
 
-exports[`enmasse test module platform build module 1`] = `
+exports[`enmasse test module platform build module: monitoring 1`] = `
+{
+  "events": [
+    [
+      {
+        "arguments": [
+          "build",
+          "module",
+        ],
+        "dependencies": {
+          "babel": Any<String>,
+          "react": Any<String>,
+          "swc": Any<String>,
+          "webpack": Any<String>,
+        },
+        "event": "cli:init",
+        "level": "INFO",
+        "message": "@tramvai/cli initialized",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "uptime": Any<Number>,
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+    [
+      {
+        "command": "build",
+        "event": "cli:command:start",
+        "features": {},
+        "level": "INFO",
+        "message": "@tramvai/cli production build started",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "parameters": {
+          "target": "module",
+        },
+        "project": {
+          "name": "module",
+          "type": "module",
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+    [
+      {
+        "command": "build",
+        "duration": Any<Number>,
+        "event": "cli:command:end",
+        "level": "INFO",
+        "memoryUsage": {
+          "maxHeapTotal": Any<Number>,
+          "maxHeapUsed": Any<Number>,
+          "maxRss": Any<Number>,
+        },
+        "message": "@tramvai/cli production build finished",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "parameters": {
+          "target": "module",
+        },
+        "project": {
+          "name": "module",
+          "type": "module",
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+  ],
+}
+`;
+
+exports[`enmasse test module platform build module: output.less 1`] = `
 [
   {
     "extension": ".js",
@@ -58,7 +195,7 @@ exports[`enmasse test module platform build module 1`] = `
 ]
 `;
 
-exports[`enmasse test package platform --help package 1`] = `
+exports[`enmasse test package platform --help package: result.stdout 1`] = `
 "Usage: bin-init <command> [options]
 
 Options:
@@ -87,7 +224,144 @@ Commands:
 "
 `;
 
-exports[`enmasse test package platform build package 1`] = `
+exports[`enmasse test package platform build package: monitoring 1`] = `
+{
+  "events": [
+    [
+      {
+        "arguments": [
+          "build",
+          "package",
+        ],
+        "dependencies": {
+          "babel": Any<String>,
+          "react": Any<String>,
+          "swc": Any<String>,
+          "webpack": Any<String>,
+        },
+        "event": "cli:init",
+        "level": "INFO",
+        "message": "@tramvai/cli initialized",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "uptime": Any<Number>,
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+    [
+      {
+        "command": "build",
+        "event": "cli:command:start",
+        "features": {},
+        "level": "INFO",
+        "message": "@tramvai/cli production build started",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "parameters": {
+          "target": "package",
+        },
+        "project": {
+          "name": "package",
+          "type": "package",
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+    [
+      {
+        "command": "build",
+        "duration": Any<Number>,
+        "event": "cli:command:end",
+        "level": "INFO",
+        "memoryUsage": {
+          "maxHeapTotal": Any<Number>,
+          "maxHeapUsed": Any<Number>,
+          "maxRss": Any<Number>,
+        },
+        "message": "@tramvai/cli production build finished",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "parameters": {
+          "target": "package",
+        },
+        "project": {
+          "name": "package",
+          "type": "package",
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+  ],
+}
+`;
+
+exports[`enmasse test package platform build package: output.less 1`] = `
 [
   {
     "extension": ".ts",
@@ -122,7 +396,7 @@ exports[`enmasse test package platform build package 1`] = `
 ]
 `;
 
-exports[`enmasse test react-app platform --help react-app 1`] = `
+exports[`enmasse test react-app platform --help react-app: result.stdout 1`] = `
 "Usage: bin-init <command> [options]
 
 Options:
@@ -151,7 +425,153 @@ Commands:
 "
 `;
 
-exports[`enmasse test react-app platform build react-app 1`] = `
+exports[`enmasse test react-app platform build react-app: monitoring 1`] = `
+{
+  "events": [
+    [
+      {
+        "arguments": [
+          "build",
+          "react-app",
+        ],
+        "dependencies": {
+          "babel": Any<String>,
+          "react": Any<String>,
+          "swc": Any<String>,
+          "webpack": Any<String>,
+        },
+        "event": "cli:init",
+        "level": "INFO",
+        "message": "@tramvai/cli initialized",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "uptime": Any<Number>,
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+    [
+      {
+        "command": "build",
+        "event": "cli:command:start",
+        "features": {
+          "devTools": true,
+          "fileSystemRouting": false,
+          "moduleImage": true,
+          "modulePwa": true,
+          "reactCompiler": false,
+          "swc": false,
+          "transitionsRouterProvider": false,
+          "viewTransitions": false,
+        },
+        "level": "INFO",
+        "message": "@tramvai/cli production build started",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "parameters": {
+          "target": "react-app",
+        },
+        "project": {
+          "name": "react-app",
+          "type": "application",
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+    [
+      {
+        "command": "build",
+        "duration": Any<Number>,
+        "event": "cli:command:end",
+        "level": "INFO",
+        "memoryUsage": {
+          "maxHeapTotal": Any<Number>,
+          "maxHeapUsed": Any<Number>,
+          "maxRss": Any<Number>,
+        },
+        "message": "@tramvai/cli production build finished",
+        "os": {
+          "arch": Any<String>,
+          "cpus": {
+            "count": Any<Number>,
+            "model": Any<String>,
+          },
+          "nodeVersion": Any<String>,
+          "packageManager": {
+            "name": "unknown",
+          },
+          "platform": Any<String>,
+        },
+        "parameters": {
+          "target": "react-app",
+        },
+        "project": {
+          "name": "react-app",
+          "type": "application",
+        },
+        "system": "tramvai-cli",
+        "timestamp": Any<String>,
+        "tramvai": {
+          "name": "@tramvai/cli",
+          "version": "0.0.0-stub",
+        },
+        "vcs": {
+          "jobUrl": Any<String>,
+          "pipelineUrl": Any<String>,
+          "repository": Any<String>,
+          "tenant": Any<String>,
+        },
+        "x-command-id": Any<String>,
+      },
+    ],
+  ],
+}
+`;
+
+exports[`enmasse test react-app platform build react-app: output.less 1`] = `
 [
   {
     "extension": ".css",

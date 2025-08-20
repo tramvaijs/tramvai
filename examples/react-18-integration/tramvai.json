@@ -1,5 +1,8 @@
 {
   "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "analytics": {
+    "enabled": false
+  },
   "projects": {
     "react-18-integration": {
       "name": "react-18-integration",

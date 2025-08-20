@@ -4,6 +4,11 @@ import { fixYarnSettingsOverride } from '../utils/fixYarnSettingsOverride';
 import { handleErrors } from '../utils/handleErrors';
 import { enableCpuProfile } from '../utils/cpu-profile';
 
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<void>>;
+}
+
 // to use V8's code cache to speed up instantiation time
 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
 import('v8-compile-cache');
@@ -19,10 +24,16 @@ export default (pathCli: string) => {
   const cli = require(pathCli).cliInitialized;
 
   return cli()
-    .then(() => {
+    .then(async () => {
+      if (global.__TRAMVAI_EXIT_HANDLERS__) {
+        await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
+      }
       exit(0);
     })
-    .catch(() => {
+    .catch(async () => {
+      if (global.__TRAMVAI_EXIT_HANDLERS__) {
+        await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
+      }
       exit(1);
     });
 };

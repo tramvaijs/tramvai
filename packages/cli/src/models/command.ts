@@ -66,14 +66,7 @@ export abstract class CLICommand<
 
     await this.validator(parameters);
 
-    const trackAfter = this.context.analytics.trackAfter({
-      name: this.name,
-      parameters: this.analyticEventLabel(parameters),
-      label: this.analyticCommandUsageLabel(parameters),
-      category: 'command',
-    });
-
-    return trackAfter(this.action(parameters));
+    return this.action(parameters);
   }
 
   protected async validator(parameters: TParams): Promise<void> {
