@@ -1,5 +1,6 @@
 import { CLICommand } from '../../models/command';
 import type { StartCommand as StartCommandType } from '../../api/start';
+import { getFeaturesProperties, getProjectProperties } from '../../models/analytics/utils';
 
 export type Params = Parameters<StartCommandType>[0] & {
   target: string;
@@ -134,8 +135,47 @@ export class StartCommand extends CLICommand<Params> {
     ];
   }
 
-  action(parameters) {
+  async action(parameters) {
+    const start = Date.now();
+
+    await this.context.analytics.send({
+      event: 'cli:command:start',
+      message: '@tramvai/cli development build started',
+      level: 'INFO',
+      command: 'start',
+      parameters,
+      project: getProjectProperties({ parameters, configManager: this.context.config }),
+      features: getFeaturesProperties({ parameters, configManager: this.context.config }),
+    });
+
     // used require for lazy code execution
-    return require('./start').default(this.context, parameters);
+    return require('./start')
+      .default(this.context, parameters, async () => {
+        await this.context.analytics.send({
+          event: 'cli:command:end',
+          message: '@tramvai/cli development build finished',
+          level: 'INFO',
+          command: 'start',
+          parameters,
+          duration: Date.now() - start,
+          project: getProjectProperties({ parameters, configManager: this.context.config }),
+          memoryUsage: this.context.analytics.memoryMonitor.read(),
+        });
+      })
+      .catch(async (error) => {
+        await this.context.analytics.send({
+          event: 'cli:command:error',
+          message: '@tramvai/cli development build failed',
+          level: 'ERROR',
+          command: 'start',
+          parameters,
+          duration: Date.now() - start,
+          error,
+          project: getProjectProperties({ parameters, configManager: this.context.config }),
+          memoryUsage: this.context.analytics.memoryMonitor.read(),
+        });
+
+        throw error;
+      });
   }
 }

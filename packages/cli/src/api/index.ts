@@ -1,12 +1,7 @@
 import '../typings/application';
 
 import { writableNoopStream } from 'noop-stream';
-import {
-  ANALYTICS_PACKAGE_INFO_TOKEN,
-  COMMAND_PARAMETERS_TOKEN,
-  STDERR_TOKEN,
-  STDOUT_TOKEN,
-} from '../di/tokens';
+import { COMMAND_PARAMETERS_TOKEN, STDERR_TOKEN, STDOUT_TOKEN } from '../di/tokens';
 import { createApp } from '../commands/createApp';
 
 import type { StartCommand } from './start';
@@ -43,10 +38,6 @@ const app = createApp({
     'start-prod': () => import('./start-prod'),
   },
   providers: [
-    {
-      provide: ANALYTICS_PACKAGE_INFO_TOKEN,
-      useValue: { name: '@tramvai/cli-api', version: '0.1.0' },
-    },
     {
       provide: STDOUT_TOKEN,
       useFactory: ({ params }) => {

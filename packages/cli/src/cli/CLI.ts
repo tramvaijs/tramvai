@@ -1,4 +1,5 @@
 import type { PackageManager } from '@tinkoff/package-manager-wrapper';
+import { AnalyticsService } from '@tramvai/api/lib/services/analytics';
 import { commander } from '../ui/commander';
 import { Context } from '../models/context';
 import type { Command, CommandMap, CommandResult } from '../models/command';
@@ -48,7 +49,8 @@ export class CLI {
     config: ConfigManager,
     cliRootDir: string,
     cliPackageManager: PackageManager,
-    packageManager: PackageManager
+    packageManager: PackageManager,
+    analytics: AnalyticsService
   ) {
     this.context = new Context(
       config,
@@ -56,6 +58,7 @@ export class CLI {
       cliRootDir,
       cliPackageManager,
       packageManager,
+      analytics,
       this.runTask,
       this.runCommand,
       this.getTasks,

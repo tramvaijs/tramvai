@@ -30,11 +30,14 @@ module.exports = function spawn(executePath) {
     { stdio: 'inherit', env: { ...process.env, WATCHPACK_WATCHER_LIMIT: '20' }, signal }
   );
 
-  cliInstance.on('error', (err) => {
+  cliInstance.on('error', async (err) => {
     if (err.code !== 'ABORT_ERR') {
       console.log(err);
       console.warn(`Process was exited with code "${err.code}"
 It's unexpected, please check available/used memory and cpu while running last command`);
+
+      await sendAnalytics(err);
+
       exit(1);
     } else {
       console.warn('Child process aborted!');
@@ -42,10 +45,13 @@ It's unexpected, please check available/used memory and cpu while running last c
     }
   });
 
-  cliInstance.on('exit', (code, sig) => {
+  cliInstance.on('exit', async (code, sig) => {
     if (sig) {
       console.warn(`Process was exited with signal "${sig}"
 It's unexpected, please check available/used memory and cpu while running last command`);
+
+      await sendAnalytics(new Error(`Process exited with signal: ${sig}`));
+
       exit(1);
     } else if (!isAborted) {
       exit(code);
@@ -68,5 +74,59 @@ function getDebugOption(debugType) {
 
   if (debugType) {
     return '--inspect';
+  }
+}
+
+async function sendAnalytics(error) {
+  const endpoint =
+    process.env.TRAMVAI_ANALYTICS_ENDPOINT ?? '';
+
+  if (
+    !endpoint ||
+    process.env.TRAMVAI_ANALYTICS_DISABLED === 'true' ||
+    process.env.TRAMVAI_ANALYTICS_DRY_RUN === 'true'
+  ) {
+    return;
+  }
+
+  try {
+    if (error instanceof Error) {
+      Object.defineProperties(error, {
+        message: {
+          configurable: true,
+          enumerable: true,
+          writable: true,
+        },
+        stack: {
+          configurable: true,
+          enumerable: true,
+          // stack is getter
+        },
+      });
+    }
+
+    await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([
+        {
+          timestamp: new Date().toISOString(),
+          level: 'ERROR',
+          system: process.env.TRAMVAI_ANALYTICS_SYSTEM ?? 'tramvai-cli',
+          event: 'cli:spawn:error',
+          message: '@tramvai/cli process spawn error',
+          arguments: process.argv.slice(2),
+          vcs: {
+            tenant: process.env.CI_PROJECT_NAMESPACE,
+            repository: process.env.CI_PROJECT_NAME,
+            pipelineUrl: process.env.CI_PIPELINE_URL,
+            jobUrl: process.env.CI_JOB_URL,
+          },
+          error,
+        },
+      ]),
+    });
+  } catch (e) {
+    // do nothing
   }
 }

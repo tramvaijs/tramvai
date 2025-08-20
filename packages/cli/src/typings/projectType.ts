@@ -17,4 +17,9 @@ export type Config = {
   projectsConfig?: any;
   $schema?: string;
   projects: { [name: string]: ConfigEntry };
+  analytics?: {
+    enabled?: boolean;
+    endpoint?: string;
+    system?: string;
+  };
 };

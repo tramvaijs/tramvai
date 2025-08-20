@@ -94,8 +94,6 @@ export const fillDeclareActionName: Plugin<{ declareActionName: string | null }>
 
         const filePath = this.file.opts.filename;
         const cwd = this.file.opts.cwd ?? '';
-        console.error('debug filePath', filePath);
-        console.error('debug cwd', cwd);
         const projectFilePath = filePath?.replace(cwd, '');
         const { line, column } = path.node.loc?.start ?? { line: 0, column: 0 };
 

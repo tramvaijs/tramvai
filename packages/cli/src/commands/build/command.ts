@@ -1,5 +1,6 @@
 import { CLICommand } from '../../models/command';
 import type { BuildCommand as BuildCommandType } from '../../api/build';
+import { getFeaturesProperties, getProjectProperties } from '../../models/analytics/utils';
 
 export type Params = Parameters<BuildCommandType>[0] & {
   target: string;
@@ -75,9 +76,51 @@ class BuildCommand extends CLICommand<Params> {
     ];
   }
 
-  action(parameters: Params) {
+  async action(parameters: Params) {
+    const start = Date.now();
+
+    await this.context.analytics.send({
+      event: 'cli:command:start',
+      message: '@tramvai/cli production build started',
+      level: 'INFO',
+      command: 'build',
+      parameters,
+      project: getProjectProperties({ parameters, configManager: this.context.config }),
+      features: getFeaturesProperties({ parameters, configManager: this.context.config }),
+    });
+
     // used require for lazy code execution
-    return require('./build').default(this.context, parameters);
+    return require('./build')
+      .default(this.context, parameters)
+      .then(async (result) => {
+        await this.context.analytics.send({
+          event: 'cli:command:end',
+          message: '@tramvai/cli production build finished',
+          level: 'INFO',
+          command: 'build',
+          parameters,
+          duration: Date.now() - start,
+          project: getProjectProperties({ parameters, configManager: this.context.config }),
+          memoryUsage: this.context.analytics.memoryMonitor.read(),
+        });
+
+        return result;
+      })
+      .catch(async (error) => {
+        await this.context.analytics.send({
+          event: 'cli:command:error',
+          message: '@tramvai/cli production build failed',
+          level: 'ERROR',
+          command: 'build',
+          parameters,
+          duration: Date.now() - start,
+          error,
+          project: getProjectProperties({ parameters, configManager: this.context.config }),
+          memoryUsage: this.context.analytics.memoryMonitor.read(),
+        });
+
+        throw error;
+      });
   }
 }
 

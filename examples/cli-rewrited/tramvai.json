@@ -1,5 +1,8 @@
 {
   "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "analytics": {
+    "enabled": false
+  },
   "projects": {
     "cli-rewrited": {
       "name": "cli-rewrited",
