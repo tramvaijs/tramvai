@@ -1,7 +1,8 @@
 import type { ChildApp } from '@tramvai/child-app-core';
 import { loadModule, waitModule } from '@tinkoff/module-loader-client';
-import type { ChildAppFinalConfig } from '@tramvai/tokens-child-app';
+import type { CHILD_APP_LOADER_PLUGIN, ChildAppFinalConfig } from '@tramvai/tokens-child-app';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { AsyncTapableHookInstance, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/core';
 import { Loader } from '../shared/loader';
 import type { ModuleFederationContainer } from '../shared/webpack/moduleFederation';
 import { getModuleFederation, initModuleFederation } from '../shared/webpack/moduleFederation';
@@ -17,14 +18,42 @@ export class BrowserLoader extends Loader {
 
   private map = new Map<string, Promise<ChildApp | undefined>>();
 
-  constructor({ logger }: { logger: typeof LOGGER_TOKEN }) {
+  private hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
+
+  public loadModuleHook: AsyncTapableHookInstance<
+    { config: ChildAppFinalConfig },
+    ChildApp | undefined
+  >;
+
+  constructor({
+    logger,
+    hookFactory,
+    plugins,
+  }: {
+    logger: typeof LOGGER_TOKEN;
+    hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
+    plugins: (typeof CHILD_APP_LOADER_PLUGIN)[] | null;
+  }) {
     super();
+    this.hookFactory = hookFactory;
 
     this.log = logger('child-app:loader');
+
+    this.loadModuleHook = this.hookFactory.createAsync<
+      { config: ChildAppFinalConfig },
+      ChildApp | undefined
+    >('childAppLoadModule');
+
+    this.loadModuleHook.tapPromise('childAppLoadModule', async (_, { config }) => {
+      return this.loadModule({ config });
+    });
+
+    plugins?.forEach((plugin) => {
+      plugin.apply({ loadModule: this.loadModuleHook });
+    });
   }
 
-  // eslint-disable-next-line max-statements
-  async load(config: ChildAppFinalConfig): Promise<ChildApp | undefined> {
+  private async loadModule({ config }: { config: ChildAppFinalConfig }) {
     const moduleName = config.name;
     const childApp = await this.get(config);
     if (childApp) {
@@ -87,6 +116,10 @@ export class BrowserLoader extends Loader {
     });
 
     return Promise.reject(new Error(`Error resolving child-app ${moduleName}`));
+  }
+
+  async load(config: ChildAppFinalConfig): Promise<ChildApp | undefined> {
+    return this.loadModuleHook.callPromise({ config });
   }
 
   async init(config: ChildAppFinalConfig): Promise<void> {

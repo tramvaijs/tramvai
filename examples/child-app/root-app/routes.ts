@@ -2,6 +2,7 @@ import type { ExtractTokenType } from '@tinkoff/dippy';
 import type { ROUTES_TOKEN } from '@tramvai/module-router';
 
 export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
+  { name: 'monitoring', path: '/monitoring', config: { bundle: 'monitoring' } },
   {
     name: 'preload-error',
     path: '/preload-error',

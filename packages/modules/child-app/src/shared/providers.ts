@@ -1,6 +1,11 @@
 import type { Provider } from '@tinkoff/dippy';
 import { Scope, DI_TOKEN, optional } from '@tinkoff/dippy';
-import { commandLineListTokens, COMMAND_LINE_RUNNER_TOKEN, provide } from '@tramvai/core';
+import {
+  commandLineListTokens,
+  COMMAND_LINE_RUNNER_TOKEN,
+  provide,
+  TAPABLE_HOOK_FACTORY_TOKEN,
+} from '@tramvai/core';
 import type { ChildAppRequestConfig } from '@tramvai/tokens-child-app';
 import {
   CHILD_APP_CONTRACT_MANAGER,
@@ -8,6 +13,7 @@ import {
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   HOST_PROVIDED_CONTRACTS,
   CHILD_APP_ERROR_BOUNDARY_TOKEN,
+  CHILD_APP_CONFIG_RESOLUTION_PLUGIN,
 } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
 import { CHILD_APP_RENDER_MANAGER_TOKEN } from '@tramvai/tokens-child-app';
@@ -65,6 +71,11 @@ export const sharedProviders: Provider[] = [
     provide: CHILD_APP_RESOLUTION_CONFIG_MANAGER_TOKEN,
     useClass: ChildAppResolutionConfigManager,
     deps: {
+      hookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
+      plugins: {
+        optional: true,
+        token: CHILD_APP_CONFIG_RESOLUTION_PLUGIN,
+      },
       configs: { token: CHILD_APP_RESOLUTION_CONFIGS_TOKEN, optional: true },
       logger: LOGGER_TOKEN,
     },

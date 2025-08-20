@@ -52,6 +52,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
   let childAppBase: PromiseType<ReturnType<typeof start>>;
   let childAppRouter: PromiseType<ReturnType<typeof start>>;
   let childAppReactQuery: PromiseType<ReturnType<typeof start>>;
+  let childAppError: PromiseType<ReturnType<typeof start>>;
   let rootApp: PromiseType<ReturnType<typeof startCli>>;
 
   beforeAll(async () => {
@@ -59,9 +60,10 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
 
     await outputFile(REFRESH_CMP_PATH, REFRESH_CMP_CONTENT_START);
 
-    [childAppBase, childAppRouter, childAppReactQuery] = await Promise.all([
+    [childAppBase, childAppRouter, childAppError, childAppReactQuery] = await Promise.all([
       startChildApp('base'),
       startChildApp('router'),
+      startChildApp('error'),
       startChildApp('react-query', {
         shared: {
           deps: ['@tramvai/react-query', '@tramvai/module-react-query'],
@@ -136,6 +138,7 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       childAppBase.close(),
       childAppRouter.close(),
       childAppReactQuery.close(),
+      childAppError.close(),
       rootApp.close(),
     ]);
   });
@@ -348,6 +351,38 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
     }
   });
   if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
+    describe('child app lifecycle hooks', () => {
+      it('child app mounted event', async () => {
+        const { serverUrl } = rootApp;
+        const { page } = await getPageWrapper('/monitoring');
+        await page.goto(`${serverUrl}/monitoring?lifecycle=render`);
+
+        await page.waitForFunction((text) => {
+          return document.querySelector('#events')?.textContent?.trim() === text;
+        }, 'preload on server,running customer on server,running customer on client,child-app-mounted');
+      });
+
+      it('child app mount failed event', async () => {
+        const { serverUrl } = rootApp;
+        const { page } = await getPageWrapper('/monitoring');
+
+        await page.goto(`${serverUrl}/monitoring?lifecycle=render&childApp=error&renderError=all`);
+        await page.waitForFunction((text) => {
+          return document.querySelector('#events')?.textContent?.trim() === text;
+        }, 'preload on server,running customer on server,running customer on client,preload on client,running customer on client,child-app-mount-failed');
+      });
+
+      it('child app config resolution event', async () => {
+        const { serverUrl } = rootApp;
+        const { page } = await getPageWrapper('/monitoring');
+
+        await page.goto(`${serverUrl}/monitoring?lifecycle=configResolution&childApp=base`);
+        await page.waitForFunction((text) => {
+          return document.querySelector('#events')?.textContent?.trim() === text;
+        }, 'child-app fetch config event,preload on server,running customer on server,running customer on client');
+      });
+    });
+
     describe('retry render', () => {
       it('should be possible retry render on client fail', async () => {
         const { serverUrl } = rootApp;

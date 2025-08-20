@@ -7,9 +7,11 @@ import {
 } from '@tramvai/tokens-child-app';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { useDi } from '@tramvai/react';
+import { useIsomorphicLayoutEffect } from '@tramvai/state';
 import { RenderContext } from './render-context';
 import { Extractor } from './extractor';
 import { ChildAppErrorBoundaryWrapper } from './childAppErrorBoundaryWrapper';
+import { ChildAppFallbackWrapper } from './ChildAppFallbackWrapper';
 
 const FailedChildAppFallback = ({ config }: { config: ChildAppReactConfig }) => {
   const { name, version, tag, fallback: Fallback } = config;
@@ -32,7 +34,7 @@ const FailedChildAppFallback = ({ config }: { config: ChildAppReactConfig }) => 
     });
   }
 
-  return Fallback ? <Fallback /> : null;
+  return <ChildAppFallbackWrapper name={name} version={version} tag={tag} fallback={Fallback} />;
 };
 
 // eslint-disable-next-line max-statements
@@ -64,6 +66,16 @@ const ChildAppWrapper = ({
     }
   }, [di, promiseDi]);
 
+  useIsomorphicLayoutEffect(() => {
+    if (di && !promiseDi) {
+      renderManager?.hooks?.mounted?.call({
+        name,
+        version,
+        tag,
+      });
+    }
+  }, []);
+
   if (!di && promiseDi) {
     // in case child-app was not rendered on ssr
     // and we have to wait before it's loading
@@ -76,7 +88,6 @@ const ChildAppWrapper = ({
       message: 'child-app was not initialized',
       childApp: { name, version, tag },
     });
-
     if (process.env.__TRAMVAI_CONCURRENT_FEATURES || typeof window !== 'undefined') {
       throw new Error(
         `Child-app was not initialized, check the loading error for child-app "${name}"`
@@ -131,7 +142,6 @@ export const ChildApp = memo((config: ChildAppReactConfig) => {
       version,
     });
   }, [name, version, tag, resolveExternalConfig]);
-
   const resultConfig = {
     ...config,
     version: resolvedExternalConfig?.version,

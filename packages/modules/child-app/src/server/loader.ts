@@ -1,5 +1,5 @@
 import isNil from '@tinkoff/utils/is/nil';
-import type { ChildApp } from '@tramvai/child-app-core';
+import type { CHILD_APP_LOADER_PLUGIN, ChildApp } from '@tramvai/child-app-core';
 import { ServerLoader as LowLevelLoader } from '@tinkoff/module-loader-server';
 import {
   CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN,
@@ -12,6 +12,7 @@ import type {
   ENV_MANAGER_TOKEN,
   ASYNC_LOCAL_STORAGE_TOKEN,
 } from '@tramvai/tokens-common';
+import { AsyncTapableHookInstance, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/core';
 import { Loader } from '../shared/loader';
 import type {
   LoadableStats,
@@ -26,20 +27,33 @@ export class ServerLoader extends Loader {
   private readonly loader: LowLevelLoader;
   private readonly initializedMap = new WeakMap<ModuleFederationContainer, ChildAppModuleWrapper>();
   private log: ReturnType<typeof LOGGER_TOKEN>;
+
+  private hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
+
+  public loadModuleHook: AsyncTapableHookInstance<
+    { config: ChildAppFinalConfig },
+    ChildApp | undefined
+  >;
+
   constructor({
     logger,
     createCache,
     envManager,
     cacheOptions,
     asyncLocalStorage,
+    hookFactory,
+    plugins,
   }: {
+    hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
     logger: typeof LOGGER_TOKEN;
     createCache: typeof CREATE_CACHE_TOKEN;
     envManager: typeof ENV_MANAGER_TOKEN;
     cacheOptions: typeof CHILD_APP_LOADER_CACHE_OPTIONS_TOKEN | null;
     asyncLocalStorage: typeof ASYNC_LOCAL_STORAGE_TOKEN | null;
+    plugins: (typeof CHILD_APP_LOADER_PLUGIN)[] | null;
   }) {
     super();
+    this.hookFactory = hookFactory;
     const cache = createCache('memory', {
       name: 'child-app-loader',
       ttl: 1000 * 60 * 60 * 24 * 5,
@@ -91,9 +105,22 @@ export class ServerLoader extends Loader {
         circuitBreakerEnabled: isNil(envManager.get('HTTP_CLIENT_CIRCUIT_BREAKER_DISABLED')),
       },
     });
+
+    this.loadModuleHook = this.hookFactory.createAsync<
+      { config: ChildAppFinalConfig },
+      ChildApp | undefined
+    >('childAppLoadModule');
+
+    this.loadModuleHook.tapPromise('childAppLoadModule', async (_, payload) => {
+      return this.loadModule(payload);
+    });
+
+    plugins?.forEach((plugin) => {
+      plugin.apply({ loadModule: this.loadModuleHook });
+    });
   }
 
-  async load(config: ChildAppFinalConfig): Promise<ChildApp | void> {
+  private async loadModule({ config }: { config: ChildAppFinalConfig }) {
     const promises = [
       this.loader.resolveByUrl<ModuleFederationContainer>(config.server.entry, {
         codePrefix: `var ASSETS_PREFIX="${config.client.baseUrl}";`,
@@ -133,6 +160,11 @@ export class ServerLoader extends Loader {
     return this.get(config);
   }
 
+  async load(config: ChildAppFinalConfig): Promise<ChildApp | void> {
+    const childApp = await this.loadModuleHook.callPromise({ config });
+    return childApp;
+  }
+
   async init(config: ChildAppFinalConfig): Promise<void> {
     const container = this.loader.getByUrl<ModuleFederationContainer>(config.server.entry);
 
@@ -165,8 +197,13 @@ export class ServerLoader extends Loader {
     }
   }
 
-  get(config: ChildAppFinalConfig): ChildApp | void {
+  get(config: ChildAppFinalConfig): ChildApp | undefined {
     const container = this.loader.getByUrl<ModuleFederationContainer>(config.server.entry);
+
+    if (!container) {
+      return undefined;
+    }
+
     const entry = container && this.initializedMap.get(container);
 
     return entry && this.resolve(entry);

@@ -17,7 +17,7 @@ type Props = {
 
 export const ChildAppErrorBoundaryWrapper = (props: PropsWithChildren<Props>) => {
   const { children, config } = props;
-  const { fallback, name, version, tag } = config;
+  const { name, version, tag, fallback } = config;
   const childAppLoadingStatus = useStoreSelector(ChildAppStore, (state) => {
     const key = `${name}@${version}`;
     const childAppState = state?.childAppPreloadStatusOnClient?.[key];
@@ -35,6 +35,7 @@ export const ChildAppErrorBoundaryWrapper = (props: PropsWithChildren<Props>) =>
   );
   return (
     <ChildAppErrorBoundary
+      config={config}
       childAppLoadingStatus={childAppLoadingStatus}
       fallback={fallback as any}
       errorHandlers={decoratedErrorHandlers}

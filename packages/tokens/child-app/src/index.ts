@@ -29,6 +29,9 @@ import type {
   HostContractsFallback,
   ChildAppErrorBoundaryHandler,
   ChildAppPreloadManagerPlugin,
+  ChildAppLoaderPlugin,
+  ChildAppConfigResolutionPlugin,
+  ChildAppRenderPlugin,
 } from './types';
 
 export * from './types';
@@ -362,4 +365,26 @@ export const CHILD_APP_ERROR_BOUNDARY_TOKEN = createToken<ChildAppErrorBoundaryH
   {
     multi: true,
   }
+);
+export const CHILD_APP_RENDER_PLUGIN = createToken<ChildAppRenderPlugin>(
+  'child-app render plugin',
+  {
+    multi: true,
+  }
+);
+export const CHILD_APP_CONFIG_RESOLUTION_PLUGIN = createToken<ChildAppConfigResolutionPlugin>(
+  'child-app config resultion plugin',
+  { multi: true }
+);
+
+export const CHILD_PRELOAD_MANAGER_PLUGIN = createToken<ChildAppPreloadManagerPlugin>(
+  'child-app preload manager plugin',
+  {
+    multi: true,
+  }
+);
+
+export const CHILD_APP_LOADER_PLUGIN = createToken<ChildAppLoaderPlugin>(
+  'child-app loader plugin',
+  { multi: true }
 );

@@ -7,12 +7,12 @@ import {
   CONTEXT_TOKEN,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
+  STORE_TOKEN,
 } from '@tramvai/module-common';
 import type { REACT_SERVER_RENDER_MODE } from '@tramvai/module-render';
 import { RenderModule } from '@tramvai/module-render';
-import { ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
+import { PAGE_SERVICE_TOKEN, ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
-import type { ContractsValidation } from '@tramvai/module-child-app';
 import {
   ChildAppModule,
   CHILD_APP_RESOLUTION_CONFIGS_TOKEN,
@@ -33,6 +33,7 @@ import {
 } from '../shared/tokens';
 import { globalStore } from './stores/global';
 import { preloadedChildAppInfoStore } from './stores/preload';
+import { addTapableHookEvent, tapableHooksEventsStore } from './stores/tapableHooks';
 
 if (typeof window === 'undefined') {
   const { setDefaultResultOrder } = require('dns');
@@ -47,6 +48,9 @@ const {
   CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN,
   HOST_PROVIDED_CONTRACTS,
   HOST_CONTRACTS_FALLBACK,
+  CHILD_APP_RENDER_PLUGIN,
+  CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+  CHILD_APP_CONFIG_RESOLUTION_PLUGIN,
 } = require('@tramvai/module-child-app');
 
 declare module '@tramvai/module-child-app' {
@@ -79,6 +83,7 @@ createApp({
     state: () => import(/* webpackChunkName: "state" */ './bundles/state'),
     loadable: () => import(/* webpackChunkName: "loadable" */ './bundles/loadable'),
     contracts: () => import(/* webpackChunkName: "contracts" */ './bundles/contracts'),
+    monitoring: () => import(/* webpackChunkName: "monitoring" */ './bundles/monitoring'),
   },
   modules: [
     CommonModule,
@@ -135,7 +140,7 @@ createApp({
     provide({
       provide: COMBINE_REDUCERS,
       multi: true,
-      useValue: [globalStore, preloadedChildAppInfoStore],
+      useValue: [globalStore, preloadedChildAppInfoStore, tapableHooksEventsStore],
     }),
     provide({
       provide: ACTION_CONDITIONALS,
@@ -159,6 +164,98 @@ createApp({
         context: CONTEXT_TOKEN,
       },
     }),
+
+    ...(CHILD_APP_CONFIG_RESOLUTION_PLUGIN
+      ? [
+          provide({
+            provide: CHILD_APP_CONFIG_RESOLUTION_PLUGIN,
+            deps: {
+              store: STORE_TOKEN,
+              pageService: PAGE_SERVICE_TOKEN,
+            },
+            useFactory: ({ store, pageService }) => {
+              const query = pageService.getCurrentUrl()?.query;
+              return {
+                apply(hooks: any) {
+                  hooks.fetchConfig.wrap(async (_: any, payload: any, next: any) => {
+                    if (query?.lifecycle === 'configResolution') {
+                      store.dispatch(addTapableHookEvent('child-app fetch config event'));
+                    }
+                    const result = await next(payload);
+                    return result;
+                  });
+                },
+              };
+            },
+          }),
+        ]
+      : []),
+    ...(CHILD_APP_PRELOAD_MANAGER_PLUGIN
+      ? [
+          provide({
+            provide: CHILD_APP_PRELOAD_MANAGER_PLUGIN,
+            deps: {
+              store: STORE_TOKEN,
+            },
+            useFactory: ({ store }) => {
+              return {
+                apply(hooks: any) {
+                  hooks.runChildAppCommandLine.wrap(async (_: any, payload: any, next: any) => {
+                    if (payload.status === 'customer') {
+                      if (typeof window === 'undefined') {
+                        store.dispatch(addTapableHookEvent(`running ${payload.status} on server`));
+                      } else {
+                        store.dispatch(addTapableHookEvent(`running ${payload.status} on client`));
+                      }
+                    }
+                    await next(payload);
+                  });
+                  hooks.prefetchChildApp.wrap(async (_: any, payload: any, next: any) => {
+                    store.dispatch(addTapableHookEvent('prefetch'));
+                    await next(payload);
+                  });
+                  hooks.preloadChildApp.wrap(async (_: any, payload: any, next: any) => {
+                    store.dispatch(
+                      addTapableHookEvent(
+                        `preload on ${typeof window === 'undefined' ? 'server' : 'client'}`
+                      )
+                    );
+                    await next(payload);
+                  });
+                },
+              };
+            },
+          }),
+        ]
+      : []),
+    ...(CHILD_APP_RENDER_PLUGIN
+      ? [
+          provide({
+            provide: CHILD_APP_RENDER_PLUGIN,
+            deps: {
+              store: STORE_TOKEN,
+              pageService: PAGE_SERVICE_TOKEN,
+            },
+            useFactory: ({ store, pageService }) => {
+              const query = pageService.getCurrentUrl()?.query;
+              return {
+                apply(hooks: any) {
+                  hooks.mounted.tap('childAppMounted', (_: any, payload: any) => {
+                    if (query?.lifecycle === 'render') {
+                      store.dispatch(addTapableHookEvent('child-app-mounted'));
+                    }
+                  });
+                  hooks.mountFailed.tap('childAppMountFailed', (_: any, payload: any) => {
+                    if (query?.lifecycle === 'render') {
+                      store.dispatch(addTapableHookEvent('child-app-mount-failed'));
+                    }
+                  });
+                },
+              };
+            },
+          }),
+        ]
+      : []),
     ...(CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN && ENV_MANAGER_TOKEN
       ? [
           provide({

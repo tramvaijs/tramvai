@@ -1,10 +1,12 @@
 import type { Container } from '@tinkoff/dippy';
+import { SyncTapableHookInstance, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/core';
 import type {
   ChildAppDiManager,
   ChildAppPreloadManager,
   ChildAppRenderManager,
   ChildAppRequestConfig,
   CHILD_APP_RESOLVE_CONFIG_TOKEN,
+  ChildAppConfigArgs,
 } from '@tramvai/tokens-child-app';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 
@@ -14,17 +16,32 @@ export class RenderManager implements ChildAppRenderManager {
   private readonly resolveFullConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
   private readonly log: ReturnType<typeof LOGGER_TOKEN>;
   private readonly hasRenderedSet = new Set<string>();
+  private hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
+
+  public hooks: {
+    mounted: SyncTapableHookInstance<ChildAppConfigArgs>;
+    mountFailed: SyncTapableHookInstance<ChildAppConfigArgs>;
+  };
+
   constructor({
     logger,
     preloadManager,
     diManager,
     resolveFullConfig,
+    hookFactory,
   }: {
+    hookFactory: typeof TAPABLE_HOOK_FACTORY_TOKEN;
     logger: typeof LOGGER_TOKEN;
     preloadManager: ChildAppPreloadManager;
     diManager: ChildAppDiManager;
     resolveFullConfig: typeof CHILD_APP_RESOLVE_CONFIG_TOKEN;
   }) {
+    this.hookFactory = hookFactory;
+    this.hooks = {
+      mounted: this.hookFactory.createSync<ChildAppConfigArgs>('childAppMounted'),
+      mountFailed: this.hookFactory.createSync<ChildAppConfigArgs>('childAppMountFailed'),
+    };
+
     this.log = logger('child-app:render');
     this.preloadManager = preloadManager;
     this.diManager = diManager;
