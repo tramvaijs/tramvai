@@ -43,8 +43,15 @@ export const wrapRouter = (page: Page) => {
     });
   };
 
+  const back = async (to: number) => {
+    return page.evaluate((backTo: number) => {
+      return (window as any).contextExternal.di.get('router pageService').back(backTo);
+    }, to);
+  };
+
   return {
     navigate,
+    back,
     navigateThenWaitForReload,
     updateCurrentRoute,
     getCurrentRoute,

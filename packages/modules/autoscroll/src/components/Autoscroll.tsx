@@ -16,8 +16,13 @@ const scrollToTop = (behavior: ScrollBehavior, top: number) => {
   }
 };
 
-const isAutoScrollEnabled = (route: ReturnType<typeof useRoute>) => {
-  return !route.navigateState?.disableAutoscroll;
+const isAutoScrollEnabled = (
+  route: ReturnType<typeof useRoute>,
+  prevRoute: ReturnType<typeof useRoute>
+) => {
+  const isDisabled =
+    route.navigateState?.disableAutoscroll || prevRoute.navigateState?.disableAutoscroll;
+  return !isDisabled;
 };
 
 const scrollToAnchor = (anchor: string, behavior: ScrollBehavior): boolean => {
@@ -32,6 +37,17 @@ const scrollToAnchor = (anchor: string, behavior: ScrollBehavior): boolean => {
   }
 };
 
+function usePreviousValue<T>(value: T): T {
+  const prevValueRef = useRef<T>(value);
+
+  /** Сохраняем предыдущее значение */
+  useEffect(() => {
+    prevValueRef.current = value;
+  }, [value]);
+
+  return prevValueRef.current;
+}
+
 // Поведение с подскроллом похоже на
 // https://reacttraining.com/react-router/web/guides/scroll-restoration/scroll-to-top
 
@@ -40,15 +56,16 @@ export function Autoscroll() {
     useDi(optional(AUTOSCROLL_BEHAVIOR_MODE_TOKEN)) || DEFAULT_AUTOSCROLL_BEHAVIOR;
   const scrollTop = useDi(optional(AUTOSCROLL_SCROLL_TOP_TOKEN)) ?? DEFAULT_AUTOSCROLL_SCROLL_TOP;
   const route = useRoute();
+  const prevRoute = usePreviousValue(route);
   const url = useUrl();
   const routeRef = useRef(url);
-  const shouldScroll = useRef(!!routeRef.current.hash && isAutoScrollEnabled(route));
+  const shouldScroll = useRef(!!routeRef.current.hash && isAutoScrollEnabled(route, prevRoute));
 
   // Так как отрисовка нужного нам элемента происходит после обновления route, при первом срабатывании эффекта мы обновляем shouldScroll, а при втором скроллим
   useEffect(() => {
     if (url.pathname !== routeRef.current.pathname || url.hash !== routeRef.current.hash) {
       routeRef.current = url;
-      shouldScroll.current = isAutoScrollEnabled(route);
+      shouldScroll.current = isAutoScrollEnabled(route, prevRoute);
     }
 
     if (!shouldScroll.current) {
