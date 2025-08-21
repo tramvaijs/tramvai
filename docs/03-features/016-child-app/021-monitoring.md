@@ -1,3 +1,8 @@
+---
+id: monitoring
+title: Monitoring
+---
+
 ## Child App Lifecycle Plugins
 
 This document describes how to monitor the lifecycle of child-apps using dedicated lifecycle plugins. These plugins allow developers to observe, log, and extend child-app behavior at key stages — such as loading, mounting, and prefetching — providing a centralized mechanism for child-app monitoring and integration.
