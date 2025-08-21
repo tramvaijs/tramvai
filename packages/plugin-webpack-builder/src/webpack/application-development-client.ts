@@ -1,8 +1,13 @@
+/* eslint-disable max-statements */
 /* eslint-disable complexity */
 import path from 'node:path';
 import flatten from '@tinkoff/utils/array/flatten';
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
+import {
+  SubresourceIntegrityPlugin,
+  type SubresourceIntegrityPluginOptions,
+} from 'webpack-subresource-integrity';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
@@ -45,6 +50,8 @@ import { createAssetsRules } from './shared/assets';
 import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createOptimizeOptions } from './shared/optimization';
+import { AssetsIntegritiesPlugin } from './plugins/AssetsIntegritiesPlugin';
+import { PurifyStatsPlugin } from '..';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -106,7 +113,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
-  const { hotRefresh } = config;
+  const { hotRefresh, integrity, projectType } = config;
 
   return {
     // todo browserslist?
@@ -272,6 +279,17 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           };
         }, {}),
       }),
+      ...(integrity
+        ? [
+            new SubresourceIntegrityPlugin({
+              enabled: 'auto',
+              hashFuncNames: ['sha256'],
+              hashLoading: 'eager',
+              ...integrity,
+            }),
+            new AssetsIntegritiesPlugin({ fileName: STATS_FILE_NAME }),
+          ]
+        : []),
       ...(hotRefresh?.enabled
         ? [
             new webpack.HotModuleReplacementPlugin(),
@@ -293,7 +311,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           showLogs: false,
         }),
       ...plugins.flat(),
-      // TODO: PurifyStatsPlugin
+      new PurifyStatsPlugin({ fileName: STATS_FILE_NAME, target: projectType }),
     ].filter(Boolean),
   };
 };

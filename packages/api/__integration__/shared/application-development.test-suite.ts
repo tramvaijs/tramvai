@@ -24,6 +24,15 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
     },
+    // TODO: тест на stats purify (PurifyStatsPlugin)
+    'app-integrity': {
+      name: 'app-integrity',
+      type: 'application',
+      integrity: {
+        enabled: true,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
+    },
     'app-output-relative': {
       name: 'app-bundle',
       type: 'application',
@@ -878,6 +887,17 @@ export default createPapiMethod({
             test.expect(platformJs).toContain('chunkLoadingGlobal');
             test.expect(platformJs).toContain('webpackChunkapplication_app_bundle_0_0_0_stub');
           });
+
+          test('Stats assets and integrities fields should be removed', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            test.expect(statsJson.assets).toBeUndefined();
+            test.expect(statsJson.integrities).toBeUndefined();
+          });
         });
 
         test.describe('app-tramvai-vendor', () => {
@@ -903,6 +923,34 @@ export default createPapiMethod({
 
             test.expect(tramvaiJs).toContain('createToken');
             test.expect(tramvaiJs).toContain('createApp');
+          });
+        });
+
+        test.describe('app-integrity', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-integrity',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('Should create integrities field in stats.json', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            test.expect(typeof statsJson.integrities).toBeTruthy();
+            test
+              .expect(statsJson.integrities['hmr.js'])
+              .toEqual('sha256-8A10Gj/aJpYAg16xUfu01fNEph3qS5esrvz5c2dbTbQ=');
           });
         });
 

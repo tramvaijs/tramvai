@@ -14,6 +14,8 @@ import {
 import { createDevServer } from './dev-server/dev-server';
 
 export { PolyfillConditionPlugin } from './webpack/plugins/polyfill-condition-plugin';
+export { AssetsIntegritiesPlugin } from './webpack/plugins/AssetsIntegritiesPlugin';
+export { PurifyStatsPlugin } from './webpack/plugins/PurifyStatsPlugin';
 export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from './webpack/webpack-config';
 export {
   WEBPACK_TRANSPILER_TOKEN,

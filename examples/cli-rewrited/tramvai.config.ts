@@ -9,6 +9,9 @@ export default defineTramvaiConfig({
     'cli-rewrited': {
       name: 'cli-rewrited',
       type: 'application',
+      integrity: {
+        enabled: true,
+      },
       pwa: {
         sw: {
           scope: '/scope/',

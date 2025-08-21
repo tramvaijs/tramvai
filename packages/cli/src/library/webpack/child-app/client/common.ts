@@ -1,6 +1,7 @@
 import type Config from 'webpack-chain';
 import { ChunkCorrelationPlugin } from '@module-federation/node';
 import LoadablePlugin from '@loadable/webpack-plugin';
+import { PurifyStatsPlugin } from '@tramvai/plugin-webpack-builder';
 
 import type { ConfigManager } from '../../../../config/configManager';
 
@@ -9,7 +10,6 @@ import files from '../../blocks/filesClient';
 import nodeClient from '../../blocks/nodeClient';
 import postcssAssets from '../../blocks/postcssAssets';
 import type { ChildAppConfigEntry } from '../../../../typings/configEntry/child-app';
-import { purifyStatsPluginFactory } from '../../plugins/PurifyStatsPlugin';
 
 const IDENTIFIER_NAME_REPLACE_REGEX = /^([^a-zA-Z$_])/;
 const IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX = /[^a-zA-Z0-9$]+/g;
@@ -57,7 +57,7 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
 
   config
     .plugin('assets-purify-plugin')
-    .use(purifyStatsPluginFactory('child-app'), [{ fileName: statsFileName }]);
+    .use(PurifyStatsPlugin, [{ fileName: statsFileName, target: 'child-app' }]);
 
   config.batch(files(configManager)).batch(nodeClient(configManager));
 };

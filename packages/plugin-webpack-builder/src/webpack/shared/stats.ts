@@ -4,6 +4,7 @@ export const DEFAULT_STATS_OPTIONS: StatsOptions = {
   all: false, // отключаем большинство ненужной информации
   publicPath: true,
   assets: true,
+  cachedAssets: true,
   outputPath: true, // выводит информацию о том в какой папке хранится билд на диске
   chunkGroups: true, // позволяет получить в stats поле namedChunkGroups которое потом используется в webpack-flush-chunks для получения чанков-зависимостей
   ids: true, // необходимо чтобы в chunksGroups были выставлены связи между модулями
@@ -15,6 +16,7 @@ export const STATS_FILE_NAME = 'stats.json';
 export const DEFAULT_STATS_FIELDS: string[] = [
   'publicPath',
   'outputPath',
+  'assets',
   'assetsByChunkName',
   'namedChunkGroups',
   'entrypoints',

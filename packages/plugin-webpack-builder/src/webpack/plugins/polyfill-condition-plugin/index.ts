@@ -1,6 +1,6 @@
-import { getPolyfillCondition, getMaxBrowserVersionsByFeatures } from './polyfillCondition';
+import { Compiler, Compilation, StatsCompilation } from 'webpack';
 
-import { Compiler, Compilation } from 'webpack';
+import { getPolyfillCondition, getMaxBrowserVersionsByFeatures } from './polyfillCondition';
 
 const TARGET_PLUGIN_NAME = 'stats-writer-plugin';
 
@@ -45,7 +45,9 @@ export class PolyfillConditionPlugin {
           const browserVersionsByFeatures = getMaxBrowserVersionsByFeatures(features);
           const polyfillCondition = getPolyfillCondition(browserVersionsByFeatures);
           const { filename } = this.options;
-          const statsJSON = JSON.parse(compilation.assets[filename].source().toString());
+          const statsJSON: StatsCompilation = JSON.parse(
+            compilation.assets[filename].source().toString()
+          );
 
           statsJSON.polyfillCondition = polyfillCondition;
           statsJSON.features = browserVersionsByFeatures;

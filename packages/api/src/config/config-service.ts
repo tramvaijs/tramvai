@@ -5,7 +5,8 @@ import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import { cosmiconfig } from 'cosmiconfig';
 import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
-import type { PluginOptions, sharpGenerate } from 'image-minimizer-webpack-plugin';
+import type { PluginOptions } from 'image-minimizer-webpack-plugin';
+import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-integrity';
 import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
 
 import type { Config as SvgoConfig } from 'svgo';
@@ -274,6 +275,7 @@ export interface ApplicationProject extends BaseProject {
   modernPolyfill?: string;
   dedupe?: DedupeOptions;
   assetsPrefix?: string;
+  integrity?: SubresourceIntegrityPluginOptions;
 }
 
 export interface ChildAppProject extends BaseProject {
@@ -604,6 +606,14 @@ export class ConfigService {
 
   get svgo(): BaseProject['svgo'] {
     return this.#project.svgo ?? {};
+  }
+
+  get integrity() {
+    if (this.#project.type === 'child-app') {
+      return null;
+    }
+
+    return this.#project.integrity ?? false;
   }
 
   get hotRefresh(): BaseProject['hotRefresh'] {
