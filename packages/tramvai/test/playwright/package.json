@@ -21,10 +21,10 @@
     "@tramvai/test-integration": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
     "console-with-style": "^1.1.0",
-    "get-port": "^5.1.1",
-    "supports-color": "8.1.1",
     "env-ci": "^5.0.2",
     "execa": "^5.1.1",
+    "get-port": "^5.1.1",
+    "supports-color": "8.1.1",
     "tslib": "^2.4.0",
     "wait-on": "^5.3.0"
   },
@@ -32,11 +32,11 @@
     "playwright-core": "*"
   },
   "devDependencies": {
-    "@types/supports-color": "^8.1.1",
-    "@types/env-ci": "^3.1.0",
-    "@types/wait-on": "^5.2.0",
-    "@tramvai/cli": "0.0.0-stub",
     "@playwright/test": "1.29.0",
+    "@tramvai/cli": "0.0.0-stub",
+    "@types/env-ci": "^3.1.0",
+    "@types/supports-color": "^8.1.1",
+    "@types/wait-on": "^5.2.0",
     "playwright-core": "1.29.0"
   },
   "license": "Apache-2.0",

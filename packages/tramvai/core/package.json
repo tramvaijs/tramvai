@@ -18,11 +18,11 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-core": "0.0.0-stub",
     "@tramvai/types-actions-state-context": "0.0.0-stub",
-    "@tinkoff/dippy": "0.0.0-stub",
     "tslib": "^2.4.0"
   },
   "peerDependencies": {

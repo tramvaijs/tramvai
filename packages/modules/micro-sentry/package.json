@@ -19,13 +19,13 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/env-validators": "0.0.0-stub",
-    "@micro-sentry/browser": "^7.0.1"
+    "@micro-sentry/browser": "^7.0.1",
+    "@tinkoff/env-validators": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
-    "@tramvai/module-common": "0.0.0-stub"
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub"
   },
   "module": "lib/server.es.js"
 }

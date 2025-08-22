@@ -24,12 +24,10 @@
     "type": "git",
     "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
   },
-  "peerDependencies": {},
   "dependencies": {
     "css-class-generator": "^2.0.0",
     "cssesc": "^3.0.0",
     "loader-utils": "^3.2.0"
   },
-  "devDependencies": {},
   "license": "Apache-2.0"
 }

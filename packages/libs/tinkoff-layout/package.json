@@ -16,8 +16,8 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "tslib": "^2.4.0",
-    "@tinkoff/utils": "^2.1.2"
+    "@tinkoff/utils": "^2.1.2",
+    "tslib": "^2.4.0"
   },
   "peerDependencies": {
     "react": ">=16.14.0"

@@ -25,10 +25,9 @@
   "dependencies": {
     "@tramvai/tokens-common": "0.0.0-stub"
   },
-  "devDependencies": {},
   "peerDependencies": {
-    "@tramvai/core": "0.0.0-stub",
     "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
     "@tramvai/tokens-metrics": "0.0.0-stub",
     "tslib": "^2.4.0"
   }

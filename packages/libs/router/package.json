@@ -6,8 +6,8 @@
   "typings": "lib/index.d.ts",
   "module": "lib/index.es.js",
   "browser": {
-    "./lib/router/server.js": "./lib/router/browser.js",
-    "./lib/index.es.js": "./lib/index.browser.js"
+    "./lib/index.es.js": "./lib/index.browser.js",
+    "./lib/router/server.js": "./lib/router/browser.js"
   },
   "files": [
     "lib"

@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@tinkoff/utils": "^2.1.2",
-    "express": "^4.17.1",
+    "express": "^4.21.2",
     "fast-glob": "^3.2.2",
     "http-proxy-middleware": "^2.0.2",
     "node-fetch": "^2.6.1",

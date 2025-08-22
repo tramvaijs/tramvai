@@ -17,6 +17,13 @@ _node_modules/
 !tools/check-versions/__integration__/__fixtures__/**/node_modules
 .yarn-cache
 .npm
+.yarn/*
+**/.yarn/*
+!.yarn/releases
+!.yarn/patches
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
 
 # IDE
 .DS_Store

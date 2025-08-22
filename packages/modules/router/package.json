@@ -4,9 +4,9 @@
   "description": "",
   "main": "lib/index.js",
   "browser": {
-    "./lib/modules/server.js": "./lib/modules/browser.js",
     "./lib/hooks/usePrefetch.js": "./lib/hooks/usePrefetch.browser.js",
-    "./lib/index.es.js": "./lib/index.browser.js"
+    "./lib/index.es.js": "./lib/index.browser.js",
+    "./lib/modules/server.js": "./lib/modules/browser.js"
   },
   "typings": "lib/index.d.ts",
   "files": [
@@ -28,15 +28,16 @@
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/router": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
+    "@tramvai/experiments": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/safe-strings": "0.0.0-stub",
     "@tramvai/tokens-child-app": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
-    "@tramvai/tokens-server": "0.0.0-stub",
-    "@tramvai/experiments": "0.0.0-stub"
+    "@tramvai/tokens-server": "0.0.0-stub"
   },
   "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
@@ -47,7 +48,6 @@
     "@tramvai/test-helpers": "0.0.0-stub",
     "@tramvai/test-mocks": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
-    "@tinkoff/dippy": "0.0.0-stub",
     "react": "*",
     "tslib": "^2.4.0"
   },

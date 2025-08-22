@@ -12,27 +12,25 @@ jobs:
     concurrency:
       group: release
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
-          registry-url: https://registry.npmjs.org/
 
-      - name: Get yarn cache
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Setup Corepack
+        run: corepack enable
 
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      - name: Setup yarn
+        run: |
+          yarn config set nodeLinker node-modules
+          yarn config set enableImmutableInstalls false
+          yarn config set npmAuthToken $NPM_AUTH_TOKEN
+        env:
+          NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
-      - run: yarn install --frozen-lockfile
+      - run: yarn install
       - run: yarn build
       - run: yarn build:publish
       - run: yarn build:change-typings
@@ -40,5 +38,3 @@ jobs:
 
       - name: Publish
         run: yarn publish:all
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

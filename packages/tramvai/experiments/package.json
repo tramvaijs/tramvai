@@ -17,7 +17,6 @@
     "build": "tramvai-build --forPublish --preserveModules",
     "watch": "tsc -w"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@tinkoff/router": "0.0.0-stub",
     "@tramvai/cli": "0.0.0-stub",

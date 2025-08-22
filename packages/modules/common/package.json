@@ -11,14 +11,14 @@
   "browser": {
     "./lib/actions/actionPageRunner.js": "./lib/actions/actionPageRunner.browser.js",
     "./lib/actions/deferred/providers.js": "./lib/actions/deferred/providers.browser.js",
-    "./lib/cache/serverProviders.js": "./lib/cache/clientProviders.js",
+    "./lib/async-local-storage/server.js": "./lib/async-local-storage/browser.js",
     "./lib/cache/cacheFactory.js": "./lib/cache/cacheFactory.browser.js",
+    "./lib/cache/serverProviders.js": "./lib/cache/clientProviders.js",
+    "./lib/child-app/serverProviders.js": "./lib/child-app/clientProviders.js",
     "./lib/index.es.js": "./lib/index.browser.js",
     "./lib/providers/serverProviders.js": "./lib/providers/clientProviders.js",
-    "./lib/child-app/serverProviders.js": "./lib/child-app/clientProviders.js",
     "./lib/requestManager/RequestManagerModule.js": "./lib/requestManager/RequestManagerModule.browser.js",
-    "./lib/responseManager/ResponseManagerModule.js": "./lib/responseManager/ResponseManagerModule.browser.js",
-    "./lib/async-local-storage/server.js": "./lib/async-local-storage/browser.js"
+    "./lib/responseManager/ResponseManagerModule.js": "./lib/responseManager/ResponseManagerModule.browser.js"
   },
   "sideEffects": false,
   "repository": {

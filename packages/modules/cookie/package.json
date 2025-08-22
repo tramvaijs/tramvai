@@ -19,16 +19,16 @@
   },
   "dependencies": {
     "@tinkoff/browser-cookies": "0.0.0-stub",
-    "@tramvai/tokens-cookie": "0.0.0-stub",
     "@tramvai/module-client-hints": "0.0.0-stub",
+    "@tramvai/tokens-cookie": "0.0.0-stub",
     "cookie": "^0.5.0"
   },
   "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
-    "@tinkoff/dippy": "0.0.0-stub",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
