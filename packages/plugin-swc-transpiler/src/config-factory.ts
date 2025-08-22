@@ -7,7 +7,7 @@ import { sync as resolve } from 'resolve';
 import findCacheDir from 'find-cache-dir';
 import type { Options as SwcOptions } from '@swc/core';
 
-const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasi';
+const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasip1';
 
 const NOT_SUPPORTED_FIELDS: (keyof WebpackTranspilerInputParameters)[] = [
   'enableFillActionNamePlugin',
