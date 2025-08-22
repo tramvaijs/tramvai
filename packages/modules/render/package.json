@@ -50,7 +50,7 @@
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub",
-    "express": "^4.17.1",
+    "express": "^4.21.2",
     "react": ">=16.14.0",
     "react-dom": ">=16.14.0",
     "tslib": "^2.4.0"
