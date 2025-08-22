@@ -36,12 +36,15 @@ import {
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
 import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
 import { configToEnv } from './shared/config-to-env';
-import { DEVTOOL_OPTIONS_TOKEN } from './shared/sourcemaps';
 import { WebpackConfigurationFactory } from './webpack-config';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from './shared/define';
-import { WATCH_OPTIONS_TOKEN } from './shared/watch-options';
 import { createStylesConfiguration } from './shared/styles';
-import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
+import {
+  RESOLVE_EXTENSIONS_TOKEN,
+  RESOLVE_FALLBACK_TOKEN,
+  RESOLVE_ALIAS_TOKEN,
+  defaultExtensions,
+} from './shared/resolve';
 import { createSnapshot } from './shared/snapshot';
 import { createSplitChunksOptions } from './shared/split-chunks';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
@@ -51,19 +54,40 @@ import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createOptimizeOptions } from './shared/optimization';
 import { AssetsIntegritiesPlugin } from './plugins/AssetsIntegritiesPlugin';
-import { PurifyStatsPlugin } from '..';
+import { PurifyStatsPlugin } from './plugins/PurifyStatsPlugin';
+import { PROVIDE_TOKEN } from './shared/provide';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
 }): Promise<Configuration> => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
+
+  const {
+    polyfill,
+    modernPolyfill,
+    sourceDir,
+    rootDir,
+    showProgress,
+    hotRefresh,
+    integrity,
+    projectType,
+  } = config;
+
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
-  const devtool = di.get(optional(DEVTOOL_OPTIONS_TOKEN)) ?? false;
-  const watchOptions = di.get(optional(WATCH_OPTIONS_TOKEN));
-  const extensions = di.get(optional(RESOLVE_EXTENSIONS)) ?? defaultExtensions;
+  const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
+  const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
+  const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
+  const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+
+  const { devtool, watchOptions, resolveAlias, resolveFallback, provide } =
+    config.extensions.webpack();
+
+  Object.assign(fallback, resolveFallback);
+  Object.assign(alias, resolveAlias);
+  Object.assign(provideList, provide);
 
   const transpilerParameters = resolveWebpackTranspilerParameters({ di });
   const workerPoolConfig = createWorkerPoolConfig({ di });
@@ -90,8 +114,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
   const virtualRootErrorBoundary = require.resolve('@tramvai/api/lib/virtual/root-error-boundary');
 
-  const { polyfill, modernPolyfill, sourceDir, rootDir, showProgress } = config;
-
   const polyfillPath = safeRequireResolve(
     resolveAbsolutePathForFile({
       file: polyfill ?? './src/polyfill',
@@ -112,8 +134,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   // TODO: test cacheUnaffected, lazyCompilation
 
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
-
-  const { hotRefresh, integrity, projectType } = config;
 
   return {
     // todo browserslist?
@@ -173,9 +193,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       // TODO: es2017, es2016, es2015 fields support?
       mainFields: ['browser', 'module', 'main'],
       symlinks: config.resolveSymlinks,
+      fallback: {
+        path: 'path-browserify',
+        ...fallback,
+      },
       alias: {
         // backward compatibility for old @tramvai/cli file-system pages mechanism
         '@tramvai/cli/lib/external/pages': '@tramvai/api/lib/virtual/file-system-pages',
+        ...alias,
       },
     },
     watchOptions: config.noClientRebuild
@@ -261,6 +286,10 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       }) as any as WebpackPluginInstance,
       showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
       new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
+      new webpack.ProvidePlugin({
+        process: 'process',
+        ...provideList,
+      }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,

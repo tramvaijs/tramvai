@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { defineTramvaiConfig } from '@tramvai/api/lib/config';
 import { WebpackBuilderPlugin } from '@tramvai/plugin-webpack-builder';
 import { BabelTranspilerPlugin } from '@tramvai/plugin-babel-transpiler';
@@ -11,6 +13,18 @@ export default defineTramvaiConfig({
       type: 'application',
       integrity: {
         enabled: true,
+      },
+      webpack: {
+        provide: {
+          measureTimeMark: path.resolve('./src/global.ts'),
+        },
+        resolveAlias: {
+          'static/*': path.resolve('./src/images/*'),
+        },
+        resolveFallback: {
+          os: 'os-browserify/browser',
+        },
+        devtool: 'inline-nosources-source-map',
       },
       pwa: {
         sw: {

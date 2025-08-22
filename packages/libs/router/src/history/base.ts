@@ -1,4 +1,4 @@
-import type { Navigation, HistoryOptions, NavigationType } from '../types';
+import type { Navigation, HistoryOptions, NavigationType, HistoryState } from '../types';
 import type { RouteTree } from '../tree/tree';
 
 export type Listener = (arg: {
@@ -24,6 +24,15 @@ export abstract class History {
   abstract save(navigation: Navigation): void;
 
   abstract go(to: number, options?: HistoryOptions): Promise<void>;
+
+  /**
+   * Получает стабильное значение window.history.state, необходимое для работы ViewTransition.
+   *
+   * Т.К. window.history.state обнуляется при инициализации tmsg чата.
+   *
+   * Возвращает undefined, если роут сразу вызывает redirect guard.
+   * */
+  abstract getCurrentState(): HistoryState | undefined;
 
   listen(listener: Listener): void {
     this.listener = listener;

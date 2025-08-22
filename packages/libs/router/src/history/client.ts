@@ -1,17 +1,8 @@
 import type { Url } from '@tinkoff/url';
 import { History } from './base';
-import type { Navigation, NavigationType, HistoryOptions, Route } from '../types';
+import type { Navigation, NavigationType, HistoryOptions, Route, HistoryState } from '../types';
 import type { Wrapper } from './wrapper';
 import { wrapHistory } from './wrapper';
-
-interface HistoryState {
-  key: string;
-  type: NavigationType;
-  navigateState?: any;
-  index: number;
-  viewTransition?: boolean;
-  viewTransitionTypes?: string[];
-}
 
 const isHistoryState = (state: any): state is HistoryState => {
   return state && typeof state.key === 'string';
@@ -112,6 +103,9 @@ export class ClientHistory extends History {
   }
 
   protected onNavigate: Parameters<typeof wrapHistory>[0]['onNavigate'];
+  getCurrentState(): HistoryState | undefined {
+    return this.currentState;
+  }
 
   init(navigation: Navigation) {
     this.currentState = isHistoryState(window.history?.state)

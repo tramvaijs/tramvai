@@ -303,6 +303,57 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'refresh-disabled', 'index.tsx'),
     },
+    'app-provide': {
+      name: 'app-provide',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'provide', 'index.ts'),
+      webpack: {
+        provide: {
+          measureTimeMark: path.join(fixturesFolder, 'application', 'provide', 'global.ts'),
+        },
+      },
+    },
+    'app-devtool-inline': {
+      name: 'app-devtool-inline',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
+      webpack: {
+        devtool: 'inline-nosources-cheap-module-source-map',
+      },
+    },
+    'app-devtool-external': {
+      name: 'app-provide-external',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
+      webpack: {
+        devtool: 'nosources-cheap-module-source-map',
+      },
+    },
+    'app-resolve': {
+      name: 'app-resolve',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'resolve', 'index.ts'),
+      webpack: {
+        resolveFallback: {
+          os: require.resolve('os-browserify/browser'),
+        },
+        resolveAlias: {
+          'components/*': path.join(fixturesFolder, 'application', 'resolve', 'components/*'),
+        },
+      },
+    },
   };
 
   const [builder, transpiler] = key.split('-');
@@ -984,7 +1035,7 @@ export default createPapiMethod({
               'platform.js',
               'react.chunk.js',
               'shared-node_modules_tinkoff_logger_lib_index_browser_js.chunk.js',
-              'shared-node_modules_tinkoff_utils_function_noop_js-node_modules_tinkoff_utils_is_object_js-no-38cf93.chunk.js',
+              'shared-node_modules_tinkoff_utils_function_noop_js-node_modules_tinkoff_utils_is_object_js-no-e0c3dc.chunk.js',
               // chunk name depends on the builder - different for `tsc` (locally) or `@tramvai/build` (CI)
               test.expect.stringMatching('shared-packages_libs_router_lib_index_'),
             ]);
@@ -1760,6 +1811,155 @@ export default Cmp;`,
             // TODO: with current API for browser build externals technically useful,
             // because you can'y specify global variable for external client package
             test.expect(platformJs).toContain('module.exports = @sotqa/mountebank-fork;');
+          });
+        });
+
+        test.describe('app-provide', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-provide',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('provide: should include module without import with providePlugin', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('module.exports = measureTimeMark;');
+            test.expect(platformJs).toContain('module.exports = measureTimeMark;');
+          });
+        });
+
+        test.describe('app-resolve', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-resolve',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('resolve: should use custom alias', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('fixtures/application/resolve/components/header.ts');
+            test.expect(platformJs).toContain('fixtures/application/resolve/components/header.ts');
+          });
+
+          test('resolve: should use fallback for nodejs apis in client build', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(platformJs).toContain('node_modules/path-browserify/index.js');
+            test.expect(platformJs).toContain('node_modules/os-browserify/browser.js');
+          });
+
+          test('resolve: should not use fallback for nodejs apis in server build', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(serverJs.includes('node_modules/path-browserify/index.js')).toBeFalsy();
+            test.expect(serverJs).toContain('module.exports = require("path");');
+            test.expect(serverJs).toContain('module.exports = require("os");');
+          });
+        });
+
+        test.describe('app-devtool-inline', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-devtool-inline',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('devtool: should generate inline sourcemaps by devtool options', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test
+              .expect(serverJs)
+              .toContain('//# sourceMappingURL=data:application/json;charset=utf-8;base64,');
+            test
+              .expect(platformJs)
+              .toContain('//# sourceMappingURL=data:application/json;charset=utf-8;base64,');
+          });
+        });
+
+        test.describe('app-devtool-external', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-devtool-external',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('devtool: should generate external sourcemaps by devtool options', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('//# sourceMappingURL=server.js.map');
+            test.expect(platformJs).toContain('//# sourceMappingURL=platform.js.map');
           });
         });
       });

@@ -1,4 +1,5 @@
 import { declareModule, provide } from '@tinkoff/dippy';
+import type { Configuration as WebpackConfiguration } from 'webpack';
 import {
   DEV_SERVER_TOKEN,
   PORT_MANAGER_TOKEN,
@@ -8,6 +9,7 @@ import {
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
+  DevtoolOption,
   Extension,
   INPUT_PARAMETERS_TOKEN,
 } from '@tramvai/api/lib/config';
@@ -24,9 +26,7 @@ export {
 } from './webpack/shared/transpiler';
 export { DEFINE_PLUGIN_OPTIONS_TOKEN } from './webpack/shared/define';
 export { WEBPACK_EXTERNALS_TOKEN } from './webpack/shared/externals';
-export { DEVTOOL_OPTIONS_TOKEN } from './webpack/shared/sourcemaps';
-export { WATCH_OPTIONS_TOKEN } from './webpack/shared/watch-options';
-export { RESOLVE_EXTENSIONS } from './webpack/shared/resolve';
+export { RESOLVE_EXTENSIONS_TOKEN } from './webpack/shared/resolve';
 export { WEBPACK_PLUGINS_TOKEN } from './webpack/shared/plugins';
 
 /**
@@ -55,6 +55,71 @@ export type SplitChunksConfig = {
   granularChunksMinSize?: number;
 };
 
+interface WatchOptions {
+  /**
+   * Delay the rebuilt after the first change. Value is a time in ms.
+   */
+  aggregateTimeout?: number;
+
+  /**
+   * Resolve symlinks and watch symlink and real file. This is usually not needed as webpack already resolves symlinks ('resolve.symlinks').
+   */
+  followSymlinks?: boolean;
+
+  /**
+   * Ignore some files from watching (glob pattern or regexp).
+   */
+  ignored?: string | RegExp | string[];
+
+  /**
+   * Enable polling mode for watching.
+   */
+  poll?: number | boolean;
+
+  /**
+   * Stop watching when stdin stream has ended.
+   */
+  stdin?: boolean;
+}
+
+interface WebpackConfigOptions {
+  /**
+   * @title Additional resolve alias setting
+   */
+  resolveAlias?: Record<string, string | false | string[]>;
+  /**
+   * @title Browser package resolve fallback. E.g. { "stream": "stream-browserify" }
+   * @see https://webpack.js.org/configuration/resolve/#resolvefallback
+   */
+  resolveFallback?: Record<string, string | false | string[]>;
+  /**
+   * @title Browser packages to provide with ProvidePlugin. E.g. { "Buffer": ["buffer", "Buffer"] }
+   * @see https://webpack.js.org/plugins/provide-plugin/
+   */
+  provide?: Record<string, string | string[]>;
+  /**
+   * @title Configure https://webpack.js.org/configuration/watch/#watchoptions
+   */
+  watchOptions?: WebpackConfiguration['watchOptions'];
+  /**
+   * @title Use the specified type of source maps for building in development mode
+   * @default false
+   */
+  devtool?: DevtoolOption;
+}
+
+const webpackConfigExtension = {
+  webpack: ({ project }: Parameters<Extension<any>>[0]): WebpackConfigOptions => {
+    return {
+      resolveFallback: project.webpack?.resolveFallback ?? {},
+      resolveAlias: project.webpack?.resolveAlias ?? {},
+      provide: project.webpack?.provide ?? {},
+      watchOptions: project.webpack?.watchOptions ?? {},
+      devtool: project.webpack?.devtool ?? false,
+    };
+  },
+};
+
 const splitChunksConfigExtension = {
   splitChunks: ({ project }: Parameters<Extension<any>>[0]): SplitChunksConfig | undefined => {
     if (project.type === 'child-app') {
@@ -78,12 +143,21 @@ const splitChunksConfigExtension = {
 };
 
 type SplitChunksConfigExtensionType = typeof splitChunksConfigExtension;
+type WebpackConfigExtensionType = typeof webpackConfigExtension;
 
 declare module '@tramvai/api/lib/config' {
   export interface ApplicationProject {
     splitChunks?: SplitChunksConfig;
+    webpack?: WebpackConfigOptions;
   }
-  export interface ConfigurationExtensions extends SplitChunksConfigExtensionType {}
+
+  export interface ChildAppProject {
+    webpack?: WebpackConfigOptions;
+  }
+
+  export interface ConfigurationExtensions
+    extends SplitChunksConfigExtensionType,
+      WebpackConfigExtensionType {}
 }
 
 export const WebpackBuilderPlugin = declareModule({
@@ -103,6 +177,10 @@ export const WebpackBuilderPlugin = declareModule({
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,
       useValue: splitChunksConfigExtension,
+    }),
+    provide({
+      provide: CONFIGURATION_EXTENSION_TOKEN,
+      useValue: webpackConfigExtension,
     }),
   ],
 });

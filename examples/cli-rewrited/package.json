@@ -43,6 +43,7 @@
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
+    "os-browserify": "^0.3.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "tslib": "^2.4.0"

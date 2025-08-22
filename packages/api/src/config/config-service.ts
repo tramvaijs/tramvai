@@ -8,6 +8,7 @@ import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import type { PluginOptions } from 'image-minimizer-webpack-plugin';
 import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-integrity';
 import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
+import type { Configuration as WebpackConfiguration } from 'webpack';
 
 import type { Config as SvgoConfig } from 'svgo';
 import type { TramvaiPlugin } from '../core/plugin';
@@ -91,6 +92,27 @@ export type HotRefreshOptions = {
    */
   options?: ConstructorParameters<typeof ReactRefreshPlugin>[0];
 };
+
+export type DevtoolOption =
+  | false
+  | 'eval'
+  | 'eval-cheap-source-map'
+  | 'eval-cheap-module-source-map'
+  | 'eval-source-map'
+  | 'cheap-source-map'
+  | 'cheap-module-source-map'
+  | 'source-map'
+  | 'inline-cheap-source-map'
+  | 'inline-cheap-module-source-map'
+  | 'inline-source-map'
+  | 'eval-nosources-cheap-source-map'
+  | 'eval-nosources-cheap-module-source-map'
+  | 'eval-nosources-source-map'
+  | 'inline-nosources-cheap-source-map'
+  | 'inline-nosources-cheap-module-source-map'
+  | 'inline-nosources-source-map'
+  | 'nosources-cheap-source-map'
+  | 'nosources-cheap-module-source-map';
 
 export type ReactCompilerOptions = {
   /*

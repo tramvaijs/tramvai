@@ -21,12 +21,15 @@ import {
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
 import { configToEnv } from './shared/config-to-env';
 import { WEBPACK_DEBUG_STATS_OPTIONS } from './shared/stats';
-import { DEVTOOL_OPTIONS_TOKEN } from './shared/sourcemaps';
 import { WebpackConfigurationFactory } from './webpack-config';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from './shared/define';
-import { WATCH_OPTIONS_TOKEN } from './shared/watch-options';
 import { createStylesConfiguration } from './shared/styles';
-import { RESOLVE_EXTENSIONS, defaultExtensions } from './shared/resolve';
+import {
+  RESOLVE_EXTENSIONS_TOKEN,
+  RESOLVE_FALLBACK_TOKEN,
+  RESOLVE_ALIAS_TOKEN,
+  defaultExtensions,
+} from './shared/resolve';
 import { normalizeBrowserslistConfig } from './shared/browserslist';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createSnapshot } from './shared/snapshot';
@@ -35,6 +38,7 @@ import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { createServerInlineRules } from './shared/server-inline';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createOptimizeOptions } from './shared/optimization';
+import { PROVIDE_TOKEN } from './shared/provide';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -44,9 +48,17 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
-  const devtool = di.get(optional(DEVTOOL_OPTIONS_TOKEN)) ?? false;
-  const watchOptions = di.get(optional(WATCH_OPTIONS_TOKEN));
-  const extensions = di.get(optional(RESOLVE_EXTENSIONS)) ?? defaultExtensions;
+  const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
+  const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
+  const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
+  const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+
+  const { devtool, watchOptions, resolveAlias, resolveFallback, provide } =
+    config.extensions.webpack();
+
+  Object.assign(fallback, resolveFallback);
+  Object.assign(alias, resolveAlias);
+  Object.assign(provideList, provide);
 
   const transpilerParameters = resolveWebpackTranspilerParameters({ di });
   const workerPoolConfig = createWorkerPoolConfig({ di });
@@ -131,6 +143,7 @@ export default appConfig;`;
       extensions: [...extensions, '.node'],
       mainFields: ['module', 'main'],
       symlinks: config.resolveSymlinks,
+      fallback,
       alias: {
         // backward compatibility for old @tramvai/cli file-system pages mechanism
         '@tramvai/cli/lib/external/pages': '@tramvai/api/lib/virtual/file-system-pages',
@@ -144,6 +157,7 @@ export default appConfig;`;
         // backward compatibility for old @tramvai/cli normalized browserslist mechanism
         '@tramvai/cli/lib/external/browserslist-normalized-file-config':
           'virtual:tramvai/browserslist',
+        ...alias,
       },
     },
     watchOptions: config.noServerRebuild
@@ -249,6 +263,10 @@ export default appConfig;`;
             ...options,
           };
         }, {}),
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process',
+        ...provideList,
       }),
       config.dedupe.enabledDev &&
         new DedupePlugin({

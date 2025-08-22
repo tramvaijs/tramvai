@@ -82,6 +82,7 @@ export interface Navigation {
    */
   viewTransition?: boolean;
   viewTransitionTypes?: string[];
+  hasUAVisualTransition?: boolean;
 }
 
 export type NavigationGuard = (
@@ -104,3 +105,12 @@ export type SyncHookName = 'change';
 export type RouterPlugin = {
   apply(router: AbstractRouter): void;
 };
+
+export interface HistoryState {
+  key: string;
+  type: NavigationType;
+  navigateState?: any;
+  index: number;
+  viewTransition?: boolean;
+  viewTransitionTypes?: string[];
+}

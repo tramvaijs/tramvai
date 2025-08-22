@@ -12,4 +12,13 @@ export class ServerHistory extends History {
 
     return Promise.resolve();
   }
+
+  getCurrentState() {
+    logger.warn({
+      event: 'history.server',
+      message: 'Trying to get current state on server',
+    });
+
+    return null;
+  }
 }

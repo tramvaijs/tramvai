@@ -60,7 +60,7 @@ export class Router extends ClientRouter {
         : navigation.to?.actualPath) ?? '';
     const from = navigation.from?.actualPath ?? '';
 
-    if (this.viewTransitionsEnabled && to !== from) {
+    if (this.viewTransitionsEnabled && to !== from && !navigation.hasUAVisualTransition) {
       navigation.viewTransition = this.shouldApplyViewTransition(navigation, to);
       const hasNavigationType =
         !!navigation.viewTransitionTypes &&
@@ -257,7 +257,11 @@ export class Router extends ClientRouter {
   private shouldApplyViewTransition(navigation: Navigation, to: string) {
     const from = navigation.from?.actualPath ?? '';
 
-    const historyIndex = window.history.state.index;
+    const historyState = this.history.getCurrentState();
+    if (!historyState) {
+      return false;
+    }
+    const historyIndex = historyState.index;
     const prevTransitionFrom = this.getPrevTransition(navigation);
 
     // handle back navigation when prev navigation was with VT enabled
@@ -286,7 +290,11 @@ export class Router extends ClientRouter {
   }
 
   private getPrevTransition(navigation: Navigation) {
-    const historyIndex = window.history.state.index;
+    const historyState = this.history.getCurrentState();
+    if (!historyState) {
+      return false;
+    }
+    const historyIndex = historyState.index;
     const index = navigation.history && navigation.isBack ? historyIndex : historyIndex - 1;
     return this.appliedViewTransitions.get(index);
   }

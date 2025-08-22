@@ -29,6 +29,7 @@
     "@opentelemetry/semantic-conventions": "^1.28.0",
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.2",
+    "@tramvai/tokens-child-app": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-http-client": "0.0.0-stub",
     "@tramvai/tokens-metrics": "0.0.0-stub",
@@ -36,7 +37,7 @@
     "@tramvai/tokens-router": "0.0.0-stub",
     "@tramvai/tokens-server": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub",
-    "path-to-regexp": "0.1.7"
+    "path-to-regexp": "^0.1.12"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",
