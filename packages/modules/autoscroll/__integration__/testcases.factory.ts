@@ -66,7 +66,6 @@ export function testcasesFactory(test: typeof testBase, label: string) {
           navigateState: { disableAutoscroll: true },
         });
         await router.back(-1);
-
         await test.expect
           .poll(async () => {
             return scroll.getCurrentScrollValue();

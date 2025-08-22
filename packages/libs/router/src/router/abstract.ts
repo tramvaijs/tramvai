@@ -358,6 +358,7 @@ export abstract class AbstractRouter {
       redirect,
       redirectFrom,
       isBack,
+      hasUAVisualTransition,
       key: this.uuid(),
     };
 
