@@ -33,6 +33,15 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
     },
+    'app-bundle-multiple-runtime': {
+      name: 'app-bundle-multiple-runtime',
+      runtimeChunk: false,
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
+    },
     'app-output-relative': {
       name: 'app-bundle',
       type: 'application',
@@ -931,12 +940,41 @@ export default createPapiMethod({
           test('output: should generate unique chunkLoadingGlobal', async ({ devServer }) => {
             await devServer.buildPromise;
 
+            const runtimeJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/runtime.js`)
+            ).text();
+
+            test.expect(runtimeJs).toContain('chunkLoadingGlobal');
+            test.expect(runtimeJs).toContain('webpackChunkapplication_app_bundle_0_0_0_stub');
+          });
+
+          test('bundle: should generate webpack runtime in separate chunk', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const removeUseStrict = (code: string) => code.replace('"use strict";\n', '');
+
+            const runtimeJsResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
+            );
+            test.expect(runtimeJsResponse.status).toEqual(200);
+            const runtimeJs = await runtimeJsResponse.text();
+
             const platformJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
             ).text();
+            const dynamicJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/dynamic.chunk.js`)
+            ).text();
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
 
-            test.expect(platformJs).toContain('chunkLoadingGlobal');
-            test.expect(platformJs).toContain('webpackChunkapplication_app_bundle_0_0_0_stub');
+            test.expect(runtimeJs).toContain('__webpack_module_cache__');
+            test.expect(removeUseStrict(dynamicJs).startsWith('(self[')).toBeTruthy();
+            test.expect(removeUseStrict(platformJs).startsWith('(self[')).toBeTruthy();
+            test.expect(statsJson.assetsByChunkName.runtime).toBeTruthy();
           });
 
           test('Stats assets and integrities fields should be removed', async ({ devServer }) => {
@@ -948,6 +986,41 @@ export default createPapiMethod({
 
             test.expect(statsJson.assets).toBeUndefined();
             test.expect(statsJson.integrities).toBeUndefined();
+          });
+        });
+
+        test.describe('app-bundle-multiple-runtime', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-bundle-multiple-runtime',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('bundle: should generate webpack runtime in platform.js chunk', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            const dynamicJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/dynamic.chunk.js`)
+            ).text();
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            test.expect(platformJs).toContain('__webpack_module_cache__');
+            test.expect(dynamicJs.replace('"use strict";\n', '').startsWith('(self[')).toBeTruthy();
+            test.expect(statsJson.assetsByChunkName.runtime).toBeUndefined();
           });
         });
 
@@ -1034,6 +1107,7 @@ export default createPapiMethod({
               'packages_api___integration___fixtures_application_granular-chunks_pages_foo_tsx.chunk.js',
               'platform.js',
               'react.chunk.js',
+              'runtime.js',
               'shared-node_modules_tinkoff_logger_lib_index_browser_js.chunk.js',
               'shared-node_modules_tinkoff_utils_function_noop_js-node_modules_tinkoff_utils_is_object_js-no-e0c3dc.chunk.js',
               // chunk name depends on the builder - different for `tsc` (locally) or `@tramvai/build` (CI)
@@ -1692,6 +1766,7 @@ export default Cmp;`,
 
             test.expect(await page.locator('#container').textContent()).toEqual('hello world');
 
+            await sleep(300);
             await outputFile(refreshPath, updatedContent);
             await sleep(300);
             test.expect(await page.locator('#container').textContent()).toEqual('hello world');

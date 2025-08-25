@@ -216,7 +216,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     optimization: {
       emitOnErrors: false,
       ...createSplitChunksOptions({ config }),
-      ...createOptimizeOptions({ config }),
+      ...createOptimizeOptions({ config, target: 'client' }),
     },
     // TODO: check is it configuration optimal?
     stats: {

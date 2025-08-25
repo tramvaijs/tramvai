@@ -298,6 +298,12 @@ export interface ApplicationProject extends BaseProject {
   dedupe?: DedupeOptions;
   assetsPrefix?: string;
   integrity?: SubresourceIntegrityPluginOptions;
+  /**
+   * @title Webpack Runtime Chunk settings
+   * @see https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
+   * @default false
+   */
+  runtimeChunk?: 'single' | 'multiple' | boolean;
 }
 
 export interface ChildAppProject extends BaseProject {
@@ -649,11 +655,11 @@ export class ConfigService {
   }
 
   get imageOptimization() {
-    return this.#project!.imageOptimization ?? {};
+    return this.#project.imageOptimization ?? {};
   }
 
   get generateDataQaTag() {
-    return this.#project!.generateDataQaTag ?? false;
+    return this.#project.generateDataQaTag ?? false;
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {

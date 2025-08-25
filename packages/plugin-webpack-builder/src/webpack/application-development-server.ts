@@ -172,7 +172,7 @@ export default appConfig;`;
         }),
     optimization: {
       emitOnErrors: false,
-      ...createOptimizeOptions({ config }),
+      ...createOptimizeOptions({ config, target: 'server' }),
     },
     // TODO: check is it configuration optimal?
     stats: {

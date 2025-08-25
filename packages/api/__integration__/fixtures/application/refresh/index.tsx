@@ -14,6 +14,7 @@ if (typeof window !== 'undefined') {
     res.end(
       `<!DOCTYPE html><html>
       <head>
+        <script src="http://localhost:${port}/dist/client/runtime.js"></script>
         <script src="http://localhost:${port}/dist/client/react.js"></script>
         <script src="http://localhost:${port}/dist/client/hmr.js"></script>
       </head>

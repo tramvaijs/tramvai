@@ -142,13 +142,30 @@ const splitChunksConfigExtension = {
   },
 };
 
+/**
+ * @see https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
+ */
+export type RuntimeChunk = 'single' | 'multiple' | boolean;
+
+const runtimeChunkExtension = {
+  runtimeChunk: ({ project }: Parameters<Extension<any>>[0]) => {
+    if (project.type === 'child-app') {
+      return false;
+    }
+
+    return (project.runtimeChunk ?? 'single') satisfies RuntimeChunk;
+  },
+};
+
 type SplitChunksConfigExtensionType = typeof splitChunksConfigExtension;
 type WebpackConfigExtensionType = typeof webpackConfigExtension;
+type RuntimeChunkConfigExtensionType = typeof runtimeChunkExtension;
 
 declare module '@tramvai/api/lib/config' {
   export interface ApplicationProject {
     splitChunks?: SplitChunksConfig;
     webpack?: WebpackConfigOptions;
+    runtimeChunk?: RuntimeChunk;
   }
 
   export interface ChildAppProject {
@@ -157,7 +174,8 @@ declare module '@tramvai/api/lib/config' {
 
   export interface ConfigurationExtensions
     extends SplitChunksConfigExtensionType,
-      WebpackConfigExtensionType {}
+      WebpackConfigExtensionType,
+      RuntimeChunkConfigExtensionType {}
 }
 
 export const WebpackBuilderPlugin = declareModule({
@@ -181,6 +199,10 @@ export const WebpackBuilderPlugin = declareModule({
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,
       useValue: webpackConfigExtension,
+    }),
+    provide({
+      provide: CONFIGURATION_EXTENSION_TOKEN,
+      useValue: runtimeChunkExtension,
     }),
   ],
 });
