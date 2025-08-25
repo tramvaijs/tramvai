@@ -6,7 +6,7 @@ import findCacheDir from 'find-cache-dir';
 import type { Options as SwcOptions } from '@swc/core';
 import type { TranspilerConfig } from '../webpack/utils/transpiler';
 
-const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasi';
+const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasip1';
 
 const NOT_SUPPORTED_FIELDS = ['alias', 'enableFillActionNamePlugin'];
 let warningWasShown = false;

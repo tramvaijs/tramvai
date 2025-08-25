@@ -32,8 +32,10 @@ Refer to docs of [`@tramvai/cli`](references/cli/experiments.md#transpilation)
 [Swc doc](https://swc.rs/docs/plugin/ecmascript/getting-started)
 
 1. Install [Rust](https://www.rust-lang.org/tools/install)
-2. Run command `rustup target add wasm32-wasi` to install required toolchain to build wasm targets.
+2. Run command `rustup target add wasm32-wasip1` to install required toolchain to build wasm targets.
 3. Install clippy as additional tool for code check - `rustup component add clippy`
+
+Alternative: use docker image with rust and run `./scripts/docker-run.sh`.
 
 ### Build
 
@@ -64,7 +66,7 @@ Refer to docs of [`@tramvai/cli`](references/cli/experiments.md#transpilation)
 1. Make changes to the source code
 2. Make sure the tests are passing with `cargo test`
 3. Commit a release version of swc plugins, you can do it either:
-   - by building it locally with command `cargo build-wasi --release`. But this requires specific os and rust versions, and therefore should be done inside docker container, using image `rust:1.70.0`
+   - by building it locally with command `cargo build-wasi --release`. But this requires specific os and rust versions, and therefore should be done inside docker container, using image `rust:1.88.0`
    - pushing your code changes and creating merge request. Merge request will fail because it'll detect changes in built files but it'll provide these built files through gitlab artifacts for job `swc-integration build check`. You can download this artifact and commit files from it to your branch.
 
 #### Upgrade swc version
