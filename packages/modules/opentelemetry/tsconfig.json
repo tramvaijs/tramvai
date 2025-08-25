@@ -38,6 +38,9 @@
         },
         {
             "path": "../../tokens/render"
+        },
+        {
+            "path": "../../tokens/child-app"
         }
     ]
 }

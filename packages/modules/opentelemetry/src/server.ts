@@ -23,6 +23,9 @@ import { providers as httpClientInstrumentationProviders } from './instrumentati
 import { providers as logsIntegrationProviders } from './instrumentation/logs';
 import { providers as commandLineRunnerIntegrationProviders } from './instrumentation/commandLineRunner';
 import { providers as routerIntegrationProviders } from './instrumentation/router';
+import { providers as childAppConfigResolutionPluginProviders } from './instrumentation/childApp/configResolution';
+import { providers as childAppLoaderPluginProviders } from './instrumentation/childApp/loader';
+import { providers as childAppPreloadPluginProviders } from './instrumentation/childApp/preload';
 import { getTraceparentHeader } from './tracer/get-traceparent-header';
 
 export * from './tokens';
@@ -30,6 +33,9 @@ export * from './tokens';
 @Module({
   imports: [],
   providers: [
+    ...childAppConfigResolutionPluginProviders,
+    ...childAppLoaderPluginProviders,
+    ...childAppPreloadPluginProviders,
     ...serverInstrumentationProviders,
     ...httpClientInstrumentationProviders,
     ...logsIntegrationProviders,
