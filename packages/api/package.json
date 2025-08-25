@@ -1,8 +1,8 @@
 {
   "name": "@tramvai/api",
   "version": "0.0.0-stub",
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib/tokens.js",
+  "types": "./lib/tokens.d.ts",
   "dependencies": {
     "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/package-manager-wrapper": "0.0.0-stub",

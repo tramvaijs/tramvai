@@ -39,6 +39,7 @@ import { createServerInlineRules } from './shared/server-inline';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createOptimizeOptions } from './shared/optimization';
 import { PROVIDE_TOKEN } from './shared/provide';
+import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -52,6 +53,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
   const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
   const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+  const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
 
   const { devtool, watchOptions, resolveAlias, resolveFallback, provide } =
     config.extensions.webpack();
@@ -113,6 +115,12 @@ export default appConfig;`;
       }),
       // server: './src/index.ts',
     },
+    cache: createCacheConfig({
+      config,
+      additionalCacheFlags,
+      transpilerParameters,
+      target: 'server',
+    }),
     output: {
       path: resolveAbsolutePathForFolder({ folder: config.outputServer, rootDir: config.rootDir }),
       publicPath: `${resolveUrl({

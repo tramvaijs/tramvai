@@ -11,21 +11,6 @@ export default defineTramvaiConfig({
     'cli-rewrited': {
       name: 'cli-rewrited',
       type: 'application',
-      integrity: {
-        enabled: true,
-      },
-      webpack: {
-        provide: {
-          measureTimeMark: path.resolve('./src/global.ts'),
-        },
-        resolveAlias: {
-          'static/*': path.resolve('./src/images/*'),
-        },
-        resolveFallback: {
-          os: 'os-browserify/browser',
-        },
-        devtool: 'inline-nosources-source-map',
-      },
       pwa: {
         sw: {
           scope: '/scope/',

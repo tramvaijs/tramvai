@@ -259,6 +259,16 @@ export interface BaseProject {
      */
     options?: PluginOptions<any, any>;
   };
+  /**
+   * Enables cache for build
+   * @default true
+   */
+  fileCache?: boolean;
+  /**
+   * Enables cache profiling
+   * @default false
+   */
+  cacheProfile?: boolean;
 }
 
 export interface ApplicationProject extends BaseProject {
@@ -672,6 +682,14 @@ export class ConfigService {
 
   get generateDataQaTag() {
     return this.#project.generateDataQaTag ?? false;
+  }
+
+  get fileCache() {
+    return this.#project.fileCache ?? true;
+  }
+
+  get cacheProfile() {
+    return this.#project.cacheProfile ?? false;
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {

@@ -19,6 +19,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-bundle': {
       name: 'app-bundle',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -28,6 +29,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-integrity': {
       name: 'app-integrity',
       type: 'application',
+      fileCache: false,
       integrity: {
         enabled: true,
       },
@@ -35,6 +37,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     },
     'app-bundle-multiple-runtime': {
       name: 'app-bundle-multiple-runtime',
+      fileCache: false,
       runtimeChunk: false,
       type: 'application',
       hotRefresh: {
@@ -45,6 +48,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-output-relative': {
       name: 'app-bundle',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -58,6 +62,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-virtual-module-config': {
       name: 'app-virtual-module-config',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -66,6 +71,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-broken': {
       name: 'app-broken',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -74,6 +80,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-broken-ssr': {
       name: 'app-broken-ssr',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -82,6 +89,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-jsx': {
       name: 'app-jsx',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -91,11 +99,13 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-css-modules': {
       name: 'app-css-modules',
       type: 'application',
+      fileCache: false,
       entryFile: path.join(fixturesFolder, 'application', 'css-modules', 'index.ts'),
     },
     'app-postcss': {
       name: 'app-postcss',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -108,6 +118,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss-fn': {
       name: 'app-postcss-fn',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -120,6 +131,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-fs-routing': {
       name: 'app-fs-routing',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -129,6 +141,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-config-to-env': {
       name: 'app-config-to-env',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -147,6 +160,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-root-error-boundary': {
       name: 'app-root-error-boundary',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -159,6 +173,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-browserslist': {
       name: 'app-browserslist',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -168,6 +183,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-polyfills': {
       name: 'app-polyfills',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -177,6 +193,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-polyfills-custom': {
       name: 'app-polyfills',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -188,6 +205,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-tramvai-vendor': {
       name: 'app-tramvai-vendor',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -196,6 +214,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-granular-chunks': {
       name: 'app-granular-chunks',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -210,15 +229,25 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-assets': {
       name: 'app-assets',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
       generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
+    'app-cache': {
+      name: 'app-cache',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
+    },
     'app-externals': {
       name: 'app-externals',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -228,6 +257,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-papi': {
       name: 'app-papi',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -238,6 +268,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-server-inline': {
       name: 'app-server-inline',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -246,6 +277,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-pwa': {
       name: 'app-pwa',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -265,6 +297,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'custom-pwa': {
       name: 'custom-pwa',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -297,16 +330,19 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-refresh': {
       name: 'app-refresh',
       type: 'application',
+      fileCache: false,
       entryFile: path.join(fixturesFolder, 'application', 'refresh', 'index.tsx'),
     },
     'app-hmr': {
       name: 'app-hmr',
       type: 'application',
+      fileCache: false,
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
     'app-refresh-disabled': {
       name: 'app-refresh-disabled',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -315,6 +351,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-provide': {
       name: 'app-provide',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -328,6 +365,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-devtool-inline': {
       name: 'app-devtool-inline',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -339,6 +377,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-devtool-external': {
       name: 'app-provide-external',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -350,6 +389,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-resolve': {
       name: 'app-resolve',
       type: 'application',
+      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -1856,6 +1896,42 @@ export default Cmp;`,
             test.expect(platformJs).toContain('SvgPlus');
             test.expect(serverJs).toContain('\"data-qa-file\": \"plus\"');
             test.expect(platformJs).toContain('\"data-qa-file\": \"plus\"');
+          });
+        });
+
+        test.describe('app-cache', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-cache',
+              rootDir: testSuiteFolder,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('cache: should generate build cache', async ({ devServer }) => {
+            await devServer.buildPromise;
+            await devServer.close();
+
+            const cacheFiles = await fs.readdirSync(
+              path.resolve(__dirname, '../../node_modules/.cache/webpack')
+            );
+
+            test.expect(cacheFiles.length).toBe(2);
+          });
+
+          test('cache: should reuse build cache', async ({ devServer }) => {
+            await devServer.buildPromise;
+            await devServer.close();
+
+            const cacheFiles = await fs.readdirSync(
+              path.resolve(__dirname, '../../node_modules/.cache/webpack')
+            );
+
+            test.expect(cacheFiles.length).toBe(2);
           });
         });
 

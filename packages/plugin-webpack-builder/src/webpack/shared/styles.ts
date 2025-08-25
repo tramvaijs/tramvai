@@ -4,10 +4,18 @@ import type webpack from 'webpack';
 import type { Config } from 'postcss-load-config';
 import ExtractCssPlugin from 'mini-css-extract-plugin';
 import { safeRequire } from '@tramvai/api/lib/utils/require';
-import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
+import { CONFIG_SERVICE_TOKEN, ConfigService } from '@tramvai/api/lib/config';
 import { resolveAbsolutePathForFile } from '@tramvai/api/lib/utils/path';
 
 type PostcssConfig = Config & { config: boolean };
+
+export const getPostcssConfigPath = (config: ConfigService) => {
+  return resolveAbsolutePathForFile({
+    file: config.postcss!.config ?? 'postcss.config.js',
+    sourceDir: config.sourceDir,
+    rootDir: config.rootDir,
+  });
+};
 
 export const createStylesConfiguration = ({
   di,
@@ -33,11 +41,7 @@ export const createStylesConfiguration = ({
 
   const postcssConfig: Config | ((loaderContext: any) => Config) =
     safeRequire(
-      resolveAbsolutePathForFile({
-        file: config.postcss!.config ?? 'postcss.config.js',
-        sourceDir: config.sourceDir,
-        rootDir: config.rootDir,
-      }),
+      getPostcssConfigPath(config),
       // ignore missed file if users haven't provided any value
       // in case the path was provided it should exist
       typeof config.postcss!.config === 'undefined'

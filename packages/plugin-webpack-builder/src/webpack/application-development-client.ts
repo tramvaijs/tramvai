@@ -4,10 +4,7 @@ import path from 'node:path';
 import flatten from '@tinkoff/utils/array/flatten';
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
-import {
-  SubresourceIntegrityPlugin,
-  type SubresourceIntegrityPluginOptions,
-} from 'webpack-subresource-integrity';
+import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
@@ -56,6 +53,7 @@ import { createOptimizeOptions } from './shared/optimization';
 import { AssetsIntegritiesPlugin } from './plugins/AssetsIntegritiesPlugin';
 import { PurifyStatsPlugin } from './plugins/PurifyStatsPlugin';
 import { PROVIDE_TOKEN } from './shared/provide';
+import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -81,6 +79,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
   const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
   const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+  const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
 
   const { devtool, watchOptions, resolveAlias, resolveFallback, provide } =
     config.extensions.webpack();
@@ -165,6 +164,12 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       // platform: './src/index.ts',
       ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
     },
+    cache: createCacheConfig({
+      config,
+      additionalCacheFlags,
+      transpilerParameters,
+      target: 'client',
+    }),
     output: {
       path: resolveAbsolutePathForFolder({
         folder: config.outputClient,
