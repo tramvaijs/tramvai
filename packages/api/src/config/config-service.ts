@@ -382,6 +382,11 @@ export class ConfigService {
   #project!: Project;
   #configPath: string | null = null;
   #extensions: ExtensionToken[] = [];
+  #resolvedExtensions:
+    | {
+        [key in keyof ConfigurationExtensions]: () => ReturnType<ConfigurationExtensions[key]>;
+      }
+    | null = null;
 
   constructor(parameters: InputParameters, extraConfiguration?: Partial<Configuration>) {
     this.#parameters = parameters;
@@ -410,13 +415,17 @@ export class ConfigService {
 
   loadExtensions(extensions: ExtensionToken[]) {
     this.#extensions = extensions;
+    this.#resolvedExtensions = null;
   }
 
   get extensions(): {
     [key in keyof ConfigurationExtensions]: () => ReturnType<ConfigurationExtensions[key]>;
   } {
-    // TODO: memoize
-    return this.#extensions.reduce((extensions, currentExtension) => {
+    if (this.#resolvedExtensions) {
+      return this.#resolvedExtensions;
+    }
+
+    this.#resolvedExtensions = this.#extensions.reduce((extensions, currentExtension) => {
       for (const key in currentExtension) {
         extensions[key] = () =>
           currentExtension[key]({
@@ -427,6 +436,8 @@ export class ConfigService {
       }
       return extensions;
     }, {});
+
+    return this.#resolvedExtensions;
   }
 
   get rawConfiguration() {
@@ -483,8 +494,9 @@ export class ConfigService {
   }
 
   get inspectBuildProcess() {
-    // TODO: respect process.env.TRAMVAI_INSPECT_BUILD_PROCESS here?
-    return this.#parameters.inspectBuildProcess ?? false;
+    return process.env.TRAMVAI_INSPECT_BUILD_PROCESS
+      ? process.env.TRAMVAI_INSPECT_BUILD_PROCESS === 'true'
+      : (this.#parameters.inspectBuildProcess ?? false);
   }
 
   get verboseLogging() {
@@ -665,8 +677,8 @@ export class ConfigService {
   async readConfigurationFile({ rootDir }: { rootDir: string }) {
     return cosmiconfig('tramvai', {
       searchStrategy: 'none',
+      searchPlaces: ['tramvai.config.ts'],
       loaders: {
-        // TODO: resolve only .ts files
         '.ts': TypeScriptLoader(),
       },
     })

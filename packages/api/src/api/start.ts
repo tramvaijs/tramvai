@@ -23,7 +23,6 @@ export async function start(
 ): Promise<DevServer> {
   tracer.init();
 
-  // TODO: use performance.now() to measure real script initialization time
   tracer.mark({
     event: 'start-command.started',
     category: ['api'],

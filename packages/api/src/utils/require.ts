@@ -1,14 +1,18 @@
 import { sync as resolve } from 'resolve';
 import { extensions } from '../config';
+import { logger } from '../services/logger';
 
 export const safeRequire = (path: string, silent?: boolean) => {
   try {
     return require(path);
   } catch (error) {
     if (!silent) {
-      // TODO: replace with logger from di?
-      // eslint-disable-next-line no-console
-      console.error(`Require for path ${path} failed`, error);
+      logger.event({
+        type: 'error',
+        event: 'safe-require-error',
+        message: `Require for path ${path} failed`,
+        payload: { error },
+      });
     }
   }
 };
@@ -20,9 +24,12 @@ export const safeRequireResolve = (path: string, silent?: boolean) => {
     });
   } catch (error) {
     if (!silent) {
-      // TODO: replace with logger from di?
-      // eslint-disable-next-line no-console
-      console.error(`Require for path ${path} failed`, error);
+      logger.event({
+        type: 'error',
+        event: 'safe-require-resolve-error',
+        message: `Require for path ${path} failed`,
+        payload: { error },
+      });
     }
 
     return '';

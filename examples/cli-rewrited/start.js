@@ -12,9 +12,11 @@ const { tracer } = require('@tramvai/api/lib/services/tracer');
 
 tracer.init();
 
+// time between "cli.run" and "start-command.started" measures the time of script initialization
 tracer.mark({
   event: 'cli.run',
   category: ['cli'],
+  timestamp: 0,
 });
 
 async function main() {

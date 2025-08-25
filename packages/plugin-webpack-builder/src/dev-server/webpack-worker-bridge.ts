@@ -50,7 +50,7 @@ export class WebpackWorkerBridge {
     if (process.env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED) {
       env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED = process.env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED;
     }
-    if (process.env.TRAMVAI_INSPECT_BUILD_PROCESS || this.#config.inspectBuildProcess) {
+    if (this.#config.inspectBuildProcess) {
       const inspectPort = this.#workerData.target === 'client' ? '9227' : '9228';
 
       env.INSPECT_WORKER_THREAD = 'break';
@@ -65,7 +65,7 @@ export class WebpackWorkerBridge {
       execArgv: [],
       // `--inspect` and `--inspect-brk` for `worker_threads` only in Node.js >= 24.1 - https://github.com/nodejs/node/pull/56759
       // execArgv:
-      //   process.env.TRAMVAI_INSPECT_BUILD_PROCESS || this.#config.inspectBuildProcess
+      //   this.#config.inspectBuildProcess
       //     ? ['--inspect-brk', `--inspect=${inspectPort}`]
       //     : [],
     });

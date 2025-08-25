@@ -5,19 +5,21 @@ import { createToken } from '@tinkoff/dippy';
 import * as chromeTraceEvent from 'chrome-trace-event';
 
 // eslint-disable-next-line prefer-destructuring
-const pid = process.pid;
-let tid: number;
+const _pid = process.pid;
+let _tid: number;
 
 try {
-  tid = require('worker_threads').threadId;
+  _tid = require('worker_threads').threadId;
 } catch {
-  tid = 0;
+  _tid = 0;
 }
 
 export type Trace = {
   event: string;
   category: string[];
   fields?: Record<string, any>;
+  timestamp?: number; // in milliseconds, event start time
+  tid?: number; // thread id, default is 0 for main thread
 };
 
 export const TRACER_TOKEN = createToken<Tracer>('tramvai tracer');
@@ -58,8 +60,8 @@ export const TRACER_TOKEN = createToken<Tracer>('tramvai tracer');
  * @reference https://github.com/parcel-bundler/parcel/blob/v2/packages/core/profiler/src/Tracer.js
  */
 export class Tracer {
-  #tid = tid;
-  #pid = pid;
+  #tid = _tid;
+  #pid = _pid;
   #cwd: string;
   #tracer?: chromeTraceEvent.Tracer;
   #stream?: Writable;
@@ -77,19 +79,22 @@ export class Tracer {
     this.#tracer = new chromeTraceEvent.Tracer();
   }
 
-  mark({ event, category, fields }: Trace) {
+  /**
+   * Make Instant Event
+   */
+  mark({ event, category, fields, timestamp, tid }: Trace) {
     if (!this.#enabled) {
       return;
     }
 
-    const start = performance.now();
+    const start = timestamp ?? performance.now();
 
     this.#tracer!.instantEvent({
       ...fields,
       name: event,
       cat: category,
       ts: millisecondsToMicroseconds(start),
-      tid: this.#tid,
+      tid: tid ?? this.#tid,
       pid: this.#pid,
     });
   }
@@ -98,8 +103,7 @@ export class Tracer {
     if (!this.#enabled) {
       return fn();
     }
-
-    const complete = this.measure(trace);
+    const complete = this.measureAsync(trace);
 
     try {
       return await fn();
@@ -108,12 +112,15 @@ export class Tracer {
     }
   }
 
-  measure({ event, category, fields }: Trace) {
+  /**
+   * Make Duration Event
+   */
+  measure({ event, category, fields, timestamp, tid }: Trace) {
     if (!this.#enabled) {
       return () => {};
     }
 
-    const start = performance.now();
+    const start = timestamp ?? performance.now();
 
     return () => {
       const duration = performance.now() - start;
@@ -125,7 +132,42 @@ export class Tracer {
         args: fields,
         ts: millisecondsToMicroseconds(start),
         dur: millisecondsToMicroseconds(duration),
-        tid: this.#tid,
+        tid: tid ?? this.#tid,
+        pid: this.#pid,
+      });
+    };
+  }
+
+  /**
+   * Make Async Event
+   */
+  measureAsync({ event, category, fields, timestamp, tid }: Trace) {
+    if (!this.#enabled) {
+      return () => {};
+    }
+
+    const start = timestamp ?? performance.now();
+
+    this.#tracer!.begin({
+      ...fields,
+      name: event,
+      id: event,
+      cat: category,
+      args: fields,
+      ts: millisecondsToMicroseconds(start),
+      tid: tid ?? this.#tid,
+      pid: this.#pid,
+    });
+
+    return () => {
+      this.#tracer!.end({
+        ...fields,
+        name: event,
+        id: event,
+        cat: category,
+        args: fields,
+        ts: millisecondsToMicroseconds(performance.now()),
+        tid: tid ?? this.#tid,
         pid: this.#pid,
       });
     };

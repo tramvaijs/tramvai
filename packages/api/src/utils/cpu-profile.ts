@@ -1,5 +1,6 @@
 import { Session } from 'inspector';
 import fs from 'fs';
+import { logger } from '../services/logger';
 
 // reference - https://github.com/vercel/next.js/blob/canary/packages/next/src/server/lib/cpu-profile.ts
 if (process.env.TRAMVAI_CPU_PROFILE) {
@@ -22,9 +23,12 @@ if (process.env.TRAMVAI_CPU_PROFILE) {
 
     session.post('Profiler.stop', (error, param) => {
       if (error) {
-        // TODO: replace with logger from di?
-        // eslint-disable-next-line no-console
-        console.error(`Cannot generate ${key} CPU profiling:`, error);
+        logger.event({
+          type: 'error',
+          event: 'cpu-profiler-error',
+          message: `Cannot generate ${key} CPU profiling: ${error.message}`,
+          payload: { error },
+        });
         return;
       }
 

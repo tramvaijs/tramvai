@@ -16,6 +16,10 @@ import { ProgressBar } from '../utils/progress-bar';
 
 type DevServerApi = ExtractTokenType<typeof DEV_SERVER_TOKEN>;
 
+const SERVER_BUILD_TID = 1;
+const CLIENT_BUILD_TID = 2;
+const SERVER_RUNNER_TID = 3;
+
 export function createDevServer({
   inputParameters,
   portManager,
@@ -146,6 +150,7 @@ export function createDevServer({
             {
               event: 'server-runner-worker.compile',
               category: ['plugin-webpack-builder'],
+              tid: SERVER_RUNNER_TID,
             },
             () => {
               return serverRunnerWorker.compile({ code });
@@ -167,9 +172,10 @@ export function createDevServer({
       }
 
       if (buildType !== 'client') {
-        let measureServerWebpackWorker: Function | null = tracer.measure({
+        let measureServerWebpackWorker: Function | null = tracer.measureAsync({
           event: 'server-webpack-worker.build',
           category: ['plugin-webpack-builder'],
+          tid: SERVER_BUILD_TID,
         });
         let measureWatchServerWebpackWorker: Function | null;
 
@@ -205,18 +211,20 @@ export function createDevServer({
         });
         serverWebpackWorker.subscribe(WATCH_RUN, () => {
           if (!initialServerBuild) {
-            measureWatchServerWebpackWorker = tracer.measure({
+            measureWatchServerWebpackWorker = tracer.measureAsync({
               event: 'server-webpack-worker.watch',
               category: ['plugin-webpack-builder'],
+              tid: SERVER_BUILD_TID,
             });
           }
         });
       }
 
       if (buildType !== 'server') {
-        let measureClientWebpackWorker: Function | null = tracer.measure({
+        let measureClientWebpackWorker: Function | null = tracer.measureAsync({
           event: 'client-webpack-worker.build',
           category: ['plugin-webpack-builder'],
+          tid: CLIENT_BUILD_TID,
         });
         let measureWatchClientWebpackWorker: Function | null;
 
@@ -259,9 +267,10 @@ export function createDevServer({
         });
         clientWebpackWorker.subscribe(WATCH_RUN, () => {
           if (!initialClientBuild) {
-            measureWatchClientWebpackWorker = tracer.measure({
+            measureWatchClientWebpackWorker = tracer.measureAsync({
               event: 'client-webpack-worker.watch',
               category: ['plugin-webpack-builder'],
+              tid: CLIENT_BUILD_TID,
             });
           }
         });
