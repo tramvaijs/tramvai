@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import type {
+  TapableFactory,
   AsyncFn,
   AsyncParallelTapableHookInstance,
   AsyncTapableHookInstance,
@@ -9,7 +10,6 @@ import type {
   SyncTapableHookInstance,
   SyncTapablePlugin,
   SyncWrapper,
-  TapableFactory,
 } from './types';
 
 export { SyncTapableHookInstance, AsyncTapableHookInstance, AsyncParallelTapableHookInstance };

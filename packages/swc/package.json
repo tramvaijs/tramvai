@@ -3,7 +3,7 @@
   "version": "0.0.0-stub",
   "description": "Tramvai integration with swc toolset",
   "files": [
-    "target/wasm32-wasi/release/*.wasm"
+    "target/wasm32-wasip1/release/*.wasm"
   ],
   "sideEffects": false,
   "repository": {
