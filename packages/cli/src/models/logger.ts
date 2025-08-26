@@ -30,7 +30,7 @@ export class Logger {
         event.message,
         event.payload ?? ''
       );
-    } else if (event.type === 'info' || process.env.DEBUG_MODE === 'true') {
+    } else if (event.type === 'info' || process.env.TRAMVAI_LOG_LEVEL === 'debug') {
       console.log(
         chalk.bgMagenta(event.type),
         chalk.magenta(event.event),

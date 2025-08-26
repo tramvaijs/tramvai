@@ -54,7 +54,7 @@ async function sendEvent(event: Record<string, any>) {
       if (!response.ok || response.status >= 400) {
         logger.event({
           type: 'error',
-          event: 'analytics-send-failed',
+          event: 'analytics-worker',
           message: `Error sending analytics data, response with status: ${response.status}`,
         });
 
@@ -71,7 +71,7 @@ async function sendEvent(event: Record<string, any>) {
   } catch (error) {
     logger.event({
       type: 'error',
-      event: 'analytics-send-failed',
+      event: 'analytics-worker',
       message: `Error sending analytics data: ${error instanceof Error ? error.message : String(error)}`,
     });
 

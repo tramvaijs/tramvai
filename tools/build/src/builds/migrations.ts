@@ -36,7 +36,7 @@ export const createBuild = (): Build => {
             tsPlugin({
               browserslist: false,
               tsconfig: {
-                target: 'es5',
+                target: 'es2022',
                 module: 'esnext',
                 declaration: false,
                 experimentalDecorators: true,

@@ -1,6 +1,7 @@
 import inspector from 'node:inspector';
 import { Worker } from 'node:worker_threads';
 import { ConfigService } from '@tramvai/api/lib/config';
+import { logger } from '@tramvai/api/lib/services/logger';
 import {
   EXIT,
   PROGRESS,
@@ -38,6 +39,8 @@ export class WebpackWorkerBridge {
     // watchpack issue - https://github.com/webpack/watchpack/issues/222, https://github.com/vercel/next.js/pull/51826
     const env: Record<string, string> = {
       WATCHPACK_WATCHER_LIMIT: '20',
+      // force color output for worker - https://github.com/chalk/supports-color#info
+      FORCE_COLOR: '1',
     };
 
     if (process.env.TRAMVAI_CPU_PROFILE) {
@@ -57,6 +60,10 @@ export class WebpackWorkerBridge {
       env.INSPECT_WORKER_THREAD_PORT = inspectPort;
     }
 
+    if (process.env.TRAMVAI_LOG_LEVEL) {
+      env.TRAMVAI_LOG_LEVEL = process.env.TRAMVAI_LOG_LEVEL;
+    }
+
     this.#worker = new Worker(this.#workerPath, {
       workerData: this.#workerData,
       name: `${this.#workerData.target} webpack`,
@@ -70,10 +77,13 @@ export class WebpackWorkerBridge {
       //     : [],
     });
 
-    this.#worker.on('error', (err) => {
-      // TODO: replace with logger from di?
-      // eslint-disable-next-line no-console
-      console.log(`[webpack-worker-bridge] ${this.#workerData.target} worker error`, err);
+    this.#worker.on('error', (error) => {
+      logger.event({
+        type: 'info',
+        event: 'webpack-worker-bridge',
+        message: `${this.#workerData.target} worker error`,
+        payload: { error },
+      });
     });
 
     if (this.#config.showProgress) {
@@ -84,9 +94,12 @@ export class WebpackWorkerBridge {
 
     this.#worker.on('exit', (code) => {
       if (code !== 0) {
-        // TODO: replace with logger from di?
-        // eslint-disable-next-line no-console
-        console.log(`[webpack-worker-bridge] ${this.#workerData.target} worker exit`, code);
+        logger.event({
+          type: 'info',
+          event: 'webpack-worker-bridge',
+          message: `${this.#workerData.target} worker exit`,
+          payload: { code },
+        });
       }
     });
   }

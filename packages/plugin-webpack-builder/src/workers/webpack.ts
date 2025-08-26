@@ -13,6 +13,7 @@ import {
 } from '@tramvai/api/lib/config';
 import { initContainer, isValidModule, optional, provide } from '@tinkoff/dippy';
 import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
+import { logger } from '@tramvai/api/lib/services/logger';
 import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
@@ -117,17 +118,24 @@ async function runWebpackDevServer() {
     if (stats.hasErrors()) {
       const { errors } = stats.toJson({ all: false, errors: true, errorDetails: true });
 
-      // TODO: replace with logger from di?
-      // eslint-disable-next-line no-console
-      console.log(`[webpack-worker] ${target} compilation done with errors:`, errors);
+      logger.event({
+        type: 'warning',
+        event: 'webpack-worker',
+        message: 'Compilation done with errors',
+        payload: { errors },
+      });
+
       parentPort!.postMessage({
         event: BUILD_FAILED,
         errors,
       } as WebpackWorkerOutgoingEventsPayload['build-failed']);
     } else {
-      // TODO: replace with logger from di?
-      // eslint-disable-next-line no-console
-      console.log(`[webpack-worker] ${target} compilation done:`);
+      logger.event({
+        type: 'debug',
+        event: 'webpack-worker',
+        message: 'Compilation done',
+      });
+
       parentPort!.postMessage({
         event: BUILD_DONE,
       } as WebpackWorkerOutgoingEventsPayload['build-done']);
@@ -135,9 +143,13 @@ async function runWebpackDevServer() {
   });
 
   compiler.hooks.failed.tap('worker-dev-server', async (error) => {
-    // TODO: replace with logger from di?
-    // eslint-disable-next-line no-console
-    console.log(`[webpack-worker] ${target} compilation failed`, error);
+    logger.event({
+      type: 'warning',
+      event: 'webpack-worker',
+      message: `${target} compilation failed`,
+      payload: { error },
+    });
+
     parentPort!.postMessage({
       event: BUILD_FAILED,
       errors: [error],
@@ -176,9 +188,12 @@ async function runWebpackDevServer() {
   }
 
   app.listen(port, () => {
-    // TODO: replace with logger from di?
-    // eslint-disable-next-line no-console
-    console.log(`[webpack-worker] dev-server for ${target} compilation started at ${port} port`);
+    logger.event({
+      type: 'debug',
+      event: 'webpack-worker',
+      message: `dev-server for ${target} compilation started at ${port} port`,
+    });
+
     parentPort!.postMessage({
       event: DEV_SERVER_STARTED,
     } as WebpackWorkerOutgoingEventsPayload['dev-server-started']);
@@ -219,9 +234,12 @@ function getHotModulePrefix(config: ConfigService): string {
 }
 
 process.on('unhandledRejection', (error) => {
-  // TODO: replace with logger from di?
-  // eslint-disable-next-line no-console
-  console.error(`[webpack-worker] unhandledRejection`, error);
+  logger.event({
+    type: 'error',
+    event: 'webpack-worker',
+    message: 'unhandledRejection',
+    payload: { error },
+  });
 
   parentPort!.postMessage({
     event: BUILD_FAILED,
@@ -232,9 +250,12 @@ process.on('unhandledRejection', (error) => {
 });
 
 process.on('uncaughtException', (error) => {
-  // TODO: replace with logger from di?
-  // eslint-disable-next-line no-console
-  console.error(`[webpack-worker] uncaughtException`, error);
+  logger.event({
+    type: 'error',
+    event: 'webpack-worker',
+    message: 'uncaughtException',
+    payload: { error },
+  });
 
   parentPort!.postMessage({
     event: BUILD_FAILED,
@@ -245,8 +266,14 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('exit', (code) => {
-  // TODO: replace with logger from di?
-  // eslint-disable-next-line no-console
-  console.error(`[webpack-worker] exit`, code);
+  if (code !== 0) {
+    logger.event({
+      type: 'error',
+      event: 'webpack-worker',
+      message: 'exit',
+      payload: { code },
+    });
+  }
+
   process.exit(code);
 });

@@ -1,1 +1,4 @@
 extends @tinkoff/browserslist-config
+
+[node]
+extends @tinkoff/browserslist-config

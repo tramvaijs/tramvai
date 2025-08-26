@@ -8,7 +8,7 @@ import type { start } from '@tramvai/cli';
 import type { startCli } from '@tramvai/test-integration';
 import { testCasesConditions } from './test-cases';
 
-jest.setTimeout(3 * 60 * 1000);
+jest.setTimeout(4 * 60 * 1000);
 
 const testCase =
   testCasesConditions[

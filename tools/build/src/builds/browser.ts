@@ -1,4 +1,5 @@
 import isObject from '@tinkoff/utils/is/object';
+import { ScriptTarget } from 'typescript';
 import type { Build, BuildParams } from './build.h';
 import { createInputOptions, createOutputOptions } from './common';
 import { getBrowserEntryFilename, getBrowserSourceFilename } from '../fileNames.ts';
@@ -25,7 +26,8 @@ export const build: Build = {
 
     const input = createInputOptions(params, {
       entry: getBrowserSourceFilename(params),
-      target: 'ES2020',
+      // packages will be transpiled by @tramvai/cli with browserslist target
+      target: ScriptTarget.ES2022,
       resolveMainFields: ['browser', 'module', 'main'],
       browser: true,
     });

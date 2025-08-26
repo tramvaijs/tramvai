@@ -1,3 +1,4 @@
+import { ScriptTarget } from 'typescript';
 import type { Build, BuildParams } from './build.h';
 import { createInputOptions, createOutputOptions } from './common';
 import { getSourceFilename } from '../fileNames.ts';
@@ -17,7 +18,8 @@ export const build: Build = {
   async getOptions(params) {
     const input = createInputOptions(params, {
       entry: getSourceFilename(params),
-      target: 'ES2020',
+      // Node.js 16+ support - https://github.com/microsoft/TypeScript/wiki/Node-Target-Mapping#node-18
+      target: ScriptTarget.ES2022,
     });
     const output = createOutputOptions(params, {
       file: buildFileName(params),

@@ -1,5 +1,6 @@
 import http from 'node:http';
 import httpProxy from 'http-proxy';
+import { logger } from '@tramvai/api/lib/services/logger';
 
 export const createProxy = ({
   port,
@@ -16,11 +17,19 @@ export const createProxy = ({
 }) => {
   const devProxy = httpProxy.createProxyServer();
 
-  devProxy.on('error', (err, req, res) => {
-    // TODO: replace with logger from di?
+  devProxy.on('error', (error, req, res) => {
+    logger.event({
+      type: 'error',
+      event: 'dev-proxy',
+      message: `proxy error`,
+      payload: {
+        error,
+        url: req.url,
+      },
+    });
+
     // TODO: requests queue for failed builds?
-    // eslint-disable-next-line no-console
-    console.error('proxy error', err, req.url);
+
     // @ts-expect-error
     res.statusCode = 500;
     res.end();
@@ -46,21 +55,50 @@ export const createProxy = ({
 
   return {
     listen: () => {
-      devServer.listen(port, () => {
-        // TODO: replace with logger from di?
-        // eslint-disable-next-line no-console
-        console.log(`Development server started at ${port} port`);
-      });
-      staticServer.listen(staticPort, () => {
-        // TODO: replace with logger from di?
-        // eslint-disable-next-line no-console
-        console.log(`Static server started at ${staticPort} port`);
-      });
+      return Promise.all([
+        new Promise<void>((resolve) => {
+          devServer.listen(port, () => {
+            logger.event({
+              type: 'info',
+              event: 'dev-proxy',
+              message: `Development server started at ${port} port`,
+            });
+            resolve();
+          });
+        }),
+        new Promise<void>((resolve) => {
+          staticServer.listen(staticPort, () => {
+            logger.event({
+              type: 'info',
+              event: 'dev-proxy',
+              message: `Static server started at ${staticPort} port`,
+            });
+            resolve();
+          });
+        }),
+      ]);
     },
     close: () => {
-      devProxy.close();
-      devServer.close();
-      staticServer.close();
+      return Promise.all([
+        // devProxy.listen method is not called so close callback is not required
+        devProxy.close(),
+        new Promise<void>((resolve) => {
+          devServer.close(() => {
+            resolve();
+          });
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        }),
+        new Promise<void>((resolve) => {
+          staticServer.close(() => {
+            resolve();
+          });
+          setTimeout(() => {
+            resolve();
+          }, 1000);
+        }),
+      ]);
     },
   };
 };

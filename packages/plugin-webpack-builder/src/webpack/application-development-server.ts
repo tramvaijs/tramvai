@@ -81,7 +81,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 export { appConfig };
 export default appConfig;`;
 
-  const browserslistConfig = JSON.stringify(normalizeBrowserslistConfig(config));
+  const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
+  const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
 
   const virtualModulesPlugin = new VirtualModulesPlugin({
     'virtual:tramvai/config': virtualTramvaiConfig,
@@ -104,7 +105,10 @@ export default appConfig;`;
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
   return {
-    target: 'node',
+    // https://webpack.js.org/configuration/target/#browserslist
+    target: normalizedBrowserslistConfig.node
+      ? `browserslist:${normalizedBrowserslistConfig.node}`
+      : 'node',
     // context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?

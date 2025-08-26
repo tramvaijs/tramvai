@@ -54,6 +54,7 @@ import { AssetsIntegritiesPlugin } from './plugins/AssetsIntegritiesPlugin';
 import { PurifyStatsPlugin } from './plugins/PurifyStatsPlugin';
 import { PROVIDE_TOKEN } from './shared/provide';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
+import { normalizeBrowserslistConfig } from './shared/browserslist';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -103,6 +104,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     },
   });
 
+  const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
+
   const virtualModulesPlugin = new VirtualModulesPlugin({});
 
   if (transpiler.warmupThreadLoader) {
@@ -135,8 +138,12 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
   return {
-    // todo browserslist?
-    target: 'web',
+    // https://webpack.js.org/configuration/target/#browserslist
+    target: normalizedBrowserslistConfig.defaults
+      ? // unknown support for UCAndroid browser lead to false checks for some ES features
+        // https://github.com/webpack/webpack/blob/914db1f7ca1ff6ed4eba015b6765add9afac35e3/lib/config/browserslistTargetHandler.js#L212
+        `browserslist:${normalizedBrowserslistConfig.defaults.filter((query) => !query.includes('UCAndroid'))}`
+      : 'web',
     // context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?

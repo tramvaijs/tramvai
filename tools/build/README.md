@@ -95,11 +95,11 @@ Such builds, especially for monorepositories with big number of packages, can ta
 
 Recommended and automatically generated `package.json` for `@tramvai/build` allows apps to use packages that were built either with `tsc`, or with `@tramvai/build` without any additional steps.
 
-All of the built bundles will contain `ES2020` standard code, it is expected that they will be bundled to `ES5` using bundler (Webpack, etc.) with configured transpilation through `babel` for packages inside `node_modules`, written in modern JS.
+All of the built bundles will contain `ES2022` standard code, it is expected that they will be used in Node.js 16+ or will be bundled to `ES5` using bundler (Webpack, etc.) with configured transpilation through `babel` for packages inside `node_modules`, written in modern JS.
 
 ### NodeJS bundle in CommonJs format
 
-NodeJS before 12 version hasn't supported ES modules or supported it only behind special flag. `@tramvai/build` generates bundle in `ES2020` standard in `CommonJS` format automatically. Name of the result bundle is taken from field `main` in `package.json`, e.g. `lib/index.js`.
+Modern NodeJS has support for ES modules, but `@tramvai/build` still generates bundle in `ES2022` standard in `CommonJS` format automatically for better interoperability with existing packages and tools that still do not support ES modules fully. Name of the result bundle is taken from field `main` in `package.json`, e.g. `lib/index.js`.
 
 When bundling package in the app using `webpack` with option `target: 'node'` this `CommonJS` bundle probably will not be used as webpack will prefer to use `module` field while resolving source code.
 
@@ -107,17 +107,17 @@ When bundling package in the app using `webpack` with option `target: 'node'` th
 
 ### Bundle for bundlers (Webpack, etc.) in ES modules format
 
-Modern bundlers support ES modules and non-standard field `"module"` in `package.json`. `@tramvai/build` generates bundle in `ES2020` standard in `ES modules` format automatically. Name of the result bundle is calculates from field `main` in `package.json` by adding postfix `.es` e.g. `lib/index.es.js`.
+Modern bundlers support ES modules and non-standard field `"module"` in `package.json`. `@tramvai/build` generates bundle in `ES2022` standard in `ES modules` format automatically. Name of the result bundle is calculates from field `main` in `package.json` by adding postfix `.es` e.g. `lib/index.es.js`.
 
 If build was called with flag `--forPublish` to `package.json` will be added new field `"module": "lib/index.es.js"`.
 
 When bundling package in the app through `webpack` with option `target: 'node'` bundle from field `module` will have higher priority over bundle from `main`.
 
-> `ES2020` code standard is generated as it is expected that bundle from field `"module"` will be resolved by bundler with configured transpilation through `babel` for packages inside `node_modules`, written in modern JS. Why we still prefer to use `ES5` code over `ES2020`? Apparently, code in `ES5` is still notably faster on NodeJS server. In the same time output bundle size is not important on server.
+> `ES2022` code standard is generated as it is expected that bundle from field `"module"` will be resolved by bundler with configured transpilation through `babel` for packages inside `node_modules`, written in modern JS. This target is fully supported in Node.js 16+ versions.
 
 ### Bundle for browsers
 
-Modern bundlers support ES modules and non-standard field `"browser"` in `package.json`. When field `browser` in specified in `package.json`, `@tramvai/build` will generate bundle in `ES2020` standard in `ES modules` format.
+Modern bundlers support ES modules and non-standard field `"browser"` in `package.json`. When field `browser` in specified in `package.json`, `@tramvai/build` will generate bundle in `ES2022` standard in `ES modules` format.
 
 If field `browser` in `package.json` is defined as a string then this string determines entry point to `browser` bundle and its name. E.g. when `"browser": "lib/browser.js"` entry point will be `src/browser.ts` and bundle will have a name `lib/browser.js`.
 
@@ -134,7 +134,7 @@ Otherwise, if field `browser` is defined as an object and build was called with 
 
 > Specification for the field [browser](https://github.com/defunctzombie/package-browser-field-spec)
 
-> `ES2020` code standard is generated as it is expected that bundle from `"browser"` field will be resolved by bundler with configured transpilation through `babel` for packages inside `node_modules` written in modern JS to the code according to the `browserslist` config.
+> `ES2022` code standard is generated as it is expected that bundle from `"browser"` field will be resolved by bundler with configured transpilation through `babel` for packages inside `node_modules` written in modern JS to the code according to the `browserslist` config.
 
 When building our package in the app with `webpack` with option `target: 'web'` bundle from field `browser` will be prioritized over field `module`.
 

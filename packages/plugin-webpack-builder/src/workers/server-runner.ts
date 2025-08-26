@@ -4,6 +4,7 @@ import '@tramvai/api/lib/utils/compile-cache';
 import path from 'node:path';
 import { parentPort, workerData } from 'node:worker_threads';
 import { Module } from 'node:module';
+import { logger } from '@tramvai/api/lib/services/logger';
 import {
   APPLICATION_SERVER_STARTED,
   COMPILE,
@@ -38,16 +39,22 @@ async function runServer() {
             // TODO: real filename
             requireFromString(message.code, 'server.js');
 
-            // TODO: replace with logger from di?
-            // eslint-disable-next-line no-console
-            console.log(`[server-runner-worker] application code executed successfully`);
+            logger.event({
+              type: 'debug',
+              event: 'server-runner-worker',
+              message: 'Application code executed successfully',
+            });
+
             parentPort!.postMessage({
               event: APPLICATION_SERVER_STARTED,
             } as ServerRunnerOutgoingEventsPayload['application-server-started']);
           } catch (error) {
-            // TODO: replace with logger from di?
-            // eslint-disable-next-line no-console
-            console.log(`[server-runner-worker] application code execution failed`, error);
+            logger.event({
+              type: 'warning',
+              event: 'server-runner-worker',
+              message: 'Application code execution failed',
+              payload: { error },
+            });
           }
           break;
         }
@@ -63,23 +70,38 @@ async function runServer() {
 runServer();
 
 process.on('unhandledRejection', (error) => {
-  // TODO: replace with logger from di?
-  // eslint-disable-next-line no-console
-  console.error(`[server-runner-worker] unhandledRejection`, error);
+  logger.event({
+    type: 'error',
+    event: 'server-runner-worker',
+    message: 'unhandledRejection',
+    payload: { error },
+  });
+
   process.exit(1);
 });
 
 process.on('uncaughtException', (error) => {
-  // TODO: replace with logger from di?
-  // eslint-disable-next-line no-console
-  console.error(`[server-runner-worker] uncaughtException`, error);
+  logger.event({
+    type: 'error',
+    event: 'server-runner-worker',
+    message: 'uncaughtException',
+    payload: { error },
+  });
+
   process.exit(1);
 });
 
 process.on('exit', (code) => {
-  // TODO: replace with logger from di?
-  // eslint-disable-next-line no-console
-  console.error(`[server-runner-worker] exit`, code);
+  if (code !== 0) {
+    logger.event({
+      type: 'error',
+      event: 'server-runner-worker',
+      message: 'exit',
+      payload: { code },
+    });
+  }
+
   // TODO: restart build process / just log?
+
   process.exit(code);
 });

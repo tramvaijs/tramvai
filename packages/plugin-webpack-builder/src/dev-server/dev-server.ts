@@ -6,6 +6,7 @@ import type {
   TRACER_TOKEN,
   DEV_SERVER_TOKEN,
 } from '@tramvai/api/lib/tokens';
+import { logger } from '@tramvai/api/lib/services/logger';
 import type { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/lib/config';
 import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
 import { BUILD_DONE, BUILD_FAILED, WATCH_RUN } from '../workers/webpack.events';
@@ -162,10 +163,15 @@ export function createDevServer({
           if (signal?.aborted) {
             resolve();
           } else {
-            // TODO: replace with logger from di?
-            // @ts-expect-error
-            // eslint-disable-next-line no-console
-            console.error(`server.js request failed:`, error?.cause?.errors);
+            logger.event({
+              type: 'error',
+              event: 'server-runner',
+              message: `server.js request failed`,
+              payload: {
+                // @ts-expect-error
+                errors: error?.cause?.errors,
+              },
+            });
             reject(error);
           }
         }
@@ -276,9 +282,7 @@ export function createDevServer({
         });
       }
 
-      proxy.listen();
-
-      // TODO await ready?
+      await proxy.listen();
 
       return {
         port: portManager.port!,
@@ -289,9 +293,8 @@ export function createDevServer({
             category: ['plugin-webpack-builder'],
           });
 
-          proxy.close();
-
           await Promise.all([
+            await proxy.close(),
             serverRunnerWorker.destroy(),
             serverWebpackWorker.destroy(),
             clientWebpackWorker.destroy(),

@@ -296,7 +296,7 @@ export class AnalyticsService {
     } catch (error) {
       this.#logger.event({
         type: 'error',
-        event: 'analytics-send-failed',
+        event: 'analytics',
         message: `Error sending analytics data: ${error instanceof Error ? error.message : String(error)}`,
       });
     }
@@ -315,8 +315,8 @@ export class AnalyticsService {
     this.#worker.on('error', (err) => {
       this.#logger.event({
         type: `error`,
-        event: 'analytics-worker-error',
-        message: `[analytics] worker error: ${err instanceof Error ? err.message : String(err)}`,
+        event: 'analytics',
+        message: `Worker error: ${err instanceof Error ? err.message : String(err)}`,
       });
     });
 
@@ -324,8 +324,8 @@ export class AnalyticsService {
       if (code !== 0) {
         this.#logger.event({
           type: `error`,
-          event: 'analytics-worker-exit',
-          message: `[analytics] worker exit with code: ${code}`,
+          event: 'analytics',
+          message: `Worker exit with code: ${code}`,
         });
       }
     });
@@ -344,7 +344,7 @@ export class AnalyticsService {
     global.__TRAMVAI_EXIT_HANDLERS__.push(async () => {
       this.#logger.event({
         type: 'info',
-        event: 'analytics-worker-exit',
+        event: 'analytics',
         message: 'Process shutting down, waiting for pending analytics to be sent',
       });
 

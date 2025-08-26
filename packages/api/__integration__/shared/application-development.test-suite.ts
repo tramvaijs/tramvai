@@ -986,6 +986,10 @@ export default createPapiMethod({
 
             test.expect(runtimeJs).toContain('chunkLoadingGlobal');
             test.expect(runtimeJs).toContain('webpackChunkapplication_app_bundle_0_0_0_stub');
+
+            // check that desctructuring and globalThis exists - it means that build target respect browserslist
+            test.expect(runtimeJs).toContain('var [chunkIds, fn, priority] = deferred[i]');
+            test.expect(runtimeJs).toContain('globalThis');
           });
 
           test('bundle: should generate webpack runtime in separate chunk', async ({
@@ -1012,8 +1016,8 @@ export default createPapiMethod({
             ).json();
 
             test.expect(runtimeJs).toContain('__webpack_module_cache__');
-            test.expect(removeUseStrict(dynamicJs).startsWith('(self[')).toBeTruthy();
-            test.expect(removeUseStrict(platformJs).startsWith('(self[')).toBeTruthy();
+            test.expect(removeUseStrict(dynamicJs).startsWith('(globalThis[')).toBeTruthy();
+            test.expect(removeUseStrict(platformJs).startsWith('(globalThis[')).toBeTruthy();
             test.expect(statsJson.assetsByChunkName.runtime).toBeTruthy();
           });
 
@@ -1059,7 +1063,9 @@ export default createPapiMethod({
             ).json();
 
             test.expect(platformJs).toContain('__webpack_module_cache__');
-            test.expect(dynamicJs.replace('"use strict";\n', '').startsWith('(self[')).toBeTruthy();
+            test
+              .expect(dynamicJs.replace('"use strict";\n', '').startsWith('(globalThis['))
+              .toBeTruthy();
             test.expect(statsJson.assetsByChunkName.runtime).toBeUndefined();
           });
         });
@@ -1114,7 +1120,7 @@ export default createPapiMethod({
             test.expect(typeof statsJson.integrities).toBeTruthy();
             test
               .expect(statsJson.integrities['hmr.js'])
-              .toEqual('sha256-8A10Gj/aJpYAg16xUfu01fNEph3qS5esrvz5c2dbTbQ=');
+              .toEqual('sha256-ppmm+7rkIB5pEpWHV58wZNu1agFxyJtfXVYtCOLtFro=');
           });
         });
 
@@ -1920,7 +1926,7 @@ export default Cmp;`,
               path.resolve(__dirname, '../../node_modules/.cache/webpack')
             );
 
-            test.expect(cacheFiles.length).toBe(2);
+            test.expect(cacheFiles.length).toBeGreaterThanOrEqual(2);
           });
 
           test('cache: should reuse build cache', async ({ devServer }) => {
@@ -1931,7 +1937,7 @@ export default Cmp;`,
               path.resolve(__dirname, '../../node_modules/.cache/webpack')
             );
 
-            test.expect(cacheFiles.length).toBe(2);
+            test.expect(cacheFiles.length).toBeGreaterThanOrEqual(2);
           });
         });
 

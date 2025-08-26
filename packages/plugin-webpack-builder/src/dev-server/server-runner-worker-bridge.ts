@@ -1,6 +1,7 @@
 import inspector from 'node:inspector';
 import { Worker } from 'node:worker_threads';
 import { ConfigService } from '@tramvai/api/lib/config';
+import { logger } from '@tramvai/api/lib/services/logger';
 import {
   APPLICATION_SERVER_STARTED,
   COMPILE,
@@ -36,6 +37,8 @@ export class ServerRunnerWorkerBridge {
   create() {
     const env: Record<string, string | undefined> = {
       ...process.env,
+      // force color output for worker - https://github.com/chalk/supports-color#info
+      FORCE_COLOR: '1',
     };
 
     if (process.env.TRAMVAI_INSPECT_SERVER_RUNTIME || this.#config.inspectServerRuntime) {
@@ -56,17 +59,23 @@ export class ServerRunnerWorkerBridge {
       //     : [],
     });
 
-    this.#worker.on('error', (err) => {
-      // TODO: replace with logger from di?
-      // eslint-disable-next-line no-console
-      console.log(`[server-runner-worker-bridge] worker error`, err);
+    this.#worker.on('error', (error) => {
+      logger.event({
+        type: 'info',
+        event: 'server-runner-worker-bridge',
+        message: `Worker error`,
+        payload: { error },
+      });
     });
 
     this.#worker.on('exit', (code) => {
       if (code !== 0) {
-        // TODO: replace with logger from di?
-        // eslint-disable-next-line no-console
-        console.log(`[server-runner-worker-bridge] worker exit`, code);
+        logger.event({
+          type: 'info',
+          event: 'server-runner-worker-bridge',
+          message: `Worker exit`,
+          payload: { code },
+        });
       }
     });
   }
