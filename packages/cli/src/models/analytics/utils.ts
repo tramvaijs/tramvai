@@ -1,7 +1,7 @@
 import { FeaturesProperties, ProjectProperties } from './analytics';
 import { ConfigEntry } from '../../typings/configEntry/common';
 import { ConfigManager } from '../config';
-import { ApplicationConfigEntry } from '../../api';
+import { ApplicationConfigEntry, ChildAppConfigEntry } from '../../api';
 
 const projectCache: { [key: string]: ProjectProperties } = {};
 const featuresCache: { [key: string]: FeaturesProperties } = {};
@@ -100,6 +100,21 @@ export function getFeaturesProperties({
           applicationProject.experiments?.viewTransitions ||
           applicationProject.experiments?.reactTransitions
         ) ?? false;
+    }
+
+    if (project.type === 'child-app') {
+      const childAppProject = project as ChildAppConfigEntry;
+      const transpilationLoader = childAppProject.experiments?.transpilation?.loader;
+
+      featuresCache[projectName].swc =
+        // @ts-expect-error incorrect branded type
+        (transpilationLoader === 'swc' ||
+          transpilationLoader?.development === 'swc' ||
+          transpilationLoader?.production === 'swc') ??
+        false;
+
+      featuresCache[projectName].reactCompiler =
+        !!childAppProject.experiments?.reactCompiler ?? false;
     }
   }
 

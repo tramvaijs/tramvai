@@ -128,7 +128,7 @@ export const httpClientFactory = ({
     }
 
     // environment variable in priority over disableCircuitBreaker
-    if (!isNil(forceDisabledCircuitBreaker)) {
+    if (forceDisabledCircuitBreaker === 'true') {
       adapterOptions.enableCircuitBreaker = !forceDisabledCircuitBreaker;
     }
 
