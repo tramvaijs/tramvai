@@ -1918,6 +1918,13 @@ export default Cmp;`,
             },
           });
 
+          test.beforeEach(async () => {
+            await fs.promises.rm(path.resolve(__dirname, '../../node_modules/.cache/webpack'), {
+              recursive: true,
+              force: true,
+            });
+          });
+
           test('cache: should generate build cache', async ({ devServer }) => {
             await devServer.buildPromise;
             await devServer.close();
@@ -1926,7 +1933,7 @@ export default Cmp;`,
               path.resolve(__dirname, '../../node_modules/.cache/webpack')
             );
 
-            test.expect(cacheFiles.length).toBeGreaterThanOrEqual(2);
+            test.expect(cacheFiles.length).toBe(2);
           });
 
           test('cache: should reuse build cache', async ({ devServer }) => {
@@ -1937,7 +1944,7 @@ export default Cmp;`,
               path.resolve(__dirname, '../../node_modules/.cache/webpack')
             );
 
-            test.expect(cacheFiles.length).toBeGreaterThanOrEqual(2);
+            test.expect(cacheFiles.length).toBe(2);
           });
         });
 
