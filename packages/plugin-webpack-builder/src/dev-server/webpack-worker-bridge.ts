@@ -10,6 +10,7 @@ import {
   WebpackWorkerOutgoingEventsPayload,
 } from '../workers/webpack.events';
 import { ProgressBar } from '../utils/progress-bar';
+import { filterWorkerStderr } from '../utils/filter';
 
 export class WebpackWorkerBridge {
   #worker: Worker | null = null;
@@ -68,6 +69,7 @@ export class WebpackWorkerBridge {
       workerData: this.#workerData,
       name: `${this.#workerData.target} webpack`,
       env,
+      stderr: !this.#config.verboseLogging,
       // if `process.execArgv` inherited from main thread, with `--inspect-brk` flag, current thread will be stucked
       execArgv: [],
       // `--inspect` and `--inspect-brk` for `worker_threads` only in Node.js >= 24.1 - https://github.com/nodejs/node/pull/56759
@@ -76,6 +78,10 @@ export class WebpackWorkerBridge {
       //     ? ['--inspect-brk', `--inspect=${inspectPort}`]
       //     : [],
     });
+
+    if (!this.#config.verboseLogging) {
+      filterWorkerStderr(this.#worker);
+    }
 
     this.#worker.on('error', (error) => {
       logger.event({

@@ -2126,6 +2126,54 @@ export default Cmp;`,
             test.expect(platformJs).toContain('//# sourceMappingURL=platform.js.map');
           });
         });
+
+        test.describe('verbose-logging', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-bundle',
+              rootDir: testSuiteFolder,
+              verboseLogging: true,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('verbose logging: should print all information in process output', async ({
+            spawnDevServer,
+          }) => {
+            const { logs } = spawnDevServer;
+
+            test
+              .expect(logs.some((log) => log.includes('LOG from webpack.Compilation')))
+              .toBeTruthy();
+          });
+        });
+
+        test.describe('disabled-verbose-logging', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-bundle',
+              rootDir: testSuiteFolder,
+              verboseLogging: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('verbose logging: disabled', async ({ spawnDevServer }) => {
+            const { logs } = spawnDevServer;
+
+            test
+              .expect(logs.every((log) => !log.includes('LOG from webpack.Compilation\n')))
+              .toBeTruthy();
+          });
+        });
       });
     });
 

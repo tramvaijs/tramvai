@@ -8,7 +8,6 @@
       "name": "cli-rewrited",
       "root": "src",
       "type": "application",
-      "modern": true,
       "fileSystemPages": {
         "enabled": true,
         "pagesDir": false

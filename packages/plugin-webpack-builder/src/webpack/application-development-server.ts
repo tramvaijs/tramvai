@@ -1,8 +1,11 @@
+/* eslint-disable max-statements */
 import path from 'node:path';
-import flatten from '@tinkoff/utils/array/flatten';
+import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
+
+import flatten from '@tinkoff/utils/array/flatten';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import { optional } from '@tinkoff/dippy';
 import {
@@ -10,6 +13,7 @@ import {
   resolveAbsolutePathForFolder,
 } from '@tramvai/api/lib/utils/path';
 import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
+
 import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
 import { resolvePublicPathDirectory } from './utils/publicPath';
 import { resolveUrl } from '../utils/url';
@@ -40,11 +44,38 @@ import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createOptimizeOptions } from './shared/optimization';
 import { PROVIDE_TOKEN } from './shared/provide';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
+import { ignoreWarnings } from './utils/warningsFilter';
+
+const filters = ignoreWarnings.map(
+  ({ message }) =>
+    (text: string) =>
+      message.test(text)
+);
+
+const stderrWithWarningFilters = new Writable({
+  write(chunk, encoding, callback) {
+    const chunkStr = chunk.toString();
+
+    if (filters.some((filter) => filter(chunkStr))) {
+      callback();
+      return;
+    }
+
+    process.stderr.write(chunk, encoding, callback);
+  },
+});
+
+stderrWithWarningFilters.on('error', (error: Error) =>
+  console.error('[infrastructureLogging] stream error', error)
+);
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
 }): Promise<Configuration> => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
+
+  const { verboseLogging } = config;
+
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
@@ -191,16 +222,14 @@ export default appConfig;`;
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
       warningsCount: false,
-      ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+      ...(verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
     },
+    ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
-      ...(config.verboseLogging ? { level: 'verbose', debug: true } : {}),
-      // ...(configManager.verboseLogging
-      //   ? {}
-      // TODO: TCORE-5273
-      //   : { stream: stderrWithWarningFilters }),
+      ...(verboseLogging ? { level: 'verbose', debug: true } : {}),
+      ...(verboseLogging ? {} : { stream: stderrWithWarningFilters }),
     },
     // TODO: pass as experiments.webpack parameter for fast researches
     experiments: {

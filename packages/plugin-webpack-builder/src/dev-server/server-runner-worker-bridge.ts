@@ -9,6 +9,7 @@ import {
   ServerRunnerIncomingEventsPayload,
   ServerRunnerOutgoingEventsPayload,
 } from '../workers/server-runner.events';
+import { filterWorkerStderr } from '../utils/filter';
 
 export type ServerRunnerkWorkerData = {
   port: number;
@@ -50,6 +51,7 @@ export class ServerRunnerWorkerBridge {
       workerData: this.#workerData,
       name: 'server runner',
       env,
+      stderr: !this.#config.verboseLogging,
       // if `process.execArgv` inherited from main thread, with `--inspect-brk` flag, current thread will be stucked
       execArgv: [],
       // `--inspect` and `--inspect-brk` for `worker_threads` only in Node.js >= 24.1 - https://github.com/nodejs/node/pull/56759
@@ -58,6 +60,10 @@ export class ServerRunnerWorkerBridge {
       //     ? ['--inspect-brk', `--inspect=9229`]
       //     : [],
     });
+
+    if (!this.#config.verboseLogging) {
+      filterWorkerStderr(this.#worker);
+    }
 
     this.#worker.on('error', (error) => {
       logger.event({

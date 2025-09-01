@@ -29,6 +29,15 @@ async function main() {
     staticPort: 4000,
   });
 
+  // TODO: respect verboseLogging in future cli
+  process.on('warning', (warn) => {
+    if (warn.name === 'DeprecationWarning') {
+      return;
+    }
+
+    console.warn(warn);
+  });
+
   process.on('exit', (code) => {
     console.error('wtf START exit', code);
 

@@ -1,21 +1,24 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
 import path from 'node:path';
-import flatten from '@tinkoff/utils/array/flatten';
+import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
-import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
-import VirtualModulesPlugin from 'webpack-virtual-modules';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import VirtualModulesPlugin from 'webpack-virtual-modules';
+
+import flatten from '@tinkoff/utils/array/flatten';
 import { optional } from '@tinkoff/dippy';
+import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
 } from '@tramvai/api/lib/utils/path';
 import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
+
 import {
   WEBPACK_DEBUG_STATS_OPTIONS,
   WEBPACK_DEBUG_STATS_FIELDS,
@@ -55,6 +58,30 @@ import { PurifyStatsPlugin } from './plugins/PurifyStatsPlugin';
 import { PROVIDE_TOKEN } from './shared/provide';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 import { normalizeBrowserslistConfig } from './shared/browserslist';
+import { ignoreWarnings } from './utils/warningsFilter';
+
+const filters = ignoreWarnings.map(
+  ({ message }) =>
+    (text: string) =>
+      message.test(text)
+);
+
+const stderrWithWarningFilters = new Writable({
+  write(chunk, encoding, callback) {
+    const chunkStr = chunk.toString();
+
+    if (filters.some((filter) => filter(chunkStr))) {
+      callback();
+      return;
+    }
+
+    process.stderr.write(chunk, encoding, callback);
+  },
+});
+
+stderrWithWarningFilters.on('error', (error: Error) =>
+  console.error('[infrastructureLogging] stream error', error)
+);
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -70,6 +97,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     hotRefresh,
     integrity,
     projectType,
+    verboseLogging,
   } = config;
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
@@ -235,16 +263,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
       warningsCount: false,
-      ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+      ...(verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
     },
+    ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
-      ...(config.verboseLogging ? { level: 'verbose', debug: true } : {}),
-      // ...(configManager.verboseLogging
-      //   ? {}
-      // TODO: TCORE-5273
-      //   : { stream: stderrWithWarningFilters }),
+      ...(verboseLogging ? { level: 'verbose', debug: true } : {}),
+      ...(verboseLogging ? {} : { stream: stderrWithWarningFilters }),
     },
     // TODO: pass as experiments.webpack parameter for fast researches
     experiments: {
@@ -292,9 +318,9 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         filename: STATS_FILE_NAME,
         stats: {
           ...DEV_STATS_OPTIONS,
-          ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+          ...(verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
         },
-        fields: [...DEV_STATS_FIELDS, ...(config.verboseLogging ? WEBPACK_DEBUG_STATS_FIELDS : [])],
+        fields: [...DEV_STATS_FIELDS, ...(verboseLogging ? WEBPACK_DEBUG_STATS_FIELDS : [])],
       }) as any as WebpackPluginInstance,
       showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
       new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
