@@ -1,4 +1,3 @@
-import { parse, minVersion } from 'semver';
 import fs from 'fs';
 import pMap from 'p-map';
 import type { Ora } from 'ora';
@@ -8,17 +7,12 @@ import { packageHasVersion } from '../../utils/commands/dependencies/packageHasV
 import { getLibPackageVersion } from './dependantLibs';
 import { isDependantLib, isUnifiedVersion } from '../../utils/tramvaiVersions';
 
-const getVersionFromDep = (dep?: string) => {
-  if (dep) {
-    return parse(dep)?.version || minVersion(dep)?.version;
-  }
-};
-
 const updateDependencies = (
   dependencies: Record<string, string> = {},
-  targetVersion: string,
-  prerelease: boolean,
+  version: string,
+  resolvedVersion: string,
   currentVersion: string,
+  tag: boolean,
   spinner: Ora
 ) => {
   return pMap<string, void>(
@@ -26,10 +20,12 @@ const updateDependencies = (
     async (dep) => {
       let nextVersion: string | undefined;
 
-      if (isUnifiedVersion(dep) && getVersionFromDep(dependencies[dep]) === currentVersion) {
-        nextVersion = targetVersion;
+      if (isUnifiedVersion(dep) && dependencies[dep] === currentVersion) {
+        nextVersion = resolvedVersion;
       } else if (isDependantLib(dep)) {
-        const libVersion = await getLibPackageVersion(dep, targetVersion, prerelease);
+        const libVersion = tag
+          ? resolvedVersion
+          : await getLibPackageVersion(dep, version, resolvedVersion, spinner);
         nextVersion = libVersion;
       }
 
@@ -64,8 +60,9 @@ const updateDependencies = (
 
 export const updatePackageJson = async (
   version: string,
+  resolvedVersion: string,
   currentVersion: string,
-  prerelease?: boolean,
+  tag?: boolean,
   path = '.'
 ) => {
   const packageJsonPath = resolve(path, 'package.json');
@@ -75,13 +72,28 @@ export const updatePackageJson = async (
   const spinner = ora(`Updating package.json versions`).start();
 
   try {
-    await updateDependencies(content.dependencies, version, prerelease, currentVersion, spinner);
-    await updateDependencies(content.devDependencies, version, prerelease, currentVersion, spinner);
+    await updateDependencies(
+      content.dependencies,
+      version,
+      resolvedVersion,
+      currentVersion,
+      tag,
+      spinner
+    );
+    await updateDependencies(
+      content.devDependencies,
+      version,
+      resolvedVersion,
+      currentVersion,
+      tag,
+      spinner
+    );
     await updateDependencies(
       content.peerDependencies,
       version,
-      prerelease,
+      resolvedVersion,
       currentVersion,
+      tag,
       spinner
     );
 

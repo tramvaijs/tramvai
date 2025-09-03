@@ -10,7 +10,15 @@ class UpdateCommand extends CLICommand {
 
   command = `update [to]`;
 
-  options = [];
+  options = [
+    {
+      name: '-t, --tag',
+      value: '[tag]',
+      transformer: (value: string) => value !== 'false',
+      description:
+        'Install target version as is - useful for dist tags like prerelease / stable-v5.x.x/ custom tags',
+    },
+  ];
 
   alias = 'u';
 

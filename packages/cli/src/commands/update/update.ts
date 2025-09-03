@@ -9,13 +9,14 @@ import { findTramvaiVersion } from '../../utils/commands/dependencies/findTramva
 
 export type Params = {
   to: string;
+  tag?: boolean;
 };
 
 export default async (
   context: Context,
-  { to: version = 'latest' }: Params
+  { to: version = 'latest', tag }: Params
 ): Promise<CommandResult> => {
-  const targetVersion = await getLatestPackageVersion('@tramvai/cli', version);
+  const resolvedVersion = tag ? version : await getLatestPackageVersion('@tramvai/cli', version);
   const currentVersion = await findTramvaiVersion();
 
   if (!currentVersion) {
@@ -24,7 +25,7 @@ export default async (
     );
   }
 
-  if (currentVersion === version) {
+  if (currentVersion === version || currentVersion === resolvedVersion) {
     throw new Error(
       'The installed version is equal to the current version, no update is required.'
     );
@@ -33,18 +34,18 @@ export default async (
   context.logger.event({
     type: 'info',
     event: 'resolving-version',
-    message: `Tramvai version resolved to ${targetVersion}`,
+    message: `Next tramvai version resolved to ${tag ? 'tag' : 'version'} "${resolvedVersion}", current version is "${currentVersion}"`,
   });
 
   if (context.packageManager.workspaces) {
     await Promise.all(
       context.packageManager.workspaces.map((directory) =>
-        updatePackageJson(targetVersion, currentVersion, version === 'prerelease', directory)
+        updatePackageJson(version, resolvedVersion, currentVersion, tag, directory)
       )
     );
   }
 
-  await updatePackageJson(targetVersion, currentVersion, version === 'prerelease');
+  await updatePackageJson(version, resolvedVersion, currentVersion, tag);
 
   context.logger.event({
     type: 'info',
