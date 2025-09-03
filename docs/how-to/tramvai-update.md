@@ -43,6 +43,12 @@ or
 tramvai update 1.0.0
 ```
 
+## Upgrading to a specific dist tag
+
+```bash
+tramvai update stable-v5.x.x --tag
+```
+
 ## Installing the new tramvai package in the app
 
 `tramvai add <packageName>` by default installs the package to `dependencies`:
