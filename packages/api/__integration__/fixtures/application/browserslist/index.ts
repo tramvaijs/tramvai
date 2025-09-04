@@ -1,3 +1,3 @@
-import browserslistConfig from 'virtual:tramvai/browserslist';
+import browserslistConfig from '@tramvai/cli/lib/external/browserslist-normalized-file-config';
 
 console.log(browserslistConfig);

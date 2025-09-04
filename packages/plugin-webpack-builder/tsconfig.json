@@ -25,6 +25,9 @@
         },
         {
             "path": "../libs/webpack-dedupe-plugin"
+        },
+        {
+            "path": "../libs/is-modern-lib"
         }
     ]
 }

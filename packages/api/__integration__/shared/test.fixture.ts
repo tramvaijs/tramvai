@@ -17,6 +17,8 @@ export const test = base.extend<TestFixture, WorkerFixture>({
   inputParameters: [
     {
       name: 'default',
+      fileCache: false,
+      noRebuild: true,
     },
     { option: true },
   ],

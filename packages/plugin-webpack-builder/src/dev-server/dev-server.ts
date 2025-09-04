@@ -64,12 +64,20 @@ export function createDevServer({
         serverRunnerPort,
       });
 
-      let resolve: Function;
-      let reject: Function;
+      let closedPromise: Promise<any> | null = null;
+      let serverResolve: Function;
+      let serverReject: Function;
+      let clientResolve: Function;
+      let clientReject: Function;
       // eslint-disable-next-line promise/param-names
-      const promise = new Promise<void>((res, rej) => {
-        resolve = res;
-        reject = rej;
+      const serverPromise = new Promise<void>((res, rej) => {
+        serverResolve = res;
+        serverReject = rej;
+      });
+      // eslint-disable-next-line promise/param-names
+      const clientPromise = new Promise<void>((res, rej) => {
+        clientResolve = res;
+        clientReject = rej;
       });
 
       const webpackWorkerPath = path.resolve(__dirname, '..', 'workers', 'webpack.js');
@@ -158,10 +166,10 @@ export function createDevServer({
             }
           );
 
-          resolve();
+          serverResolve();
         } catch (error) {
           if (signal?.aborted) {
-            resolve();
+            serverResolve();
           } else {
             logger.event({
               type: 'error',
@@ -172,7 +180,7 @@ export function createDevServer({
                 errors: error?.cause?.errors,
               },
             });
-            reject(error);
+            serverReject(error);
           }
         }
       }
@@ -204,7 +212,9 @@ export function createDevServer({
           }
         });
         serverWebpackWorker.subscribe(BUILD_FAILED, (data) => {
-          reject(data.errors);
+          serverReject(data.errors);
+
+          compileServerAfterBuild();
 
           if (measureServerWebpackWorker) {
             measureServerWebpackWorker();
@@ -238,9 +248,7 @@ export function createDevServer({
 
         // TODO: DEV_SERVER_STARTED
         clientWebpackWorker.subscribe(BUILD_DONE, () => {
-          if (buildType === 'client') {
-            resolve();
-          }
+          clientResolve();
 
           if (measureClientWebpackWorker) {
             measureClientWebpackWorker();
@@ -256,7 +264,7 @@ export function createDevServer({
           }
         });
         clientWebpackWorker.subscribe(BUILD_FAILED, (data) => {
-          reject(data.errors);
+          clientReject(data.errors);
 
           if (measureClientWebpackWorker) {
             measureClientWebpackWorker();
@@ -287,21 +295,40 @@ export function createDevServer({
       return {
         port: portManager.port!,
         staticPort: portManager.staticPort!,
+        httpServer: proxy.httpServer,
+        staticHttpServer: proxy.staticHttpServer,
         close: async () => {
+          if (closedPromise) {
+            await closedPromise;
+            return;
+          }
+
           tracer.mark({
             event: 'dev-server.close',
             category: ['plugin-webpack-builder'],
           });
 
-          await Promise.all([
-            await proxy.close(),
+          closedPromise = Promise.all([
+            proxy.close(),
             serverRunnerWorker.destroy(),
             serverWebpackWorker.destroy(),
             clientWebpackWorker.destroy(),
             ...closeHandlers.map((handler) => handler()),
           ]);
+
+          await closedPromise;
         },
-        buildPromise: promise,
+        invalidate: async () => {
+          await Promise.all([serverWebpackWorker.invalidate(), clientWebpackWorker.invalidate()]);
+        },
+        // need to wait for all builds to finish, because if we close compilation right after first build (e.g. in tests),
+        // file-system caches will not be flushed for the other build
+        buildPromise: Promise.allSettled(
+          [
+            (buildType === 'all' || buildType === 'server') && serverPromise,
+            (buildType === 'all' || buildType === 'client') && clientPromise,
+          ].filter(Boolean)
+        ).then(() => {}),
       };
     },
   };

@@ -9,7 +9,7 @@ import { enumerateErrorProperties } from '../utils/errors';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
-  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<void>>;
+  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
 }
 
 export type LEVEL = 'INFO' | 'WARN' | 'ERROR';
@@ -82,6 +82,7 @@ export type FeaturesProperties = {
   modulePwa?: boolean;
   viewTransitions?: boolean;
   transitionsRouterProvider?: boolean;
+  experimentalWebpackWorkerThreads?: boolean;
 };
 
 export type VcsProperties = {
@@ -230,9 +231,15 @@ export class AnalyticsService {
     this.memoryMonitor = createMemoryMonitor({ sampleInterval: 250 });
     this.memoryMonitor.start();
 
-    process.on('SIGINT', this.memoryMonitor.stop);
-    process.on('SIGTERM', this.memoryMonitor.stop);
-    process.on('exit', this.memoryMonitor.stop);
+    // CLI will wait for this handlers before exiting
+    // @reference `packages/cli/src/cli/runCLI.ts`
+    if (!global.__TRAMVAI_EXIT_HANDLERS__) {
+      global.__TRAMVAI_EXIT_HANDLERS__ = [];
+    }
+
+    global.__TRAMVAI_EXIT_HANDLERS__.push(async () => {
+      this.memoryMonitor?.stop();
+    });
   }
 
   #initErrorHandlers() {

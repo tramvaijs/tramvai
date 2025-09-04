@@ -14,6 +14,7 @@ import type { Config as SvgoConfig } from 'svgo';
 import type { TramvaiPlugin } from '../core/plugin';
 import { resolveAbsolutePathForFile } from '../utils/path';
 import { packageVersion } from '../utils/package-version';
+import { logger } from '../services/logger';
 
 export interface SharpEncodeOptions {
   encodeOptions?: {
@@ -176,6 +177,7 @@ export type InputParameters = {
   name: string;
   mode?: 'development' | 'production';
   port?: number;
+  host?: string;
   staticPort?: number;
   staticHost?: string;
   https?: boolean;
@@ -226,6 +228,16 @@ export type InputParameters = {
    * @default false
    */
   showProgress?: boolean;
+  /**
+   * Enables cache for build
+   * @default true
+   */
+  fileCache?: boolean;
+  /**
+   * Enables cache profiling
+   * @default false
+   */
+  cacheProfile?: boolean;
 };
 
 export type Project = ApplicationProject | ChildAppProject;
@@ -238,8 +250,21 @@ export interface BaseProject {
 
   /**
    * Enables data-qa-tag plugin for transpiler
+   * @default false
    */
   generateDataQaTag?: boolean;
+
+  /**
+   * @title Enable babel plugin `fill-declare-action-name` (not supported with swc transpiler)
+   * @default false
+   */
+  enableFillDeclareActionNamePlugin?: boolean;
+
+  /**
+   * @title transpile libs based only on %40tinkoff/is-modern-lib
+   * @default true
+   */
+  transpileOnlyModernLibs?: boolean;
 
   /**
    * React hot-refresh options
@@ -259,16 +284,24 @@ export interface BaseProject {
      */
     options?: PluginOptions<any, any>;
   };
+
   /**
-   * Enables cache for build
-   * @default true
+   * @title Enable source maps for client and server builds
+   * @default { development: false, production: true }
    */
-  fileCache?: boolean;
+  sourceMap?:
+    | boolean
+    | {
+        development: boolean;
+        production: boolean;
+      };
+
   /**
-   * Enables cache profiling
+   * @title backwards compatibility for `*.less` files processing
+   * @deprecated prefer CSS Modules and PostCSS usage, this option will be removed in future releases
    * @default false
    */
-  cacheProfile?: boolean;
+  deprecatedLessSupport?: boolean;
 }
 
 export interface ApplicationProject extends BaseProject {
@@ -306,7 +339,6 @@ export interface ApplicationProject extends BaseProject {
   polyfill?: string;
   modernPolyfill?: string;
   dedupe?: DedupeOptions;
-  assetsPrefix?: string;
   integrity?: SubresourceIntegrityPluginOptions;
   /**
    * @title Webpack Runtime Chunk settings
@@ -666,6 +698,23 @@ export class ConfigService {
     return this.#project.integrity ?? false;
   }
 
+  get runtimeChunk() {
+    if (this.#project.type === 'child-app') {
+      return null;
+    }
+
+    return this.#project.runtimeChunk ?? false;
+  }
+
+  get sourceMap(): boolean {
+    // eslint-disable-next-line no-nested-ternary
+    return typeof this.#project.sourceMap === 'boolean'
+      ? this.#project.sourceMap
+      : this.mode === 'development'
+        ? (this.#project.sourceMap?.development ?? false)
+        : (this.#project.sourceMap?.production ?? true);
+  }
+
   get hotRefresh(): BaseProject['hotRefresh'] {
     return {
       enabled: this.#project.hotRefresh?.enabled ?? true,
@@ -684,12 +733,24 @@ export class ConfigService {
     return this.#project.generateDataQaTag ?? false;
   }
 
+  get enableFillDeclareActionNamePlugin() {
+    return this.#project.enableFillDeclareActionNamePlugin ?? false;
+  }
+
+  get transpileOnlyModernLibs() {
+    return this.#project.transpileOnlyModernLibs ?? true;
+  }
+
   get fileCache() {
-    return this.#project.fileCache ?? true;
+    return this.#parameters.fileCache ?? true;
   }
 
   get cacheProfile() {
-    return this.#project.cacheProfile ?? false;
+    return this.#parameters.cacheProfile ?? false;
+  }
+
+  get deprecatedLessSupport() {
+    return this.#project.deprecatedLessSupport ?? false;
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {
@@ -706,7 +767,16 @@ export class ConfigService {
           this.#configPath = result.filepath;
           return result.config;
         }
-        throw Error(`tramvai configuration file not found`);
+        // TODO: flag to throw error if config not found?
+        logger.event({
+          type: 'error',
+          event: 'config-service',
+          message: '"tramvai.config.ts" configuration file not found',
+        });
+        return {
+          projects: {},
+          plugins: [],
+        };
       });
   }
 

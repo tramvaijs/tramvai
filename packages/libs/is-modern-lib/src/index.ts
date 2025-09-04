@@ -99,6 +99,11 @@ export const modernLibsFilter = (filePath: string): boolean => {
     return false;
   }
 
+  // we can't resolve virtual module package.json
+  if (filePath.includes('virtual:tramvai')) {
+    return false;
+  }
+
   const results = filePath.match(MODULE_DIR);
   const packagePath = results && results[1];
   const cacheKey = packagePath || filePath;

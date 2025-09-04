@@ -126,7 +126,7 @@ export async function installDependencies({
 
   // Install cli and core packages into the root of repository if using workspaces for update command to work correctly
   if (workspace !== undefined) {
-    console.log(`${chalk.blue('[DEPENDENCIES]')} Installing root dependencies`);
+    console.log(`${chalk.blue('[DEPENDENCIES]')} Installing root dev dependencies`);
 
     await packageManager.install({
       packageNames: deps(type, { isDev: true, isRoot: true }),
@@ -135,7 +135,7 @@ export async function installDependencies({
       workspace: undefined,
     });
 
-    console.log(`${chalk.blue('[DEPENDENCIES]')} Installing root dev dependencies`);
+    console.log(`${chalk.blue('[DEPENDENCIES]')} Installing root dependencies`);
 
     await packageManager.install({
       packageNames: deps(type, { isDev: false, isRoot: true }),

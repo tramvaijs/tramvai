@@ -1,10 +1,14 @@
+import type { Server } from 'node:http';
 import { createToken } from '@tinkoff/dippy';
 
 export type DevServer = {
   close(): Promise<void>;
+  invalidate(): Promise<void>;
   buildPromise: Promise<void>;
   port: number;
   staticPort: number;
+  httpServer?: Server;
+  staticHttpServer?: Server;
 };
 
 export const DEV_SERVER_TOKEN = createToken<DevServerApi>('tramvai dev-server');

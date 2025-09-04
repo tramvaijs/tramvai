@@ -64,6 +64,7 @@ packages/api/__integration__/fixtures/application/broken-ssr/dynamic.ts
 packages/api/__integration__/fixtures/application/fs-routing/routes/bar
 packages/api/__integration__/fixtures/application/fs-routing/pages
 packages/api/__integration__/fixtures/application/papi/api/pong.ts
+!packages/api/__integration__/fixtures/application/**/node_modules
 
 # package-lock
 examples/*/package-lock.json

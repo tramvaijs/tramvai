@@ -7,6 +7,8 @@ export const BUILD_DONE = 'build-done';
 export const BUILD_FAILED = 'build-failed';
 export const WATCH_RUN = 'watch-run';
 export const PROGRESS = 'progress';
+export const INVALIDATE = 'invalidate';
+export const INVALIDATE_DONE = 'invalidate-done';
 export const EXIT = 'exit';
 
 export type WebpackWorkerData = {
@@ -18,6 +20,9 @@ export type WebpackWorkerData = {
 };
 
 export type WebpackWorkerIncomingEventsPayload = {
+  [INVALIDATE]: {
+    event: typeof INVALIDATE;
+  };
   [EXIT]: {
     event: typeof EXIT;
   };
@@ -43,5 +48,8 @@ export type WebpackWorkerOutgoingEventsPayload = {
   };
   [WATCH_RUN]: {
     event: typeof WATCH_RUN;
+  };
+  [INVALIDATE_DONE]: {
+    event: typeof INVALIDATE_DONE;
   };
 };

@@ -23,12 +23,19 @@ import {
   BUILD_FAILED,
   DEV_SERVER_STARTED,
   EXIT,
+  INVALIDATE,
+  INVALIDATE_DONE,
   WATCH_RUN,
   WebpackWorkerData,
   WebpackWorkerIncomingEventsPayload,
   WebpackWorkerOutgoingEventsPayload,
 } from './webpack.events';
 import { BUILD_TARGET_TOKEN } from '../webpack/webpack-config';
+
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
+}
 
 // eslint-disable-next-line max-statements
 async function runWebpackDevServer() {
@@ -169,15 +176,15 @@ async function runWebpackDevServer() {
     next();
   });
 
+  const devMiddleware = webpackDevMiddleware(compiler, {
+    writeToDisk: false,
+    publicPath: resolvePublicPathDirectory(
+      target === 'server' ? config.outputServer : config.outputClient
+    ),
+  });
+
   // TODO: parameter to configure { writeToDisk: true } - can be much less memory consumption
-  app.use(
-    webpackDevMiddleware(compiler, {
-      writeToDisk: false,
-      publicPath: resolvePublicPathDirectory(
-        target === 'server' ? config.outputServer : config.outputClient
-      ),
-    })
-  );
+  app.use(devMiddleware);
 
   if (config.hotRefresh?.enabled) {
     app.use(
@@ -207,12 +214,35 @@ async function runWebpackDevServer() {
     'message',
     ({ event }: WebpackWorkerIncomingEventsPayload[keyof WebpackWorkerIncomingEventsPayload]) => {
       switch (event) {
+        // we need to terminate worker after compiler is closed, and all event loop active handles are closed,
+        // for example `chokidar` file watchers, otherwise, parent process will be exited prematurelly with "SIGABRT" signal.
         case EXIT:
-          compiler.close((error) => {
-            // we need to terminate worker after compiler is closed, and all event loop active handles are closed,
-            // for example `chokidar` file watchers, otherwise, parent process will be exited prematurelly with "SIGABRT" signal.
-            process.exit(0);
-          });
+          // @ts-expect-error
+          if (devMiddleware.context.watching?.running) {
+            // we don't need to wait for callback, because if build in progress, it will be waiting for finish
+            compiler.close(() => {});
+
+            setTimeout(() => {
+              process.exit(0);
+            });
+          } else {
+            compiler.close((error) => {
+              process.exit(0);
+            });
+          }
+          break;
+        case INVALIDATE:
+          if (devMiddleware.context.watching) {
+            devMiddleware.context.watching.invalidate(() => {
+              parentPort!.postMessage({
+                event: INVALIDATE_DONE,
+              } as WebpackWorkerOutgoingEventsPayload['invalidate-done']);
+            });
+          } else {
+            parentPort!.postMessage({
+              event: INVALIDATE_DONE,
+            } as WebpackWorkerOutgoingEventsPayload['invalidate-done']);
+          }
           break;
       }
     }
@@ -265,7 +295,7 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-process.on('exit', (code) => {
+async function runExitHandlersAndQuit(code: number) {
   if (code !== 0) {
     logger.event({
       type: 'error',
@@ -275,5 +305,10 @@ process.on('exit', (code) => {
     });
   }
 
+  if (global.__TRAMVAI_EXIT_HANDLERS__) {
+    await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
+  }
   process.exit(code);
-});
+}
+
+process.on('exit', async (code) => runExitHandlersAndQuit(code));

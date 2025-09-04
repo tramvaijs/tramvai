@@ -106,6 +106,16 @@ interface WebpackConfigOptions {
    * @default false
    */
   devtool?: DevtoolOption;
+  /**
+   * @title The externals configuration option provides a way of excluding dependencies from the output bundles
+   * @see https://webpack.js.org/configuration/externals/
+   */
+  externals?:
+    | string[]
+    | {
+        development?: string[];
+        production?: string[];
+      };
 }
 
 const webpackConfigExtension = {
@@ -114,8 +124,9 @@ const webpackConfigExtension = {
       resolveFallback: project.webpack?.resolveFallback ?? {},
       resolveAlias: project.webpack?.resolveAlias ?? {},
       provide: project.webpack?.provide ?? {},
-      watchOptions: project.webpack?.watchOptions ?? {},
+      watchOptions: project.webpack?.watchOptions,
       devtool: project.webpack?.devtool ?? false,
+      externals: project.webpack?.externals,
     };
   },
 };

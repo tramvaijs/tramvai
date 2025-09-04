@@ -4,6 +4,8 @@ import { ConfigService } from '@tramvai/api/lib/config';
 import { logger } from '@tramvai/api/lib/services/logger';
 import {
   EXIT,
+  INVALIDATE,
+  INVALIDATE_DONE,
   PROGRESS,
   WebpackWorkerData,
   WebpackWorkerIncomingEventsPayload,
@@ -44,6 +46,9 @@ export class WebpackWorkerBridge {
       FORCE_COLOR: '1',
     };
 
+    if ('NODE_TLS_REJECT_UNAUTHORIZED' in process.env) {
+      env.NODE_TLS_REJECT_UNAUTHORIZED = process.env.NODE_TLS_REJECT_UNAUTHORIZED!;
+    }
     if (process.env.TRAMVAI_CPU_PROFILE) {
       env.TRAMVAI_CPU_PROFILE = process.env.TRAMVAI_CPU_PROFILE;
       env.__TRAMVAI_CPU_PROFILE_FILENAME = `tramvai.${this.#workerData.type}-${this.#workerData.target}-webpack-worker`;
@@ -53,6 +58,9 @@ export class WebpackWorkerBridge {
     }
     if (process.env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED) {
       env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED = process.env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED;
+    }
+    if (process.env.TRAMVAI_THREAD_LOADER_WORKERS) {
+      env.TRAMVAI_THREAD_LOADER_WORKERS = process.env.TRAMVAI_THREAD_LOADER_WORKERS;
     }
     if (this.#config.inspectBuildProcess) {
       const inspectPort = this.#workerData.target === 'client' ? '9227' : '9228';
@@ -66,7 +74,18 @@ export class WebpackWorkerBridge {
     }
 
     this.#worker = new Worker(this.#workerPath, {
-      workerData: this.#workerData,
+      workerData: {
+        ...this.#workerData,
+        extraConfiguration: {
+          projects: this.#workerData.extraConfiguration.projects,
+          // pass only serializable plugins
+          plugins: this.#workerData.extraConfiguration.plugins
+            ? this.#workerData.extraConfiguration.plugins.filter(
+                (plugin) => typeof plugin === 'string'
+              )
+            : [],
+        },
+      },
       name: `${this.#workerData.target} webpack`,
       env,
       stderr: !this.#config.verboseLogging,
@@ -108,6 +127,22 @@ export class WebpackWorkerBridge {
         });
       }
     });
+  }
+
+  async invalidate() {
+    if (this.#worker) {
+      await new Promise<void>((resolve) => {
+        this.#worker!.once('message', (data) => {
+          if (data.event === INVALIDATE_DONE) {
+            resolve();
+          }
+        });
+
+        this.#worker!.postMessage({
+          event: INVALIDATE,
+        } as WebpackWorkerIncomingEventsPayload['invalidate']);
+      });
+    }
   }
 
   async destroy() {

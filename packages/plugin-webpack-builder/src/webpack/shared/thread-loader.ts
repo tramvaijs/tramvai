@@ -11,14 +11,22 @@ export type WorkerPoolConfig = {
 };
 
 function calculateNumberOfWorkers() {
+  if (
+    typeof process.env.TRAMVAI_THREAD_LOADER_WORKERS === 'string' &&
+    !Number.isNaN(Number(process.env.TRAMVAI_THREAD_LOADER_WORKERS))
+  ) {
+    return Number(process.env.TRAMVAI_THREAD_LOADER_WORKERS);
+  }
+
   // There are situations when this call will return undefined so
   // we are fallback here to 1.
   // More info on: https://github.com/nodejs/node/issues/19022
   const cpus = os.cpus() || {
     length: 1,
   };
-  // use a half of the available CPUs per different webpack worker
-  return Math.max(1, cpus.length / 2 - 1);
+  // for transpilation use a half of the available CPUs per different webpack worker,
+  // also leave at least 3 CPUs free (for webpack workers itself and server-runner worker)
+  return Math.max(1, (cpus.length - 3) / 2);
 }
 
 export const createWorkerPoolConfig = ({ di }: { di: Container }): WorkerPoolConfig => {

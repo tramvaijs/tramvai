@@ -1,3 +1,4 @@
+import os from 'os';
 import * as threadLoader from 'thread-loader';
 import { getPool } from 'thread-loader/dist/workerPools';
 import type Config from 'webpack-chain';
@@ -10,6 +11,24 @@ const getCustomConfig = (configManager: ConfigManager<CliConfigEntry>): any => {
   return additionalConfig || {};
 };
 
+function calculateNumberOfWorkers() {
+  if (
+    typeof process.env.TRAMVAI_THREAD_LOADER_WORKERS === 'string' &&
+    !Number.isNaN(Number(process.env.TRAMVAI_THREAD_LOADER_WORKERS))
+  ) {
+    return Number(process.env.TRAMVAI_THREAD_LOADER_WORKERS);
+  }
+  // There are situations when this call will return undefined so
+  // we are fallback here to 1.
+  // More info on: https://github.com/nodejs/node/issues/19022
+  const cpus = os.cpus() || {
+    length: 1,
+  };
+  // for transpilation use a half of the available CPUs per different webpack worker,
+  // also leave at least 1 CPUs free (for process itself)
+  return Math.max(1, cpus.length - 1);
+}
+
 const createWorkerPoolConfig = (configManager: ConfigManager<CliConfigEntry>) => {
   return {
     poolTimeout: configManager.env === 'development' ? Infinity : undefined,
@@ -18,11 +37,13 @@ const createWorkerPoolConfig = (configManager: ConfigManager<CliConfigEntry>) =>
     poolRespawn: configManager.env === 'development',
     ...getCustomConfig(configManager),
     name: 'tramvai-worker-pool',
+    workers: calculateNumberOfWorkers(),
   };
 };
 
 const isApplicable = (configManager: ConfigManager<CliConfigEntry>) => {
   return (
+    process.env.TRAMVAI_DISABLE_THREAD_LOADER !== 'true' &&
     // thread-loader uses child_process.fork under the hood, and sometimes (50/50) work in these processes does not get into inspector.Session profile
     !process.env.TRAMVAI_CPU_PROFILE &&
     !process.env.TRAMVAI_DEBUG_BUILD &&

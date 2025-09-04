@@ -117,6 +117,13 @@ export class StartCommand extends CLICommand<Params> {
       value: '[httpsCert]',
       description: 'Path to https certificate',
     },
+    {
+      name: '--experimentalWebpackWorkerThreads',
+      value: '[experimentalWebpackWorkerThreads]',
+      transformer: (value: string) => value !== 'false',
+      description:
+        'Enable new experimental @tramvai/api builder to run webpack compilation in worker threads',
+    },
   ];
 
   alias = 's';

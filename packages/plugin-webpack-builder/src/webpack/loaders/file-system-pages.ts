@@ -127,21 +127,23 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
       return fsPages;
     };
 
-    const fsRoutes = fileSystemPages.routesDir
-      ? await filesToPages({
-          pagesRootDirectory: fileSystemPages.routesDir,
-          isRoutes: true,
-          test: new RegExp(`index${extensionsRegexp.source}`),
-        })
-      : [];
-    const fsPages = fileSystemPages.pagesDir
-      ? await filesToPages({
-          pagesRootDirectory: fileSystemPages.pagesDir,
-          test: fileSystemPages.componentsPattern
-            ? new RegExp(fileSystemPages.componentsPattern)
-            : extensionsRegexp,
-        })
-      : [];
+    const fsRoutes =
+      fileSystemPages.enabled && fileSystemPages.routesDir
+        ? await filesToPages({
+            pagesRootDirectory: fileSystemPages.routesDir,
+            isRoutes: true,
+            test: new RegExp(`index${extensionsRegexp.source}`),
+          })
+        : [];
+    const fsPages =
+      fileSystemPages.enabled && fileSystemPages.pagesDir
+        ? await filesToPages({
+            pagesRootDirectory: fileSystemPages.pagesDir,
+            test: fileSystemPages.componentsPattern
+              ? new RegExp(fileSystemPages.componentsPattern)
+              : extensionsRegexp,
+          })
+        : [];
 
     const code = `import { lazy } from '@tramvai/react';
 

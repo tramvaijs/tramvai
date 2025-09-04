@@ -1,4 +1,4 @@
-/* eslint-disable max-statements */
+/* eslint-disable max-statements, complexity */
 import path from 'node:path';
 import { Writable } from 'node:stream';
 import webpack from 'webpack';
@@ -33,6 +33,7 @@ import {
   RESOLVE_FALLBACK_TOKEN,
   RESOLVE_ALIAS_TOKEN,
   defaultExtensions,
+  createResolveOptions,
 } from './shared/resolve';
 import { normalizeBrowserslistConfig } from './shared/browserslist';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
@@ -45,6 +46,9 @@ import { createOptimizeOptions } from './shared/optimization';
 import { PROVIDE_TOKEN } from './shared/provide';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 import { ignoreWarnings } from './utils/warningsFilter';
+import { createSourceMaps } from './shared/sourcemaps';
+
+const mainFields = ['module', 'main'];
 
 const filters = ignoreWarnings.map(
   ({ message }) =>
@@ -85,13 +89,11 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
   const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
+  const webpackConfigExtension = config.extensions.webpack();
 
-  const { devtool, watchOptions, resolveAlias, resolveFallback, provide } =
-    config.extensions.webpack();
-
-  Object.assign(fallback, resolveFallback);
-  Object.assign(alias, resolveAlias);
-  Object.assign(provideList, provide);
+  Object.assign(fallback, webpackConfigExtension.resolveFallback);
+  Object.assign(alias, webpackConfigExtension.resolveAlias);
+  Object.assign(provideList, webpackConfigExtension.provide);
 
   const transpilerParameters = resolveWebpackTranspilerParameters({ di });
   const workerPoolConfig = createWorkerPoolConfig({ di });
@@ -116,10 +118,14 @@ export default appConfig;`;
   const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
 
   const virtualModulesPlugin = new VirtualModulesPlugin({
-    'virtual:tramvai/config': virtualTramvaiConfig,
+    // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/config.js`,
+    // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
+    // 'virtual:tramvai/config': virtualTramvaiConfig,
     // alias from @tramvai/cli/lib/external/config will be resolved to this request
     '/node_modules/virtual:tramvai/config.js': virtualTramvaiConfig,
-    'virtual:tramvai/browserslist': `export default ${browserslistConfig}`,
+    // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/browserslist.js`,
+    // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
+    // 'virtual:tramvai/browserslist': `export default ${browserslistConfig}`,
     // alias from @tramvai/cli/lib/external/browserslist-normalized-file-config will be resolved to this request
     '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
   });
@@ -134,6 +140,10 @@ export default appConfig;`;
   // TODO: test cacheUnaffected, lazyCompilation
 
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
+
+  const sourceMapsConfiguration = createSourceMaps({ config, target: 'server' });
+
+  const resolveOptions = await createResolveOptions({ di, mainFields });
 
   return {
     // https://webpack.js.org/configuration/target/#browserslist
@@ -176,15 +186,17 @@ export default appConfig;`;
       pathinfo: config.inspectBuildProcess,
     },
     mode: 'development',
-    devtool,
+    devtool: config.sourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
     node: {
       // TODO https://github.com/tramvaijs/tramvai/-/commit/c3f3db838fd711ee7a53a84f5bd832cdeebc293a
       // __dirname: false
+      // "warn" with `futureDefaults`
+      global: true,
     },
     resolve: {
       // support for https://nodejs.org/api/addons.html
       extensions: [...extensions, '.node'],
-      mainFields: ['module', 'main'],
+      mainFields,
       symlinks: config.resolveSymlinks,
       fallback,
       alias: {
@@ -194,20 +206,21 @@ export default appConfig;`;
         '@tramvai/cli/lib/external/api': '@tramvai/api/lib/virtual/file-system-papi',
         // backward compatibility for old @tramvai/cli config mechanism
         '@tramvai/cli/lib/external/config': 'virtual:tramvai/config',
-        ...(isRootErrorBoundaryEnabled
-          ? { '@/__private__/error': config.fileSystemPages!.rootErrorBoundaryPath }
-          : {}),
         // backward compatibility for old @tramvai/cli normalized browserslist mechanism
         '@tramvai/cli/lib/external/browserslist-normalized-file-config':
           'virtual:tramvai/browserslist',
+        ...(isRootErrorBoundaryEnabled
+          ? { '@/__private__/error': config.fileSystemPages!.rootErrorBoundaryPath }
+          : {}),
         ...alias,
       },
+      plugins: [...resolveOptions.plugins],
     },
     watchOptions: config.noServerRebuild
       ? {
           ignored: /.*/,
         }
-      : (watchOptions ?? {
+      : (webpackConfigExtension.watchOptions ?? {
           aggregateTimeout: 20,
           ignored: config.inspectBuildProcess
             ? ['**/.git/**']
@@ -244,12 +257,26 @@ export default appConfig;`;
       'fastify',
       'core-js',
       ...flatten<RegExp>(externals),
+      ...(Array.isArray(webpackConfigExtension.externals)
+        ? webpackConfigExtension.externals
+        : (webpackConfigExtension.externals?.development ?? [])),
     ].map((s) => new RegExp(`^${s}`)),
     module: {
+      parser: {
+        javascript: {
+          // "error" with `futureDefaults`
+          exportsPresence: 'warn',
+        },
+      },
       rules: [
         // *.inline files rules should be before the transpiler rules
         ...createServerInlineRules({ di }),
-        ...createTranspilerRules({ transpiler, transpilerParameters, workerPoolConfig }),
+        ...createTranspilerRules({
+          transpiler,
+          transpilerParameters,
+          workerPoolConfig,
+          transpileOnlyModernLibs: config.transpileOnlyModernLibs,
+        }),
         ...stylesConfiguration.rules,
         ...createAssetsRules({ di }),
         {
@@ -274,6 +301,7 @@ export default appConfig;`;
             extensions,
           },
         },
+        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
       // TODO: unsafeCache - TCORE-5274
     },

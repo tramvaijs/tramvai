@@ -54,6 +54,8 @@ export const createProxy = ({
   });
 
   return {
+    httpServer: devServer,
+    staticHttpServer: staticServer,
     listen: () => {
       return Promise.all([
         new Promise<void>((resolve) => {

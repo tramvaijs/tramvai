@@ -4,6 +4,7 @@ import { CONFIG_SERVICE_TOKEN, ReactCompilerOptions } from '@tramvai/api/lib/con
 import envTargets from '@tinkoff/browserslist-config';
 import type webpack from 'webpack';
 import browserslist from 'browserslist';
+import { modernLibsFilter } from '@tinkoff/is-modern-lib';
 import { WorkerPoolConfig } from './thread-loader';
 import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from '../webpack-config';
 
@@ -85,11 +86,12 @@ export const resolveWebpackTranspilerParameters = (
 
   const {
     generateDataQaTag,
+    enableFillDeclareActionNamePlugin,
     //   target,
     //   rootDir,
     //   enableFillActionNamePlugin,
     //   excludesPresetEnv,
-    //   experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
+    //   experiments: { reactCompiler },
   } = config;
   // const { env, modern } = configManager;
   const isServer = buildTarget === 'server';
@@ -111,7 +113,7 @@ export const resolveWebpackTranspilerParameters = (
     loader: true,
     modules: false,
     typescript: false,
-    // enableFillDeclareActionNamePlugin,
+    enableFillDeclareActionNamePlugin,
     // reactCompiler,
     // ...overrideOptions,
   };
@@ -135,10 +137,12 @@ export const createTranspilerRules = ({
   transpiler,
   transpilerParameters,
   workerPoolConfig,
+  transpileOnlyModernLibs,
 }: {
   transpiler: WebpackTranspiler;
   transpilerParameters: WebpackTranspilerInputParameters;
   workerPoolConfig: WorkerPoolConfig;
+  transpileOnlyModernLibs: boolean;
 }): webpack.RuleSetRule[] => {
   return [
     {
@@ -153,6 +157,23 @@ export const createTranspilerRules = ({
         {
           loader: transpiler.loader,
           options: transpiler.configFactory(transpilerParameters),
+        },
+      ].filter(Boolean),
+    },
+    {
+      test: /\.[cm]?js[x]?$/,
+      include: transpileOnlyModernLibs ? modernLibsFilter : /node_modules/,
+      // thread-loader trying to resolve virtual modules and fail webpack build,
+      // so we should ignore such modules in our filter
+      exclude: [/virtual:tramvai/, /[\\/]cli[\\/]lib[\\/]external/],
+      use: [
+        transpiler.useThreadLoader && {
+          loader: 'thread-loader',
+          options: workerPoolConfig,
+        },
+        {
+          loader: transpiler.loader,
+          options: transpiler.configFactory({ ...transpilerParameters, hot: false }),
         },
       ].filter(Boolean),
     },

@@ -9,5 +9,6 @@ console.log(
   process.env.NODE_ENV,
   process.env.APP_ID,
   `isBrowser ${process.env.BROWSER}`,
-  `isServer ${process.env.SERVER}`
+  `isServer ${process.env.SERVER}`,
+  `typeof window ${typeof window}`
 );

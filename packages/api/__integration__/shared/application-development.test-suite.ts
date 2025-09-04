@@ -19,7 +19,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-bundle': {
       name: 'app-bundle',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -29,7 +28,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-integrity': {
       name: 'app-integrity',
       type: 'application',
-      fileCache: false,
       integrity: {
         enabled: true,
       },
@@ -37,7 +35,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     },
     'app-bundle-multiple-runtime': {
       name: 'app-bundle-multiple-runtime',
-      fileCache: false,
       runtimeChunk: false,
       type: 'application',
       hotRefresh: {
@@ -48,7 +45,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-output-relative': {
       name: 'app-bundle',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -62,7 +58,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-virtual-module-config': {
       name: 'app-virtual-module-config',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -71,7 +66,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-broken': {
       name: 'app-broken',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -80,7 +74,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-broken-ssr': {
       name: 'app-broken-ssr',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -89,7 +82,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-jsx': {
       name: 'app-jsx',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -99,13 +91,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-css-modules': {
       name: 'app-css-modules',
       type: 'application',
-      fileCache: false,
       entryFile: path.join(fixturesFolder, 'application', 'css-modules', 'index.ts'),
     },
     'app-postcss': {
       name: 'app-postcss',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -118,7 +108,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss-fn': {
       name: 'app-postcss-fn',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -131,9 +120,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-fs-routing': {
       name: 'app-fs-routing',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
+      },
+      fileSystemPages: {
+        enabled: true,
       },
       sourceDir: path.join(fixturesFolder, 'application', 'fs-routing'),
       entryFile: 'index.ts',
@@ -141,7 +132,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-config-to-env': {
       name: 'app-config-to-env',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -160,7 +150,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-root-error-boundary': {
       name: 'app-root-error-boundary',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -173,7 +162,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-browserslist': {
       name: 'app-browserslist',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -183,7 +171,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-polyfills': {
       name: 'app-polyfills',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -193,7 +180,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-polyfills-custom': {
       name: 'app-polyfills',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -205,7 +191,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-tramvai-vendor': {
       name: 'app-tramvai-vendor',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -214,7 +199,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-granular-chunks': {
       name: 'app-granular-chunks',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -229,7 +213,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-assets': {
       name: 'app-assets',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -247,7 +230,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-externals': {
       name: 'app-externals',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -257,7 +239,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-papi': {
       name: 'app-papi',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -268,7 +249,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-server-inline': {
       name: 'app-server-inline',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -277,7 +257,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-pwa': {
       name: 'app-pwa',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -297,7 +276,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'custom-pwa': {
       name: 'custom-pwa',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -330,19 +308,16 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-refresh': {
       name: 'app-refresh',
       type: 'application',
-      fileCache: false,
       entryFile: path.join(fixturesFolder, 'application', 'refresh', 'index.tsx'),
     },
     'app-hmr': {
       name: 'app-hmr',
       type: 'application',
-      fileCache: false,
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
     'app-refresh-disabled': {
       name: 'app-refresh-disabled',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -351,7 +326,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-provide': {
       name: 'app-provide',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -365,7 +339,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-devtool-inline': {
       name: 'app-devtool-inline',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -377,7 +350,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-devtool-external': {
       name: 'app-provide-external',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -386,10 +358,18 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         devtool: 'nosources-cheap-module-source-map',
       },
     },
+    'app-sourcemaps': {
+      name: 'app-sourcemaps',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
+      sourceMap: true,
+    },
     'app-resolve': {
       name: 'app-resolve',
       type: 'application',
-      fileCache: false,
       hotRefresh: {
         enabled: false,
       },
@@ -402,6 +382,36 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           'components/*': path.join(fixturesFolder, 'application', 'resolve', 'components/*'),
         },
       },
+    },
+    'app-tsconfig-paths': {
+      name: 'app-tsconfig-paths',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      sourceDir: path.join(fixturesFolder, 'application', 'tsconfig-paths'),
+    },
+    'app-enable-fill-declare-action-name': {
+      name: 'app-enable-fill-declare-action-name',
+      type: 'application',
+      entryFile: path.join(
+        fixturesFolder,
+        'application',
+        'enable-fill-declare-action-name',
+        'index.ts'
+      ),
+      enableFillDeclareActionNamePlugin: true,
+    },
+    'app-node-modules-transpilation': {
+      name: 'app-node-modules-transpilation',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
+      transpileOnlyModernLibs: false,
+    },
+    'app-node-modules-transpilation-only-modern': {
+      name: 'app-node-modules-transpilation-only-modern',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
     },
   };
 
@@ -419,6 +429,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               name: 'app-bundle',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -445,6 +456,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               name: 'app-output-relative',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -470,6 +482,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               name: 'app-virtual-module-config',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -500,6 +513,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               name: 'app-browserslist',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -528,6 +542,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               name: 'app-broken',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -588,6 +603,7 @@ export default bar;`,
               name: 'app-broken-ssr',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -647,6 +663,7 @@ export default bar;`,
               name: 'app-config-to-env',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -664,6 +681,7 @@ export default bar;`,
 
             test.expect(serverJs).toContain('isBrowser ${false}');
             test.expect(serverJs).toContain('isServer ${true}');
+            test.expect(serverJs).toContain('typeof window ${\"undefined\"');
           });
         });
 
@@ -673,6 +691,7 @@ export default bar;`,
               name: 'app-root-error-boundary',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -700,6 +719,7 @@ export default bar;`,
               name: 'app-assets',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -736,6 +756,7 @@ export default bar;`,
               name: 'app-papi',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -822,6 +843,7 @@ export default createPapiMethod({
               name: 'app-server-inline',
               rootDir: testSuiteFolder,
               buildType: 'server',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -852,6 +874,7 @@ export default createPapiMethod({
               name: 'app-pwa',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -877,6 +900,7 @@ export default createPapiMethod({
               name: 'custom-pwa',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -951,6 +975,7 @@ export default createPapiMethod({
               name: 'app-bundle',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1039,6 +1064,7 @@ export default createPapiMethod({
               name: 'app-bundle-multiple-runtime',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1076,6 +1102,7 @@ export default createPapiMethod({
               name: 'app-tramvai-vendor',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1102,6 +1129,7 @@ export default createPapiMethod({
               name: 'app-integrity',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1119,8 +1147,12 @@ export default createPapiMethod({
 
             test.expect(typeof statsJson.integrities).toBeTruthy();
             test
-              .expect(statsJson.integrities['hmr.js'])
-              .toEqual('sha256-ppmm+7rkIB5pEpWHV58wZNu1agFxyJtfXVYtCOLtFro=');
+              .expect(statsJson.integrities['platform.js'])
+              .toEqual(
+                transpiler === 'swc'
+                  ? 'sha256-Scl9WC7VB4SG7qTweQNdToPnEF46/qgxAq8CsJ9PERI='
+                  : 'sha256-ms4Xs27s61wu/BhvcPNwzSegNFoQXNkhSmZgiOnZQuY='
+              );
           });
         });
 
@@ -1130,6 +1162,7 @@ export default createPapiMethod({
               name: 'app-granular-chunks',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1154,8 +1187,8 @@ export default createPapiMethod({
               'platform.js',
               'react.chunk.js',
               'runtime.js',
+              'shared-node_modules_process_browser_js-node_modules_tinkoff_utils_function_noop_js-node_modul-d8fc52.chunk.js',
               'shared-node_modules_tinkoff_logger_lib_index_browser_js.chunk.js',
-              'shared-node_modules_tinkoff_utils_function_noop_js-node_modules_tinkoff_utils_is_object_js-no-e0c3dc.chunk.js',
               // chunk name depends on the builder - different for `tsc` (locally) or `@tramvai/build` (CI)
               test.expect.stringMatching('shared-packages_libs_router_lib_index_'),
             ]);
@@ -1169,6 +1202,7 @@ export default createPapiMethod({
                 name: projectName,
                 rootDir: testSuiteFolder,
                 buildType: 'client',
+                fileCache: false,
                 noRebuild: true,
               },
               extraConfiguration: {
@@ -1209,6 +1243,7 @@ export default createPapiMethod({
               name: 'app-output-relative',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1238,6 +1273,7 @@ export default createPapiMethod({
               name: 'app-broken',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -1298,6 +1334,7 @@ export default bar;`,
               name: 'app-config-to-env',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1315,6 +1352,7 @@ export default bar;`,
 
             test.expect(platformJs).toContain('isBrowser ${true}');
             test.expect(platformJs).toContain('isServer ${false}');
+            test.expect(platformJs).toContain('typeof window ${\"object\"}');
           });
         });
 
@@ -1324,6 +1362,7 @@ export default bar;`,
               name: 'app-root-error-boundary',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1354,6 +1393,7 @@ export default bar;`,
               name: 'app-assets',
               rootDir: testSuiteFolder,
               buildType: 'client',
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1448,6 +1488,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-jsx',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1484,6 +1525,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-css-modules',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1525,6 +1567,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-postcss',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1552,6 +1595,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-postcss-fn',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1579,6 +1623,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-fs-routing',
               rootDir: testSuiteFolder,
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -1707,6 +1752,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-refresh',
               rootDir: testSuiteFolder,
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -1755,6 +1801,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-hmr',
               rootDir: testSuiteFolder,
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -1792,6 +1839,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-refresh-disabled',
               rootDir: testSuiteFolder,
+              fileCache: false,
             },
             extraConfiguration: {
               plugins,
@@ -1833,6 +1881,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-config-to-env',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1878,6 +1927,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-assets',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1910,6 +1960,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-cache',
               rootDir: testSuiteFolder,
+              fileCache: true,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1953,6 +2004,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-externals',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -1983,6 +2035,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-provide',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -2013,6 +2066,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-resolve',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -2068,6 +2122,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-devtool-inline',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -2102,6 +2157,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-devtool-external',
               rootDir: testSuiteFolder,
+              fileCache: false,
               noRebuild: true,
             },
             extraConfiguration: {
@@ -2172,6 +2228,154 @@ export default Cmp;`,
             test
               .expect(logs.every((log) => !log.includes('LOG from webpack.Compilation\n')))
               .toBeTruthy();
+          });
+        });
+
+        test.describe('app-sourcemaps', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-sourcemaps',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('sourcemaps: should generate external sourcemaps', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(serverJs).toContain('//# sourceMappingURL=data:application/json');
+            test.expect(platformJs).toContain('//# sourceMappingURL=platform.js.map');
+          });
+        });
+
+        test.describe('app-tsconfig-paths', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-tsconfig-paths',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('tsconfig-paths: should resolve paths from tsconfig.json', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(serverJs).toContain(`foo-bar`);
+            test.expect(platformJs).toContain(`foo-bar`);
+          });
+        });
+
+        test.describe('app-enable-fill-declare-action-name', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-enable-fill-declare-action-name',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('transpiler: "fillDeclareActionName" plugin enabled by flag', async ({
+            devServer,
+          }) => {
+            if (transpiler === 'swc') {
+              test.skip(true, 'swc plugin "fillDeclareActionName" is not implemented');
+              return;
+            }
+
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(platformJs).toContain(`name: \"secondAction__`);
+            test.expect(serverJs).toContain(`name: \"secondAction__`);
+          });
+        });
+
+        test.describe('app-node-modules-transpilation', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-node-modules-transpilation',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('transpiler: all node_modules libraries are transpiled', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(platformJs).not.toContain(`#value`);
+            test.expect(platformJs).not.toContain(`#tramvaiValue`);
+          });
+        });
+
+        test.describe('app-node-modules-transpilation-only-modern', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-node-modules-transpilation-only-modern',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('transpiler: modern node_modules libraries are transpiled', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+
+            test.expect(platformJs).toContain(`#value`);
+            test.expect(platformJs).not.toContain(`#tramvaiValue`);
           });
         });
       });

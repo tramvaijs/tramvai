@@ -42,11 +42,12 @@ export function getProjectProperties({
   return projectCache[projectName];
 }
 
+// eslint-disable-next-line max-statements
 export function getFeaturesProperties({
   parameters,
   configManager,
 }: {
-  parameters: { target?: string };
+  parameters: { target?: string; experimentalWebpackWorkerThreads?: boolean };
   configManager: ConfigManager;
 }): FeaturesProperties {
   const projectName = parameters.target ?? 'unknown';
@@ -100,6 +101,9 @@ export function getFeaturesProperties({
           applicationProject.experiments?.viewTransitions ||
           applicationProject.experiments?.reactTransitions
         ) ?? false;
+
+      featuresCache[projectName].experimentalWebpackWorkerThreads =
+        parameters.experimentalWebpackWorkerThreads;
     }
 
     if (project.type === 'child-app') {

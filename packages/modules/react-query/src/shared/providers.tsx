@@ -15,11 +15,12 @@ import {
 } from '@tramvai/tokens-react-query';
 
 const HydrateNameV4 = 'Hydrate';
+const HydrateNameV5 = 'HydrationBoundary';
 // @ts-expect-error Can't use require because of dual-package hazard
 // (CJS version of context will be imported here, and ESM version in user space)
 // I think treeshaking will be broken here, but looks like we already use all exports from `@tanstack/react-query`
 const Hydrate: React.ComponentType<PropsWithChildren<{ state: DehydratedState }>> =
-  HydrateNameV4 in ReactQuery ? ReactQuery[HydrateNameV4] : ReactQuery.HydrationBoundary;
+  HydrateNameV4 in ReactQuery ? ReactQuery[HydrateNameV4] : ReactQuery[HydrateNameV5];
 
 export const sharedQueryProviders: Provider[] = [
   provide({

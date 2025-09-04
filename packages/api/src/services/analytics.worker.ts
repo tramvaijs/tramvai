@@ -2,6 +2,11 @@ import { parentPort, workerData } from 'node:worker_threads';
 import { logger } from './logger';
 import { enumerateErrorProperties } from '../utils/errors';
 
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
+}
+
 const { endpoint, debug, dryRun } = workerData;
 
 const queue: Promise<any>[] = [];
@@ -86,3 +91,12 @@ async function sendEvent(event: Record<string, any>) {
     }
   }
 }
+
+async function runExitHandlersAndQuit(code: number) {
+  if (global.__TRAMVAI_EXIT_HANDLERS__) {
+    await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
+  }
+  process.exit(code);
+}
+
+process.on('exit', async (code) => runExitHandlersAndQuit(code));

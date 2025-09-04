@@ -31,7 +31,7 @@ export const configFactory = ({
   markCreateTokenAsPure = true,
   typescript = false,
   loader = true,
-  removeTypeofWindow,
+  removeTypeofWindow = true,
   tramvai = false,
   hot = false,
   excludesPresetEnv,

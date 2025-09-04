@@ -13,6 +13,11 @@ import {
 } from './server-runner.events';
 import { EXIT } from './webpack.events';
 
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
+}
+
 const requireFromString = (code: string, filename: string) => {
   // @ts-expect-error
   const newModule = new Module(filename, module.parent);
@@ -50,10 +55,10 @@ async function runServer() {
             } as ServerRunnerOutgoingEventsPayload['application-server-started']);
           } catch (error) {
             logger.event({
-              type: 'warning',
+              type: 'error',
               event: 'server-runner-worker',
               message: 'Application code execution failed',
-              payload: { error },
+              payload: { error, code: message.code },
             });
           }
           break;
@@ -91,7 +96,7 @@ process.on('uncaughtException', (error) => {
   process.exit(1);
 });
 
-process.on('exit', (code) => {
+async function runExitHandlersAndQuit(code: number) {
   if (code !== 0) {
     logger.event({
       type: 'error',
@@ -103,5 +108,10 @@ process.on('exit', (code) => {
 
   // TODO: restart build process / just log?
 
+  if (global.__TRAMVAI_EXIT_HANDLERS__) {
+    await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
+  }
   process.exit(code);
-});
+}
+
+process.on('exit', async (code) => runExitHandlersAndQuit(code));

@@ -2,6 +2,11 @@ import { Session } from 'inspector';
 import fs from 'fs';
 import { logger } from '../services/logger';
 
+declare global {
+  // eslint-disable-next-line no-var, vars-on-top
+  var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
+}
+
 // reference - https://github.com/vercel/next.js/blob/canary/packages/next/src/server/lib/cpu-profile.ts
 if (process.env.TRAMVAI_CPU_PROFILE) {
   const session = new Session();
@@ -38,7 +43,13 @@ if (process.env.TRAMVAI_CPU_PROFILE) {
     });
   }
 
-  process.on('SIGINT', saveProfile);
-  process.on('SIGTERM', saveProfile);
-  process.on('exit', saveProfile);
+  // CLI will wait for this handlers before exiting
+  // @reference `packages/cli/src/cli/runCLI.ts`
+  if (!global.__TRAMVAI_EXIT_HANDLERS__) {
+    global.__TRAMVAI_EXIT_HANDLERS__ = [];
+  }
+
+  global.__TRAMVAI_EXIT_HANDLERS__.push(async () => {
+    saveProfile();
+  });
 }

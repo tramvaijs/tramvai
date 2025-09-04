@@ -23,7 +23,7 @@ export const configFactory = (config: Partial<WebpackTranspilerInputParameters>)
     browsersListTargets,
     typescript = false,
     hot = false,
-    removeTypeofWindow,
+    removeTypeofWindow = true,
     tramvai = false,
     rootDir = process.cwd(),
     generateDataQaTag = false,
