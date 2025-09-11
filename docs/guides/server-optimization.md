@@ -6,21 +6,25 @@ title: Server optimization
 ## Introduction
 
 In most server applications there is a set of resources that can be optimized:
+
 - CPU
 - Memory
 - Network
 
 And there are a common set of metrics that can be used to measure application performance:
+
 - Latency
 - Throughput
 
 Node.js with Server-Side Rendering have some specifics:
+
 - Node.js is single-threaded and doesn't like long blocking tasks
 - SSR unfortunately is long blocking task
 
 SSR especially suffer for CPU limits in Kubernetes clusters - https://medium.com/pipedrive-engineering/how-we-choked-our-kubernetes-nodejs-services-932acc8cc2be
 
 This guide will contain a set of recommended optimizations to make your application faster and more reliable in all self-hosted environments:
+
 - [K8s limits](#k8s-limits)
 - [Request Limiter](#request-limiter)
 - [Semi space size](#semi-space-size)
@@ -34,7 +38,14 @@ This guide will contain a set of recommended optimizations to make your applicat
 
 **TL;DR**: provide **1000m - 1150m** CPU limit/request, run Node.js with `--max-old-space-size=(0.75% * memory.limit)` parameter
 
+:::tip
+
+Starting from Node.js 24 you can use `--max-old-space-size-percentage=75`.
+
+:::
+
 Low CPU limits can significantly slow down your application response time because of CPU throttling. More information why:
+
 - https://medium.com/pipedrive-engineering/how-we-choked-our-kubernetes-nodejs-services-932acc8cc2be
 - https://web.archive.org/web/20220317223152/https://amixr.io/blog/what-wed-do-to-save-from-the-well-known-k8s-incident/
 
@@ -60,6 +71,69 @@ EXPOSE 3000
 CMD [ "node", "--max-old-space-size=350", "/app/server.js" ]
 ```
 
+Also, you can refer to k8s container resources when defining env variables:
+
+```yaml title="Deployment manifest"
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  selector:
+    matchLabels:
+      app: app
+  template:
+    spec:
+      containers:
+        - name: app
+          env:
+            - name: MEMORY_LIMIT_BYTES
+              valueFrom:
+                resourceFieldRef:
+                  # or requests.memory
+                  resource: limits.memory
+```
+
+:::note
+
+If you are deploying to environment with VPA, you should reference to `requests.memory` instead of `limits.memory`.
+
+:::
+
+```Dockerfile title="Dockerfile"
+// highlight-next-line
+CMD [ "node" , "--max-old-space-size=$((MEMORY_LIMIT_BYTES * 75 / 100))", "main.js" ]
+```
+
+Worth noting that if your runtime image does not have shell (bash, sh) you should write custom wrapper in appropriate language (e.g. Node.js) to perform computations:
+
+```javascript
+const { spawn } = require('node:child_process');
+const process = require('node:process');
+
+const getMemoryLimit = () => {
+  const DEFAULT_SIZE = 512;
+  const FRACTION = 0.75;
+
+  const parsed = Number.parseInt(process.env.MEMORY_LIMIT_BYTES, 10);
+
+  return Math.round((parsed > 0 ? parsed / 1024 / 1024 : DEFAULT_SIZE) * FRACTION);
+};
+
+const server = spawn(
+  'node',
+  [`--max-old-space-size=${getMemoryLimit()}`, './main.js'],
+  // Pay attention to properly link stdio of parent and child process
+  { stdio: 'inherit' }
+);
+
+server.on('error', (error) => {
+  process.exit(1);
+});
+
+server.on('exit', (code, signal) => {
+  process.exit(code);
+});
+```
+
 ### Request Limiter
 
 **TL;DR**: connect `@tramvai/module-request-limiter` to your application
@@ -71,6 +145,7 @@ Unexpected traffic spikes can make your application unresponsive. A blocked even
 When the application is overloaded, the module will return a **429** error to the client. You can handle this error at the load balancer level and return [Client-Side Rendering fallback](03-features/010-rendering/05-csr.md#csr-fallback) or some page fallback cache.
 
 More information:
+
 - [`@tramvai/module-request-limiter` documentation](references/modules/request-limiter.md)
 - [Article "How to scale SSR applications"](https://medium.com/its-tinkoff/ssr-applications-at-scale-d57892719024)
 
@@ -80,10 +155,7 @@ More information:
 
 [--max-semi-space-size documentation](https://nodejs.org/api/cli.html#--max-semi-space-sizesize-in-mib)
 
-The default value depends on the memory limit. For example, on 64-bit systems
-with a memory limit of 512 MiB, the max size of a semi-space defaults to 1 MiB.
-On 64-bit systems with a memory limit of 2 GiB, the max size of a semi-space
-defaults to 16 MiB.
+The default value depends on the memory limit. For example, on 64-bit systems with a memory limit of 512 MiB, the max size of a semi-space defaults to 1 MiB. On 64-bit systems with a memory limit of 2 GiB, the max size of a semi-space defaults to 16 MiB.
 
 During application performance profiling, you may observe that your code spends a significant amount of time on Garbage Collector (GC) work. By default, GC work too frequently, and we can reduce the number of GC runs by increasing the size of the semi space. This optimization will reduce the CPU workload and make your event loop less busy, resulting in faster response times, especially in the 95th and 99th percentiles.
 
@@ -106,6 +178,7 @@ CMD [ "node", "--max-semi-space-size=64", "/app/server.js" ]
 ```
 
 More information:
+
 - https://www.alibabacloud.com/blog/better-node-application-performance-through-gc-optimization_595119
 - https://blog.ztec.fr/en/2024/post/node.js-20-upgrade-journey-though-unexpected-heap-issues-with-kubernetes/
 - https://github.com/nodejs/node/issues/42511
@@ -137,6 +210,7 @@ fetch('https://example.com', { agent: httpsAgent });
 ```
 
 More information:
+
 - [`@tramvai/module-http-client` documentation](03-features/09-data-fetching/02-http-client.md)
 - [keepAlive parameter](https://nodejs.org/api/http.html#new-agentoptions)
 - https://community.ops.io/lob_dev/stop-wasting-connections-use-http-keep-alive-1ckg
@@ -150,11 +224,13 @@ One of possible Node.js bottlenecks is APIs that use `libuv` thread pool, one of
 From our experience, optimal `libuv` thread pool size is **8**, but it can be different for your application.
 
 You can increase `libuv` thread pool size by setting `UV_THREADPOOL_SIZE` env variable:
+
 ```
 UV_THREADPOOL_SIZE=8
 ```
 
 More information:
+
 - [about UV_THREADPOOL_SIZE](https://nodejs.org/docs/latest-v18.x/api/cli.html#uv_threadpool_sizesize)
 - [about `libuv` thread pool](https://docs.libuv.org/en/latest/threadpool.html)
 
@@ -169,6 +245,7 @@ Possible disadvantages of DNS lookup cache - it can lead to lookup errors if DNS
 Also, DNS lookup cache optimization effect can be not so significant, if `keepAlive` connections are used, because number of DNS resolves will be reduced.
 
 More information:
+
 - [`@tramvai/module-dns-cache` documentation](references/modules/dns-cache.md)
 - [`cacheable-lookup` documentation](https://github.com/szmarczak/cacheable-lookup)
 - [about DNS resolving](https://httptoolkit.com/blog/configuring-nodejs-dns/)

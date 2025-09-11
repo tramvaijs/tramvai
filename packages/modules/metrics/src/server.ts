@@ -72,6 +72,10 @@ export * from '@tramvai/tokens-metrics';
       multi: true,
     }),
     provide({
+      provide: UTILITY_SERVER_PATHS,
+      useValue: '/metrics',
+    }),
+    provide({
       provide: WEB_FASTIFY_APP_METRICS_TOKEN,
       useFactory: ({
         app,
