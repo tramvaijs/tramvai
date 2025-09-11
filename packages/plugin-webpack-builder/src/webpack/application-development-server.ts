@@ -47,6 +47,9 @@ import { PROVIDE_TOKEN } from './shared/provide';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 import { ignoreWarnings } from './utils/warningsFilter';
 import { createSourceMaps } from './shared/sourcemaps';
+import { getSharedModules } from './shared/shared-modules';
+import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
+import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
 
 const mainFields = ['module', 'main'];
 
@@ -312,6 +315,14 @@ export default appConfig;`;
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,
+      new webpack.container.ModuleFederationPlugin({
+        name: 'host',
+        shared: getSharedModules(config),
+      }),
+      new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
+      new ModuleFederationFixRange({
+        flexibleTramvaiVersions: config.shared?.flexibleTramvaiVersions,
+      }),
       config.showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': false,

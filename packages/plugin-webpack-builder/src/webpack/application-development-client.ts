@@ -60,6 +60,9 @@ import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache'
 import { normalizeBrowserslistConfig } from './shared/browserslist';
 import { ignoreWarnings } from './utils/warningsFilter';
 import { createSourceMaps } from './shared/sourcemaps';
+import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
+import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
+import { getSharedModules } from './shared/shared-modules';
 
 const mainFields = ['browser', 'module', 'main'];
 
@@ -359,6 +362,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         },
         fields: [...DEV_STATS_FIELDS, ...(verboseLogging ? WEBPACK_DEBUG_STATS_FIELDS : [])],
       }) as any as WebpackPluginInstance,
+      new webpack.container.ModuleFederationPlugin({
+        name: 'host',
+        shared: getSharedModules(config),
+      }),
+      new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
+      new ModuleFederationFixRange({
+        flexibleTramvaiVersions: config.shared!.flexibleTramvaiVersions,
+      }),
       showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
       new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
       new webpack.ProvidePlugin({

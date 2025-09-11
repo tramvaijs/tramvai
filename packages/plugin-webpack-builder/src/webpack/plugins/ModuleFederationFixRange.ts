@@ -1,9 +1,10 @@
 import type webpack from 'webpack';
 import type { Compiler, NormalModule } from 'webpack';
 import { WebpackError } from 'webpack';
+// @ts-ignore
 // eslint-disable-next-line no-restricted-imports
 import { parseRange, satisfy } from 'webpack/lib/util/semver';
-import { isDependantLib, isUnifiedVersion } from '../../../utils/tramvaiVersions';
+import { isDependantLib, isUnifiedVersion } from '../utils/tramvaiVersions';
 
 const PLUGIN_NAME = 'ModuleFederationValidateDuplicates';
 
@@ -17,11 +18,11 @@ interface SharedModuleOptions {
 }
 
 interface SharedModule extends NormalModule {
-  options?: SharedModuleOptions;
+  options: SharedModuleOptions;
 }
 
 export interface ModuleFederationFixRangeOptions {
-  flexibleTramvaiVersions: boolean;
+  flexibleTramvaiVersions?: boolean;
 }
 
 export class ModuleFederationFixRange implements webpack.WebpackPluginInstance {
@@ -40,7 +41,7 @@ export class ModuleFederationFixRange implements webpack.WebpackPluginInstance {
           if (tap.name === 'ConsumeSharedPlugin') {
             const originalFn = tap.fn;
             // eslint-disable-next-line no-param-reassign
-            tap.fn = async (...args) => {
+            tap.fn = async (...args: unknown[]) => {
               const module: SharedModule | undefined = await originalFn(...args);
 
               if (module?.options) {
@@ -113,9 +114,11 @@ export class ModuleFederationFixRange implements webpack.WebpackPluginInstance {
               }
             }
 
+            // @ts-ignore
             if (invalidModules.size > 0 && validModule) {
               for (const sharedModule of invalidModules) {
                 const error = new WebpackError(
+                  // @ts-ignore
                   `Shared module has been actually resolved to ${validVersion} instead of the expected`
                 );
                 error.module = sharedModule;

@@ -1,5 +1,5 @@
 import type webpack from 'webpack';
-import type { Compiler } from 'webpack';
+import type { Chunk, Compiler } from 'webpack';
 
 const PLUGIN_NAME = 'ModuleFederationIgnoreEntires';
 
@@ -44,8 +44,8 @@ export class ModuleFederationIgnoreEntries implements webpack.WebpackPluginInsta
           if (tap.name === 'ConsumeSharedPlugin') {
             const originalFn = tap.fn;
             // eslint-disable-next-line no-param-reassign
-            tap.fn = (chunk, ...args) => {
-              if (!this.entries.has(chunk.name)) {
+            tap.fn = (chunk: Chunk, ...args: unknown[]) => {
+              if (!this.entries.has(chunk.name!)) {
                 originalFn(chunk, ...args);
               }
             };

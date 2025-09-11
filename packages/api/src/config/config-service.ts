@@ -8,7 +8,6 @@ import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
 import type { PluginOptions } from 'image-minimizer-webpack-plugin';
 import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-integrity';
 import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
-import type { Configuration as WebpackConfiguration } from 'webpack';
 
 import type { Config as SvgoConfig } from 'svgo';
 import type { TramvaiPlugin } from '../core/plugin';
@@ -141,6 +140,12 @@ export type ApplicationExperiments = {
    * @default false
    */
   reactTransitions?: boolean;
+  /**
+   * @title automatically resolve requiredVersion for shared dependencies
+   * @see https://webpack.js.org/plugins/module-federation-plugin/#requiredversion
+   * @default false
+   */
+  autoResolveSharedRequiredVersions?: boolean;
 };
 
 /**
@@ -302,6 +307,53 @@ export interface BaseProject {
    * @default false
    */
   deprecatedLessSupport?: boolean;
+
+  /**
+   * @title Specify dependencies that will be shared between application and child-apps
+   * @description Properly defining that dependencies may greatly reduce filesize of loaded js on the client
+   * @default {}
+   */
+  shared?: {
+    /**
+     * @title Should default dependencies list be added to shared list
+     * @description It includes the list of commonly used dependencies in the child-apps
+     * By default, it is enabled in application in case of tramvai/module-child-app is specified in package.json
+     * and for child-apps
+     */
+    defaultTramvaiDependencies?: boolean;
+    /**
+     * @title add caret range specifier for tramvai dependencies
+     * @description minimal versions are inferred from package.json
+     * @default true
+     */
+    flexibleTramvaiVersions?: boolean;
+    /**
+     * @title add chunks to preload as critical in-parallel with "platform.js"
+     * @description this option is useful when you need to create async boundary for app dependencies.
+     * More info - https://webpack.js.org/concepts/module-federation/#uncaught-error-shared-module-is-not-available-for-eager-consumption
+     * @default []
+     */
+    criticalChunks?: string[];
+    /**
+     * @title list of the dependencies that will be shared
+     * @default []
+     */
+    deps?: Array<
+      | string
+      | {
+          /**
+           * @title name of the dependency import
+           */
+          name: string;
+          /**
+           * @title if dependency is marked as singleton the dependency will be initialized only once and will not be updated
+           * @description Do not overuse that feature as it may lead to subtle bugs in case of different versions on different sides
+           * @default false
+           */
+          singleton: boolean;
+        }
+    >;
+  };
 }
 
 export interface ApplicationProject extends BaseProject {
@@ -662,16 +714,16 @@ export class ConfigService {
     return this.#project.postcss ?? {};
   }
 
-  get experiments(): ApplicationExperiments | null {
+  get experiments(): ApplicationExperiments {
     if (this.#project.type === 'child-app') {
-      return null;
+      return {};
     }
 
     const experiments = this.#project.experiments ?? {};
-
     return {
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
+      autoResolveSharedRequiredVersions: experiments.autoResolveSharedRequiredVersions ?? false,
     };
   }
 
@@ -751,6 +803,33 @@ export class ConfigService {
 
   get deprecatedLessSupport() {
     return this.#project.deprecatedLessSupport ?? false;
+  }
+
+  get shared(): BaseProject['shared'] {
+    const configShared = this.#project.shared;
+
+    return {
+      defaultTramvaiDependencies: configShared?.defaultTramvaiDependencies,
+      flexibleTramvaiVersions: configShared?.flexibleTramvaiVersions ?? true,
+      criticalChunks: configShared?.criticalChunks ?? [],
+      deps: configShared?.deps ?? [],
+    };
+  }
+
+  get buildPath() {
+    if (this.#project.type === 'child-app') {
+      return resolveAbsolutePathForFile({
+        rootDir: this.rootDir,
+        sourceDir: this.sourceDir,
+        file: this.#project.output!,
+      });
+    }
+
+    return resolveAbsolutePathForFile({
+      rootDir: this.rootDir,
+      sourceDir: this.sourceDir,
+      file: this.buildType === 'server' ? this.outputServer : this.outputClient,
+    });
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {

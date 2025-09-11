@@ -1,14 +1,18 @@
 import type Config from 'webpack-chain';
 import { container } from 'webpack';
+
+import {
+  ModuleFederationFixRange,
+  ModuleFederationFixRangeOptions,
+  ModuleFederationIgnoreEntries,
+  ModuleFederationIgnoreEntriesOptions,
+} from '@tramvai/plugin-webpack-builder';
+
 import { getSharedModules } from '../child-app/moduleFederationShared';
 import type { ModuleFederationPluginOptions } from '../types/webpack';
 import type { ConfigManager } from '../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';
-import type { ModuleFederationIgnoreEntriesOptions } from '../plugins/ModuleFederationIgnoreEntries';
-import { ModuleFederationIgnoreEntries } from '../plugins/ModuleFederationIgnoreEntries';
 import { rootErrorBoundaryFactory } from '../blocks/rootErrorBoundary';
-import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
-import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
 import { FileStatsPlugin } from '../plugins/FileStats';
 
 export const commonApplication =

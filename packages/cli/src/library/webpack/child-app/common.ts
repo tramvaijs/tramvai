@@ -2,11 +2,16 @@ import type Config from 'webpack-chain';
 import type webpack from 'webpack';
 import path from 'path';
 import crypto from 'crypto';
+
 import { UniversalFederationPlugin } from '@module-federation/node';
+import {
+  ModuleFederationFixRange,
+  ModuleFederationFixRangeOptions,
+  PatchAutoPublicPathPlugin,
+} from '@tramvai/plugin-webpack-builder';
+
 import common from '../common/main';
-
 import type { ConfigManager } from '../../../config/configManager';
-
 import ts from '../blocks/ts';
 import js from '../blocks/js';
 import css from '../blocks/css';
@@ -16,10 +21,7 @@ import { getSharedModules } from './moduleFederationShared';
 import { configToEnv } from '../blocks/configToEnv';
 import type { ChildAppConfigEntry } from '../../../typings/configEntry/child-app';
 import { extractCssPluginFactory } from '../blocks/extractCssPlugin';
-import type { ModuleFederationFixRangeOptions } from '../plugins/ModuleFederationFixRange';
-import { ModuleFederationFixRange } from '../plugins/ModuleFederationFixRange';
 import { resolveFrameworksPaths } from '../application/client/prod/optimization/splitChunks';
-import { PatchAutoPublicPathPlugin } from '../plugins/AutoPublicPathPlugin';
 
 // eslint-disable-next-line max-statements
 export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: Config) => {
