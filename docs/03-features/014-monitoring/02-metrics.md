@@ -5,7 +5,7 @@ title: Metrics
 
 Server-side metrics provided with `@tramvai/module-metrics` module and connected out-of-the-box.
 
-`MetricsModule` provides the interface described in `@platform/metrics-types`. On server the interface is implemented with public package `prom-client` that provides metrics on url `/metrics` Prometheus format.
+`MetricsModule` provides the interface described in `@tramvai/tokens-metrics`. On server the interface is implemented with public package `prom-client` that provides metrics on url `/metrics` Prometheus format.
 
 More details about metrics type, parameters and how to use it see in [docs to `prom-client`](https://github.com/siimon/prom-client).
 

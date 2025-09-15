@@ -1,6 +1,6 @@
 import resolveExternal from './resolveExternal';
 
-const modules = ['react', 'react-dom'];
+const modules = ['react', 'react-dom', 'react/jsx-runtime', 'react/jsx-dev-runtime'];
 
 export default modules.reduce(
   (acc, name) => {
