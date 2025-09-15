@@ -1,5 +1,9 @@
 {
-  "name": "{{configEntry.name}}",
+  {{#if isMonorepo}}
+    "name": "{{configEntry.name}}-monorepo",
+  {{else}}
+    "name": "{{configEntry.name}}",
+  {{/if}}
   "private": true,
   "scripts": {
     "start": "tramvai start {{configEntry.name}}",
