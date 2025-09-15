@@ -16,6 +16,7 @@ _node_modules/
 !tools/monorepo/depscheck/src/__fixtures__/**/node_modules
 !tools/check-versions/__integration__/__fixtures__/**/node_modules
 .yarn-cache
+.yarn-cache/*
 .npm
 .yarn/*
 **/.yarn/*
@@ -24,6 +25,7 @@ _node_modules/
 !.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
+
 
 # IDE
 .DS_Store

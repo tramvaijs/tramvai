@@ -1,5 +1,6 @@
 import path from 'path';
 import chalk from 'chalk';
+import { command } from 'execa';
 import inquirer from 'inquirer';
 import { packageManagerFactory } from '@tinkoff/package-manager-wrapper';
 import type { Context } from '../../models/context';
@@ -21,7 +22,22 @@ import { typeQuestion } from './questions/type';
 // ts не копирует файлы, так что шаблона не будет в lib директории =(
 const getPathToTemplate = (type: Type, template: Templates) =>
   path.resolve(__dirname, '../../../src/commands/new/templates', type, template);
-const getPathToShared = () => path.resolve(__dirname, '../../../src/commands/new/templates/shared');
+const getPathToPackageManagerConfig = (packageManager: PackageManagers) => {
+  if (packageManager === 'yarn') {
+    return path.resolve(
+      __dirname,
+      '../../../src/commands/new/templates/packageManagerConfig/yarnPackageManagerConfig'
+    );
+  }
+
+  return path.resolve(
+    __dirname,
+    '../../../src/commands/new/templates/packageManagerConfig/defaultPackageManagerConfig'
+  );
+};
+const getPathToShared = () => {
+  return path.resolve(__dirname, '../../../src/commands/new/templates/shared');
+};
 const getPathToBlock = (type: Type) =>
   path.resolve(__dirname, '../../../src/commands/new/templates', type, 'block');
 const getPathToMonorepoBlock = () =>
@@ -29,6 +45,7 @@ const getPathToMonorepoBlock = () =>
 const getPathToTestingFramework = (type: Type, testingFramework: TestingFrameworks) =>
   path.resolve(__dirname, '../../../src/commands/new/templates', type, 'testing', testingFramework);
 
+// eslint-disable-next-line max-statements
 export default async function createNew(context: Context, params: Params): Promise<CommandResult> {
   const {
     name: inputName,
@@ -64,24 +81,31 @@ export default async function createNew(context: Context, params: Params): Promi
 
   const templateDir = getPathToTemplate(type, template);
   const sharedDir = getPathToShared();
+  const packageManagerConfigDif = getPathToPackageManagerConfig(packageManager);
   const blockDir = getPathToBlock(type);
   const isMonorepo = template === 'monorepo';
+
+  const isYarn = packageManager === 'yarn';
+
   const baseDir = type === 'app' ? 'apps' : 'child-apps';
+  const rootDir = path.resolve(process.cwd(), directoryName);
   const blockDirectoryName = {
     monorepo: path.join(baseDir, name),
     multirepo: 'src',
   }[template];
 
   const templateData = {
+    isMonorepo,
     configEntry,
     isJest: testingFramework === 'jest',
     isNpm: packageManager === 'npm',
-    isYarn: packageManager === 'yarn',
+    isYarn,
     workspaceBaseDir: isMonorepo ? baseDir : undefined,
   };
 
   await renderTemplate(templateDir, directoryName, templateData);
   await renderTemplate(sharedDir, directoryName, templateData);
+  await renderTemplate(packageManagerConfigDif, directoryName, templateData);
   await renderTemplate(blockDir, path.join(directoryName, blockDirectoryName), templateData);
   if (template === 'monorepo') {
     const monorepoBlockDir = getPathToMonorepoBlock();
@@ -100,15 +124,23 @@ export default async function createNew(context: Context, params: Params): Promi
       templateData
     );
   }
-
   await initializationGit(directoryName);
+
+  if (isYarn) {
+    await command('yarn set version berry', {
+      env: {
+        YARN_HTTP_PROXY: process.env.HTTP_PROXY,
+        YARN_HTTPS_PROXY: process.env.HTTPS_PROXY,
+      },
+      cwd: rootDir,
+      stdio: 'inherit',
+    });
+  }
+
   await installDependencies({
     localDir: directoryName,
     type,
-    packageManager: packageManagerFactory(
-      { rootDir: path.resolve(process.cwd(), directoryName) },
-      packageManager
-    ),
+    packageManager: packageManagerFactory({ rootDir }, packageManager),
     testingFramework,
     workspace: isMonorepo ? blockDirectoryName : undefined,
   });
