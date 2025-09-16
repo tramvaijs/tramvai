@@ -6,6 +6,10 @@ on:
       - main
       - stable-v[0-9]+.x.x
 
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -18,6 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Setup Corepack
         run: corepack enable
@@ -26,9 +31,6 @@ jobs:
         run: |
           yarn config set nodeLinker node-modules
           yarn config set enableImmutableInstalls false
-          yarn config set npmAuthToken $NPM_AUTH_TOKEN
-        env:
-          NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - run: yarn install
       - run: yarn build
