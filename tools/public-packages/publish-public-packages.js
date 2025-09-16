@@ -10,6 +10,8 @@ async function publishPublicPackages() {
     require.resolve(`${packageName}/package.json`).replace('/package.json', '')
   );
 
+  let publicationFailed = false;
+
   for (let i = 0; i < paths.length; i++) {
     const pkgPath = paths[i];
     let channel;
@@ -23,6 +25,7 @@ async function publishPublicPackages() {
       );
     } catch (e) {
       console.log('npm publish error', e);
+      publicationFailed = true;
     }
     if (channel && channel.stderr) {
       console.log('npm publish problem', channel.stderr);
@@ -30,6 +33,10 @@ async function publishPublicPackages() {
     if (channel && channel.stdout) {
       console.log('npm publish finish', channel.stdout);
     }
+  }
+
+  if (publicationFailed) {
+    process.exit(1);
   }
 }
 
