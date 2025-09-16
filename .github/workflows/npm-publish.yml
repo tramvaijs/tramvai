@@ -27,8 +27,13 @@ jobs:
         run: |
           yarn config set nodeLinker node-modules
           yarn config set enableImmutableInstalls false
+          yarn config set npmPublishAccess public
+          yarn config set npmPublishRegistry https://registry.npmjs.org/
+          yarn config set npmAlwaysAuth true
+          yarn config set npmAuthToken $NPM_AUTH_TOKEN
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NPM_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - run: yarn install
       - run: yarn build
