@@ -102,6 +102,7 @@ export const PwaPlugin = declareModule({
           'process.env.TRAMVAI_PWA_SW_SCOPE': JSON.stringify(pwa.sw?.scope),
           'process.env.TRAMVAI_PWA_MANIFEST_ENABLED': JSON.stringify(pwa.webmanifest?.enabled),
           'process.env.TRAMVAI_PWA_MANIFEST_DEST': JSON.stringify(pwa.webmanifest?.dest),
+          'process.env.TRAMVAI_PWA_MANIFEST_SCOPE': JSON.stringify(pwa.webmanifest?.scope),
           'process.env.TRAMVAI_PWA_META': `'${JSON.stringify(pwa?.meta ?? {})}'`,
         };
 

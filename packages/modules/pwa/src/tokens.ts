@@ -23,6 +23,11 @@ export const PWA_SW_URL_TOKEN = createToken<string>('pwa sw url');
 export const PWA_SW_SCOPE_TOKEN = createToken<string>('pwa sw scope');
 
 /**
+ * @description Token to owerwrite default - `pwa.manifest.scope`
+ */
+export const PWA_MANIFEST_SCOPE_TOKEN = createToken<string | undefined>('pwa manifest scope');
+
+/**
  * @description Token to add query params to sw url
  */
 export const PWA_SW_PARAMS_TOKEN = createToken<Record<string, string>>('pwa sw params', {
