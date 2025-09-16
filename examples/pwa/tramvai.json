@@ -57,6 +57,7 @@
             "enabled": true,
             "dest": "/manifest.[hash].webmanifest",
             "name": "my manifest",
+            "scope": "/manifest-scope/",
             "short_name": "also my manifest but short"
           },
           "icon": {

@@ -21,7 +21,7 @@ test.describe('packages/modules/pwa', () => {
 
       const url = await Pwa.getWebmanifestUrl();
 
-      test.expect(/\/scope\/manifest\.webmanifest$/.test(url)).toBe(true);
+      test.expect(/\/manifest-scope\/manifest\.webmanifest$/.test(url)).toBe(true);
     });
 
     test('proxy should work', async ({ app, I, Pwa }) => {

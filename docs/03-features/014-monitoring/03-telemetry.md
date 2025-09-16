@@ -174,6 +174,26 @@ const extractTraceparent = (): string | undefined => {
 };
 ```
 
+#### Filter out `traceparent` header
+
+In a browser context, some cross-origin requests can be blocked by CORS policy (or preflight requests can be not supported) if `traceparent` header is added.
+
+So, you can filter out `traceparent` header for some requests with `OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN` token, e.g. as a blacklist:
+
+```ts
+const provider = provide({
+  provide: OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN,
+  useFactory: ({ envManager }) => (url: string) => {
+    const blacklist = ['/excluded-api-path', envManager.get('CDN_WITHOUT_ALLOWED_HEADERS_URL')];
+
+    return !blacklist.some((blockerUrl) => url.includes(blockerUrl));
+  },
+  deps: {
+    envManager: ENV_MANAGER_TOKEN,
+  },
+});
+```
+
 ## Debug and testing
 
 By default, in `development` mode [ConsoleSpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.ConsoleSpanExporter.html) is used, which prints all spans to the console.

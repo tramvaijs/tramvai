@@ -14,6 +14,7 @@ import { safeStringifyJSON } from '@tramvai/safe-strings';
 import { HTTP_CLIENT_FACTORY } from '@tramvai/tokens-http-client';
 import { MockerModule } from '@tramvai/module-mocker';
 import { RESOURCES_REGISTRY } from '@tramvai/tokens-render';
+import { OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN } from '../src/tokens';
 
 const IN_MEMORY_SPAN_EXPORTER = createToken<InMemorySpanExporter>(
   'opentelemetry in-memory span exporter',
@@ -125,7 +126,10 @@ createApp({
       useFactory:
         ({ httpClient, resourcesRegistry }) =>
         async () => {
-          const { payload } = await httpClient.get('/json');
+          const [{ payload }] = await Promise.all([
+            httpClient.get('/json'),
+            httpClient.get('/filtered-json'),
+          ]);
 
           if (typeof window === 'undefined') {
             resourcesRegistry.register({
@@ -138,6 +142,14 @@ createApp({
       deps: {
         httpClient: 'MOCK_HTTP_CLIENT',
         resourcesRegistry: RESOURCES_REGISTRY,
+      },
+    }),
+    provide({
+      provide: OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN,
+      useValue: (url: string) => {
+        const blacklist = ['/filtered-json'];
+
+        return !blacklist.some((blockerUrl) => url.includes(blockerUrl));
       },
     }),
   ],

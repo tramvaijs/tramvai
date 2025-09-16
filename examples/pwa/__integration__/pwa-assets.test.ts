@@ -72,7 +72,7 @@ describe('packages/modules/pwa - assets', () => {
     });
 
     it('should borrow scope from "pwa.sw.scope" parameter', () => {
-      expect(webmanifestContent.scope).toBe('/scope/');
+      expect(webmanifestContent.scope).toBe('/manifest-scope/');
     });
 
     it('should borrow theme_color from "pwa.meta.themeColor" parameter', () => {

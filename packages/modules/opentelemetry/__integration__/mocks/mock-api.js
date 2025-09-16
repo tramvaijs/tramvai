@@ -8,5 +8,12 @@ module.exports = {
         },
       });
     },
+    'GET /filtered-json': (req, res) => {
+      res.status(200).send({
+        response: {
+          headers: req.headers,
+        },
+      });
+    },
   },
 };

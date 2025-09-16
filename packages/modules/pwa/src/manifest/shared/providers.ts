@@ -1,4 +1,4 @@
-import { commandLineListTokens, declareModule, DI_TOKEN, provide, Scope } from '@tramvai/core';
+import { commandLineListTokens, DI_TOKEN, provide } from '@tramvai/core';
 import { ResourceType, ResourceSlot, RESOURCES_REGISTRY } from '@tramvai/tokens-render';
 import { PWA_MANIFEST_INIT_COMMAND_LINE, PWA_MANIFEST_URL_TOKEN } from '../../tokens';
 
