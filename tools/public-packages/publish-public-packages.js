@@ -25,7 +25,13 @@ async function publishPublicPackages() {
       );
     } catch (e) {
       console.log('npm publish error', e);
-      publicationFailed = true;
+      const skipError =
+        e instanceof Error &&
+        e.message.includes('You cannot publish over the previously published versions');
+
+      if (!skipError) {
+        publicationFailed = true;
+      }
     }
     if (channel && channel.stderr) {
       console.log('npm publish problem', channel.stderr);
