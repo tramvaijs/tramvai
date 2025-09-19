@@ -51,3 +51,12 @@ export interface UserAgent {
   mobileOS?: string;
   sameSiteNoneCompatible: boolean;
 }
+
+export type UAParserExtensionSource = (RegExp[] | (string[] | string)[])[];
+
+export type UAParserExtensionsTypes = {
+  browser?: UAParserExtensionSource;
+  device?: UAParserExtensionSource;
+  os?: UAParserExtensionSource;
+  engine?: UAParserExtensionSource;
+};

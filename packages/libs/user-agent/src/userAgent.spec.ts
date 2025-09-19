@@ -1,3 +1,5 @@
+import UAParser from 'ua-parser-js';
+import { UAParserExtensionsTypes } from '../lib';
 import { parseUserAgentHeader } from './userAgent';
 
 describe('modern browsers', () => {
@@ -329,6 +331,57 @@ describe('mobile devices', () => {
         "os": {
           "name": "Windows Phone",
           "version": "10.0",
+        },
+        "sameSiteNoneCompatible": true,
+      }
+    `);
+  });
+});
+
+describe('extensions', () => {
+  it('extension', () => {
+    const ua = 'iPhone/iOS(18.5)/MB/7.11.1(7111000)';
+    const extension: UAParserExtensionsTypes[] = [
+      {
+        browser: [[/(MB)\/([^/]+)$/i], [UAParser.BROWSER.NAME, UAParser.BROWSER.VERSION]],
+      },
+      {
+        device: [
+          [/^([^/]+)\/([^/]+)\/MB\/([^/]+)$/],
+          [UAParser.DEVICE.MODEL, [UAParser.DEVICE.TYPE, UAParser.DEVICE.MOBILE]],
+        ],
+        os: [
+          [/(iOS)([^/]+)\/MB\/([^/]+)$/],
+          [UAParser.OS.NAME, UAParser.OS.VERSION],
+          [/(Android)([^/]+)\/MB\/([^/]+)$/],
+          [UAParser.OS.NAME, UAParser.OS.VERSION],
+        ],
+      },
+    ];
+    expect(parseUserAgentHeader(ua, extension)).toMatchInlineSnapshot(`
+      {
+        "browser": {
+          "browserEngine": "other",
+          "major": "7",
+          "name": "mb",
+          "version": "7.11.1(7111000)",
+        },
+        "cpu": {
+          "architecture": undefined,
+        },
+        "device": {
+          "model": "iPhone",
+          "type": "mobile",
+          "vendor": undefined,
+        },
+        "engine": {
+          "name": undefined,
+          "version": undefined,
+        },
+        "mobileOS": "ios",
+        "os": {
+          "name": "iOS",
+          "version": "(18.5)",
         },
         "sameSiteNoneCompatible": true,
       }

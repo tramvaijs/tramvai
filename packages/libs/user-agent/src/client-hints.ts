@@ -1,5 +1,6 @@
 import type { Browser, Engine, UserAgent } from './types';
-import { getBrowserEngine, getMobileOs } from './utils';
+import { getBrowserEngine } from './utils/get-browser-engine';
+import { getMobileOs } from './utils/get-mobile-os';
 
 const KNOWN_VENDORS = new Set(['Opera', 'Google Chrome', 'Microsoft Edge', 'Firefox', 'Safari']);
 

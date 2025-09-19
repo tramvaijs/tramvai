@@ -13,8 +13,11 @@ import { METRICS_MODULE_TOKEN } from '@tramvai/module-metrics';
 import { parseClientHints } from '@tinkoff/user-agent';
 import noop from '@tinkoff/utils/function/noop';
 import { isNumber } from '@tinkoff/env-validators';
-
-import { PARSER_CLIENT_HINTS_ENABLED, USER_AGENT_TOKEN } from '../tokens';
+import {
+  PARSER_CLIENT_HINTS_ENABLED,
+  USER_AGENT_PARSER_EXTENSIONS_TOKEN,
+  USER_AGENT_TOKEN,
+} from '../tokens';
 import { setUserAgent } from '../shared/stores/userAgent';
 import { parseUserAgentWithCache } from './parseUserAgentWithCache';
 
@@ -67,14 +70,22 @@ export const serverUserAgentProviders: Provider[] = [
   }),
   provide({
     provide: USER_AGENT_TOKEN,
-    useFactory: ({ requestManager, cache, parserClientHintsEnabled, store, metrics }) => {
+    useFactory: ({
+      requestManager,
+      cache,
+      parserClientHintsEnabled,
+      store,
+      metrics,
+      extensions,
+    }) => {
       const userAgent =
         parserClientHintsEnabled && requestManager.getHeader('sec-ch-ua')
           ? parseClientHints(requestManager.getHeaders())
           : parseUserAgentWithCache(
               cache,
               requestManager.getHeader('user-agent') as string,
-              metrics
+              metrics,
+              extensions
             );
 
       store.dispatch(setUserAgent(userAgent));
@@ -85,6 +96,7 @@ export const serverUserAgentProviders: Provider[] = [
       requestManager: REQUEST_MANAGER_TOKEN,
       parserClientHintsEnabled: PARSER_CLIENT_HINTS_ENABLED,
       store: STORE_TOKEN,
+      extensions: { token: USER_AGENT_PARSER_EXTENSIONS_TOKEN, optional: true },
       cache: 'userAgentMemoryCache',
       metrics: 'userAgentCacheMetrics',
     },
