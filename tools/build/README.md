@@ -24,9 +24,7 @@ Add necessary fields to `package.json`:
   "module": "lib/index.es.js",
   "typings": "lib/index.d.ts",
   "sideEffects": false,
-  "files": [
-    "lib"
-  ]
+  "files": ["lib"]
 }
 ```
 
@@ -53,21 +51,10 @@ Create `tsconfig.json`:
     "outDir": "./lib",
     "declarationDir": "./lib",
     "types": ["node"],
-    "lib": [
-      "es2015",
-      "es2016",
-      "es2017",
-      "es2018",
-      "dom"
-    ]
+    "lib": ["es2015", "es2016", "es2017", "es2018", "dom"]
   },
   "include": ["./src"],
-  "exclude": [
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+  "exclude": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts", "**/*.test.tsx"]
 }
 ```
 
@@ -119,7 +106,7 @@ When bundling package in the app through `webpack` with option `target: 'node'` 
 
 Modern bundlers support ES modules and non-standard field `"browser"` in `package.json`. When field `browser` in specified in `package.json`, `@tramvai/build` will generate bundle in `ES2022` standard in `ES modules` format.
 
-If field `browser` in `package.json` is defined as a string then this string determines entry point to `browser` bundle and its name. E.g. when `"browser": "lib/browser.js"` entry point will be `src/browser.ts` and bundle will have a name `lib/browser.js`.
+If field `browser` in `package.json` is defined as a string then this string determines entry point to `browser` bundle and its name. E.g. when `"browser": "lib/browser.js"` entry point will be `src/index.ts` and bundle will have a name `lib/browser.js`.
 
 Otherwise, if field `browser` is defined as an object and build was called with flag `--forPublish` then name is defined by the field `main` in `package.json` with adding postfix `.browser` e.g. `lib/index.browser.js`. After that to field `browser` new property will be added as pointer for bundlers to bundle for the browser, instead of the field `module`:
 
@@ -216,7 +203,7 @@ new TramvaiBuild(options).copy();
 
 ### Build separate bundle for browsers
 
-Let's say we have to entry points. One is for the server - `src/server.ts` and for the client - `src/browser.ts`. In this case we should set field `browser` in `package.json` the next way:
+Let's say we have to entry points. One is for the server - `src/server.ts` and for the client - `src/index.ts`. In this case we should set field `browser` in `package.json` the next way:
 
 ```json
 {
@@ -238,7 +225,7 @@ After build for publication we will get next `package.json`:
 
 ### Replace specific module for browser bundle
 
-Let's say we have one entry point - `src/index.ts` and a module `src/external.ts` we want to replace by `src/external.browser.ts`. In this case we should set field `browser` in `package.json` the next way:
+Let's say we have one entry point - `src/index.ts` and a module `src/external.ts` we want to replace by `src/external.index.ts`. In this case we should set field `browser` in `package.json` the next way:
 
 ```json
 {
