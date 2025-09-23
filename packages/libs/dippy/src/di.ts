@@ -2,8 +2,8 @@ export { Container } from './Container';
 export { RecordProvide } from './Container.h';
 export { IS_DI_CHILD_CONTAINER_TOKEN, ChildContainer } from './ChildContainer';
 export { createContainer } from './createContainer/createContainer';
-export { initContainer } from './initContainer/initContainer';
 export { createChildContainer } from './createChildContainer/createChildContainer';
+export { initContainer } from './initContainer/initContainer';
 
 export {
   Provider,
