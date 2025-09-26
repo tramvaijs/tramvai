@@ -65,7 +65,7 @@ const devDependencies = [
   'postcss-nested',
   'husky@^4',
   'lint-staged',
-  'prettier-config-tinkoff',
+  '@tramvai/prettier-config',
   'typescript',
 ];
 
