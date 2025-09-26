@@ -1,5 +1,5 @@
 {
-  "name": "prettier-config-tinkoff",
+  "name": "@tramvai/prettier-config",
   "sourceRoot": "packages/libs/prettier/src",
   "projectType": "library",
   "targets": {}

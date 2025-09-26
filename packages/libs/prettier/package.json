@@ -1,7 +1,7 @@
 {
-  "name": "prettier-config-tinkoff",
+  "name": "@tramvai/prettier-config",
   "version": "0.0.0-stub",
-  "initialVersion": "0.1.4",
+  "initialVersion": "1.0.0",
   "description": "Tinkoff prettier config",
   "keywords": [
     "prettier",
