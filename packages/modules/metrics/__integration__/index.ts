@@ -3,11 +3,24 @@ import { MetricsModule } from '@tramvai/module-metrics';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { METRICS_MODULE_TOKEN, REGISTER_INSTANT_METRIC_TOKEN } from '@tramvai/tokens-metrics';
 import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
+import { HTTP_CLIENT } from '@tramvai/tokens-http-client';
 
 createApp({
   name: 'metrics',
   modules: [...modules, MetricsModule],
   providers: [
+    {
+      provide: commandLineListTokens.customerStart,
+      multi: true,
+      useFactory: ({ httpClient }) => {
+        return () => {
+          httpClient.request({ url: 'http://not-exists.com' }).catch(() => {});
+        };
+      },
+      deps: {
+        httpClient: HTTP_CLIENT,
+      },
+    },
     typeof window === 'undefined'
       ? {
           provide: REGISTER_INSTANT_METRIC_TOKEN,
