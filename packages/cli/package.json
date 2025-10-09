@@ -199,7 +199,7 @@
     "@types/webpack-stats-plugin": "^0.3.2",
     "babel-plugin-tester": "^10.1.0",
     "react": "19.0.0",
-    "sharp": "0.32.6"
+    "sharp": "0.34.3"
   },
   "peerDependencies": {
     "babel-plugin-react-compiler": "*"
@@ -211,7 +211,7 @@
   },
   "hiddenDependencies": {
     "image-webpack-loader": "^6.0.0",
-    "sharp": "0.32.6"
+    "sharp": "0.34.3"
   },
   "license": "Apache-2.0",
   "engines": {
