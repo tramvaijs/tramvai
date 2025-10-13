@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import React, { useEffect, useReducer } from 'react';
 import { render, fireEvent } from '@testing-library/react';

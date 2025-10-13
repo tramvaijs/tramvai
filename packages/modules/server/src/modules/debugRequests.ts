@@ -5,6 +5,8 @@ import { Module, Scope, commandLineListTokens } from '@tramvai/core';
 import { parse } from '@tinkoff/url';
 import { EventEmitter } from 'events';
 import monkeypatch from '@tinkoff/monkeypatch';
+import { subscribe } from 'diagnostics_channel';
+import { DiagnosticsChannel } from 'undici';
 import http from 'http';
 import https from 'https';
 
@@ -41,6 +43,14 @@ interface Deps {
 }
 
 const INTERCEPTOR_TOKEN = 'debugRequestsInterceptor';
+
+const requestAdditionalDataSymbol = Symbol('request-additional-data');
+type RequestWithStatus = DiagnosticsChannel.RequestCreateMessage['request'] & {
+  // For debug purpose
+  [requestAdditionalDataSymbol]: {
+    responseStatusCode: number;
+  };
+};
 
 @Module({
   providers: [
@@ -98,6 +108,38 @@ ${parsed.href || `${parsed.protocol}//${parsed.hostname}${parsed.path}`}
                 });
               });
           };
+
+          subscribe(
+            'undici:request:headers',
+            ({
+              request,
+              response,
+            }: {
+              request: RequestWithStatus;
+              response: DiagnosticsChannel.RequestHeadersMessage['response'];
+            }) => {
+              request[requestAdditionalDataSymbol] = {
+                responseStatusCode: response.statusCode,
+              };
+            }
+          );
+
+          subscribe('undici:request:trailers', ({ request }: { request: RequestWithStatus }) => {
+            log.debug(`${request[requestAdditionalDataSymbol]?.responseStatusCode || 'unknown status'}
+${request.origin}${request.path}
+`);
+          });
+
+          subscribe(
+            'undici:request:error',
+            ({ error, request }: DiagnosticsChannel.RequestErrorMessage) => {
+              log.error({
+                event: 'request-failed',
+                error,
+                url: request.origin + request.path,
+              });
+            }
+          );
 
           monkeypatch({ obj: http, method: 'request', handler });
           monkeypatch({ obj: https, method: 'request', handler });

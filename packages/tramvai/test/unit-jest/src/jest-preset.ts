@@ -4,6 +4,8 @@ const config: Config.InitialOptions = {
   testRunner: 'jest-circus/runner',
   testEnvironment: 'node',
 
+  snapshotSerializers: [require.resolve('./abortController-serializer')],
+
   transform: {
     '\\.[jt]sx?$': [
       require.resolve('@swc-node/jest'),

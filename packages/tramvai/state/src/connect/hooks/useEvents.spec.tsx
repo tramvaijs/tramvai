@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { createMockStore } from '@tramvai/test-mocks';
 import { testComponent } from '@tramvai/test-react';

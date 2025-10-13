@@ -13,7 +13,7 @@ import { HttpProxyAgentModule } from '@tramvai/module-http-proxy-agent';
 import { ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { TramvaiDnsCacheModule } from '@tramvai/module-dns-cache';
-import { modules, bundles } from '../../../../test/shared/common';
+import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
 
 createApp({
   name: 'http-proxy-agent-app',
@@ -24,7 +24,6 @@ createApp({
       useFactory: ({ pageService, httpClient, envManager }) => {
         return async function makeTestRequest() {
           if (typeof window === 'undefined') {
-            const fetch = require('node-fetch').default;
             const queryParams = pageService.getCurrentUrl().query;
 
             if ('send-proxied-request' in queryParams) {

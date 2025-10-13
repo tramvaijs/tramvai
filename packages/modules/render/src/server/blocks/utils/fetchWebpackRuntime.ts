@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 let runtimeCode;
 
 export const fetchWebpackRuntime = async (webpackRuntimeURL: string) => {

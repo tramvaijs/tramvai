@@ -1,6 +1,4 @@
 import * as path from 'path';
-import fetch from 'node-fetch';
-
 import type {
   WebpackStats,
   FETCH_WEBPACK_STATS_TOKEN,

@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import React from 'react';
 import { composeLayoutOptions } from './utils';

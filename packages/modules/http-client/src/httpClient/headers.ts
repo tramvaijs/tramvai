@@ -5,7 +5,7 @@ import type { APP_INFO_TOKEN } from '@tramvai/tokens-core';
 import { createUserAgent } from './createUserAgent';
 
 /**
- * `node-fetch` sends "User-Agent: node-fetch" header
+ * nodejs sends "User-Agent: node" header
  * on the server by default. For logging purpose, we are
  * replacing "User-Agent" value with custom one, containing
  * both application name and version.

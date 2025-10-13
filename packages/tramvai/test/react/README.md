@@ -42,7 +42,7 @@ Under the hood the [@testing-library/react](https://testing-library.com/docs/rea
 
 ```ts
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { testComponent } from '@tramvai/test-react';
 
@@ -84,7 +84,7 @@ Under the hood the [@testing-library/react](https://github.com/testing-library/r
 
 ```ts
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { testHook } from '@tramvai/test-react';
 
@@ -122,7 +122,7 @@ You can manually specify not to use legacy rendering mode by settings option [`l
 
 ```ts
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { testComponent } from '@tramvai/test-react';
 

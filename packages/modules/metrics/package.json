@@ -35,7 +35,8 @@
     "@tramvai/tokens-router": "0.0.0-stub",
     "@tramvai/tokens-server": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub",
-    "prom-client": "^14.2.0"
+    "prom-client": "^14.2.0",
+    "undici": "^7.16.0"
   },
   "peerDependencies": {
     "tslib": "^2.4.0"

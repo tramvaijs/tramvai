@@ -2,6 +2,9 @@
   "name": "@tramvai/core",
   "version": "0.0.0-stub",
   "description": "",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [

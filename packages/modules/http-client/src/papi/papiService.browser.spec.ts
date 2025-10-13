@@ -1,13 +1,14 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 /* eslint-disable import/first */
-jest.mock('node-fetch');
 jest.mock('../papiClientModule', () => require('../papiClientModule.browser'));
 jest.mock('react-dom/server', () => require('react-dom/server.node'));
+jest.mock('@tinkoff/request-plugin-protocol-http/lib/index', () =>
+  require('@tinkoff/request-plugin-protocol-http/lib/index.browser')
+);
 
-import fetch from 'node-fetch';
 import type { Provider } from '@tinkoff/dippy';
 import { testModule } from '@tramvai/test-unit';
 import type { ModuleType } from '@tramvai/core';
@@ -35,6 +36,8 @@ import {
 } from '@tramvai/internal-test-utils/mocks/tramvai/envManager';
 import { createJsonResponse } from '@tramvai/internal-test-utils/utils/fetch';
 import { HttpClientModule } from '../httpClientModule';
+
+const fetch = jest.spyOn(globalThis, 'fetch');
 
 global.setImmediate = ((fn, ...args) => fn(...args)) as any;
 
@@ -128,23 +131,20 @@ describe('PapiService, browser', () => {
     const response = await apiClient.request({ path: 'fake', query: { foo: 'bar' } });
     const request = (fetch as any).mock.calls[0];
 
-    expect(request).toMatchInlineSnapshot(`
-      [
-        "/testApp/papi/fake?foo=bar",
-        {
-          "agent": undefined,
-          "body": undefined,
-          "credentials": "same-origin",
-          "headers": {
-            "Content-type": "application/x-www-form-urlencoded",
-            "X-real-ip": undefined,
-          },
-          "method": "GET",
-          "signal": AbortSignal {},
-          "timeout": 30000,
+    expect(request).toMatchObject([
+      '/testApp/papi/fake?foo=bar',
+      {
+        body: undefined,
+        credentials: 'same-origin',
+        dispatcher: undefined,
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded',
+          'X-real-ip': undefined,
         },
-      ]
-    `);
+        method: 'GET',
+        signal: expect.any(Object),
+      },
+    ]);
 
     expect(response).toMatchInlineSnapshot(`
       {
@@ -172,23 +172,20 @@ describe('PapiService, browser', () => {
     });
     const request = (fetch as any).mock.calls[0];
 
-    expect(request).toMatchInlineSnapshot(`
-      [
-        "/testApp/papi/fake",
-        {
-          "agent": undefined,
-          "body": "foo=bar",
-          "credentials": "same-origin",
-          "headers": {
-            "Content-type": "application/x-www-form-urlencoded",
-            "X-real-ip": undefined,
-          },
-          "method": "POST",
-          "signal": AbortSignal {},
-          "timeout": 30000,
+    expect(request).toMatchObject([
+      '/testApp/papi/fake',
+      {
+        body: 'foo=bar',
+        credentials: 'same-origin',
+        dispatcher: undefined,
+        headers: {
+          'Content-type': 'application/x-www-form-urlencoded',
+          'X-real-ip': undefined,
         },
-      ]
-    `);
+        method: 'POST',
+        signal: expect.any(Object),
+      },
+    ]);
 
     expect(response).toMatchInlineSnapshot(`
       {

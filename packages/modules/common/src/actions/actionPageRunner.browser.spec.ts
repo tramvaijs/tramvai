@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import noop from '@tinkoff/utils/function/noop';
 import { createAction, declareAction } from '@tramvai/core';

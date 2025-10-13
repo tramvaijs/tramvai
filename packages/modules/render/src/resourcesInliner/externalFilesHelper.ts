@@ -1,19 +1,7 @@
-import http from 'http';
-import https from 'https';
-import type { Agent, AgentOptions } from 'https';
 import requestFactory from '@tinkoff/request-core';
 import httpPlugin, { getHeaders } from '@tinkoff/request-plugin-protocol-http';
 
-const options: AgentOptions = {
-  keepAlive: true,
-  scheduling: 'lifo',
-};
-const agent = {
-  http: new http.Agent(options) as Agent,
-  https: new https.Agent(options),
-};
-
-const request = requestFactory([httpPlugin({ agent })]);
+const request = requestFactory([httpPlugin()]);
 
 const thirtySeconds = 1000 * 30;
 

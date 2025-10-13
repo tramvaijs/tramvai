@@ -20,8 +20,9 @@
   },
   "dependencies": {
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
-    "@tinkoff/url": "0.0.0-stub"
+    "@tinkoff/request-plugin-protocol-http": "0.15.0",
+    "@tinkoff/url": "0.0.0-stub",
+    "undici": "^7.16.0"
   },
   "peerDependencies": {
     "@tramvai/core": "0.0.0-stub",

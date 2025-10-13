@@ -3,10 +3,7 @@ import request from '@tinkoff/request-core';
 import deduplicate from '@tinkoff/request-plugin-cache-deduplicate';
 import http from '@tinkoff/request-plugin-protocol-http';
 import circuitBreaker from '@tinkoff/request-plugin-circuit-breaker';
-import { createAgent } from './agent/createAgent';
 import type { RequestOptions } from './types.h';
-
-const agent = createAgent();
 
 export const makeRequest = (
   { circuitBreakerEnabled }: RequestOptions = { circuitBreakerEnabled: true }
@@ -28,7 +25,7 @@ export const makeRequest = (
     );
   }
 
-  plugins.push(http({ agent }));
+  plugins.push(http());
 
   return request(plugins);
 };

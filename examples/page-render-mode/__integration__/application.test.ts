@@ -3,7 +3,6 @@ import { sleep } from '@tramvai/test-integration';
 import { startCli } from '@tramvai/test-integration';
 import { initPlaywright } from '@tramvai/test-pw';
 import path from 'path';
-import fetch from 'node-fetch';
 
 jest.setTimeout(30000);
 

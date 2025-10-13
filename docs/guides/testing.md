@@ -490,7 +490,7 @@ Basic unit test example:
 
 ```tsx
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 import { testComponent, screen } from '@tramvai/test-react';
@@ -512,7 +512,7 @@ it('event', () => {
 
 ```tsx
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 import { testComponent, screen } from '@tramvai/test-react';
@@ -538,7 +538,7 @@ it('props', () => {
 
 ```tsx
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 import { useState } from 'react';
@@ -573,7 +573,7 @@ As many other `tramvai` testing utilities, you can pass custom DI or providers t
 
 ```tsx
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 import { createToken } from '@tramvai/core';
@@ -603,7 +603,7 @@ it('di', () => {
 
 ```tsx
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 import { createReducer, createEvent, useStore } from '@tramvai/state';
@@ -641,7 +641,7 @@ it('state', async () => {
 
 ```tsx
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 
 import { useStore } from '@tramvai/state';

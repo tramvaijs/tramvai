@@ -27,5 +27,4 @@ export type Args =
 export type CreateRequestWithMetrics = (args: {
   metricsInstances: MetricsInstances;
   getServiceName: GetServiceName;
-  config: ModuleConfig;
 }) => (originalRequest: HttpModule['request'], ...requestArgs: Args) => ClientRequest;

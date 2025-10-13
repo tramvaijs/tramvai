@@ -3,8 +3,10 @@
   "version": "0.0.0-stub",
   "description": "",
   "main": "lib/index.js",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "browser": {
-    "./lib/agent/createAgent.js": "./lib/agent/createAgent.browser.js",
     "./lib/index.es.js": "./lib/index.browser.js"
   },
   "typings": "lib/index.d.ts",
@@ -22,18 +24,19 @@
   "dependencies": {
     "@tinkoff/request-core": "^0.10.0",
     "@tinkoff/request-plugin-cache-deduplicate": "^0.10.3",
-    "@tinkoff/request-plugin-cache-etag": "^0.4.3",
+    "@tinkoff/request-plugin-cache-etag": "^0.5.0",
     "@tinkoff/request-plugin-cache-memory": "^0.10.2",
-    "@tinkoff/request-plugin-circuit-breaker": "^0.4.0",
+    "@tinkoff/request-plugin-circuit-breaker": "^0.5.0",
     "@tinkoff/request-plugin-log": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
+    "@tinkoff/request-plugin-protocol-http": "0.15.0",
     "@tinkoff/request-plugin-retry": "^0.3.0",
     "@tinkoff/request-plugin-transform-url": "^0.10.0",
     "@tinkoff/request-plugin-validate": "^0.10.0",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/http-client": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "undici": "^7.16.0"
   },
   "sideEffects": false,
   "license": "Apache-2.0",

@@ -1,5 +1,4 @@
 import { resolve } from 'path';
-import fetch from 'node-fetch';
 import { start } from '@tramvai/cli';
 import { getStaticUrl } from '@tramvai/test-integration';
 

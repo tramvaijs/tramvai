@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { createMockContext } from '@tramvai/test-mocks';
 import { testHook } from '@tramvai/test-react';

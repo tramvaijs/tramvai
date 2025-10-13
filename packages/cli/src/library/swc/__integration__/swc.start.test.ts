@@ -1,7 +1,6 @@
 import { start } from '@tramvai/cli';
 import { getStaticUrl } from '@tramvai/test-integration';
 import type { PromiseType } from 'utility-types';
-import fetch from 'node-fetch';
 
 let app: PromiseType<ReturnType<typeof start>>;
 let clientCode: string;

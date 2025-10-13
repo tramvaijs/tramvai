@@ -2,7 +2,6 @@ const http = require('http');
 const { exec, spawnSync } = require('child_process');
 const path = require('path');
 const express = require('express');
-const fetch = require('node-fetch');
 const getPort = require('get-port');
 const { createTerminus } = require('./index');
 
@@ -166,7 +165,6 @@ describe('Terminus', () => {
     });
 
     // @todo исправить нестабильный тест
-    // eslint-disable-next-line jest/no-test-callback
     it.skip('returns 503 once signal received', async () => {
       const port = await getPort();
       let responseAssertionsComplete = false;
@@ -200,7 +198,6 @@ describe('Terminus', () => {
     });
 
     // @todo исправить нестабильный тест
-    // eslint-disable-next-line jest/no-test-callback
     it.skip('calls onSendFailureDuringShutdown when sending 503 during shutdown', async () => {
       const port = await getPort();
       let responseAssertionsComplete = false;
@@ -237,7 +234,6 @@ describe('Terminus', () => {
     });
 
     // @todo исправить нестабильный тест
-    // eslint-disable-next-line jest/no-test-callback
     it.skip('does NOT call onSendFailureDuringShutdown when sending 503 during failed healthcheck', async () => {
       const port = await getPort();
       let responseAssertionsComplete = false;

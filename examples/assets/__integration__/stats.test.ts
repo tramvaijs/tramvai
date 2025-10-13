@@ -1,5 +1,4 @@
 import path from 'path';
-import fetch from 'node-fetch';
 import type { StartCliResult } from '@tramvai/test-integration';
 import { startCli } from '@tramvai/test-integration';
 

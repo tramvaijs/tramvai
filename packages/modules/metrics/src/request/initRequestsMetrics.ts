@@ -9,6 +9,7 @@ import type {
   HttpModule,
   HttpsModule,
 } from './types';
+import { addMetricsForFetch, initConnectionResolveMetrics } from './createRequestWithMetrics';
 
 export const initRequestsMetrics = ({
   metrics,
@@ -62,14 +63,20 @@ export const initRequestsMetrics = ({
     }),
   };
 
+  addMetricsForFetch({ metricsInstances, getServiceName });
+
+  if (config.enableConnectionResolveMetrics) {
+    initConnectionResolveMetrics({ metricsInstances });
+  }
+
   monkeypatch({
     obj: https,
     method: 'request',
-    handler: createRequestWithMetrics({ metricsInstances, getServiceName, config }),
+    handler: createRequestWithMetrics({ metricsInstances, getServiceName }),
   });
   monkeypatch({
     obj: http,
     method: 'request',
-    handler: createRequestWithMetrics({ metricsInstances, getServiceName, config }),
+    handler: createRequestWithMetrics({ metricsInstances, getServiceName }),
   });
 };

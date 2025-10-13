@@ -85,7 +85,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
 
       const { payload } = await httpClient.request({
         url: `http://localhost:${port}/fake`,
-        timeout: 200,
+        timeout: 500,
       });
 
       expect(payload).toBe('ok');

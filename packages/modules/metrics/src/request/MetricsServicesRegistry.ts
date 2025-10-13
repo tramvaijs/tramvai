@@ -51,6 +51,19 @@ class MetricsServicesRegistry implements MetricsServicesRegistryInterface {
       return undefined;
     }
 
+    // In undici diagnostic_channel headers is flat string list
+    // ['header', 'value', 'header2', 'value2']
+    if (Array.isArray(options?.headers)) {
+      const headerIndex = options.headers.findIndex((item) => item === SERVICE_NAME_HEADER);
+
+      if (headerIndex !== -1) {
+        const serviceName = options.headers[headerIndex + 1];
+        options.headers.splice(headerIndex, 2);
+
+        return serviceName;
+      }
+    }
+
     const serviceFromHeaders =
       typeof options?.headers?.get === 'function'
         ? options.headers.get(SERVICE_NAME_HEADER)
@@ -74,7 +87,7 @@ class MetricsServicesRegistry implements MetricsServicesRegistryInterface {
     if (!treeValue) {
       return undefined;
     }
-    // Когда урл запросен из регистри, мы не знаем был ли он добавлен с протоколом, поэтому
+    // Когда урл запрошен из регистри, мы не знаем был ли он добавлен с протоколом, поэтому
     // проверяем оба варианта
     return treeValue[protocol] || treeValue[NO_PROTOCOL];
   }

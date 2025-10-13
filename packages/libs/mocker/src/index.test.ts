@@ -2,7 +2,6 @@ import express from 'express';
 import type { Server } from 'http';
 import { createServer } from 'http';
 import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
-import fetch from 'node-fetch';
 import { Mocker, FileSystemMockRepository } from './index';
 
 const listen = (server: Server, port: number) => {

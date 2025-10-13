@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { format } from '@tinkoff/url';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
@@ -71,12 +70,11 @@ export class BackgroundFetchService {
         'User-Agent': userAgentByDeviceType[`${deviceType}`],
         'X-Tramvai-Static-Page-Revalidate': 'true',
       },
-      timeout: 10000,
+      signal: AbortSignal.timeout(10000),
     })
       .then(async (response) => {
         const body = await response.text();
-        const headers = response.headers.raw();
-        const { status } = response;
+        const { headers, status } = response;
 
         this.log.debug({
           event: status >= 500 ? 'background-fetch-5xx' : 'background-fetch-success',
@@ -86,7 +84,8 @@ export class BackgroundFetchService {
 
         return {
           body,
-          headers,
+          // @ts-ignore outdated typings for headers in typescript
+          headers: Object.fromEntries(headers.entries()),
           status,
         };
       })

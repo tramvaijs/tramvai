@@ -1,6 +1,5 @@
 import type { PromiseType } from 'utility-types';
 import { startProd } from '@tramvai/cli';
-import fetch from 'node-fetch';
 import autocannon from 'autocannon';
 import waitOn from 'wait-on';
 import { getPort } from '@tramvai/internal-test-utils/utils/getPort';

@@ -1,6 +1,7 @@
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
+import type { Agent, Dispatcher } from 'undici';
 import type { BaseHttpClient, HttpClient, HttpClientInterceptor } from '@tramvai/http-client';
-import type { TinkoffRequestOptions, Agent } from '@tramvai/tinkoff-request-http-client-adapter';
+import type { TinkoffRequestOptions } from '@tramvai/tinkoff-request-http-client-adapter';
 
 export type HttpClientFactoryOptions = TinkoffRequestOptions & { name: string };
 
@@ -36,13 +37,36 @@ export const HTTP_CLIENT = createToken<HttpClient>('HTTP_CLIENT');
 
 /**
  * @description
- * Global HTTP and HTTPS agents for all clients
- * https://nodejs.org/dist/latest-v16.x/docs/api/http.html#class-httpagent
+ * Global HTTP and HTTPS agents for all fetch requests
+ * @see https://undici.nodejs.org/#/docs/api/Dispatcher.md
+ * @see https://undici.nodejs.org/#/docs/api/Agent.md
  */
 export const HTTP_CLIENT_AGENT = createToken<{
   http: Agent;
   https: Agent;
-}>('HTTP_CLIENT_AGENT');
+}>('HTTP_CLIENT_AGENT', { scope: Scope.SINGLETON });
+
+/**
+ * @description
+ * Global agent options
+ * @see https://undici.nodejs.org/#/docs/api/Agent?id=parameter-agentoptions
+ */
+export const HTTP_CLIENT_AGENT_OPTIONS = createToken<Agent.Options>('HTTP_CLIENT_AGENT_OPTIONS', {
+  scope: Scope.SINGLETON,
+});
+
+/**
+ * @description
+ * Interceptors for global agent
+ * @see https://undici.nodejs.org/#/docs/api/Dispatcher?id=dispatchercomposeinterceptors-interceptor
+ */
+export const HTTP_CLIENT_AGENT_INTERCEPTORS = createToken<Dispatcher.DispatcherComposeInterceptor>(
+  'HTTP_CLIENT_AGENT_INTERCEPTORS',
+  {
+    multi: true,
+    scope: Scope.SINGLETON,
+  }
+);
 
 /**
  * @description

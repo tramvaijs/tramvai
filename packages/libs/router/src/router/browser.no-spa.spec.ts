@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { parse } from '@tinkoff/url';
 import { NoSpaRouter } from './clientNoSpa';

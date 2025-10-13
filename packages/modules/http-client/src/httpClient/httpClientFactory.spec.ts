@@ -1,7 +1,3 @@
-/* eslint-disable import/first */
-jest.mock('node-fetch');
-
-import fetch from 'node-fetch';
 import { testModule } from '@tramvai/test-unit';
 import { ENV_MANAGER_TOKEN, LOGGER_TOKEN, REQUEST_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { DEFAULT_HTTP_CLIENT_INTERCEPTORS, HTTP_CLIENT_FACTORY } from '@tramvai/tokens-http-client';
@@ -27,6 +23,8 @@ const { loggerMock, loggerFactoryMock } = createLoggerMocks();
 const requestManagerMock = createRequestManagerMock();
 const envManagerMock = createEnvManagerMock();
 const interceptorMock = jest.fn((r, n) => n(r));
+
+const fetch = jest.spyOn(require('undici'), 'fetch');
 
 const mockHttpClientFactory = (providers: Provider[] = []) => {
   const { di } = testModule(HttpClientModule, {
@@ -251,4 +249,3 @@ describe('httpClientFactory', () => {
     expect(interceptorMock).toHaveBeenCalledTimes(1);
   });
 });
-/* eslint-enable import/first */

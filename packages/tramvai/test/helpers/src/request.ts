@@ -27,6 +27,8 @@ export const requestFactory = (appOrUrl: Application | FastifyInstance | string)
   ) => {
     const instance = request[method](path);
 
+    console.log(instance);
+
     if (contentType) {
       instance.type(contentType);
     }

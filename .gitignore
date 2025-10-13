@@ -25,6 +25,8 @@ _node_modules/
 !.yarn/plugins
 !.yarn/sdks
 !.yarn/versions
+.yalc
+yalc.lock
 
 
 # IDE

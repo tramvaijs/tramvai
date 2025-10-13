@@ -1,4 +1,5 @@
 import either from '@tinkoff/utils/function/either';
+import type { Agent } from 'undici/types';
 
 import type { ContextState, Plugin, MakeRequest, Request } from '@tinkoff/request-core';
 import request from '@tinkoff/request-core';
@@ -15,12 +16,6 @@ import circuitBreaker from '@tinkoff/request-plugin-circuit-breaker';
 import type { HttpClientBaseOptions } from '@tramvai/http-client';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import retry from '@tinkoff/request-plugin-retry';
-import { createAgent } from './agent/createAgent';
-import type { Agent } from './agent/createAgent';
-
-export type { Agent };
-
-const defaultAgent = createAgent();
 
 export type RequestValidator = {
   (state: ContextState): any;
@@ -215,7 +210,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
 
   plugins.push(
     http({
-      agent: agent || defaultAgent,
+      agent,
       querySerializer: querySerializer || undefined,
     })
   );

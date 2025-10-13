@@ -2,6 +2,9 @@
   "name": "@tramvai/cli",
   "version": "0.0.0-stub",
   "description": "Cli инструмент для сборки и запуска приложений",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "files": [
     "src",
     "lib",
@@ -67,7 +70,7 @@
     "@tinkoff/minicss-class-generator": "0.0.0-stub",
     "@tinkoff/package-manager-wrapper": "0.0.0-stub",
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
+    "@tinkoff/request-plugin-protocol-http": "0.15.0",
     "@tinkoff/request-plugin-retry": "^0.3.0",
     "@tinkoff/utils": "^2.1.3",
     "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",
@@ -158,6 +161,7 @@
     "text-table": "^0.2.0",
     "thread-loader": "^3.0.4",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
+    "undici": "^7.16.0",
     "utility-types": "^3.10.0",
     "v8-compile-cache": "^2.3.0",
     "validate-npm-package-name": "^3.0.0",
@@ -209,8 +213,5 @@
     "image-webpack-loader": "^6.0.0",
     "sharp": "0.34.3"
   },
-  "license": "Apache-2.0",
-  "engines": {
-    "node": ">=16.0.0"
-  }
+  "license": "Apache-2.0"
 }

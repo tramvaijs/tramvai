@@ -183,38 +183,6 @@ More information:
 - https://blog.ztec.fr/en/2024/post/node.js-20-upgrade-journey-though-unexpected-heap-issues-with-kubernetes/
 - https://github.com/nodejs/node/issues/42511
 
-### Agent keepAlive
-
-**TL;DR**: use `@tramvai/module-http-client` module
-
-One of the best network optimizations is to use `keepAlive` connections. This will reduce the number of DNS resolves and TCP connections and reduce the time to establish a connection.
-
-`@tramvai/module-http-client` module automatically create `http` and `https` agents with `keepAlive: true` parameter.
-
-If you don't use this module, you can create your own agents with `keepAlive: true` parameter:
-
-```ts
-import http from 'http';
-import https from 'https';
-
-const options = {
-  keepAlive: true,
-  scheduling: 'lifo',
-};
-
-const httpAgent = new http.Agent(options);
-const httpsAgent = new https.Agent(options);
-
-fetch('http://example.com', { agent: httpAgent });
-fetch('https://example.com', { agent: httpsAgent });
-```
-
-More information:
-
-- [`@tramvai/module-http-client` documentation](03-features/09-data-fetching/02-http-client.md)
-- [keepAlive parameter](https://nodejs.org/api/http.html#new-agentoptions)
-- https://community.ops.io/lob_dev/stop-wasting-connections-use-http-keep-alive-1ckg
-
 ### `libuv` threads
 
 **TL;DR**: set env variable `UV_THREADPOOL_SIZE` to **8**

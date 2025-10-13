@@ -14,7 +14,26 @@ createApp({
       multi: true,
       useFactory: ({ httpClient }) => {
         return () => {
-          httpClient.request({ url: 'http://not-exists.com' }).catch(() => {});
+          if (typeof window === 'undefined') {
+            httpClient.request({ url: 'http://not-exists.com' }).catch(() => {});
+
+            fetch('http://not-exists.com', {
+              headers: {
+                'x-tramvai-service-name': 'FETCH_REQUEST',
+              },
+            }).catch(() => {});
+
+            const http = require('http');
+            http.request(
+              'http://not-exists.com',
+              {
+                headers: {
+                  'x-tramvai-service-name': 'HTTP_REQUEST',
+                },
+              },
+              () => {}
+            );
+          }
         };
       },
       deps: {

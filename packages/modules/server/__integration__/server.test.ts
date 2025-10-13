@@ -1,5 +1,4 @@
 import { resolve } from 'path';
-import fetch from 'node-fetch';
 import { testApp } from '@tramvai/internal-test-utils/testApp';
 import { startExternalWebsite } from '@tramvai/internal-test-utils/utils/externalWebsite';
 import { getPort } from '@tramvai/internal-test-utils/utils/getPort';

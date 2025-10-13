@@ -26,7 +26,7 @@
     "@tinkoff/htmlpagebuilder": "0.0.0-stub",
     "@tinkoff/layout-factory": "0.0.0-stub",
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "^0.12.1",
+    "@tinkoff/request-plugin-protocol-http": "0.15.0",
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/user-agent": "0.0.0-stub",
     "@tramvai/experiments": "0.0.0-stub",
@@ -36,7 +36,7 @@
     "@tramvai/safe-strings": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@types/loadable__server": "^5.12.6",
-    "node-fetch": "^2.6.1"
+    "undici": "^7.16.0"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",
@@ -54,9 +54,6 @@
     "react": ">=16.14.0",
     "react-dom": ">=16.14.0",
     "tslib": "^2.4.0"
-  },
-  "devDependencies": {
-    "@types/node-fetch": "^2.6.2"
   },
   "gitHead": "8e826a214c87b188fc4d254cdd8f2a2b2c55f3a8",
   "module": "lib/server.es.js",

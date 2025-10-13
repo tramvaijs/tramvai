@@ -1,5 +1,5 @@
 /**
- * @jest-environment jsdom
+ * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { CookieManager } from './cookieManager.browser';
 import { prepareCookieOptions } from './utils';

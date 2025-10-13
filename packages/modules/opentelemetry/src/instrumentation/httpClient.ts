@@ -50,11 +50,8 @@ export const providers = [
         // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#http-client
         return tracer.trace(`${method} ${serviceName}`, { kind: SpanKind.CLIENT }, (span) => {
           // todo: move custom tramvai attrs to constants
-          /**
-           * - `tramvai.http-client.transport` - internal HTTP client, `node-fetch` at server-side (possible `undici` in future), `fetch` at client-side
-           */
           span.setAttribute('tramvai.scope', 'http-client');
-          span.setAttribute('tramvai.http-client.transport', 'node-fetch');
+          span.setAttribute('tramvai.http-client.transport', 'undici');
 
           span.setAttribute(ATTR_HTTP_REQUEST_METHOD, method);
           span.setAttribute(ATTR_SERVER_ADDRESS, parsedUrl.hostname);

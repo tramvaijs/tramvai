@@ -22,12 +22,10 @@
     "express": "^4.21.2",
     "fast-glob": "^3.2.2",
     "http-proxy-middleware": "^2.0.2",
-    "node-fetch": "^2.6.1",
     "tslib": "^2.4.0"
   },
   "devDependencies": {
-    "@types/http-proxy-middleware": "^0.19.3",
-    "@types/node-fetch": "^2.6.2"
+    "@types/http-proxy-middleware": "^0.19.3"
   },
   "license": "Apache-2.0"
 }
