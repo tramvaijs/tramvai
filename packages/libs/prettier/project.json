@@ -1,6 +1,0 @@
-{
-  "name": "@tramvai/prettier-config",
-  "sourceRoot": "packages/libs/prettier/src",
-  "projectType": "library",
-  "targets": {}
-}
