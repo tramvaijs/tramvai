@@ -480,13 +480,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-string-parser@npm:^7.19.4":
-  version: 7.19.4
-  resolution: "@babel/helper-string-parser@npm:7.19.4::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40babel%2Fhelper-string-parser%2F-%2Fhelper-string-parser-7.19.4.tgz"
-  checksum: 10c0/e20c81582e75df2a020a1c547376668a6e1e1c2ca535a6b7abb25b83d5536c99c0d113184bbe87c1a26e923a9bb0c6e5279fca8db6bd609cd3499fafafc01598
-  languageName: node
-  linkType: hard
-
 "@babel/helper-string-parser@npm:^7.27.1":
   version: 7.27.1
   resolution: "@babel/helper-string-parser@npm:7.27.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40babel%2Fhelper-string-parser%2F-%2Fhelper-string-parser-7.27.1.tgz"
@@ -494,14 +487,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-validator-identifier@npm:^7.18.6, @babel/helper-validator-identifier@npm:^7.19.1":
-  version: 7.19.1
-  resolution: "@babel/helper-validator-identifier@npm:7.19.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40babel%2Fhelper-validator-identifier%2F-%2Fhelper-validator-identifier-7.19.1.tgz"
-  checksum: 10c0/f978ecfea840f65b64ab9e17fac380625a45f4fe1361eeb29867fcfd1c9eaa72abd7023f2f40ac3168587d7e5153660d16cfccb352a557be2efd347a051b4b20
-  languageName: node
-  linkType: hard
-
-"@babel/helper-validator-identifier@npm:^7.27.1":
+"@babel/helper-validator-identifier@npm:^7.18.6, @babel/helper-validator-identifier@npm:^7.19.1, @babel/helper-validator-identifier@npm:^7.27.1":
   version: 7.27.1
   resolution: "@babel/helper-validator-identifier@npm:7.27.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40babel%2Fhelper-validator-identifier%2F-%2Fhelper-validator-identifier-7.27.1.tgz"
   checksum: 10c0/c558f11c4871d526498e49d07a84752d1800bf72ac0d3dad100309a2eaba24efbf56ea59af5137ff15e3a00280ebe588560534b0e894a4750f8b1411d8f78b84
@@ -1652,18 +1638,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/types@npm:^7.12.7, @babel/types@npm:^7.18.10, @babel/types@npm:^7.18.4, @babel/types@npm:^7.18.6, @babel/types@npm:^7.18.9, @babel/types@npm:^7.19.0, @babel/types@npm:^7.19.4, @babel/types@npm:^7.4.4":
-  version: 7.19.4
-  resolution: "@babel/types@npm:7.19.4::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40babel%2Ftypes%2F-%2Ftypes-7.19.4.tgz"
-  dependencies:
-    "@babel/helper-string-parser": "npm:^7.19.4"
-    "@babel/helper-validator-identifier": "npm:^7.19.1"
-    to-fast-properties: "npm:^2.0.0"
-  checksum: 10c0/62d0d24fc87e36666874725b05bb0895a8834f09713ec76bf28eb2b615aa80287fd3f29801a923b9ff8a90d7f8ffd4b40bc7bc4840e4a530e165cdab3e6bfb78
-  languageName: node
-  linkType: hard
-
-"@babel/types@npm:^7.8.3":
+"@babel/types@npm:^7.12.7, @babel/types@npm:^7.18.10, @babel/types@npm:^7.18.4, @babel/types@npm:^7.18.6, @babel/types@npm:^7.18.9, @babel/types@npm:^7.19.0, @babel/types@npm:^7.19.4, @babel/types@npm:^7.4.4, @babel/types@npm:^7.8.3":
   version: 7.28.2
   resolution: "@babel/types@npm:7.28.2::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40babel%2Ftypes%2F-%2Ftypes-7.28.2.tgz"
   dependencies:
@@ -4426,18 +4401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cross-spawn@npm:^7.0.3":
-  version: 7.0.3
-  resolution: "cross-spawn@npm:7.0.3::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fcross-spawn%2F-%2Fcross-spawn-7.0.3.tgz"
-  dependencies:
-    path-key: "npm:^3.1.0"
-    shebang-command: "npm:^2.0.0"
-    which: "npm:^2.0.1"
-  checksum: 10c0/5738c312387081c98d69c98e105b6327b069197f864a60593245d64c8089c8a0a744e16349281210d56835bb9274130d825a78b2ad6853ca13cfbeffc0c31750
-  languageName: node
-  linkType: hard
-
-"cross-spawn@npm:^7.0.6":
+"cross-spawn@npm:^7.0.3, cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fcross-spawn%2F-%2Fcross-spawn-7.0.6.tgz"
   dependencies:
@@ -4665,19 +4629,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.2.0":
-  version: 4.3.4
-  resolution: "debug@npm:4.3.4::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fdebug%2F-%2Fdebug-4.3.4.tgz"
-  dependencies:
-    ms: "npm:2.1.2"
-  peerDependenciesMeta:
-    supports-color:
-      optional: true
-  checksum: 10c0/cedbec45298dd5c501d01b92b119cd3faebe5438c3917ff11ae1bff86a6c722930ac9c8659792824013168ba6db7c4668225d845c633fbdafbbf902a6389f736
-  languageName: node
-  linkType: hard
-
-"debug@npm:^4.3.4":
+"debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.2.0, debug@npm:^4.3.4":
   version: 4.4.1
   resolution: "debug@npm:4.4.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fdebug%2F-%2Fdebug-4.4.1.tgz"
   dependencies:
@@ -6118,14 +6070,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-cache-semantics@npm:^4.0.0":
-  version: 4.1.0
-  resolution: "http-cache-semantics@npm:4.1.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fhttp-cache-semantics%2F-%2Fhttp-cache-semantics-4.1.0.tgz"
-  checksum: 10c0/abe115ddd9f24914a49842f2745ecc8380837bbe30b59b154648c76ebc1bd3d5f8bd05c1789aaa2ae6b79624c591d13c8aa79104ff21078e117140a65ac20654
-  languageName: node
-  linkType: hard
-
-"http-cache-semantics@npm:^4.1.1":
+"http-cache-semantics@npm:^4.0.0, http-cache-semantics@npm:^4.1.1":
   version: 4.2.0
   resolution: "http-cache-semantics@npm:4.2.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fhttp-cache-semantics%2F-%2Fhttp-cache-semantics-4.2.0.tgz"
   checksum: 10c0/45b66a945cf13ec2d1f29432277201313babf4a01d9e52f44b31ca923434083afeca03f18417f599c9ab3d0e7b618ceb21257542338b57c54b710463b4a53e37
@@ -7430,13 +7375,6 @@ __metadata:
   version: 2.0.0
   resolution: "ms@npm:2.0.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fms%2F-%2Fms-2.0.0.tgz"
   checksum: 10c0/f8fda810b39fd7255bbdc451c46286e549794fcc700dc9cd1d25658bbc4dc2563a5de6fe7c60f798a16a60c6ceb53f033cb353f493f0cf63e5199b702943159d
-  languageName: node
-  linkType: hard
-
-"ms@npm:2.1.2":
-  version: 2.1.2
-  resolution: "ms@npm:2.1.2::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fms%2F-%2Fms-2.1.2.tgz"
-  checksum: 10c0/a437714e2f90dbf881b5191d35a6db792efbca5badf112f87b9e1c712aace4b4b9b742dd6537f3edf90fd6f684de897cec230abde57e87883766712ddda297cc
   languageName: node
   linkType: hard
 
@@ -10118,13 +10056,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"to-fast-properties@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "to-fast-properties@npm:2.0.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fto-fast-properties%2F-%2Fto-fast-properties-2.0.0.tgz"
-  checksum: 10c0/b214d21dbfb4bce3452b6244b336806ffea9c05297148d32ebb428d5c43ce7545bdfc65a1ceb58c9ef4376a65c0cb2854d645f33961658b3e3b4f84910ddcdd7
-  languageName: node
-  linkType: hard
-
 "to-readable-stream@npm:^1.0.0":
   version: 1.0.0
   resolution: "to-readable-stream@npm:1.0.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fto-readable-stream%2F-%2Fto-readable-stream-1.0.0.tgz"
@@ -10902,18 +10833,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"wrap-ansi@npm:^8.0.1":
-  version: 8.0.1
-  resolution: "wrap-ansi@npm:8.0.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fwrap-ansi%2F-%2Fwrap-ansi-8.0.1.tgz"
-  dependencies:
-    ansi-styles: "npm:^6.1.0"
-    string-width: "npm:^5.0.1"
-    strip-ansi: "npm:^7.0.1"
-  checksum: 10c0/f32dc32427920ff97b6e8265baecb79339dd4de2818f7a3e7bda60f32136a8bad7b9601b945b52552e1c46cece75dea967623a06dbc6a6e6604754c401b98820
-  languageName: node
-  linkType: hard
-
-"wrap-ansi@npm:^8.1.0":
+"wrap-ansi@npm:^8.0.1, wrap-ansi@npm:^8.1.0":
   version: 8.1.0
   resolution: "wrap-ansi@npm:8.1.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fwrap-ansi%2F-%2Fwrap-ansi-8.1.0.tgz"
   dependencies:
