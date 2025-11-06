@@ -1,16 +1,18 @@
 import fs from 'node:fs';
-import mergeDeep from '@tinkoff/utils/object/mergeDeep';
-import { createToken } from '@tinkoff/dippy';
-import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
-import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
-import { cosmiconfig } from 'cosmiconfig';
-import { TypeScriptLoader } from 'cosmiconfig-typescript-loader';
-import type { PluginOptions } from 'image-minimizer-webpack-plugin';
-import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-integrity';
-import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
 
 import type { Config as SvgoConfig } from 'svgo';
+import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
+import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-integrity';
+import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
+import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
+import type { PluginOptions } from 'image-minimizer-webpack-plugin';
+
+import { cosmiconfig } from 'cosmiconfig';
+import mergeDeep from '@tinkoff/utils/object/mergeDeep';
+import { createToken } from '@tinkoff/dippy';
+
 import type { TramvaiPlugin } from '../core/plugin';
+import { typescriptLoader } from './config-loader';
 import { resolveAbsolutePathForFile } from '../utils/path';
 import { packageVersion } from '../utils/package-version';
 import { logger } from '../services/logger';
@@ -837,7 +839,7 @@ export class ConfigService {
       searchStrategy: 'none',
       searchPlaces: ['tramvai.config.ts'],
       loaders: {
-        '.ts': TypeScriptLoader(),
+        '.ts': typescriptLoader(),
       },
     })
       .search(rootDir)

@@ -12,7 +12,7 @@
     "@docusaurus/theme-common": "2.3.1",
     "@easyops-cn/docusaurus-search-local": "^0.21.4",
     
-    
+    "@tinkoff/pvm": "^1.24.0",
     "@tinkoff/utils": "^2.1.2",
     "clsx": "^1.1.1",
     "directory-tree": "^2.2.4",
@@ -20,7 +20,8 @@
     "prism-react-renderer": "^1.1.1",
     "prop-types": "^15.7.2",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tslib": "^2.4.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-decorators": "*",
@@ -31,6 +32,7 @@
     "@types/react-dom": "^18.0.0",
     "fast-glob": "^3.2.2",
     "indent-string": "^4.0.0",
+    "typescript": "~5.1.0",
     "unist-util-visit": "^2.0.3"
   },
   "browserslist": [
