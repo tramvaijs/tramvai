@@ -108,7 +108,7 @@ export const bundleResource = async ({
         attrs: {
           'data-critical': 'true',
           ...(integrities[webpackRuntimeScriptName]
-            ? { integrity: integrities[webpackRuntimeScriptName] }
+            ? { integrity: integrities[webpackRuntimeScriptName], crossorigin: 'anonymous' }
             : {}),
         },
       });
@@ -125,7 +125,7 @@ export const bundleResource = async ({
       slot: ResourceSlot.HEAD_CORE_STYLES,
       payload: genHref(style),
       attrs: {
-        ...(integrities[style] ? { integrity: integrities[style] } : {}),
+        ...(integrities[style] ? { integrity: integrities[style], crossorigin: 'anonymous' } : {}),
         'data-critical': 'true',
         // looks like we don't need this scripts preload at all, but also it is official recommendation for streaming
         // https://github.com/reactwg/react-18/discussions/114
@@ -140,7 +140,9 @@ export const bundleResource = async ({
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
       payload: genHref(script),
       attrs: {
-        ...(integrities[script] ? { integrity: integrities[script] } : {}),
+        ...(integrities[script]
+          ? { integrity: integrities[script], crossorigin: 'anonymous' }
+          : {}),
         'data-critical': 'true',
         ...scriptTypeAttr,
       },
@@ -153,7 +155,9 @@ export const bundleResource = async ({
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
       payload: genHref(script),
       attrs: {
-        ...(integrities[script] ? { integrity: integrities[script] } : {}),
+        ...(integrities[script]
+          ? { integrity: integrities[script], crossorigin: 'anonymous' }
+          : {}),
         'data-critical': 'true',
         ...scriptTypeAttr,
       },

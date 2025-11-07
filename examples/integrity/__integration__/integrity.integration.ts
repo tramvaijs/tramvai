@@ -3,7 +3,7 @@ import crypto from 'node:crypto';
 import { test } from './integrity-fixture';
 
 type windowWithObserver = typeof window & {
-  scriptObserver: (src: string, integrity: string | null) => void;
+  scriptObserver: (src: string, integrity: string | null, crossOrigin: string | null) => void;
 };
 
 async function checkIntegrity(page: Page, src: string, integrity?: string) {
@@ -29,6 +29,28 @@ test.describe('Script integrity tests', () => {
     }
   });
 
+  test('test crossorigin attribute for styles when integrity is present', async ({
+    I,
+    page,
+    app,
+  }) => {
+    await I.gotoPage(app.serverUrl, '/');
+    const styles = await page.$$eval('link[rel="stylesheet"]', (elements) =>
+      elements.map((el) => ({
+        href: el.getAttribute('href'),
+        integrity: el.getAttribute('integrity'),
+        crossorigin: el.getAttribute('crossorigin'),
+      }))
+    );
+
+    for (const style of styles) {
+      // When integrity is present, crossorigin should be 'anonymous'
+      if (style.integrity) {
+        test.expect(style.crossorigin).toEqual('anonymous');
+      }
+    }
+  });
+
   test('sri hashes should be inside runtime chunk', async ({ page, app }) => {
     const { staticUrl } = app;
     const src = `${staticUrl}/dist/client/runtime.js`;
@@ -39,11 +61,15 @@ test.describe('Script integrity tests', () => {
   });
 
   test('test integrity for async webpack chunks', async ({ I, page, app }) => {
-    const addedScripts: { src: string; integrity: string | null }[] = [];
+    const addedScripts: { src: string; integrity: string | null; crossOrigin: string | null }[] =
+      [];
 
-    await page.exposeFunction('scriptObserver', (src: string, integrity: string | null) => {
-      addedScripts.push({ src, integrity });
-    });
+    await page.exposeFunction(
+      'scriptObserver',
+      (src: string, integrity: string | null, crossOrigin: string) => {
+        addedScripts.push({ src, integrity, crossOrigin });
+      }
+    );
 
     await page.addInitScript(() => {
       window.addEventListener('DOMContentLoaded', () => {
@@ -57,7 +83,11 @@ test.describe('Script integrity tests', () => {
                 (node as HTMLScriptElement).src
               ) {
                 const script = node as HTMLScriptElement;
-                (<windowWithObserver>window).scriptObserver(script.src, script.integrity);
+                (<windowWithObserver>window).scriptObserver(
+                  script.src,
+                  script.integrity,
+                  script.crossOrigin
+                );
               }
             });
           }
@@ -76,6 +106,7 @@ test.describe('Script integrity tests', () => {
     for (const script of addedScripts) {
       // eslint-disable-next-line jest/no-standalone-expect
       test.expect(script.integrity).not.toBeNull();
+      test.expect(script.crossOrigin).toBe('anonymous');
       await checkIntegrity(page, script.src, script.integrity!);
     }
   });
