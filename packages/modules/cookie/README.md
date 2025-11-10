@@ -18,7 +18,7 @@ Implements interface `CookieManager` and adds provider `COOKIE_MANAGER_TOKEN` fr
 
 ## How to
 
-### Get cookie
+### Working with cookies
 
 ```tsx
 import { Module, provide } from '@tramvai/core';
@@ -29,10 +29,37 @@ import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
     provide({
       provide: 'my_module',
       useFactory: ({ cookie }) => {
+        cookie.set('sid', 'ads.api3');
         cookie.get('sid'); // > ads.api3
       },
       deps: {
         cookie: COOKIE_MANAGER_TOKEN,
+      },
+    }),
+  ],
+})
+class MyModule {}
+```
+
+### Set multiple cookies with the same key
+
+By default, cookies with the same key are deduplicated on the server-side. To set multiple cookies with the same key, you can use a unique identifier for each cookie with the `ResponseManager.setCookie` method:
+
+```tsx
+import { Module, provide } from '@tramvai/core';
+import { RESPONSE_MANAGER_TOKEN } from '@tramvai/module-common';
+
+@Module({
+  providers: [
+    provide({
+      provide: 'my_module',
+      useFactory: ({ responseManager }) => {
+        responseManager.setCookie('b', `b=b; Path=/; SameSite=Strict`);
+        // different identifier 'b-subpath' to avoid deduplication, will not affect the cookie name
+        responseManager.setCookie('b-subpath', `b=b; Path=/foo/bar/; SameSite=Strict`);
+      },
+      deps: {
+        responseManager: RESPONSE_MANAGER_TOKEN,
       },
     }),
   ],
