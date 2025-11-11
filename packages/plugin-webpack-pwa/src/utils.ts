@@ -1,5 +1,5 @@
-import { PWAConfig } from './types';
 import { InjectManifest } from 'workbox-webpack-plugin';
+import { PWAConfig } from './types';
 
 export function getWorkboxOptions({
   swSrc,
