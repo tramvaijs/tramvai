@@ -7,6 +7,8 @@ import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
+// @ts-expect-error
+import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { optional } from '@tinkoff/dippy';
@@ -63,6 +65,7 @@ import { createSourceMaps } from './shared/sourcemaps';
 import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
 import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
 import { getSharedModules } from './shared/shared-modules';
+import { getRsdoctorOptions } from './shared/rsdoctor';
 
 const mainFields = ['browser', 'module', 'main'];
 
@@ -353,6 +356,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     plugins: [
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
+      config.benchmark && new RsdoctorWebpackPlugin(getRsdoctorOptions('client')),
       ...stylesConfiguration.plugins,
       new StatsWriterPlugin({
         filename: STATS_FILE_NAME,

@@ -24,6 +24,7 @@ export const startApplicationExperimental = async (di: Container): Result => {
   const inputParameters: StartParameters = {
     name: configEntry.name,
     mode: 'development',
+    benchmark: options.benchmark,
     buildType: options.buildType,
     port: options.port,
     host: options.host,
@@ -101,7 +102,7 @@ export const startApplicationExperimental = async (di: Container): Result => {
       await devServer.invalidate();
     },
     getBuildStats: () => {
-      return {};
+      return devServer.getStats();
     },
     builder: {
       name: '@tramvai/plugin-webpack-builder',
@@ -114,7 +115,7 @@ export const startApplicationExperimental = async (di: Container): Result => {
             await devServer.invalidate();
           },
           getBuildStats: () => {
-            return {};
+            return devServer.getStats();
           },
         };
       },
@@ -210,7 +211,7 @@ function mapTramvaiJsonToNewTsConfig({ rootDir }: { rootDir: string }) {
       }
       if (applicationProject.polyfill) {
         try {
-          if (require.resolve(mappedProject.polyfill).includes('node_modules')) {
+          if (require.resolve(applicationProject.polyfill).includes('node_modules')) {
             mappedProject.polyfill = require.resolve(applicationProject.polyfill);
           } else {
             mappedProject.polyfill = path.resolve(applicationProject.polyfill);

@@ -1,4 +1,5 @@
 import { Configuration, InputParameters } from '@tramvai/api/lib/config';
+import { BuildStats } from '@tramvai/api/lib/builder/dev-server';
 import { BuildTarget, BuildType } from '../webpack/webpack-config';
 import { ProgressState } from '../utils/progress-bar/types';
 
@@ -36,6 +37,7 @@ export type WebpackWorkerOutgoingEventsPayload = {
   };
   [BUILD_DONE]: {
     event: typeof BUILD_DONE;
+    stats: BuildStats;
   };
   [BUILD_FAILED]: {
     event: typeof BUILD_FAILED;

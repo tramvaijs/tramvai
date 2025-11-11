@@ -185,6 +185,7 @@ export type InputParameters = {
   mode?: 'development' | 'production';
   port?: number;
   host?: string;
+  benchmark?: boolean;
   staticPort?: number;
   staticHost?: string;
   https?: boolean;
@@ -570,6 +571,10 @@ export class ConfigService {
 
   get staticHost() {
     return this.#parameters?.staticHost ?? 'localhost';
+  }
+
+  get benchmark() {
+    return this.#parameters?.benchmark ?? false;
   }
 
   get httpProtocol() {

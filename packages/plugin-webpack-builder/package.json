@@ -6,6 +6,7 @@
   "dependencies": {
     "@module-federation/node": "^0.15.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
+    "@rsdoctor/webpack-plugin": "^1.3.6",
     "@svgr/webpack": "^8.1.0",
     "@tinkoff/browserslist-config": "0.0.0-stub",
     "@tinkoff/dippy": "0.0.0-stub",

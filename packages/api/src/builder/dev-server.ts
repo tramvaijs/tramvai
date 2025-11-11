@@ -1,9 +1,18 @@
 import type { Server } from 'node:http';
 import { createToken } from '@tinkoff/dippy';
 
+export type BuildStats = {
+  maxMemoryRss?: number;
+  buildTime: number;
+};
+
 export type DevServer = {
   close(): Promise<void>;
   invalidate(): Promise<void>;
+  getStats(): {
+    client: BuildStats;
+    server: BuildStats;
+  };
   buildPromise: Promise<void>;
   port: number;
   staticPort: number;

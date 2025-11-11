@@ -1,3 +1,5 @@
+import { BuildStats } from '@tramvai/api/lib/builder/dev-server';
+
 export interface BuilderCustomOptions {
   [key: string]: Record<string, any>;
 }
@@ -35,8 +37,8 @@ interface BuilderAnalyzeOptions {
 }
 
 export type GetBuildStats = () => {
-  clientBuildTime?: number;
-  serverBuildTime?: number;
+  client?: BuildStats;
+  server?: BuildStats;
   maxMemoryRss?: number;
 };
 

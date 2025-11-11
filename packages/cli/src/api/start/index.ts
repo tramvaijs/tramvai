@@ -24,6 +24,7 @@ export type Params = WithConfig<{
   noClientRebuild?: boolean;
   resolveSymlinks?: boolean;
   showConfig?: boolean;
+  benchmark?: boolean;
   withBuildStats?: boolean;
   // @todo: not working?
   env?: Record<string, string>;

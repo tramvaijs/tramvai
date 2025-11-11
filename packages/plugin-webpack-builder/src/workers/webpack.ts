@@ -31,6 +31,8 @@ import {
   WebpackWorkerOutgoingEventsPayload,
 } from './webpack.events';
 import { BUILD_TARGET_TOKEN } from '../webpack/webpack-config';
+import { calculateBuildTime } from '../utils/calculateBuildTime';
+import { maxMemoryRss } from '../utils/maxMemoryRss';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
@@ -39,6 +41,7 @@ declare global {
 
 // eslint-disable-next-line max-statements
 async function runWebpackDevServer() {
+  const getMaxMemoryRss = maxMemoryRss();
   const { type, target, port, inputParameters, extraConfiguration } =
     workerData as WebpackWorkerData;
   const app = express();
@@ -120,6 +123,7 @@ async function runWebpackDevServer() {
   }
 
   const compiler = webpack(webpackConfig!)!;
+  const getBuildTime = calculateBuildTime(compiler);
 
   compiler.hooks.done.tap('worker-dev-server', async (stats) => {
     if (stats.hasErrors()) {
@@ -145,6 +149,10 @@ async function runWebpackDevServer() {
 
       parentPort!.postMessage({
         event: BUILD_DONE,
+        stats: {
+          maxMemoryRss: getMaxMemoryRss(),
+          buildTime: getBuildTime(),
+        },
       } as WebpackWorkerOutgoingEventsPayload['build-done']);
     }
   });

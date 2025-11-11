@@ -57,6 +57,7 @@ __migrations__
 stats.json
 webpackAssets.json
 .tmp
+.rsdoctor
 test/tramvai.json
 tinkoff-examples/granular/src/bundles
 tinkoff-examples/granular/src/pages

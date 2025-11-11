@@ -37,6 +37,7 @@ export interface Settings<E extends Env> {
   profile?: boolean;
   noServerRebuild?: boolean;
   noClientRebuild?: boolean;
+  benchmark?: boolean;
   resolveSymlinks?: boolean;
   showConfig?: boolean;
   onlyBundles?: string[];
@@ -131,6 +132,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     profile: false,
     noClientRebuild: false,
     noServerRebuild: false,
+    benchmark: false,
     resolveSymlinks: true,
     disableProdOptimization: false,
     onlyBundles: [],

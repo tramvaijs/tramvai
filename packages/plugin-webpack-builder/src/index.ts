@@ -37,6 +37,10 @@ export { DEFINE_PLUGIN_OPTIONS_TOKEN } from './webpack/shared/define';
 export { WEBPACK_EXTERNALS_TOKEN } from './webpack/shared/externals';
 export { RESOLVE_EXTENSIONS_TOKEN } from './webpack/shared/resolve';
 export { WEBPACK_PLUGINS_TOKEN } from './webpack/shared/plugins';
+export { getRsdoctorOptions } from './webpack/shared/rsdoctor';
+
+export { calculateBuildTime } from './utils/calculateBuildTime';
+export { maxMemoryRss } from './utils/maxMemoryRss';
 
 /**
  * @title Configure the options on webpack splitChunks

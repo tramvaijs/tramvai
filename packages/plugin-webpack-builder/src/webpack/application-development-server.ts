@@ -4,6 +4,8 @@ import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
+// @ts-expect-error
+import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
@@ -50,6 +52,7 @@ import { createSourceMaps } from './shared/sourcemaps';
 import { getSharedModules } from './shared/shared-modules';
 import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
 import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
+import { getRsdoctorOptions } from './shared/rsdoctor';
 
 const mainFields = ['module', 'main'];
 
@@ -312,6 +315,7 @@ export default appConfig;`;
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
+      config.benchmark && new RsdoctorWebpackPlugin(getRsdoctorOptions('server')),
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,

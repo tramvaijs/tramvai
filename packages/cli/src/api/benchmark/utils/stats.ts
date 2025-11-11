@@ -1,45 +1,62 @@
-import type { RunStats, Stats } from '../types';
+import type { RunStats, Samples, CompilationStats } from '../types';
 
-export const getSamplesStats = (samples: number[]): Stats => {
-  const n = samples.length;
+function getMeanValue(samples: number[]) {
+  if (samples.length === 0) {
+    return;
+  }
 
   let sum = 0;
 
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < samples.length; i++) {
     sum += samples[i];
   }
 
-  const mean = sum / n;
+  return sum / samples.length;
+}
 
-  sum = 0;
+function getCompilationMeanStats(allStats) {
+  const result = {} as CompilationStats;
 
-  for (let i = 0; i < n; i++) {
-    sum += (samples[i] - mean) * (samples[i] - mean);
+  const stats: CompilationStats = allStats[0];
+
+  for (const section in stats) {
+    for (const metricName in stats[section]) {
+      const samples = allStats.reduce((acc, item) => {
+        acc.push(item[section][metricName]);
+        return acc;
+      }, []);
+
+      if (!result[section]) {
+        result[section] = {};
+      }
+      const meanValue = getMeanValue(samples);
+
+      // ignore values less than 10ms
+      if (meanValue > 10) {
+        result[section][metricName] = meanValue;
+      }
+    }
   }
 
-  const std = Math.sqrt(sum / n);
-  const variance = (100 * std) / mean;
-
-  return {
-    samples,
-    mean,
-    std,
-    variance,
-  };
-};
+  return result;
+}
 
 export const getResultStats = ({
-  clientSamples,
-  serverSamples,
+  clientBuildTimeSamples,
+  clientCompilationTimings,
+  clientMaxMemoryRssSamples,
+  serverBuildTimeSamples,
+  serverCompilationTimings,
+  serverMaxMemoryRssSamples,
   maxMemoryRssSamples,
-}: {
-  clientSamples: number[];
-  serverSamples: number[];
-  maxMemoryRssSamples: number[];
-}): RunStats => {
+}: Samples): RunStats => {
   return {
-    client: getSamplesStats(clientSamples),
-    server: getSamplesStats(serverSamples),
-    maxMemoryRss: getSamplesStats(maxMemoryRssSamples),
+    serverBuildTime: getMeanValue(serverBuildTimeSamples),
+    serverCompilationStats: getCompilationMeanStats(serverCompilationTimings),
+    clientBuildTime: getMeanValue(clientBuildTimeSamples),
+    clientCompilationStats: getCompilationMeanStats(clientCompilationTimings),
+    maxMemoryRss: getMeanValue(maxMemoryRssSamples),
+    clientMaxMemoryRss: getMeanValue(clientMaxMemoryRssSamples),
+    serverMaxMemoryRss: getMeanValue(serverMaxMemoryRssSamples),
   };
 };

@@ -6,6 +6,7 @@ import type {
   TRACER_TOKEN,
   DEV_SERVER_TOKEN,
 } from '@tramvai/api/lib/tokens';
+import { BuildStats } from '@tramvai/api/lib/builder/dev-server';
 import { logger } from '@tramvai/api/lib/services/logger';
 import type { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/lib/config';
 import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
@@ -84,6 +85,8 @@ export function createDevServer({
       const serverRunnerWorkerPath = path.resolve(__dirname, '..', 'workers', 'server-runner.js');
       const serverPublicPath = resolvePublicPathDirectory(config.outputServer);
       const progressBar = new ProgressBar();
+      let serverStats: BuildStats | undefined;
+      let clientStats: BuildStats | undefined;
       let serverRunnerAbortController: AbortController | undefined;
       let initialServerBuild = true;
       let initialClientBuild = true;
@@ -199,7 +202,8 @@ export function createDevServer({
 
         // TODO: DEV_SERVER_STARTED
         // TODO: debounce?
-        serverWebpackWorker.subscribe(BUILD_DONE, () => {
+        serverWebpackWorker.subscribe(BUILD_DONE, ({ stats }) => {
+          serverStats = stats;
           compileServerAfterBuild();
 
           if (measureServerWebpackWorker) {
@@ -247,7 +251,8 @@ export function createDevServer({
         clientWebpackWorker.create();
 
         // TODO: DEV_SERVER_STARTED
-        clientWebpackWorker.subscribe(BUILD_DONE, () => {
+        clientWebpackWorker.subscribe(BUILD_DONE, ({ stats }) => {
+          clientStats = stats;
           clientResolve();
 
           if (measureClientWebpackWorker) {
@@ -297,6 +302,10 @@ export function createDevServer({
         staticPort: portManager.staticPort!,
         httpServer: proxy.httpServer,
         staticHttpServer: proxy.staticHttpServer,
+        getStats: () => ({
+          client: clientStats!,
+          server: serverStats!,
+        }),
         close: async () => {
           if (closedPromise) {
             await closedPromise;

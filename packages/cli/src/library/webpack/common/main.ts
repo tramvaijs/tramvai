@@ -3,6 +3,8 @@ import type Config from 'webpack-chain';
 import path from 'path';
 import { existsSync } from 'fs-extra';
 import findCacheDir from 'find-cache-dir';
+import { RsdoctorWebpackMultiplePlugin } from '@rsdoctor/webpack-plugin';
+import { getRsdoctorOptions } from '@tramvai/plugin-webpack-builder';
 import { ignoreWarnings } from '../utils/warningsFilter';
 import resolve from '../blocks/resolve';
 import ignoreLocales from '../blocks/ignoreLocales';
@@ -125,6 +127,12 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
         'process.env.DISABLE_EXTERNAL_SCRIPTS': process.env.DISABLE_EXTERNAL_SCRIPTS || false,
       },
     ]);
+
+  if (configManager.benchmark) {
+    config
+      .plugin('rsdoctor-benchmark')
+      .use(RsdoctorWebpackMultiplePlugin, [getRsdoctorOptions(configManager.buildType)]);
+  }
 
   // TODO: remove after dropping support for node@14
   if (configManager.buildType === 'server') {
