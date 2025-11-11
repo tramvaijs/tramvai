@@ -51,6 +51,10 @@ jobs:
         working-directory: ../
         run: tramvai-debug new smoke-bootstrap --type=app --template=multirepo --packageManager=npm --testingFramework=jest
 
+      - name: Update tramvai version
+        working-directory: ../
+        run: tramvai-debug update prerelease
+
       - name: Install Playwright
         working-directory: ../smoke-bootstrap
         run: yarn playwright install
