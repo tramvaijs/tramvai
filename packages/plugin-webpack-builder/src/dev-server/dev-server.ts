@@ -15,6 +15,7 @@ import { WebpackWorkerBridge } from './webpack-worker-bridge';
 import { ServerRunnerWorkerBridge } from './server-runner-worker-bridge';
 import { createProxy } from './proxy';
 import { ProgressBar } from '../utils/progress-bar';
+import { CompilationWatcher } from '../utils/compilation-watcher';
 
 type DevServerApi = ExtractTokenType<typeof DEV_SERVER_TOKEN>;
 
@@ -43,7 +44,7 @@ export function createDevServer({
         category: ['plugin-webpack-builder'],
       });
 
-      const { buildType } = config;
+      const { buildType, disableServerRunnerWaiting } = config;
 
       await portManager.computeAvailablePorts();
 
@@ -57,12 +58,14 @@ export function createDevServer({
         inputParameters.staticPort = portManager.staticPort!;
       }
 
+      const compilationWatcher = new CompilationWatcher();
       const proxy = createProxy({
         port: portManager.port!,
         staticPort: portManager.staticPort!,
         serverBuildPort,
         browserBuildPort,
         serverRunnerPort,
+        compilationWatcher,
       });
 
       let closedPromise: Promise<any> | null = null;
@@ -96,6 +99,8 @@ export function createDevServer({
         workerPath: serverRunnerWorkerPath,
         workerData: {
           port: serverRunnerPort,
+          proxyPort: portManager.port!,
+          disableServerRunnerWaiting,
         },
       });
       const serverWebpackWorker = new WebpackWorkerBridge({
@@ -169,8 +174,12 @@ export function createDevServer({
             }
           );
 
+          compilationWatcher.endCompilation();
+
           serverResolve();
         } catch (error) {
+          compilationWatcher.endCompilation();
+
           if (signal?.aborted) {
             serverResolve();
           } else {
@@ -237,6 +246,8 @@ export function createDevServer({
               tid: SERVER_BUILD_TID,
             });
           }
+
+          compilationWatcher.startCompilation();
         });
       }
 

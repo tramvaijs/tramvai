@@ -274,6 +274,7 @@ export default appConfig;`;
           exportsPresence: 'warn',
         },
       },
+      unsafeCache: true,
       rules: [
         // *.inline files rules should be before the transpiler rules
         ...createServerInlineRules({ di }),
@@ -309,7 +310,6 @@ export default appConfig;`;
         },
         ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
-      // TODO: unsafeCache - TCORE-5274
     },
     plugins: [
       new webpack.optimize.LimitChunkCountPlugin({

@@ -4,6 +4,7 @@ import { ConfigService } from '@tramvai/api/lib/config';
 import { logger } from '@tramvai/api/lib/services/logger';
 import {
   APPLICATION_SERVER_STARTED,
+  APPLICATION_SERVER_START_FAILED,
   COMPILE,
   EXIT,
   ServerRunnerIncomingEventsPayload,
@@ -11,14 +12,16 @@ import {
 } from '../workers/server-runner.events';
 import { filterWorkerStderr } from '../utils/filter';
 
-export type ServerRunnerkWorkerData = {
+export type ServerRunnerWorkerData = {
   port: number;
+  proxyPort: number;
+  disableServerRunnerWaiting: boolean;
 };
 
 export class ServerRunnerWorkerBridge {
   #worker: Worker | null = null;
   #workerPath: string;
-  #workerData: ServerRunnerkWorkerData;
+  #workerData: ServerRunnerWorkerData;
   #config: ConfigService;
 
   constructor({
@@ -28,7 +31,7 @@ export class ServerRunnerWorkerBridge {
   }: {
     config: ConfigService;
     workerPath: string;
-    workerData: ServerRunnerkWorkerData;
+    workerData: ServerRunnerWorkerData;
   }) {
     this.#workerPath = workerPath;
     this.#workerData = workerData;
@@ -116,11 +119,15 @@ export class ServerRunnerWorkerBridge {
   }
 
   async compile(payload: { code: string }) {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>((resolve, reject) => {
       this.#worker?.once(
         'message',
         (data: ServerRunnerOutgoingEventsPayload[keyof ServerRunnerOutgoingEventsPayload]) => {
           if (data.event === APPLICATION_SERVER_STARTED) {
+            resolve();
+          }
+
+          if (data.event === APPLICATION_SERVER_START_FAILED) {
             resolve();
           }
         }

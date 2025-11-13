@@ -1,6 +1,7 @@
 import http from 'node:http';
 import httpProxy from 'http-proxy';
 import { logger } from '@tramvai/api/lib/services/logger';
+import type { CompilationWatcher } from '../utils/compilation-watcher';
 
 export const createProxy = ({
   port,
@@ -8,31 +9,39 @@ export const createProxy = ({
   serverRunnerPort,
   serverBuildPort,
   browserBuildPort,
+  compilationWatcher,
 }: {
   port: number;
   staticPort: number;
   serverRunnerPort: number;
   serverBuildPort: number;
   browserBuildPort: number;
+  compilationWatcher: CompilationWatcher;
 }) => {
   const devProxy = httpProxy.createProxyServer();
 
-  devProxy.on('error', (error, req, res) => {
-    logger.event({
-      type: 'error',
-      event: 'dev-proxy',
-      message: `proxy error`,
-      payload: {
-        error,
-        url: req.url,
-      },
-    });
+  devProxy.on('error', async (error, req, res) => {
+    if (compilationWatcher.isCompilationInProgress()) {
+      await compilationWatcher.waitCompilation();
 
-    // TODO: requests queue for failed builds?
+      devProxy.web(req, res as any, {
+        target: `http://localhost:${serverRunnerPort}`,
+      });
+    } else {
+      logger.event({
+        type: 'error',
+        event: 'dev-proxy',
+        message: `proxy error`,
+        payload: {
+          error,
+          url: req.url,
+        },
+      });
 
-    // @ts-expect-error
-    res.statusCode = 500;
-    res.end();
+      // @ts-expect-error
+      res.statusCode = 500;
+      res.end();
+    }
   });
 
   const devServer = http.createServer((req, res) => {

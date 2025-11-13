@@ -246,6 +246,11 @@ export type InputParameters = {
    * @default false
    */
   cacheProfile?: boolean;
+  /**
+   * Disable server runner start waiting, used for test purposes
+   * @default false
+   */
+  disableServerRunnerWaiting?: boolean;
 };
 
 export type Project = ApplicationProject | ChildAppProject;
@@ -806,6 +811,14 @@ export class ConfigService {
 
   get cacheProfile() {
     return this.#parameters.cacheProfile ?? false;
+  }
+
+  get disableServerRunnerWaiting() {
+    if (this.#project.type === 'application') {
+      return this.#parameters.disableServerRunnerWaiting ?? false;
+    }
+
+    return false;
   }
 
   get deprecatedLessSupport() {

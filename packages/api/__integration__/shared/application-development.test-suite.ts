@@ -543,6 +543,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             inputParameters: {
               name: 'app-bundle',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -570,6 +571,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             inputParameters: {
               name: 'app-output-relative',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -596,6 +598,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             inputParameters: {
               name: 'app-virtual-module-config',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -627,6 +630,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             inputParameters: {
               name: 'app-browserslist',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -656,6 +660,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             inputParameters: {
               name: 'app-broken',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
             },
@@ -777,6 +782,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-config-to-env',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -805,6 +811,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-root-error-boundary',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -833,6 +840,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-assets',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -870,6 +878,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-papi',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
             },
@@ -957,6 +966,7 @@ export default createPapiMethod({
             inputParameters: {
               name: 'app-server-inline',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'server',
               fileCache: false,
               noRebuild: true,
@@ -988,6 +998,7 @@ export default createPapiMethod({
             inputParameters: {
               name: 'app-pwa',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'client',
               fileCache: false,
               noRebuild: true,
@@ -1014,6 +1025,7 @@ export default createPapiMethod({
             inputParameters: {
               name: 'custom-pwa',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               buildType: 'client',
               fileCache: false,
               noRebuild: true,
@@ -1602,6 +1614,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-jsx',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -1639,6 +1652,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-css-modules',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -1681,6 +1695,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-postcss',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -1709,6 +1724,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-postcss-fn',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -1737,6 +1753,7 @@ export default bar;`,
             inputParameters: {
               name: 'app-fs-routing',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
             },
             extraConfiguration: {
@@ -1747,6 +1764,7 @@ export default bar;`,
 
           test('file-system-pages: "virtual/file-system-pages" import should be updated after changes in "routes" and "pages" directories', async ({
             devServer,
+            page,
           }) => {
             await devServer.buildPromise;
             // TODO: immediate rebuild because "pages" folder is absent
@@ -1759,8 +1777,8 @@ export default bar;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(platformJs).toContain('foo');
-            test.expect(serverJs).toContain('foo');
+            test.expect(platformJs).toContain('@/routes/foo/index');
+            test.expect(serverJs).toContain('@/routes/foo/index');
 
             // MARK: NEW FILE IN EXISTED FOLDER
 
@@ -1782,7 +1800,7 @@ export default Page;`,
               'utf-8'
             );
 
-            await sleep(100);
+            await sleep(500);
 
             platformJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
@@ -1791,8 +1809,8 @@ export default Page;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(platformJs).toContain('bar');
-            test.expect(serverJs).toContain('bar');
+            test.expect(platformJs).toContain('@/routes/bar/index');
+            test.expect(serverJs).toContain('@/routes/bar/index');
 
             // MARK: NEW FOLDER AND FILE
 
@@ -1814,7 +1832,7 @@ export default Cmp;`,
               'utf-8'
             );
 
-            await sleep(100);
+            await sleep(500);
 
             platformJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
@@ -1823,8 +1841,8 @@ export default Cmp;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(platformJs).toContain('baz');
-            test.expect(serverJs).toContain('baz');
+            test.expect(platformJs).toContain('@/pages/baz/index');
+            test.expect(serverJs).toContain('@/pages/baz/index');
 
             // MARK: CHANGED FILE
 
@@ -1849,8 +1867,8 @@ export default Cmp;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(platformJs).not.toContain('bar');
-            test.expect(serverJs).not.toContain('bar');
+            test.expect(platformJs).not.toContain('@/routes/bar/index');
+            test.expect(serverJs).not.toContain('@/routes/bar/index');
           });
         });
 
@@ -1915,6 +1933,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-hmr',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
             },
             extraConfiguration: {
@@ -1974,12 +1993,10 @@ export default Cmp;`,
 
             test.expect(await page.locator('#container').textContent()).toEqual('hello world');
 
-            await sleep(300);
+            await sleep(1000);
             await outputFile(refreshPath, updatedContent);
-            await sleep(300);
-            test.expect(await page.locator('#container').textContent()).toEqual('hello world');
+            await sleep(1000);
 
-            await page.reload();
             test
               .expect(await page.locator('#container').textContent())
               .toEqual('super hello world');
@@ -1995,6 +2012,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-config-to-env',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2041,6 +2059,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-assets',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2074,6 +2093,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-cache',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: true,
               noRebuild: true,
             },
@@ -2121,6 +2141,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-externals',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2152,6 +2173,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-provide',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2183,6 +2205,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-resolve',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2239,6 +2262,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-devtool-inline',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2274,6 +2298,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-devtool-external',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2305,6 +2330,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-bundle',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               verboseLogging: true,
               noRebuild: true,
             },
@@ -2330,6 +2356,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-bundle',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               verboseLogging: false,
               noRebuild: true,
             },
@@ -2353,6 +2380,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-sourcemaps',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2382,6 +2410,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-tsconfig-paths',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2411,6 +2440,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-enable-fill-declare-action-name',
               rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
               fileCache: false,
               noRebuild: true,
             },
@@ -2447,6 +2477,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-node-modules-transpilation',
               rootDir: testSuiteFolder,
+              buildType: 'client',
               fileCache: false,
               noRebuild: true,
             },
@@ -2473,6 +2504,7 @@ export default Cmp;`,
             inputParameters: {
               name: 'app-node-modules-transpilation-only-modern',
               rootDir: testSuiteFolder,
+              buildType: 'client',
               fileCache: false,
               noRebuild: true,
             },
@@ -2785,8 +2817,6 @@ export default Cmp;`,
         test('should correctly add custom critical chunk', async ({ devServer, page }) => {
           await devServer.buildPromise;
           await page.goto(`http://localhost:${devServer.port}`);
-
-          await page.pause();
 
           const criticalChunksRaw = await page.evaluate(
             () => (window as any).webpackChunkapplication_app_mf_host_critical_chunks_0_0_0_stub

@@ -194,13 +194,11 @@ async function runWebpackDevServer() {
   // TODO: parameter to configure { writeToDisk: true } - can be much less memory consumption
   app.use(devMiddleware);
 
-  if (config.hotRefresh?.enabled) {
-    app.use(
-      getHotModulePrefix(config),
-      // @ts-ignore - https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73338
-      webpackHotMiddleware(compiler, { log: false, statsOptions: { cached: false } })
-    );
-  }
+  app.use(
+    getHotModulePrefix(config),
+    // @ts-ignore - https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73338
+    webpackHotMiddleware(compiler, { log: false, statsOptions: { cached: false } })
+  );
 
   app.listen(port, () => {
     logger.event({

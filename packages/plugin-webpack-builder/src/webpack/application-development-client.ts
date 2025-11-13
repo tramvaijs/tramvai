@@ -200,8 +200,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             sourceDir: config.sourceDir,
             rootDir: config.rootDir,
           }),
-          hotRefresh?.enabled &&
-            'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
+          'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
         ].filter(Boolean) as string[],
       },
       ...(polyfillPath
@@ -316,6 +315,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           exportsPresence: 'warn',
         },
       },
+      unsafeCache: true,
       rules: [
         ...createTranspilerRules({
           transpiler,
@@ -351,7 +351,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           : []),
         ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
-      // TODO: unsafeCache - TCORE-5274
     },
     plugins: [
       virtualModulesPlugin,
@@ -380,6 +379,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         process: 'process',
         ...provideList,
       }),
+      new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
@@ -411,7 +411,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         : []),
       ...(hotRefresh?.enabled
         ? [
-            new webpack.HotModuleReplacementPlugin(),
             new ReactRefreshPlugin({
               ...hotRefresh.options,
               overlay:

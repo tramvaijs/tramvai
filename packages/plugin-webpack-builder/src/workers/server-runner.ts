@@ -5,8 +5,11 @@ import path from 'node:path';
 import { parentPort, workerData } from 'node:worker_threads';
 import { Module } from 'node:module';
 import { logger } from '@tramvai/api/lib/services/logger';
+import { AddressInfo, Server } from 'node:net';
+import { subscribe, unsubscribe } from 'node:diagnostics_channel';
 import {
   APPLICATION_SERVER_STARTED,
+  APPLICATION_SERVER_START_FAILED,
   COMPILE,
   ServerRunnerIncomingEventsPayload,
   ServerRunnerOutgoingEventsPayload,
@@ -29,30 +32,91 @@ const requireFromString = (code: string, filename: string) => {
   return newModule.exports;
 };
 
+interface NetServerListenAsyncEndMessage {
+  server: Server;
+}
+
+const originalAddress = Server.prototype.address;
+const originalListen = Server.prototype.listen;
+const initListenHandler = (onListen: (port: number | undefined) => void) => {
+  const listenHandler = (msg: unknown) => {
+    const address = <AddressInfo>(<NetServerListenAsyncEndMessage>msg).server.address();
+    const { port } = address;
+
+    onListen(port);
+    unsubscribe('tracing:net.server.listen:asyncEnd', listenHandler);
+  };
+
+  subscribe('tracing:net.server.listen:asyncEnd', listenHandler);
+};
+
+// Monkeypatch server listen method for correct log of started server port
+function monkeyPatchPort(actualPort: number) {
+  const proxyPort = process.env.PORT;
+
+  Server.prototype.listen = function listen(
+    this: Server & { __tramvai_cli_port: number },
+    opts?: any,
+    ...args
+  ) {
+    if (Number(opts?.port ?? opts) === Number(proxyPort)) {
+      this.__tramvai_cli_port = opts.port;
+      // @ts-ignore
+      return originalListen.call(this, { ...opts, port: actualPort }, ...args);
+    }
+
+    // @ts-ignore
+    return originalListen.call(this, opts, ...args);
+  };
+
+  Server.prototype.address = function address(this: Server & { __tramvai_cli_port: number }) {
+    const addr = <AddressInfo>originalAddress.call(this);
+
+    if (typeof this.__tramvai_cli_port !== 'undefined') {
+      return {
+        ...addr,
+        __tramvai_cli_port: addr.port,
+        port: Number(actualPort),
+      };
+    }
+
+    return addr;
+  };
+}
+
 async function runServer() {
-  const { port } = workerData;
+  const { port, proxyPort, disableServerRunnerWaiting } = workerData;
+  process.env.PORT = String(proxyPort);
+
+  monkeyPatchPort(port);
+  initListenHandler((startedPort) => {
+    if (Number(port) === startedPort) {
+      parentPort!.postMessage({
+        event: APPLICATION_SERVER_STARTED,
+      } as ServerRunnerOutgoingEventsPayload['application-server-started']);
+    }
+  });
 
   parentPort?.on(
     'message',
     (message: ServerRunnerIncomingEventsPayload[keyof ServerRunnerIncomingEventsPayload]) => {
       switch (message.event) {
         case COMPILE: {
-          // TODO: show dev-server port in `server-listen-port` logs. Monkeypatch http server or pass another env?
-          process.env.PORT = String(port);
-
           try {
             // TODO: real filename
             requireFromString(message.code, 'server.js');
+
+            if (disableServerRunnerWaiting) {
+              parentPort!.postMessage({
+                event: APPLICATION_SERVER_STARTED,
+              } as ServerRunnerOutgoingEventsPayload['application-server-started']);
+            }
 
             logger.event({
               type: 'debug',
               event: 'server-runner-worker',
               message: 'Application code executed successfully',
             });
-
-            parentPort!.postMessage({
-              event: APPLICATION_SERVER_STARTED,
-            } as ServerRunnerOutgoingEventsPayload['application-server-started']);
           } catch (error) {
             logger.event({
               type: 'error',
@@ -60,6 +124,10 @@ async function runServer() {
               message: 'Application code execution failed',
               payload: { error, code: message.code },
             });
+
+            parentPort!.postMessage({
+              event: APPLICATION_SERVER_START_FAILED,
+            } as ServerRunnerOutgoingEventsPayload['application-server-start-failed']);
           }
           break;
         }
