@@ -16,7 +16,10 @@ export default async (
   context: Context,
   { to: version = 'latest', tag }: Params
 ): Promise<CommandResult> => {
-  const resolvedVersion = tag ? version : await getLatestPackageVersion('@tramvai/cli', version);
+  const registry = await context.packageManager.getRegistryUrl();
+  const resolvedVersion = tag
+    ? version
+    : await getLatestPackageVersion('@tramvai/cli', registry, version);
   const currentVersion = await findTramvaiVersion();
 
   if (!currentVersion) {
@@ -40,12 +43,12 @@ export default async (
   if (context.packageManager.workspaces) {
     await Promise.all(
       context.packageManager.workspaces.map((directory) =>
-        updatePackageJson(version, resolvedVersion, currentVersion, tag, directory)
+        updatePackageJson(version, resolvedVersion, currentVersion, registry, tag, directory)
       )
     );
   }
 
-  await updatePackageJson(version, resolvedVersion, currentVersion, tag);
+  await updatePackageJson(version, resolvedVersion, currentVersion, registry, tag);
 
   context.logger.event({
     type: 'info',

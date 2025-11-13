@@ -44,4 +44,8 @@ export class PnpmPackageManager extends PackageManager {
   getLockFileName() {
     return 'pnpm-lock.yaml';
   }
+
+  async getRegistryUrl(): Promise<string> {
+    return (await this.run('pnpm config get registry', {})).stdout.trim();
+  }
 }

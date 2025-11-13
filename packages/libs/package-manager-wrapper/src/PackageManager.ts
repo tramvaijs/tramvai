@@ -51,6 +51,7 @@ export abstract class PackageManager {
   abstract remove(options: RemoveOptions): Promise<void>;
   abstract dedupe(options?: DedupeOptions): Promise<void>;
   abstract getLockFileName(): string;
+  abstract getRegistryUrl(): Promise<string>;
 
   async exists(options: ExistsOptions): Promise<boolean> {
     const { name } = options;

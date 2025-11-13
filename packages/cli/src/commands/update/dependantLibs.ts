@@ -7,13 +7,15 @@ export const getLibPackageVersion = async (
   name: string,
   version: string,
   resolvedVersion: string,
+  registryUrl: string,
   spinner: Ora
 ): Promise<string | undefined> => {
   const unifiedModule = DEPENDANT_LIBS_MAP.get(name);
 
   if (!unifiedModule) {
     try {
-      return await getLatestPackageVersion(name, { version });
+      // @ts-expect-error uncomplete type definition, `registryUrl` is supported
+      return await getLatestPackageVersion(name, { version, registryUrl });
     } catch (e) {
       // clear the spinner to be able to log info that should be preserved in the output
       // the idea borrowed from [here](https://github.com/sindresorhus/ora/issues/120)

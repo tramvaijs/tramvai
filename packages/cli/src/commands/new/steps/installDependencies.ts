@@ -68,7 +68,8 @@ const devDependencies = [
 
 const rootDependencies = {
   devDependencies: ['@tramvai/cli'],
-  dependencies: [],
+  // with monorepo template and workspaces, old `tslib` version can be hoisted in the root
+  dependencies: ['tslib@^2.0.3'],
 };
 
 function getBaseDeps(type: Type, isDev: boolean) {

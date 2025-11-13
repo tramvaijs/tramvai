@@ -160,6 +160,7 @@
     "text-table": "^0.2.0",
     "thread-loader": "^3.0.4",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
+    "tslib": "^2.4.0",
     "undici": "^7.16.0",
     "utility-types": "^3.10.0",
     "v8-compile-cache": "^2.3.0",

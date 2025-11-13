@@ -59,4 +59,8 @@ export class YarnPackageManager extends PackageManager {
   getLockFileName() {
     return 'yarn.lock';
   }
+
+  async getRegistryUrl(): Promise<string> {
+    return (await this.run('yarn config get registry', {})).stdout.trim();
+  }
 }

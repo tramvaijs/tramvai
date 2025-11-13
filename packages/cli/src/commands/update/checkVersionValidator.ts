@@ -1,7 +1,7 @@
 import { packageHasVersion } from '../../utils/commands/dependencies/packageHasVersion';
 import type { Params } from './update';
 
-export const checkVersion = async (_, { to: version = 'latest' }: Params) => {
+export const checkVersion = async (context, { to: version = 'latest' }: Params) => {
   if (version === 'latest') {
     return {
       name: 'checkVersion',
@@ -9,7 +9,9 @@ export const checkVersion = async (_, { to: version = 'latest' }: Params) => {
     };
   }
 
-  if (await packageHasVersion('@tramvai/core', version)) {
+  const registryUrl = await context.packageManager.getRegistryUrl();
+
+  if (await packageHasVersion('@tramvai/core', version, registryUrl)) {
     return {
       name: 'checkVersion',
       status: 'ok',
