@@ -3,6 +3,14 @@
   "version": "0.0.0-stub",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
+  "files": [
+    "src",
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
   "dependencies": {
     "@module-federation/node": "^0.15.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
