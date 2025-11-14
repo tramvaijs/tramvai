@@ -6,15 +6,11 @@ const FIXTURES_DIR = resolve(__dirname, '__fixtures__');
 jest.useRealTimers();
 jest.setTimeout(120000);
 
-const matchStats = {
-  samples: expect.any(Array),
-  mean: expect.any(Number),
-  std: expect.any(Number),
-  variance: expect.any(Number),
-};
-const matchFullStats = {
-  client: matchStats,
-  server: matchStats,
+const compilationStats = {
+  // TODO: not working in CI, loaders field in report is empty: TCORE-5363
+  // loaderBuildCosts: expect.any(Object),
+  totalBuildCosts: expect.any(Object),
+  pluginBuildCosts: expect.any(Object),
 };
 
 describe('@tramvai/cli benchmark command', () => {
@@ -31,9 +27,11 @@ describe('@tramvai/cli benchmark command', () => {
       });
 
       expect(result).toMatchObject({
-        cache: matchFullStats,
-        noCache: matchFullStats,
-        rebuild: matchFullStats,
+        clientBuildTime: expect.any(Number),
+        serverBuildTime: expect.any(Number),
+        clientCompilationStats: compilationStats,
+        serverCompilationStats: compilationStats,
+        maxMemoryRss: expect.any(Number),
       });
     });
   });

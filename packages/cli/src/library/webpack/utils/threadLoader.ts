@@ -23,6 +23,7 @@ const createWorkerPoolConfig = (configManager: ConfigManager<CliConfigEntry>) =>
 
 const isApplicable = (configManager: ConfigManager<CliConfigEntry>) => {
   return (
+    !configManager.benchmark &&
     // thread-loader uses child_process.fork under the hood, and sometimes (50/50) work in these processes does not get into inspector.Session profile
     !process.env.TRAMVAI_CPU_PROFILE &&
     !process.env.TRAMVAI_DEBUG_BUILD &&

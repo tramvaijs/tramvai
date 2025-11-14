@@ -3,6 +3,8 @@ import { provide } from '@tinkoff/dippy';
 import { EventEmitter } from 'events';
 import { CONFIG_MANAGER_TOKEN, WITH_BUILD_STATS_TOKEN } from '../../../di/tokens';
 import { closeWorkerPool, warmupWorkerPool } from '../../../library/webpack/utils/threadLoader';
+import { calculateBuildTime } from '../utils/calculateBuildTime';
+import { maxMemoryRss } from '../utils/maxMemoryRss';
 import {
   CLOSE_HANDLER_TOKEN,
   EVENT_EMITTER_TOKEN,
@@ -11,9 +13,7 @@ import {
   WEBPACK_CLIENT_COMPILER_TOKEN,
   WEBPACK_SERVER_COMPILER_TOKEN,
 } from '../tokens';
-import { calculateBuildTime } from '../utils/calculateBuildTime';
 import { emitWebpackEvents } from '../utils/webpackEvents';
-import { maxMemoryRss } from '../utils/maxMemoryRss';
 
 export const sharedProviders: Provider[] = [
   provide({
@@ -31,8 +31,12 @@ export const sharedProviders: Provider[] = [
       const getMaxMemoryRss = maxMemoryRss();
       return () => {
         return {
-          clientBuildTime: getClientTime?.(),
-          serverBuildTime: getServerTime?.(),
+          client: {
+            buildTime: getClientTime?.(),
+          },
+          server: {
+            buildTime: getServerTime?.(),
+          },
           maxMemoryRss: getMaxMemoryRss?.(),
         };
       };

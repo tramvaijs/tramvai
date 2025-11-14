@@ -37,6 +37,18 @@ export class BenchmarkCommand extends CLICommand<Params> {
         'Specify the names of the bundles that need to be collected, other bundles will not be collected and their request will fail with an error',
     },
     {
+      name: '--fileCache',
+      value: '[fileCache]',
+      transformer: (value: string) => value !== 'false',
+      description: 'Enable/disable persistent file cache for used cli builder',
+    },
+    {
+      name: '-t, --buildType',
+      value: '[type]',
+      description: 'Build type <client|server>',
+      defaultValue: 'client',
+    },
+    {
       name: '--times',
       value: '[times]',
       description: 'How many times to run single type of benchmark',

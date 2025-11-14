@@ -34,9 +34,14 @@ interface BuilderAnalyzeOptions {
   plugin?: string;
 }
 
+export type BuildStats = {
+  maxMemoryRss?: number;
+  buildTime: number;
+};
+
 export type GetBuildStats = () => {
-  clientBuildTime?: number;
-  serverBuildTime?: number;
+  client?: BuildStats;
+  server?: BuildStats;
   maxMemoryRss?: number;
 };
 

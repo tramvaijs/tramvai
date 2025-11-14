@@ -21,6 +21,7 @@ export type Params = WithConfig<{
   env?: Record<string, string>;
   fileCache?: boolean;
   withBuildStats?: boolean;
+  benchmark?: boolean;
   withModulesStats?: boolean;
 
   // `package` target parameters
