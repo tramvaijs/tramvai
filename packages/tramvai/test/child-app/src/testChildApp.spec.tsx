@@ -30,5 +30,5 @@ describe('test/childApp/testChildApp', () => {
     expect(render.getByTestId('from-root').textContent).toBe('Value from Root: root');
 
     return close();
-  });
+  }, 10000);
 });

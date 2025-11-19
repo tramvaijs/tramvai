@@ -14,12 +14,11 @@
     "test:integration:watch": "jest --runInBand --watch --config ./jest.integration.config.js"
   },
   "devDependencies": {
+    "@jest/types": "^29.6.3",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/test-integration": "0.0.0-stub",
     "@tramvai/test-integration-jest": "0.0.0-stub",
-    "@types/jest": "^29.5.0",
-    "jest": "^29.5.0",
-    "jest-circus": "^29.5.0"
+    "jest": "^29.7.0"
   },
   "dependencies": {
     "@tinkoff/pack-polyfills": "0.0.0-stub",

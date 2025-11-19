@@ -25,7 +25,7 @@
         "resolveJsonModule": true,
         "types": [
             "../../node_modules/@types/node",
-            "../../node_modules/@types/jest",
+            "../../node_modules/@jest/types",
             "../../node_modules/@types/webpack"
         ],
         "declarationDir": "./lib",

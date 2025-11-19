@@ -3,6 +3,8 @@ import { getDiWrapper } from '@tramvai/test-helpers';
 import { CommonTestModule } from '@tramvai/test-mocks';
 import type { createMockEnvManager } from '@tramvai/test-mocks';
 import { HttpClientModule } from '../../httpClientModule';
+import { jest } from '@jest/globals';
+import type { Mock } from 'jest-mock';
 
 const fetch = jest.spyOn(require('undici'), 'fetch');
 
@@ -29,7 +31,7 @@ export const testApi = (options: Options) => {
     providers: [...providers],
   });
 
-  const fetchMock: jest.Mock = fetch as any;
+  const fetchMock: Mock = fetch as any;
 
   const clearCaches = () => {
     caches.forEach((cache) => cache.clear());

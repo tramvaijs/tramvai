@@ -9,10 +9,9 @@ const COMMON_JEST_DEPENDENCIES = [
   '@tramvai/test-unit',
   '@tramvai/test-react',
   '@tramvai/test-unit-jest',
-  '@types/jest@^29.0.0',
-  'jest@^29.0.0',
-  'jest-circus@^29.0.0',
-  'jest-environment-jsdom@^29.0.0',
+  '@jest/types@^29.7.0',
+  'jest@^29.7.0',
+  'jest-environment-jsdom@^29.7.0',
   'ts-node',
 ];
 

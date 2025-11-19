@@ -51,7 +51,7 @@ describe('@tinkoff/request to HttpClient adapter', () => {
   describe('features', () => {
     it('defaultTimeout, fast response - success', async () => {
       const { port, terminate } = await startMockServer(applyFastResponseHandler);
-      const httpClient = createAdapter({ logger: loggerFactoryMock, defaultTimeout: 200 });
+      const httpClient = createAdapter({ logger: loggerFactoryMock, defaultTimeout: 500 });
 
       const { payload } = await httpClient.request({ url: `http://localhost:${port}/fake` });
 

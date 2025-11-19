@@ -22,7 +22,7 @@ module.exports = {
 
 This presets implements next settings:
 
-- use jest-circus as testRunner
+- default test runner jest-circuis
 - default testEnvironment is `node`
 - uses `@swc-node/jest` for transformation
 - css files are mapped with [`identity-obj-proxy`](https://www.npmjs.com/package/identity-obj-proxy)

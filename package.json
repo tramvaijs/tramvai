@@ -38,7 +38,7 @@
   ],
   "devDependencies": {
     "@tramvai/build": "workspace:tools/build",
-    "@types/jest": "^29.0.2",
+    "@jest/types": "^29.6.3",
     "@types/node": "20.14.13",
     "@types/webpack-env": "^1.13.16",
     "expect-type": "^0.13.0",

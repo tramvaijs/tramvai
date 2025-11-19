@@ -23,7 +23,7 @@ describe('server/utils/tramvaiDepsFilter', () => {
         '@testing-library/jest-dom': '^5.1.1',
         '@testing-library/react': '^10.0.1',
         '@types/hoist-non-react-statics': '^3.3.1',
-        '@types/jest': '^25.1.4',
+        '@jest/types': '^25.1.4',
         '@types/lru-cache': '^5.1.0',
         '@types/node': '^13.13.2',
         '@types/react': '^16.9.23',

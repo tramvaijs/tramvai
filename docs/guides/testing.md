@@ -18,7 +18,7 @@ This setup will use `jest` as test runner.
 :hourglass: Install `jest` dependencies and `ts-node` for TS config support:
 
 ```bash npm2yarn
-npm install --save-dev jest jest-circus jest-environment-jsdom @types/jest ts-node
+npm install --save-dev jest jest-environment-jsdom @jest/types ts-node
 ```
 
 :hourglass: Install tramvai-specific jest presets (`tramvai add` command considers current `tramvai` version in application):

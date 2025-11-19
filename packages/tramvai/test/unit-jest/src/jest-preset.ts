@@ -1,7 +1,6 @@
 import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
-  testRunner: 'jest-circus/runner',
   testEnvironment: 'node',
 
   snapshotSerializers: [require.resolve('./abortController-serializer')],

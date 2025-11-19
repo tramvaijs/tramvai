@@ -42,5 +42,5 @@ Using this jest preset you can run integration tests in watch mode. In this case
 Minimal set of dependencies for running `jest`:
 
 ```bash
-npm i --save-dev jest @types/jest jest-circus
+npm i --save-dev jest @jest/types
 ```

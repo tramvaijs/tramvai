@@ -1,8 +1,6 @@
 import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
-  testRunner: 'jest-circus/runner',
-
   transform: {
     '\\.[jt]sx?$': [
       require.resolve('@swc-node/jest'),
