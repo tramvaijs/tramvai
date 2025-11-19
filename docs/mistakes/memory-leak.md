@@ -10,6 +10,42 @@ To find out root cause of the problem you need to analyze memory allocation on s
 
 ### Start the app
 
+#### Run server manually
+
+:::tip
+
+Use this recipe for any server performance tests, results will be more stable than with `start-prod` command
+
+:::
+
+Before, you need to make a production build:
+
+```bash
+tramvai build <appName>
+```
+
+After, with default options, application server bundle will be placed here - `dist/server/server.js`, and client code in `dist/client` directory.
+
+Use this command to run application server:
+
+```bash
+DANGEROUS_UNSAFE_ENV_FILES='true' DEV_STATIC='true' ASSETS_PREFIX='http://localhost:4000/dist/client/' node --inspect dist/server/server.js
+```
+
+About env variables:
+
+- `DANGEROUS_UNSAFE_ENV_FILES` force server to read env variables from `env.development.js`
+- `DEV_STATIC` force server to run static server on `4000` port (all folders from current directory will be served)
+- `ASSETS_PREFIX` points to client code folder on static server
+
+#### Run start-prod command
+
+:::tip
+
+Fastest way to run production server, but not suitable for performance tests due to inaccuracies
+
+:::
+
 1. You may use either `start` or `start-prod` command to profile your app, but keep in mind that `start` runs app in dev-environment that leads to higher memory consumption and additional code that may distract you from analyzing core logic of the app. However `start` is preferred when you need to make code changes and you do not need to get the exact values of memory usage as for the prod-environment.
 2. Using `@tramvai/cli` you can pass a special flag [`--debug`](references/cli/base.md#debug-an-app) and pass it either to the `start` or `start-prod` command
 3. You may pass any additional environment variables when calling cli commands as usual. For example, you may pass flag [`HTTP_CLIENT_CACHE_DISABLED`](references/modules/http-client.md#http-client#how-to-disable-http-request-caching) to disable http cache.
