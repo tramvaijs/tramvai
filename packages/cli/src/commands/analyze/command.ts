@@ -8,7 +8,7 @@ import { checkReactCompilerDependencies } from '../../validators/commands/checkR
 
 export type Params = {
   target: string;
-  plugin?: 'bundle' | 'whybundled' | 'statoscope';
+  plugin?: 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor';
   showConfig?: boolean;
 };
 

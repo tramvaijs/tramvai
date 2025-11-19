@@ -7,7 +7,7 @@ The special webpack plugin [webpack-bundle-analyzer](https://github.com/webpack-
 For running analyze
 
 ```sh
-npx tramvai analyze APP_ID
+npx tramvai build APP_ID --analyze
 ```
 
 After that app will be built in prod mode and a new tab in browser will be opened
@@ -19,7 +19,7 @@ With that can help utility [whybundled](https://github.com/d4rkr00t/whybundled) 
 Run next command
 
 ```sh
-npx tramvai analyze APP_ID --plugin whybundled
+npx tramvai build APP_ID --analyze=whybundled
 ```
 
 After that a special version of `stats.json` can be found inside `outputClient` directory. The exact path will be showed in your terminal
@@ -44,7 +44,7 @@ Statoscope is a toolkit for analyzing (with a UI-based report) and validate stat
 
 ```sh
 # generates result json file
-npx tramvai analyze APP_ID --plugin statoscope
+npx tramvai build APP_ID --analyze=statoscope
 ```
 
 When the command is finished, pass the result file to https://statoscope.tech/ tool.
@@ -57,5 +57,5 @@ It used only for build speed debug, not bundle structure or size, you should use
 
 ```sh
 # automatically open report in browser
-npx tramvai analyze APP_ID --plugin rsdoctor
+npx tramvai build APP_ID --analyze=rsdoctor
 ```

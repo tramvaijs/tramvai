@@ -76,6 +76,7 @@ it('should populate defaults for config', () => {
             "runtimeChunk": false,
             "serverRunner": "thread",
             "transpilation": {
+              "include": "only-modern",
               "loader": "babel",
             },
             "viewTransitions": false,
@@ -152,6 +153,7 @@ it('should populate defaults for config', () => {
             "minifier": "terser",
             "reactCompiler": false,
             "transpilation": {
+              "include": "only-modern",
               "loader": "babel",
             },
             "webpack": {
@@ -325,6 +327,7 @@ it('should populate defaults for overridable options', () => {
             "runtimeChunk": false,
             "serverRunner": "thread",
             "transpilation": {
+              "include": "only-modern",
               "loader": {
                 "development": "swc",
                 "production": "babel",
@@ -419,6 +422,7 @@ it('should populate defaults for overridable options', () => {
             "minifier": "terser",
             "reactCompiler": false,
             "transpilation": {
+              "include": "only-modern",
               "loader": {
                 "development": "babel",
                 "production": "babel",

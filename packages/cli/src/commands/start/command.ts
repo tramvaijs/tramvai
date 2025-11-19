@@ -96,6 +96,12 @@ export class StartCommand extends CLICommand<Params> {
       description: 'Show config with which cli was launched',
     },
     {
+      name: '--analyze',
+      value: '[analyze]',
+      description:
+        'Run build with analyze, supported plugins: <bundle|whybundled|statoscope|rsdoctor>',
+    },
+    {
       name: '--onlyBundles',
       value: '[onlyBundles]',
       transformer: (value: string) => value.split(','),
