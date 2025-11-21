@@ -9,7 +9,12 @@
       "node",
       "jest",
       "@types/jest",
-      "@types/tramvai-monorepo"
+      "@types/tramvai-monorepo",
+      "@tinkoff/eventea-types/p/boxyCore",
+      "@tinkoff/eventea-types/p/eventea",
+      "@tinkoff/eventea-types/p/boxy",
+      "@tinkoff/eventea-types/p/push-web",
+      "@tinkoff/eventea-types/p/application-health"
     ]
   },
   "exclude": [
