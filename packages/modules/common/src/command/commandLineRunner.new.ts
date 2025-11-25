@@ -1,6 +1,6 @@
 import type { MultiTokenInterface, Provider } from '@tinkoff/dippy';
 import { createChildContainer } from '@tinkoff/dippy';
-import { ExecutionAbortError, isSilentError } from '@tinkoff/errors';
+import { ExecutionAbortError, isSilentError, makeErrorSilent } from '@tinkoff/errors';
 import type {
   AsyncTapableHookInstance,
   CommandLineDescription,
@@ -175,13 +175,19 @@ export class CommandLineRunner implements Interface {
       try {
         await this.executeCommand(fn, command, di);
       } catch (error) {
+        const silentError = error && typeof error === 'object' && isSilentError(error as Error);
+        const executionError = new ExecutionAbortError({
+          message: 'Execution context were aborted because of one of the commands failed',
+          contextName: `command-line:${line}:${command.toString()}`,
+          reason: error,
+        });
+
+        if (silentError) {
+          makeErrorSilent(executionError);
+        }
+
         // in case if any error happens during line execution results from other line handlers will not be used anyway
-        this.abortControllerByDi.get(di)?.abort(
-          new ExecutionAbortError({
-            message: 'Execution context were aborted because of one of the commands failed',
-            contextName: `command-line:${line}:${command.toString()}`,
-          })
-        );
+        this.abortControllerByDi.get(di)?.abort(executionError);
 
         throw error;
       }
