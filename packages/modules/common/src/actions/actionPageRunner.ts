@@ -14,6 +14,7 @@ import {
   ExecutionAbortError,
   isPageActionsAbortError,
   isSilentError,
+  makeErrorSilent,
   PageActionsAbortError,
 } from '@tinkoff/errors';
 import type {
@@ -171,12 +172,18 @@ You can find more detailed information from "action-execution-error" logs, and f
                   const silentError =
                     reasonIsObject && isSilentError(executionContext.abortSignal.reason);
 
+                  const executionError = new ExecutionAbortError({
+                    message: `Execution aborted in context "${contextName}"`,
+                    contextName,
+                    reason: executionContext.abortSignal.reason,
+                  });
+
+                  if (silentError) {
+                    makeErrorSilent(executionError);
+                  }
+
                   this.log[silentError ? 'info' : 'warn']({
-                    error: new ExecutionAbortError({
-                      message: `Execution aborted in context "${contextName}"`,
-                      contextName,
-                      reason: executionContext.abortSignal.reason,
-                    }),
+                    error: executionError,
                     event: `action-execution-error`,
                     message: `${timeoutError ? `${actionName} has exceeded timeout of ${this.deps.limitTime}ms, execution results will be ignored` : `${actionName} execution error`}.
 This action will be automatically executed on client - https://tramvai.dev/docs/features/data-fetching/action#synchronizing-between-server-and-client
