@@ -8,11 +8,17 @@ export function tokenToString(token: symbol): string {
   return token.toString().replace(/^Symbol\((.+)\)$/, '$1');
 }
 
+const DEFAULT_NAME = 'token';
 export class TokenClass<T> implements TokenType<T> {
   /**
    * Индетификатор токена
    */
   name: symbol;
+
+  /**
+   * Строковое имя токена, переданное в конструктор. Будет использовано в вызове .toString()
+   */
+  stringName: string;
 
   options: TokenOptions;
 
@@ -22,7 +28,8 @@ export class TokenClass<T> implements TokenType<T> {
   isModernToken = true as const;
 
   constructor(name?: string, options: TokenOptions = {}) {
-    this.name = name ? Symbol.for(name) : Symbol('token');
+    this.stringName = name ?? DEFAULT_NAME;
+    this.name = name ? Symbol.for(name) : Symbol(DEFAULT_NAME);
     this.options = options;
   }
 
@@ -30,7 +37,7 @@ export class TokenClass<T> implements TokenType<T> {
    * toString будет использоваться для получения индитификатора токена
    */
   toString() {
-    return tokenToString(this.name);
+    return this.stringName;
   }
 }
 

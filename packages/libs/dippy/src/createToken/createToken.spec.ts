@@ -6,6 +6,7 @@ describe('createToken', () => {
 
     expect(token).toEqual({
       name: expect.any(Symbol),
+      stringName: 'token',
       isToken: true,
       isModernToken: true,
       options: {},
@@ -18,6 +19,7 @@ describe('createToken', () => {
 
     expect(token).toEqual({
       name: expect.any(Symbol),
+      stringName: 'tok',
       isToken: true,
       isModernToken: true,
       options: {},
@@ -39,6 +41,7 @@ describe('createToken', () => {
 
     expect(token).toEqual({
       name: expect.any(Symbol),
+      stringName: 'tuk',
       isToken: true,
       isModernToken: true,
       options: { multi: true },
