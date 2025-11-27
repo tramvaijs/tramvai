@@ -1,7 +1,13 @@
+import path from 'node:path';
+
 import { createToken } from '@tinkoff/dippy';
 import type { Container } from '@tinkoff/dippy';
-import { CONFIG_SERVICE_TOKEN, ReactCompilerOptions } from '@tramvai/api/lib/config';
-import envTargets from '@tinkoff/browserslist-config';
+import {
+  CONFIG_SERVICE_TOKEN,
+  ReactCompilerOptions,
+  TranspilationOptions,
+} from '@tramvai/api/lib/config';
+import envTargets, { modern } from '@tinkoff/browserslist-config';
 import type webpack from 'webpack';
 import browserslist from 'browserslist';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
@@ -28,8 +34,10 @@ export type WebpackTranspilerInputParameters = {
   hot: boolean;
   excludesPresetEnv: string[];
   rootDir: string;
+  sourceDir: string;
   browsersListTargets: string[];
   reactCompiler: boolean | ReactCompilerOptions;
+  include: TranspilationOptions['include'];
   /**
    * Enable or disable `loose` transformations:
    * with swc loader - https://swc.rs/docs/configuration/compilation#jscloose
@@ -88,7 +96,8 @@ export const resolveWebpackTranspilerParameters = (
     generateDataQaTag,
     enableFillDeclareActionNamePlugin,
     //   target,
-    //   rootDir,
+    sourceDir,
+    rootDir,
     //   enableFillActionNamePlugin,
     //   excludesPresetEnv,
     //   experiments: { reactCompiler },
@@ -104,10 +113,12 @@ export const resolveWebpackTranspilerParameters = (
     generateDataQaTag,
     tramvai: true,
     removeTypeofWindow: true,
+    include: config.transpilation.include,
     hot: !!config.hotRefresh?.enabled,
     // excludesPresetEnv,
     // enableFillActionNamePlugin,
-    rootDir: config.rootDir,
+    rootDir,
+    sourceDir,
     actualTarget,
     browsersListTargets: getBrowserslistConfig(config.rootDir, actualTarget),
     loader: true,
@@ -137,13 +148,22 @@ export const createTranspilerRules = ({
   transpiler,
   transpilerParameters,
   workerPoolConfig,
-  transpileOnlyModernLibs,
 }: {
   transpiler: WebpackTranspiler;
   transpilerParameters: WebpackTranspilerInputParameters;
   workerPoolConfig: WorkerPoolConfig;
-  transpileOnlyModernLibs: boolean;
 }): webpack.RuleSetRule[] => {
+  const { env } = transpilerParameters;
+  const include =
+    env === 'production'
+      ? transpilerParameters.include?.production
+      : transpilerParameters.include?.development;
+  const shouldSkipTranspile = include === 'none';
+  const shouldTranspileOnlyModern = include === 'only-modern';
+  const manualIncludeList = Array.isArray(include)
+    ? include.map((dependencyPath) => new RegExp(dependencyPath))
+    : undefined;
+
   return [
     {
       test: /\.[cm]?js[x]?$/,
@@ -160,23 +180,26 @@ export const createTranspilerRules = ({
         },
       ].filter(Boolean),
     },
-    {
-      test: /\.[cm]?js[x]?$/,
-      include: transpileOnlyModernLibs ? modernLibsFilter : /node_modules/,
-      // thread-loader trying to resolve virtual modules and fail webpack build,
-      // so we should ignore such modules in our filter
-      exclude: [/virtual:tramvai/, /[\\/]cli[\\/]lib[\\/]external/],
-      use: [
-        transpiler.useThreadLoader && {
-          loader: 'thread-loader',
-          options: workerPoolConfig,
+    shouldSkipTranspile
+      ? {}
+      : {
+          test: /\.[cm]?js[x]?$/,
+          include:
+            manualIncludeList ?? (shouldTranspileOnlyModern ? modernLibsFilter : /node_modules/),
+          // thread-loader trying to resolve virtual modules and fail webpack build,
+          // so we should ignore such modules in our filter
+          exclude: [/virtual:tramvai/, /[\\/]cli[\\/]lib[\\/]external/],
+          use: [
+            transpiler.useThreadLoader && {
+              loader: 'thread-loader',
+              options: workerPoolConfig,
+            },
+            {
+              loader: transpiler.loader,
+              options: transpiler.configFactory({ ...transpilerParameters, hot: false }),
+            },
+          ].filter(Boolean),
         },
-        {
-          loader: transpiler.loader,
-          options: transpiler.configFactory({ ...transpilerParameters, hot: false }),
-        },
-      ].filter(Boolean),
-    },
     {
       test: /\.ts[x]?$/,
       // test: [/\.ts[x]?$/, /^virtual:/],

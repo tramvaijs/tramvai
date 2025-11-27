@@ -33,8 +33,8 @@ const app = createApp({
   commands: {
     start: () => import('./start'),
     build: () => import('./build'),
-    benchmark: () => import('./benchmark'),
     analyze: () => import('./analyze'),
+    benchmark: () => import('./benchmark'),
     'start-prod': () => import('./start-prod'),
   },
   providers: [

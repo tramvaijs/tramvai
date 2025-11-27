@@ -35,7 +35,7 @@ After any command you can pass `--help` string, e.g. `tramvai --help` or `tramva
 - `tramvai start-prod` - run app in development mode, but code will be build in the production mode
 - `tramvai build` - build an app for server and client
 - `tramvai static` - generate static HTML for application pages
-- `tramvai analyze` - analyze bundle size
+- `tramvai benchmark` - run benchmark for application build (run build multiple times and calculate mean values)
 - `tramvai generate` - code generation for different components. E.g. new projects, react components, actions and etc.
 - `tramvai update` - update `@tramvai/cli` and all of the `@tramvai` and `@tramvai-tinkoff` dependencies in the project. This command additionally executes dependency deduplication and code migrations
 - `tramvai add` - add `@tramvai` or `@tramvai-tinkoff` dependency to the app. This command additionally executes dependency deduplication and code migrations

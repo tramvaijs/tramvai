@@ -150,6 +150,16 @@ export type ApplicationExperiments = {
   autoResolveSharedRequiredVersions?: boolean;
 };
 
+export type TranspilationOptions = {
+  /**
+   * @title customize transpiling of node_modules in prod/dev environments
+   */
+  include?: {
+    development?: 'all' | 'only-modern' | 'none' | string[];
+    production?: 'all' | 'only-modern';
+  };
+};
+
 /**
  * @title Enable DedupePlugin
  * @default {}
@@ -186,6 +196,7 @@ export type InputParameters = {
   port?: number;
   host?: string;
   benchmark?: boolean;
+  analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor';
   staticPort?: number;
   staticHost?: string;
   https?: boolean;
@@ -273,11 +284,7 @@ export interface BaseProject {
    */
   enableFillDeclareActionNamePlugin?: boolean;
 
-  /**
-   * @title transpile libs based only on %40tinkoff/is-modern-lib
-   * @default true
-   */
-  transpileOnlyModernLibs?: boolean;
+  transpilation?: TranspilationOptions;
 
   /**
    * React hot-refresh options
@@ -582,6 +589,10 @@ export class ConfigService {
     return this.#parameters?.benchmark ?? false;
   }
 
+  get analyze() {
+    return this.#parameters.analyze ?? false;
+  }
+
   get httpProtocol() {
     return this.#parameters?.https ? 'https' : 'http';
   }
@@ -801,8 +812,13 @@ export class ConfigService {
     return this.#project.enableFillDeclareActionNamePlugin ?? false;
   }
 
-  get transpileOnlyModernLibs() {
-    return this.#project.transpileOnlyModernLibs ?? true;
+  get transpilation() {
+    return {
+      include: {
+        development: this.#project.transpilation?.include?.development ?? 'only-modern',
+        production: this.#project.transpilation?.include?.production ?? 'only-modern',
+      },
+    };
   }
 
   get fileCache() {

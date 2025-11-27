@@ -65,7 +65,7 @@ import { createSourceMaps } from './shared/sourcemaps';
 import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
 import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
 import { getSharedModules } from './shared/shared-modules';
-import { getRsdoctorOptions } from './shared/rsdoctor';
+import { getAnalyzeRsdoctorOptions, getBenchmarkRsdoctorOptions } from './shared/rsdoctor';
 
 const mainFields = ['browser', 'module', 'main'];
 
@@ -321,7 +321,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           transpiler,
           transpilerParameters,
           workerPoolConfig,
-          transpileOnlyModernLibs: config.transpileOnlyModernLibs,
         }),
         ...stylesConfiguration.rules,
         ...createAssetsRules({ di }),
@@ -355,7 +354,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     plugins: [
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
-      config.benchmark && new RsdoctorWebpackPlugin(getRsdoctorOptions('client')),
+      config.benchmark && new RsdoctorWebpackPlugin(getBenchmarkRsdoctorOptions('client')),
+      config.analyze && new RsdoctorWebpackPlugin(getAnalyzeRsdoctorOptions()),
       ...stylesConfiguration.plugins,
       new StatsWriterPlugin({
         filename: STATS_FILE_NAME,

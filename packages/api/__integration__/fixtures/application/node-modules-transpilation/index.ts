@@ -2,5 +2,6 @@
 import { FakeModernLibrary } from 'fake-library';
 // @tinkoff/is-modern-lib detect `@tramvai/*` scoped packages as modern
 import { FakeTramvaiModernLibrary } from '@tramvai/fake-library';
+import { focusManager } from '@tanstack/query-core';
 
-console.log(FakeModernLibrary, FakeTramvaiModernLibrary);
+console.log(FakeModernLibrary, FakeTramvaiModernLibrary, focusManager);

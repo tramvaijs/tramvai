@@ -52,7 +52,7 @@ import { createSourceMaps } from './shared/sourcemaps';
 import { getSharedModules } from './shared/shared-modules';
 import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
 import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
-import { getRsdoctorOptions } from './shared/rsdoctor';
+import { getAnalyzeRsdoctorOptions, getBenchmarkRsdoctorOptions } from './shared/rsdoctor';
 
 const mainFields = ['module', 'main'];
 
@@ -282,7 +282,6 @@ export default appConfig;`;
           transpiler,
           transpilerParameters,
           workerPoolConfig,
-          transpileOnlyModernLibs: config.transpileOnlyModernLibs,
         }),
         ...stylesConfiguration.rules,
         ...createAssetsRules({ di }),
@@ -315,7 +314,8 @@ export default appConfig;`;
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
-      config.benchmark && new RsdoctorWebpackPlugin(getRsdoctorOptions('server')),
+      config.benchmark && new RsdoctorWebpackPlugin(getBenchmarkRsdoctorOptions('server')),
+      config.analyze && new RsdoctorWebpackPlugin(getAnalyzeRsdoctorOptions()),
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,

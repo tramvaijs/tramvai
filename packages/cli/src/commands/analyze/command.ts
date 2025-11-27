@@ -2,7 +2,7 @@ import { CLICommand } from '../../models/command';
 
 export type Params = {
   target: string;
-  plugin?: 'bundle' | 'whybundled' | 'statoscope';
+  plugin?: 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor';
   showConfig?: boolean;
 };
 

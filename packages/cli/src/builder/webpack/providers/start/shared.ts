@@ -9,6 +9,7 @@ import {
   WEBPACK_COMPILER_TOKEN,
   WEBPACK_SERVER_COMPILER_TOKEN,
   WEBPACK_SERVER_CONFIG_TOKEN,
+  WEBPACK_ANALYZE_PLUGIN_TOKEN,
 } from '../../tokens';
 import { createDevServer } from '../../devServer/setup';
 import { CONFIG_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../../di/tokens';
@@ -16,8 +17,11 @@ import { CONFIG_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../../di/tokens
 export const startSharedProviders: Provider[] = [
   provide({
     provide: WEBPACK_COMPILER_TOKEN,
-    useFactory: ({ clientConfig, serverConfig }) => {
-      const configs = [clientConfig, serverConfig].filter(Boolean).map(toWebpackConfig);
+    useFactory: ({ clientConfig, serverConfig, analyzePlugin }) => {
+      const configs = [clientConfig, serverConfig]
+        .filter(Boolean)
+        .map((config) => (analyzePlugin ? analyzePlugin.patchConfig(config) : config))
+        .map(toWebpackConfig);
       const multiCompiler = webpack(configs);
       const { inputFileSystem } = multiCompiler.compilers[0];
 
@@ -51,6 +55,7 @@ export const startSharedProviders: Provider[] = [
     deps: {
       clientConfig: { token: WEBPACK_CLIENT_CONFIG_TOKEN, optional: true },
       serverConfig: { token: WEBPACK_SERVER_CONFIG_TOKEN, optional: true },
+      analyzePlugin: { token: WEBPACK_ANALYZE_PLUGIN_TOKEN, optional: true },
     },
   }),
   provide({

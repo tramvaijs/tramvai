@@ -8,6 +8,7 @@ import {
   INIT_HANDLER_TOKEN,
   PROCESS_HANDLER_TOKEN,
   SERVER_CONFIG_MANAGER_TOKEN,
+  WEBPACK_ANALYZE_PLUGIN_TOKEN,
   WEBPACK_SERVER_COMPILER_TOKEN,
   WEBPACK_SERVER_CONFIG_TOKEN,
 } from '../../tokens';
@@ -18,12 +19,16 @@ import { createCompiler } from '../../utils/compiler';
 export const buildServerProviders: Provider[] = [
   provide({
     provide: WEBPACK_SERVER_COMPILER_TOKEN,
-    useFactory: ({ webpackConfig, di }) => {
-      return createCompiler(toWebpackConfig(webpackConfig), di);
+    useFactory: ({ webpackConfig, di, analyzePlugin }) => {
+      return createCompiler(
+        toWebpackConfig(analyzePlugin ? analyzePlugin.patchConfig(webpackConfig) : webpackConfig),
+        di
+      );
     },
     deps: {
       webpackConfig: WEBPACK_SERVER_CONFIG_TOKEN,
       di: DI_TOKEN,
+      analyzePlugin: { token: WEBPACK_ANALYZE_PLUGIN_TOKEN, optional: true },
     },
   }),
   provide({

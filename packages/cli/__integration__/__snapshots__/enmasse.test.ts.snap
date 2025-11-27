@@ -9,11 +9,11 @@ Options:
 
 Commands:
   build|b [options] <target>                    Command to build platform entities - applications, modules, libraries
+  analyze|a [options] <target>                  Command for analyzing application
   start-prod|sp [options] <target>              Command to run in production mode
   start|s [options] <target>                    Command to run in development mode
   lint|l <target>                               Command to run lint
   task|t <name> [options]                       Run task
-  analyze|a [options] <target>                  Command for analyzing application
   generate|g [target] [generator]               Command for code generation
     [target] - application name
     [generator] - action|reducer|bundle|component|page|module
@@ -204,11 +204,11 @@ Options:
 
 Commands:
   build|b [options] <target>                    Command to build platform entities - applications, modules, libraries
+  analyze|a [options] <target>                  Command for analyzing application
   start-prod|sp [options] <target>              Command to run in production mode
   start|s [options] <target>                    Command to run in development mode
   lint|l <target>                               Command to run lint
   task|t <name> [options]                       Run task
-  analyze|a [options] <target>                  Command for analyzing application
   generate|g [target] [generator]               Command for code generation
     [target] - application name
     [generator] - action|reducer|bundle|component|page|module
@@ -405,11 +405,11 @@ Options:
 
 Commands:
   build|b [options] <target>                    Command to build platform entities - applications, modules, libraries
+  analyze|a [options] <target>                  Command for analyzing application
   start-prod|sp [options] <target>              Command to run in production mode
   start|s [options] <target>                    Command to run in development mode
   lint|l <target>                               Command to run lint
   task|t <name> [options]                       Run task
-  analyze|a [options] <target>                  Command for analyzing application
   generate|g [target] [generator]               Command for code generation
     [target] - application name
     [generator] - action|reducer|bundle|component|page|module

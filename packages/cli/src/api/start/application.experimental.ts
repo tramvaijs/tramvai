@@ -26,6 +26,7 @@ export const startApplicationExperimental = async (di: Container): Result => {
     mode: 'development',
     benchmark: options.benchmark,
     buildType: options.buildType,
+    analyze: options.analyze,
     port: options.port,
     host: options.host,
     staticPort: options.staticPort,
@@ -275,6 +276,19 @@ function mapTramvaiJsonToNewTsConfig({ rootDir }: { rootDir: string }) {
           mappedProject.webpack = {};
         }
         mappedProject.webpack.devtool = applicationProject.webpack.devtool;
+      }
+      if (applicationProject.experiments?.transpilation) {
+        const applicationProjectInclude = applicationProject.experiments.transpilation.include;
+        mappedProject.transpilation = {
+          include: {
+            development:
+              typeof applicationProjectInclude === 'string' ||
+              Array.isArray(applicationProjectInclude)
+                ? applicationProjectInclude
+                : // @ts-ignore
+                  applicationProjectInclude.development,
+          },
+        };
       }
       if (applicationProject.experiments?.pwa) {
         mappedProject.pwa = {

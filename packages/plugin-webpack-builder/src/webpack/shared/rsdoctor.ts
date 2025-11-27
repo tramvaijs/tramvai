@@ -3,7 +3,7 @@ import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 type options = ConstructorParameters<typeof RsdoctorWebpackPlugin<[]>>[0];
 
-export const getRsdoctorOptions = (buildType: 'client' | 'server'): options => ({
+export const getBenchmarkRsdoctorOptions = (buildType: 'client' | 'server'): options => ({
   disableClientServer: true,
   features: ['plugins', 'loader'],
   linter: {
@@ -23,5 +23,11 @@ export const getRsdoctorOptions = (buildType: 'client' | 'server'): options => (
         },
       },
     },
+  },
+});
+
+export const getAnalyzeRsdoctorOptions = (): options => ({
+  linter: {
+    level: 'Ignore',
   },
 });

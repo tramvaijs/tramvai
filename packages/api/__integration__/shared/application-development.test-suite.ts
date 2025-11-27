@@ -517,16 +517,40 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       ),
       enableFillDeclareActionNamePlugin: true,
     },
-    'app-node-modules-transpilation': {
-      name: 'app-node-modules-transpilation',
-      type: 'application',
-      entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
-      transpileOnlyModernLibs: false,
-    },
     'app-node-modules-transpilation-only-modern': {
       name: 'app-node-modules-transpilation-only-modern',
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
+    },
+    'app-node-modules-transpilation': {
+      name: 'app-node-modules-transpilation',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
+      transpilation: {
+        include: {
+          development: 'all',
+        },
+      },
+    },
+    'app-node-modules-skip-transpilation': {
+      name: 'app-node-modules-skip-transpilation',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
+      transpilation: {
+        include: {
+          development: 'none',
+        },
+      },
+    },
+    'app-node-modules-selective-transpilation': {
+      name: 'app-node-modules-selective-transpilation',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'node-modules-transpilation', 'index.ts'),
+      transpilation: {
+        include: {
+          development: ['@tanstack'],
+        },
+      },
     },
   };
 
@@ -2493,9 +2517,12 @@ export default Cmp;`,
             const platformJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
             ).text();
+            const tramvaiJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/tramvai.js`)
+            ).text();
 
             test.expect(platformJs).not.toContain(`#value`);
-            test.expect(platformJs).not.toContain(`#tramvaiValue`);
+            test.expect(tramvaiJs).not.toContain(`#tramvaiValue`);
           });
         });
 
@@ -2522,9 +2549,76 @@ export default Cmp;`,
             const platformJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
             ).text();
+            const tramvaiJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/tramvai.js`)
+            ).text();
 
             test.expect(platformJs).toContain(`#value`);
-            test.expect(platformJs).not.toContain(`#tramvaiValue`);
+            test.expect(tramvaiJs).not.toContain(`#tramvaiValue`);
+          });
+        });
+
+        test.describe('app-node-modules-skip-transpilation', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-node-modules-skip-transpilation',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('transpiler: node_modules libraries are not transpiled', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            const tramvaiJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/tramvai.js`)
+            ).text();
+
+            test.expect(platformJs).toContain(`#value`);
+            test.expect(tramvaiJs).toContain(`#tramvaiValue`);
+          });
+        });
+
+        test.describe('app-node-modules-selective-transpilation', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-node-modules-selective-transpilation',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              disableServerRunnerWaiting: true,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('transpiler: node_modules libraries are partially transpiled', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            const tramvaiJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/tramvai.js`)
+            ).text();
+
+            test.expect(platformJs).toContain(`#value`);
+            test.expect(tramvaiJs).toContain(`#tramvaiValue`);
+            test.expect(platformJs).not.toContain(`#focused`);
           });
         });
       });

@@ -75,6 +75,12 @@ export type TranspilationExperiments = {
    * @default "babel"
    */
   loader: OverridableOption<TranspilationLoader>;
+
+  /**
+   * @title customize transpiling of node_modules in prod/dev environments
+   * @default "only-modern"
+   */
+  include?: OverridableOption<'all' | 'only-modern' | 'none' | string[]>;
 };
 
 export interface Experiments {

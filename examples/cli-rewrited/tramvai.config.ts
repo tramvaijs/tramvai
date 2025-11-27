@@ -25,6 +25,11 @@ export default defineTramvaiConfig({
           short_name: 'Т-Банк',
         },
       },
+      transpilation: {
+        include: {
+          development: 'none',
+        },
+      },
       fileSystemPages: {
         enabled: true,
         pagesDir: false,

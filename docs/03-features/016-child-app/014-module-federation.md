@@ -88,9 +88,9 @@ In tramvai.json add new `shared` field
 
 In order to choose what dependencies should be shared:
 
-- use `tramvai analyze` command to explore the output bundle and how different options affects it
+- use `tramvai build --analyze` command to explore the output bundle and how different options affects it
 - try different dependencies and see what is loading on the page when child-app is used
-- validate how adding shared dependency affects root-app bundle size through `tramvai analyze`
+- validate how adding shared dependency affects root-app bundle size through `tramvai build --analyze`
 
 ### How to manage dependencies?
 

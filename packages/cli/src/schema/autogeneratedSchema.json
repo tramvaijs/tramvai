@@ -911,6 +911,69 @@
                       "type": "string"
                     }
                   ]
+                },
+                "include": {
+                  "cli_overridable": "",
+                  "title": "customize transpiling of node_modules in prod/dev environments",
+                  "default": "only-modern",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "development": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "enum": [
+                                "all",
+                                "none",
+                                "only-modern"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "production": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "enum": [
+                                "all",
+                                "none",
+                                "only-modern"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "enum": [
+                        "all",
+                        "none",
+                        "only-modern"
+                      ],
+                      "type": "string"
+                    }
+                  ]
                 }
               },
               "additionalProperties": false
@@ -1292,23 +1355,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@10836": {
+                        "__@match@10839": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10838": {
+                        "__@replace@10841": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10841": {
+                        "__@search@10844": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10843": {
+                        "__@split@10846": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10845": {
+                        "__@matchAll@10848": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1816,6 +1879,69 @@
                       "type": "string"
                     }
                   ]
+                },
+                "include": {
+                  "cli_overridable": "",
+                  "title": "customize transpiling of node_modules in prod/dev environments",
+                  "default": "only-modern",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "development": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "enum": [
+                                "all",
+                                "none",
+                                "only-modern"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "production": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "enum": [
+                                "all",
+                                "none",
+                                "only-modern"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "enum": [
+                        "all",
+                        "none",
+                        "only-modern"
+                      ],
+                      "type": "string"
+                    }
+                  ]
                 }
               },
               "additionalProperties": false
@@ -2090,23 +2216,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@10836": {
+                        "__@match@10839": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10838": {
+                        "__@replace@10841": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10841": {
+                        "__@search@10844": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10843": {
+                        "__@split@10846": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10845": {
+                        "__@matchAll@10848": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2614,6 +2740,69 @@
                       "type": "string"
                     }
                   ]
+                },
+                "include": {
+                  "cli_overridable": "",
+                  "title": "customize transpiling of node_modules in prod/dev environments",
+                  "default": "only-modern",
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "development": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "enum": [
+                                "all",
+                                "none",
+                                "only-modern"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        },
+                        "production": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "enum": [
+                                "all",
+                                "none",
+                                "only-modern"
+                              ],
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    {
+                      "enum": [
+                        "all",
+                        "none",
+                        "only-modern"
+                      ],
+                      "type": "string"
+                    }
+                  ]
                 }
               },
               "additionalProperties": false
@@ -2888,23 +3077,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@10836": {
+                        "__@match@10839": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10838": {
+                        "__@replace@10841": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10841": {
+                        "__@search@10844": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10843": {
+                        "__@split@10846": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10845": {
+                        "__@matchAll@10848": {
                           "type": "object",
                           "additionalProperties": false
                         }

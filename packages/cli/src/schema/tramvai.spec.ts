@@ -105,6 +105,7 @@ describe('JSON schema для tramvai.json', () => {
               "runtimeChunk": false,
               "serverRunner": "thread",
               "transpilation": {
+                "include": "only-modern",
                 "loader": "babel",
               },
               "viewTransitions": false,
@@ -181,6 +182,7 @@ describe('JSON schema для tramvai.json', () => {
               "minifier": "terser",
               "reactCompiler": false,
               "transpilation": {
+                "include": "only-modern",
                 "loader": "babel",
               },
               "webpack": {

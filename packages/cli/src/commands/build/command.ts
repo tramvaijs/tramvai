@@ -48,6 +48,12 @@ class BuildCommand extends CLICommand<Params> {
       description: '<package> Prepare library package.json for publication',
     },
     {
+      name: '--analyze',
+      value: '[analyze]',
+      description:
+        'Run build with analyze, supported plugins: <bundle|whybundled|statoscope|rsdoctor>',
+    },
+    {
       name: '--fileCache',
       value: '[fileCache]',
       transformer: (value: string) => value !== 'false',

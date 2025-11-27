@@ -14,8 +14,8 @@ import buildCommand from '../commands/build/command';
 import { StartCommand } from '../commands/start/command';
 import lintCommand from '../commands/lint/command';
 import taskCommand from '../commands/task/command';
-import analyze from '../commands/analyze/command';
 import generate from '../commands/generate/command';
+import analyze from '../commands/analyze/command';
 import newCommand from '../commands/new/command';
 import updateCommand from '../commands/update/command';
 import addCommand from '../commands/add/command';
@@ -29,15 +29,16 @@ import type { TaskMap } from '../models/task';
 import { getRootFile } from '../utils/getRootFile';
 import { getTramvaiConfig } from '../utils/getTramvaiConfig';
 import { syncJsonFile } from '../utils/syncJsonFile';
+import AnalyzeCommand from '../commands/analyze/command';
 
 async function loadCommands(): Promise<CommandMap> {
   return [
     buildCommand,
+    AnalyzeCommand,
     StartProdCommand,
     StartCommand,
     lintCommand,
     taskCommand,
-    analyze,
     generate,
     newCommand,
     updateCommand,

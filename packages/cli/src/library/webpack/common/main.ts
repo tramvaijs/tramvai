@@ -4,7 +4,7 @@ import path from 'path';
 import { existsSync } from 'fs-extra';
 import findCacheDir from 'find-cache-dir';
 import { RsdoctorWebpackMultiplePlugin } from '@rsdoctor/webpack-plugin';
-import { getRsdoctorOptions } from '@tramvai/plugin-webpack-builder';
+import { getBenchmarkRsdoctorOptions } from '@tramvai/plugin-webpack-builder';
 import { ignoreWarnings } from '../utils/warningsFilter';
 import resolve from '../blocks/resolve';
 import ignoreLocales from '../blocks/ignoreLocales';
@@ -131,7 +131,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
   if (configManager.benchmark) {
     config
       .plugin('rsdoctor-benchmark')
-      .use(RsdoctorWebpackMultiplePlugin, [getRsdoctorOptions(configManager.buildType)]);
+      .use(RsdoctorWebpackMultiplePlugin, [getBenchmarkRsdoctorOptions(configManager.buildType)]);
   }
 
   // TODO: remove after dropping support for node@14

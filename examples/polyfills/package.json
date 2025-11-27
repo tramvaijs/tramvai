@@ -6,7 +6,7 @@
     "start": "tramvai start polyfills",
     "start:prod": "tramvai start-prod polyfills",
     "build": "tramvai build polyfills",
-    "analyze": "tramvai analyze polyfills --plugin statoscope",
+    "analyze": "tramvai build --analyze=statoscope",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
     "test": "jest",
     "test:watch": "jest --watch",

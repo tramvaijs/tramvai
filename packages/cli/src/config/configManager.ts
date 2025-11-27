@@ -41,6 +41,7 @@ export interface Settings<E extends Env> {
   resolveSymlinks?: boolean;
   showConfig?: boolean;
   onlyBundles?: string[];
+  analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor';
   disableProdOptimization?: boolean;
   fileCache?: boolean;
 }
@@ -135,6 +136,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     benchmark: false,
     resolveSymlinks: true,
     disableProdOptimization: false,
+    analyze: false,
     onlyBundles: [],
     // according to measures fileCache in webpack doesn't affect
     // performance much so enable it by default as it always was before

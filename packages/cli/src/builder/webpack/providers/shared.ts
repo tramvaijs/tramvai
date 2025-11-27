@@ -11,8 +11,26 @@ import {
   INIT_HANDLER_TOKEN,
   WEBPACK_CLIENT_COMPILER_TOKEN,
   WEBPACK_SERVER_COMPILER_TOKEN,
+  WEBPACK_ANALYZE_PLUGIN_NAME_TOKEN,
+  WEBPACK_ANALYZE_PLUGIN_TOKEN,
 } from '../tokens';
 import { emitWebpackEvents } from '../utils/webpackEvents';
+import { BundleAnalyzePlugin } from '../analyzePlugins/bundle';
+import { StatoscopeAnalyzePlugin } from '../analyzePlugins/statoscope';
+import { WhyBundledAnalyzePlugin } from '../analyzePlugins/whyBundled';
+import { RsdoctorAnalyzePlugin } from '../analyzePlugins/rsdoctor';
+import type { AnalyzePlugin } from '../types';
+
+interface Type<T> extends Function {
+  new (...args: any[]): T;
+}
+
+const pluginMap: Record<string, Type<AnalyzePlugin>> = {
+  bundle: BundleAnalyzePlugin,
+  whybundled: WhyBundledAnalyzePlugin,
+  statoscope: StatoscopeAnalyzePlugin,
+  rsdoctor: RsdoctorAnalyzePlugin,
+};
 
 export const sharedProviders: Provider[] = [
   provide({
@@ -44,6 +62,27 @@ export const sharedProviders: Provider[] = [
       withBuildStats: { token: WITH_BUILD_STATS_TOKEN, optional: true },
       clientCompiler: { token: WEBPACK_CLIENT_COMPILER_TOKEN, optional: true },
       serverCompiler: { token: WEBPACK_SERVER_COMPILER_TOKEN, optional: true },
+    },
+  }),
+  provide({
+    provide: WEBPACK_ANALYZE_PLUGIN_TOKEN,
+    useFactory: ({ pluginName }) => {
+      if (!pluginName) {
+        return;
+      }
+
+      const PluginClass = pluginMap[pluginName];
+
+      if (!PluginClass) {
+        throw new Error(
+          'Set correct value for --analytics cli option, <bundle|whybundled|statoscope|rsdoctor>\n'
+        );
+      }
+
+      return new PluginClass();
+    },
+    deps: {
+      pluginName: WEBPACK_ANALYZE_PLUGIN_NAME_TOKEN,
     },
   }),
   provide({
@@ -80,13 +119,18 @@ export const sharedProviders: Provider[] = [
   provide({
     provide: CLOSE_HANDLER_TOKEN,
     multi: true,
-    useFactory: ({ configManager }) => {
+    useFactory: ({ configManager, analyzePlugin }) => {
       return async () => {
         await closeWorkerPool(configManager);
+
+        if (analyzePlugin) {
+          return analyzePlugin.afterBuild();
+        }
       };
     },
     deps: {
       configManager: CONFIG_MANAGER_TOKEN,
+      analyzePlugin: { token: WEBPACK_ANALYZE_PLUGIN_TOKEN, optional: true },
     },
   }),
 ];

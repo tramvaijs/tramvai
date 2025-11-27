@@ -27,7 +27,6 @@ import { buildClientProviders } from './providers/build/client';
 import { buildServerProviders } from './providers/build/server';
 import { CONFIG_MANAGER_TOKEN } from '../../di/tokens';
 import { buildApplicationServerProviders } from './providers/build/application/server';
-import { analyzeSharedProviders } from './providers/analyze/shared';
 
 const BUILDER_NAME = 'webpack';
 
@@ -52,6 +51,14 @@ export const webpackProviders: Provider[] = [
                 ...(shouldBuildClient ? startClientProviders : []),
                 ...(shouldBuildServer ? startServerProviders : []),
               ]);
+
+              const configManager = di.get(CONFIG_MANAGER_TOKEN);
+              if (configManager.analyze) {
+                di.register({
+                  provide: WEBPACK_ANALYZE_PLUGIN_NAME_TOKEN,
+                  useValue: configManager.analyze,
+                });
+              }
 
               await runHandlers(di.get({ token: INIT_HANDLER_TOKEN, optional: true, multi: true }));
 
@@ -89,15 +96,21 @@ export const webpackProviders: Provider[] = [
                 ...(shouldBuildServer ? buildServerProviders : []),
               ]);
 
-              await runHandlers(di.get({ token: INIT_HANDLER_TOKEN, optional: true, multi: true }));
-
               const configManager = di.get(CONFIG_MANAGER_TOKEN);
+              if (configManager.analyze) {
+                di.register({
+                  provide: WEBPACK_ANALYZE_PLUGIN_NAME_TOKEN,
+                  useValue: configManager.analyze,
+                });
+              }
 
               if (configManager.type === 'application') {
                 registerProviders(di, [
                   ...(shouldBuildServer ? buildApplicationServerProviders : []),
                 ]);
               }
+
+              await runHandlers(di.get({ token: INIT_HANDLER_TOKEN, optional: true, multi: true }));
 
               const getBuildStats = di.get(GET_BUILD_STATS_TOKEN);
 
@@ -112,24 +125,6 @@ export const webpackProviders: Provider[] = [
               return {
                 getBuildStats,
               };
-            },
-            async analyze({ plugin }) {
-              di.register({
-                provide: WEBPACK_ANALYZE_PLUGIN_NAME_TOKEN,
-                useValue: plugin || 'bundle',
-              });
-
-              registerProviders(di, analyzeSharedProviders);
-
-              await runHandlers(di.get({ token: INIT_HANDLER_TOKEN, optional: true, multi: true }));
-
-              await runHandlers(
-                di.get({ token: PROCESS_HANDLER_TOKEN, optional: true, multi: true })
-              );
-
-              await runHandlers(
-                di.get({ token: CLOSE_HANDLER_TOKEN, optional: true, multi: true })
-              );
             },
             on(event, callback) {
               di.get(EVENT_EMITTER_TOKEN).on(event, callback);
