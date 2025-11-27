@@ -21,6 +21,7 @@ const metaRobotsContent = {
   'index, nofollow': robotsNoFollow,
   none: robotsNone,
   'noindex, nofollow': robotsNone,
+  skip: [],
 };
 
 export const converters: Record<string, Converter> = {

@@ -1,5 +1,14 @@
 import { testApp } from '@tramvai/internal-test-utils/testApp';
 import { testAppInBrowser } from '@tramvai/internal-test-utils/browser';
+import type { Page } from 'playwright-core';
+
+const checkRobotsMetaTagsCount = async (page: Page, robotsMetaTags: Record<string, number>) => {
+  for (const [metaTagContent, expectedCount] of Object.entries(robotsMetaTags)) {
+    expect(await page.locator(`meta[name="robots"][content="${metaTagContent}"]`).count()).toBe(
+      expectedCount
+    );
+  }
+};
 
 describe('seo', () => {
   const { getApp } = testApp({
@@ -13,6 +22,14 @@ describe('seo', () => {
 
       return head.replace(new RegExp(app.staticUrl, 'g'), 'http://localhost:4000');
     };
+
+    it('test robots skip meta', async () => {
+      expect(await getHeadHtml('/robots/skip/')).toMatchSnapshot();
+    });
+
+    it('test robots all meta', async () => {
+      expect(await getHeadHtml('/robots/all/')).toMatchSnapshot();
+    });
 
     it('test default meta pack', async () => {
       expect(await getHeadHtml('/seo/default/')).toMatchSnapshot();
@@ -55,6 +72,7 @@ describe('seo', () => {
     it('should allow to update meta in page actions', async () => {
       const { page, router } = await getPageWrapper('/seo/dynamic/');
       expect(await page.title()).toBe('WoW, such dynamic!');
+      expect(await page.locator('meta[name="robots"]').count()).toBe(0);
       await router.navigate('../common/');
       expect(await page.title()).toBe('common seo');
       await router.navigate('../dynamic/');
@@ -86,20 +104,33 @@ describe('seo', () => {
     });
 
     it('should have title which is came from the server action', async () => {
-      const { page, router } = await getPageWrapper('/seo/dynamic-server/');
+      const { page } = await getPageWrapper('/seo/dynamic-server/');
+
+      await checkRobotsMetaTagsCount(page, { all: 1, 'index, follow': 1, noarchive: 1 });
 
       expect(await page.title()).toBe('Hello, this is Tramvai!');
     });
 
     it('should have title which is came from the server action and then be changed by the action on client', async () => {
-      const { page, router } = await getPageWrapper('/seo/dynamic-server-dynamic-client');
+      const { page } = await getPageWrapper('/seo/dynamic-server-dynamic-client');
 
       expect(await page.title()).toBe('Hello, this is Tramvai!');
+      await checkRobotsMetaTagsCount(page, { all: 1, 'index, follow': 1, noarchive: 1 });
 
       await page.waitForFunction(
         (expectedTitle) => document.title === expectedTitle,
         'WoW, such dynamic!'
       );
+      await checkRobotsMetaTagsCount(page, { all: 0, 'index, follow': 0, noarchive: 0 });
+    });
+
+    it('ручное обновление robots meta tags', async () => {
+      const { page } = await getPageWrapper('/seo/apply-meta');
+      const button = page.getByTestId('apply-robots-skip-meta-button');
+
+      await button.click();
+
+      expect(await page.locator('meta[name="robots"]').count()).toBe(0);
     });
 
     it('после захода на страницу, ручное обновление через APPLY_META_TOKEN - старая мета обновилась если была изменена, мета из админки не пропала, если не была изменена, новая мета добавилась', async () => {
