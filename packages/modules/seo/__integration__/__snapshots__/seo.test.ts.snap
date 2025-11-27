@@ -83,12 +83,9 @@ exports[`seo ssr test default meta pack 1`] = `
     
 
     
-    <link crossorigin="anonymous"
-      data-critical="true"
-      onload="__preloadJS()"
-      rel="stylesheet"
-      href="\${STATIC_URL}/dist/client/root.chunk.css"
-    >
+    
+    <style type="text/css"></style>
+    <link crossorigin="anonymous" data-href="\${STATIC_URL}/dist/client/root.chunk.css" rel="stylesheet" >
     
 
     
@@ -261,6 +258,136 @@ exports[`seo ssr test og meta 1`] = `
     
     <style type="text/css"></style>
     <link crossorigin="anonymous" data-href="\${STATIC_URL}/dist/client/root.chunk.css" rel="stylesheet" >
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/root.chunk.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/platform.js"
+    ></script>
+    
+
+    
+
+    
+
+    
+
+    
+  "
+`;
+
+exports[`seo ssr test robots all meta 1`] = `
+"
+    <meta charset="UTF-8" >
+    
+    <meta name="attrFromPageService" content="\${SERVER_URL}/robots/all/" data-meta-dynamic="true" >
+    <meta name="robots" content="all" data-meta-dynamic="true" >
+    <meta name="robots" content="index, follow" data-meta-dynamic="true" >
+    <meta name="robots" content="noarchive" data-meta-dynamic="true" >
+    <meta name="metaCustomNameAttribute" content="metaCustomContent" data-meta-dynamic="true" >
+    
+
+    
+    <script></script>
+    <script></script>
+    
+
+    
+    
+    <style type="text/css"></style>
+    <link crossorigin="anonymous" data-href="\${STATIC_URL}/dist/client/root.chunk.css" rel="stylesheet" >
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/root.chunk.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/platform.js"
+    ></script>
+    
+
+    
+
+    
+
+    
+
+    
+  "
+`;
+
+exports[`seo ssr test robots skip meta 1`] = `
+"
+    <meta charset="UTF-8" >
+    
+    <meta name="attrFromPageService" content="\${SERVER_URL}/robots/skip/" data-meta-dynamic="true" >
+    <meta name="metaCustomNameAttribute" content="metaCustomContent" data-meta-dynamic="true" >
+    
+
+    
+    <script></script>
+    <script></script>
+    
+
+    
+    <link crossorigin="anonymous"
+      data-critical="true"
+      onload="__preloadJS()"
+      rel="stylesheet"
+      href="\${STATIC_URL}/dist/client/root.chunk.css"
+    >
     
 
     

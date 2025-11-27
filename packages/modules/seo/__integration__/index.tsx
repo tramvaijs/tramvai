@@ -1,10 +1,12 @@
 import { createApp, createBundle, declareAction, provide } from '@tramvai/core';
 import { SeoModule, META_WALK_TOKEN, META_DEFAULT_TOKEN } from '@tramvai/module-seo';
 import { PAGE_SERVICE_TOKEN, ROUTES_TOKEN } from '@tramvai/tokens-router';
-import { modules, bundles } from '../../../../test/shared/common';
+import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
+import React from 'react';
 import { jsonLd } from './data/jsonLd';
 import { Button } from './Button';
 import { APPLY_META_TOKEN } from '../src/tokens';
+import { ApplyMetaRobotsButton } from './ApplyMetaRobotsButton';
 
 const metaSpecial = (context, meta) => {
   meta.updateMeta(10, {
@@ -23,6 +25,7 @@ const dynamicAction = declareAction({
   async fn() {
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',
+      robots: 'skip',
     });
   },
   deps: {
@@ -30,6 +33,20 @@ const dynamicAction = declareAction({
   },
   conditions: {
     always: true,
+  },
+});
+
+export const applyMetaRobotsAction = declareAction({
+  name: 'applyMetaRobots',
+  async fn() {
+    this.deps.applyMeta({
+      metaObj: {
+        robots: 'skip',
+      },
+    });
+  },
+  deps: {
+    applyMeta: APPLY_META_TOKEN,
   },
 });
 
@@ -58,6 +75,7 @@ const dynamicClientAction = declareAction({
 
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',
+      robots: 'skip',
     });
   },
   deps: {
@@ -74,6 +92,7 @@ const dynamicServerAction = declareAction({
   async fn() {
     this.deps.meta.updateMeta(10, {
       title: 'Hello, this is Tramvai!',
+      robots: 'all',
     });
   },
   deps: {
@@ -120,7 +139,12 @@ const dynamicServerAndClientBundle = createBundle({
 const applyMetaBundle = createBundle({
   name: 'apply-meta',
   components: {
-    page: () => Button(),
+    page: () => (
+      <div>
+        <Button />
+        <ApplyMetaRobotsButton />
+      </div>
+    ),
     layout: ({ children }) => children,
   },
 });
@@ -141,10 +165,37 @@ createApp({
     {
       provide: ROUTES_TOKEN,
       multi: true,
+
       useValue: [
         {
           name: 'default',
           path: '/seo/default/',
+        },
+        {
+          name: 'robots-skip',
+          path: '/robots/skip/',
+          config: {
+            meta: {
+              seo: {
+                metaTags: {
+                  robots: 'skip',
+                },
+              },
+            },
+          },
+        },
+        {
+          name: 'robots-all',
+          path: '/robots/all/',
+          config: {
+            meta: {
+              seo: {
+                metaTags: {
+                  robots: 'all',
+                },
+              },
+            },
+          },
         },
         {
           name: 'common',
