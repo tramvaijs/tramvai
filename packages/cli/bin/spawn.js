@@ -1,6 +1,8 @@
 const { spawn: cpSpawn } = require('child_process');
 const exit = require('exit');
 
+const { restartReason } = require('./const');
+
 const args = process.argv.slice(2);
 const maxMemory = process.env.MAX_USED_MEMORY || '3000';
 const maxSemiSpaceSize = process.env.MAX_SEMI_SPACE_SIZE || '128';
@@ -46,6 +48,10 @@ It's unexpected, please check available/used memory and cpu while running last c
   });
 
   cliInstance.on('exit', async (code, sig) => {
+    if (signal.aborted && signal.reason === restartReason) {
+      return;
+    }
+
     if (sig) {
       console.warn(`Process was exited with signal "${sig}"
 It's unexpected, please check available/used memory and cpu while running last command`);
