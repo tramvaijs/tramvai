@@ -61,6 +61,10 @@ export class YarnPackageManager extends PackageManager {
   }
 
   async getRegistryUrl(): Promise<string> {
-    return (await this.run('yarn config get registry', {})).stdout.trim();
+    if (await this.isFileExists(`${this.rootDir}/.yarnrc`)) {
+      return (await this.run('yarn config get registry', {})).stdout.trim();
+    }
+
+    return (await this.run('npm config get registry', {})).stdout.trim();
   }
 }
