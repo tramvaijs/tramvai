@@ -24,6 +24,7 @@ import {
   afterUpdateCurrentHooksToken,
   routeTransformToken,
   ROUTER_VIEW_TRANSITIONS_ENABLED,
+  BACK_NAVIGATION_WITHIN_ROUTE_TYPE,
 } from './tokens';
 import { RouterStore } from '../stores/RouterStore';
 import { commonGuards } from './guards/common';
@@ -50,6 +51,7 @@ export const providers: Provider[] = [
       additionalParameters,
       plugins,
       viewTransitionsEnabled,
+      backNavigationWithinRouteType,
     }) => {
       const router = new RouterClass({
         ...additionalParameters,
@@ -57,6 +59,7 @@ export const providers: Provider[] = [
         mergeSlashes: true,
         enableViewTransitions:
           process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true' && viewTransitionsEnabled,
+        backNavigationWithinRouteType,
         routes: flatten(routes ?? []).map(routeTransform),
         plugins,
       });
@@ -96,6 +99,10 @@ export const providers: Provider[] = [
       },
       plugins: optional(ROUTER_PLUGIN),
       viewTransitionsEnabled: ROUTER_VIEW_TRANSITIONS_ENABLED,
+      backNavigationWithinRouteType: {
+        token: BACK_NAVIGATION_WITHIN_ROUTE_TYPE,
+        optional: true,
+      },
     },
   }),
   provide({

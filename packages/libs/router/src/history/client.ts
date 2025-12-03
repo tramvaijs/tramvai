@@ -1,6 +1,13 @@
 import type { Url } from '@tinkoff/url';
 import { History } from './base';
-import type { Navigation, NavigationType, HistoryOptions, Route, HistoryState } from '../types';
+import {
+  HistoryOptions,
+  HistoryState,
+  Navigation,
+  NavigationType,
+  BackNavigationType,
+  Route,
+} from '../types';
 import type { Wrapper } from './wrapper';
 import { wrapHistory } from './wrapper';
 
@@ -86,10 +93,15 @@ export class ClientHistory extends History {
   private currentIndex = 0;
   private currentState: HistoryState;
   private historyUnsubscribeCallback: () => void | undefined;
+  private backNavigationWithinRouteType: BackNavigationType;
 
   protected historyWrapper: Wrapper<HistoryState>;
 
-  constructor() {
+  constructor({
+    backNavigationWithinRouteType,
+  }: {
+    backNavigationWithinRouteType?: BackNavigationType;
+  } = {}) {
     super();
     this.historyWrapper = wrapHistory({
       onNavigate: ({ url, replace, navigateState }) => {
@@ -100,6 +112,8 @@ export class ClientHistory extends History {
         });
       },
     });
+    this.backNavigationWithinRouteType =
+      backNavigationWithinRouteType ?? BackNavigationType.PREFER_UPDATE;
   }
 
   protected onNavigate: Parameters<typeof wrapHistory>[0]['onNavigate'];
@@ -114,6 +128,7 @@ export class ClientHistory extends History {
     this.currentIndex = this.currentState.index;
     this.historyWrapper.init(this.currentState);
     this.historyUnsubscribeCallback = this.historyWrapper.subscribe(
+      // eslint-disable-next-line max-statements
       async ({ path, state, hasUAVisualTransition }) => {
         try {
           let navigationType: NavigationType;
@@ -127,13 +142,32 @@ export class ClientHistory extends History {
             this.currentState = state;
             navigateState = state.navigateState;
 
-            if (
-              key === prevKey &&
-              (type === 'updateCurrentRoute' || prevType === 'updateCurrentRoute')
-            ) {
-              navigationType = 'updateCurrentRoute';
+            if (key !== prevKey) {
+              navigateState = 'navigate';
             } else {
-              navigationType = 'navigate';
+              if (this.backNavigationWithinRouteType === BackNavigationType.PREFER_UPDATE) {
+                if (type === 'updateCurrentRoute' || prevType === 'updateCurrentRoute') {
+                  navigationType = 'updateCurrentRoute';
+                } else {
+                  navigationType = 'navigate';
+                }
+              }
+
+              if (this.backNavigationWithinRouteType === BackNavigationType.CURRENT_TYPE) {
+                if (isBack ? prevType === 'updateCurrentRoute' : type === 'updateCurrentRoute') {
+                  navigationType = 'updateCurrentRoute';
+                } else {
+                  navigationType = 'navigate';
+                }
+              }
+
+              if (this.backNavigationWithinRouteType === BackNavigationType.PREVIOUS_TYPE) {
+                if (isBack ? type === 'updateCurrentRoute' : type === 'updateCurrentRoute') {
+                  navigationType = 'updateCurrentRoute';
+                } else {
+                  navigationType = 'navigate';
+                }
+              }
             }
           } else {
             // if it is not HistoryState than it is probably not a state from @tinkoff/router so reset it

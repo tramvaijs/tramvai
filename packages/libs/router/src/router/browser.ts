@@ -51,8 +51,16 @@ export class Router extends ClientRouter {
     }
   }
 
-  protected async run(payload: Navigation) {
-    const navigation: Navigation = { ...payload };
+  protected async run(navigation: Navigation) {
+    // if navigation was cancelled before, do not run it
+    if (navigation.skipped) {
+      logger.debug({
+        event: 'run.cancel',
+        navigation,
+      });
+
+      return;
+    }
 
     const to =
       (navigation.to.redirect !== undefined
@@ -124,7 +132,7 @@ export class Router extends ClientRouter {
 
   protected commitNavigation(navigation: Navigation) {
     // if we have parallel navigation do not update current url, as it outdated anyway
-    if (navigation.cancelled || navigation.skipped) {
+    if (navigation.skipped) {
       logger.debug({
         event: 'delay-ignore-commit',
         navigation,
@@ -138,7 +146,7 @@ export class Router extends ClientRouter {
 
   protected async runGuards(navigation: Navigation) {
     // drop checking guards if we have delayed navigation
-    if (navigation.cancelled) {
+    if (navigation.skipped) {
       logger.debug({
         event: 'delay-ignore-guards',
         navigation,
@@ -154,7 +162,7 @@ export class Router extends ClientRouter {
     // except only for case when current navigation already happened
     // and we should synchronize this update with app
     // (in case app has some logic for currently showing url on afterNavigate or afterRouteUpdate)
-    if (navigation.cancelled && this.lastNavigation !== navigation) {
+    if (navigation.skipped && this.lastNavigation !== navigation) {
       logger.debug({
         event: 'delay-ignore-hooks',
         navigation,
@@ -185,7 +193,7 @@ export class Router extends ClientRouter {
 
           // set cancelled flag
           if (this.currentNavigation) {
-            this.currentNavigation.cancelled = true;
+            this.currentNavigation.skipped = true;
             this.currentNavigation = null;
           }
 
@@ -336,19 +344,19 @@ export class Router extends ClientRouter {
     }
   }
 
-  cancel() {
-    if (!this.isNavigating()) return;
-
+  cancel(navigation?: Navigation) {
     logger.debug({
-      event: 'cancelled',
-      navigation: this.currentNavigation,
+      event: 'cancel',
+      navigation: navigation ?? this.currentNavigation,
     });
 
-    const cancelled = this.currentNavigation;
+    if (navigation) {
+      navigation.skipped = true;
+    }
 
-    this.currentNavigation.skipped = true;
-    this.currentNavigation = null;
-
-    return cancelled;
+    if (!navigation || navigation === this.currentNavigation) {
+      this.currentNavigation.skipped = true;
+      this.currentNavigation = null;
+    }
   }
 }

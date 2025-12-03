@@ -222,7 +222,11 @@ describe('router/server', () => {
       it('should run hooks for navigate', async () => {
         const mockBefore = jest.fn();
         const mockAfter = jest.fn();
-        const mockResolve = jest.fn();
+
+        let resolveArgMock;
+        const mockResolve = jest.fn().mockImplementation((arg) => {
+          resolveArgMock = { ...arg }; // Save a copy of the argument at the time of the call
+        });
 
         router.registerHook('beforeResolve', mockResolve);
         router.registerHook('beforeNavigate', mockBefore);
@@ -237,7 +241,7 @@ describe('router/server', () => {
           url: expect.objectContaining({ path: '/child1?a=1' }),
           key: currentNavigationObjectUuid++,
         };
-        expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
+        expect(resolveArgMock).toEqual({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
         expect(mockAfter).toHaveBeenCalledWith(navigation);
       });
@@ -452,8 +456,10 @@ describe('router/server', () => {
       it('should run hooks for navigate', async () => {
         const mockBefore = jest.fn();
         const mockAfter = jest.fn();
-        const mockResolve = jest.fn();
-
+        let resolveArgMock;
+        const mockResolve = jest.fn().mockImplementation((arg) => {
+          resolveArgMock = { ...arg }; // Save a copy of the argument at the time of the call
+        });
         router.registerHook('beforeResolve', mockResolve);
         router.registerHook('beforeNavigate', mockBefore);
         router.registerHook('afterNavigate', mockAfter);
@@ -468,7 +474,7 @@ describe('router/server', () => {
           key: currentNavigationObjectUuid++,
         };
 
-        expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
+        expect(resolveArgMock).toEqual({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
         expect(mockAfter).toHaveBeenCalledWith(navigation);
       });
@@ -651,8 +657,10 @@ describe('router/server', () => {
       it('should run hooks for navigate', async () => {
         const mockBefore = jest.fn();
         const mockAfter = jest.fn();
-        const mockResolve = jest.fn();
-
+        let resolveArgMock;
+        const mockResolve = jest.fn().mockImplementation((arg) => {
+          resolveArgMock = { ...arg }; // Save a copy of the argument at the time of the call
+        });
         router.registerHook('beforeResolve', mockResolve);
         router.registerHook('beforeNavigate', mockBefore);
         router.registerHook('afterNavigate', mockAfter);
@@ -666,7 +674,7 @@ describe('router/server', () => {
           url: expect.objectContaining({ path: '/child1?a=1' }),
           key: currentNavigationObjectUuid++,
         };
-        expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
+        expect(resolveArgMock).toEqual({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
         expect(mockAfter).toHaveBeenCalledWith(navigation);
       });

@@ -8,7 +8,7 @@ import type {
   SyncTapableHookInstance,
 } from '@tinkoff/hook-runner';
 import { TapableHooks } from '@tinkoff/hook-runner';
-import type {
+import {
   Route,
   NavigateOptions,
   UpdateCurrentRouteOptions,
@@ -21,6 +21,7 @@ import type {
   SyncHookName,
   HistoryOptions,
   RouterPlugin,
+  BackNavigationType,
 } from '../types';
 import type { History } from '../history/base';
 import type { RouteTree } from '../tree/tree';
@@ -37,6 +38,7 @@ export interface Options {
   trailingSlash?: boolean;
   mergeSlashes?: boolean;
   enableViewTransitions?: boolean;
+  backNavigationWithinRouteType?: BackNavigationType;
 
   routes?: Route[];
 
@@ -284,7 +286,7 @@ export abstract class AbstractRouter {
       throw new Error('updateCurrentRoute should only be called after navigate to some route');
     }
 
-    const { replace, params, navigateState } = updateRouteOptions;
+    const { replace, params, navigateState, isBack } = updateRouteOptions;
     const { to: from, url: fromUrl } = prevNavigation;
 
     const navigation: Navigation = {
@@ -298,6 +300,7 @@ export abstract class AbstractRouter {
       navigateState,
       code: updateRouteOptions.code,
       key: this.uuid(),
+      isBack,
     };
 
     logger.debug({
@@ -346,7 +349,7 @@ export abstract class AbstractRouter {
     const { to: from, url: fromUrl } = prevNavigation ?? {};
     const redirectFrom = redirect ? this.getCurrentRoute() : undefined;
 
-    let navigation: Navigation = {
+    const navigation: Navigation = {
       type: 'navigate',
       from,
       url: resolvedUrl,
@@ -372,10 +375,7 @@ export abstract class AbstractRouter {
     const to = this.resolveRoute({ url: resolvedUrl, params, navigateState }, { wildcard: true });
 
     if (to) {
-      navigation = {
-        ...navigation,
-        to,
-      };
+      navigation.to = to;
     }
 
     logger.debug({
@@ -495,7 +495,7 @@ export abstract class AbstractRouter {
     throw new Error('Navigation blocked');
   }
 
-  cancel(): Navigation | void {}
+  cancel(_?: Navigation): Navigation | void {}
 
   protected normalizePathname(pathname?: string) {
     let normalized = pathname;

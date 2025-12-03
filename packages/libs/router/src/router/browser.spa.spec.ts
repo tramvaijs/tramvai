@@ -2,7 +2,7 @@
  * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
 import { parse } from '@tinkoff/url';
-import type { Navigation, NavigationRoute } from '../types';
+import type { NavigationRoute } from '../types';
 import { Router } from './browser';
 
 const mockPush = jest.spyOn(window.history, 'pushState');
@@ -249,6 +249,21 @@ describe('router/browser-spa', () => {
         await router.updateCurrentRoute({ query: { a: undefined }, preserveQuery: true });
         expect(router.getCurrentUrl()?.query).toEqual({ b: 'b' });
       });
+
+      it('should pass isBack into back navigation', async () => {
+        await router.updateCurrentRoute({ query: { a: 'a', b: 'b' } });
+
+        const mockHook = jest.fn();
+        router.registerHook('beforeUpdateCurrent', mockHook);
+
+        await router.back();
+
+        expect(mockHook).toHaveBeenCalledWith(
+          expect.objectContaining({
+            isBack: true,
+          })
+        );
+      });
     });
 
     describe('navigate', () => {
@@ -338,6 +353,21 @@ describe('router/browser-spa', () => {
           name: 'child1',
           navigateState: { test: '123' },
         });
+      });
+
+      it('should pass isBack into back navigation', async () => {
+        await router.navigate({ url: '/child1/', navigateState: { test: '123' } });
+
+        const mockHook = jest.fn();
+        router.registerHook('beforeResolve', mockHook);
+
+        await router.back();
+
+        expect(mockHook).toHaveBeenCalledWith(
+          expect.objectContaining({
+            isBack: true,
+          })
+        );
       });
     });
 
@@ -469,7 +499,10 @@ describe('router/browser-spa', () => {
       it('should run hooks for navigate', async () => {
         const mockBefore = jest.fn();
         const mockAfter = jest.fn();
-        const mockResolve = jest.fn();
+        let resolveArgMock;
+        const mockResolve = jest.fn().mockImplementation((arg) => {
+          resolveArgMock = { ...arg }; // Save a copy of the argument at the time of the call
+        });
 
         router.registerHook('beforeResolve', mockResolve);
         router.registerHook('beforeNavigate', mockBefore);
@@ -486,7 +519,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           key: currentNavigationObjectUuid++,
         };
-        expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
+        expect(resolveArgMock).toEqual({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
         expect(mockAfter).toHaveBeenCalledWith(navigation);
       });
@@ -584,7 +617,7 @@ describe('router/browser-spa', () => {
 
         expect(mockGuard).toHaveBeenCalledWith({
           type: 'navigate',
-          cancelled: true,
+          skipped: true,
           from: expect.objectContaining({ name: 'root' }),
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),
@@ -637,46 +670,17 @@ describe('router/browser-spa', () => {
         await router.start();
       });
 
-      it('does not cancel if method called outside of navigation flow', () => {
-        router.cancel();
-
-        expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
-      });
-
-      it("does not cancel navigation if it's not started yet", async () => {
-        const promise = router.navigate('/child1/');
-
-        router.cancel();
-
-        await promise;
-
-        expect(router.getCurrentRoute()).toMatchObject({ name: 'child1', path: '/child1/' });
-        expect(router.isNavigating()).toBe(false);
-      });
-
-      it('does not cancel navigation if method called in beforeResolve hook and navigation is not started yet', async () => {
-        const hook = jest.fn().mockImplementationOnce(() => {
-          router.cancel();
-        });
-        router.registerHook('beforeResolve', hook);
-
-        await router.navigate('/child1/');
-
-        expect(router.getCurrentRoute()).toMatchObject({ name: 'child1', path: '/child1/' });
-        expect(router.isNavigating()).toBe(false);
-      });
-
       it('cancels navigation if method called in beforeResolve hook and navigation already started', async () => {
-        const hook = jest.fn().mockImplementationOnce(async () => {
+        const hook = jest.fn().mockImplementationOnce(async (navigation) => {
           setTimeout(() => {
-            router.cancel();
-          }, 100);
+            router.cancel(navigation);
+          }, 2);
         });
         router.registerHook('beforeResolve', hook);
 
         // emulating slow navigation to be sure navigation has started before calling cancel()
         const guard = jest.fn().mockImplementationOnce(async () => {
-          await new Promise((resolve) => setTimeout(resolve, 150));
+          await new Promise((resolve) => setTimeout(resolve, 4));
         });
         router.registerGuard(guard);
 
@@ -686,46 +690,114 @@ describe('router/browser-spa', () => {
         expect(router.isNavigating()).toBe(false);
       });
 
-      it('cancels navigation if method called in beforeNavigate hook', async () => {
-        const hook = jest.fn().mockImplementationOnce(async () => {
-          router.cancel();
+      it('cancel navigation if method called in beforeResolve hook', async () => {
+        router.registerHook('beforeResolve', async (navigation) => {
+          router.cancel(navigation);
         });
-        router.registerHook('beforeNavigate', hook);
+
+        const mockBeforeNavigateHook = jest.fn();
+        const guardMock = jest.fn();
+        const mockChangeHook = jest.fn();
+        const mockAfterNavigateHook = jest.fn();
+
+        router.registerGuard(guardMock);
+        router.registerHook('beforeNavigate', mockBeforeNavigateHook);
+        router.registerSyncHook('change', mockChangeHook);
+        router.registerHook('afterNavigate', mockAfterNavigateHook);
 
         await router.navigate('/child1/');
 
         expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
         expect(router.isNavigating()).toBe(false);
+        expect(mockBeforeNavigateHook).not.toHaveBeenCalled();
+        expect(guardMock).not.toHaveBeenCalled();
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterNavigateHook).not.toHaveBeenCalled();
       });
 
-      it('cancels navigation if method called in beforeUpdateCurrent hook', async () => {
-        const hook = jest.fn().mockImplementationOnce(async () => {
-          router.cancel();
+      it('cancel navigation if method called in beforeNavigate hook', async () => {
+        const hook = jest.fn().mockImplementationOnce(async (navigation) => {
+          router.cancel(navigation);
         });
+
+        const mockChangeHook = jest.fn();
+        const mockAfterNavigateHook = jest.fn();
+
+        router.registerHook('beforeNavigate', hook);
+        router.registerSyncHook('change', mockChangeHook);
+        router.registerHook('afterNavigate', mockAfterNavigateHook);
+
+        await router.navigate('/child1/');
+
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
+        expect(router.isNavigating()).toBe(false);
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterNavigateHook).not.toHaveBeenCalled();
+      });
+
+      it('cancel navigation if method called in guard', async () => {
+        const gurad = jest.fn().mockImplementationOnce(async (navigation) => {
+          router.cancel(navigation);
+        });
+        const mockBeforeNavigateHook = jest.fn();
+        const mockChangeHook = jest.fn();
+        const mockAfterNavigateHook = jest.fn();
+
+        router.registerGuard(gurad);
+        router.registerHook('beforeNavigate', mockBeforeNavigateHook);
+        router.registerSyncHook('change', mockChangeHook);
+        router.registerHook('afterNavigate', mockAfterNavigateHook);
+
+        await router.navigate('/child1/');
+
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
+        expect(router.isNavigating()).toBe(false);
+        expect(mockBeforeNavigateHook).not.toHaveBeenCalled();
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterNavigateHook).not.toHaveBeenCalled();
+      });
+
+      it('dont cancel navigation if method called in change hook', async () => {
+        const mockChangeHook = jest.fn();
+        const mockAfterNavigateHook = jest.fn();
+
+        router.registerSyncHook('change', (navigation) => {
+          router.cancel(navigation);
+        });
+        router.registerHook('afterNavigate', mockAfterNavigateHook);
+
+        await router.navigate('/child1/');
+
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'child1', path: '/child1/' });
+        expect(router.isNavigating()).toBe(false);
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterNavigateHook).toHaveBeenCalled();
+      });
+
+      it('cancel navigation if method called in beforeUpdateCurrent hook', async () => {
+        const hook = jest.fn().mockImplementationOnce(async (navigation) => {
+          router.cancel(navigation);
+        });
+
+        const mockChangeHook = jest.fn();
+        const mockAfterUpdateHook = jest.fn();
+
         router.registerHook('beforeUpdateCurrent', hook);
+        router.registerSyncHook('change', mockChangeHook);
+        router.registerHook('afterUpdateCurrent', mockAfterUpdateHook);
 
         await router.updateCurrentRoute({ query: { foo: 'bar' } });
 
         expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
         expect(router.getCurrentUrl()).toMatchObject({ query: {} });
         expect(router.isNavigating()).toBe(false);
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterUpdateHook).not.toHaveBeenCalled();
       });
 
-      it('cancels navigation if method called in guard', async () => {
-        const gurad = jest.fn().mockImplementationOnce(async () => {
-          router.cancel();
-        });
-        router.registerGuard(gurad);
-
-        await router.navigate('/child1/');
-
-        expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
-        expect(router.isNavigating()).toBe(false);
-      });
-
-      it('cancels first navigation and makes second one', async () => {
+      it('cancel first navigation and makes second one', async () => {
         const hook = jest.fn().mockImplementationOnce(async (navigation) => {
-          if (navigation.to?.path === '/child1/') router.cancel();
+          if (navigation.to?.path === '/child1/') router.cancel(navigation);
         });
         router.registerHook('beforeNavigate', hook);
 
@@ -739,21 +811,52 @@ describe('router/browser-spa', () => {
         expect(router.isNavigating()).toBe(false);
       });
 
-      it('resets cancelled state', async () => {
-        let cancelled: Navigation | undefined;
-        const guard = jest.fn().mockImplementationOnce(async () => {
-          cancelled = router.cancel();
+      it('cancel first navigation and makes second one in beforeResolve hook', async () => {
+        const hook = jest.fn().mockImplementationOnce(async (navigation) => {
+          if (navigation.url?.path === '/child1/') {
+            router.cancel(navigation);
+            await router.navigate('/child2/');
+          }
         });
-        const hook = jest.fn().mockImplementationOnce(() => {
-          cancelled!.skipped = false;
-          return router.navigate(cancelled!.url!.href);
-        });
-        router.registerGuard(guard);
-        router.registerHook('beforeNavigate', hook);
+        router.registerHook('beforeResolve', hook);
 
         await router.navigate('/child1/');
 
-        expect(router.getCurrentRoute()).toMatchObject({ name: 'child1', path: '/child1/' });
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'child2', path: '/child2/' });
+        expect(router.isNavigating()).toBe(false);
+      });
+
+      it('cancel first navigation in beforeResolve hook and makes concurrently second one', async () => {
+        router.registerHook(
+          'beforeResolve',
+          async (navigation) =>
+            new Promise((resolve) => {
+              if (navigation.url?.path === '/child1/') {
+                setTimeout(() => {
+                  router.cancel(navigation);
+
+                  resolve();
+                }, 2);
+                return;
+              }
+
+              if (navigation.url?.path === '/child2/') {
+                setTimeout(() => {
+                  resolve();
+                }, 4);
+
+                return;
+              }
+
+              resolve();
+            })
+        );
+
+        router.navigate('/child1/');
+
+        await router.navigate('/child2/');
+
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'child2', path: '/child2/' });
       });
     });
 
@@ -1168,8 +1271,10 @@ describe('router/browser-spa', () => {
       it('should run hooks for navigate', async () => {
         const mockBefore = jest.fn();
         const mockAfter = jest.fn();
-        const mockResolve = jest.fn();
-
+        let resolveArgMock;
+        const mockResolve = jest.fn().mockImplementation((arg) => {
+          resolveArgMock = { ...arg }; // Save a copy of the argument at the time of the call
+        });
         router.registerHook('beforeResolve', mockResolve);
         router.registerHook('beforeNavigate', mockBefore);
         router.registerHook('afterNavigate', mockAfter);
@@ -1189,7 +1294,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           key: currentNavigationObjectUuid++,
         };
-        expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
+        expect(resolveArgMock).toEqual({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
         expect(mockAfter).toHaveBeenCalledWith(navigation);
       });
@@ -1289,7 +1394,7 @@ describe('router/browser-spa', () => {
 
         expect(mockGuard).toHaveBeenCalledWith({
           type: 'navigate',
-          cancelled: true,
+          skipped: true,
           from: expect.objectContaining({ name: 'root' }),
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),
@@ -1538,7 +1643,10 @@ describe('router/browser-spa', () => {
       it('should run hooks for navigate', async () => {
         const mockBefore = jest.fn();
         const mockAfter = jest.fn();
-        const mockResolve = jest.fn();
+        let resolveArgMock;
+        const mockResolve = jest.fn().mockImplementation((arg) => {
+          resolveArgMock = { ...arg }; // Save a copy of the argument at the time of the call
+        });
 
         router.registerHook('beforeResolve', mockResolve);
         router.registerHook('beforeNavigate', mockBefore);
@@ -1559,7 +1667,7 @@ describe('router/browser-spa', () => {
           fromUrl: expect.objectContaining({ path: '/' }),
           key: currentNavigationObjectUuid++,
         };
-        expect(mockResolve).toHaveBeenCalledWith({ ...navigation, to: undefined });
+        expect(resolveArgMock).toEqual({ ...navigation, to: undefined });
         expect(mockBefore).toHaveBeenCalledWith(navigation);
         expect(mockAfter).toHaveBeenCalledWith(navigation);
       });
@@ -1658,7 +1766,7 @@ describe('router/browser-spa', () => {
 
         expect(mockGuard).toHaveBeenCalledWith({
           type: 'navigate',
-          cancelled: true,
+          skipped: true,
           from: expect.objectContaining({ name: 'root' }),
           fromUrl: expect.objectContaining({ path: '/' }),
           to: expect.objectContaining({ name: 'child1' }),

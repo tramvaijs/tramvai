@@ -32,11 +32,11 @@ export interface BaseNavigateOptions {
   hash?: string;
   navigateState?: any;
   code?: number;
+  isBack?: boolean;
 }
 
 export interface NavigateOptions extends BaseNavigateOptions {
   url?: string;
-  isBack?: boolean;
   viewTransition?: boolean;
   viewTransitionTypes?: string[];
   hasUAVisualTransition?: boolean;
@@ -62,7 +62,6 @@ export interface Navigation {
   replace?: boolean;
   navigateState?: any;
   history?: boolean;
-  cancelled?: boolean;
   skipped?: boolean;
   code?: number;
   isBack?: boolean;
@@ -113,4 +112,16 @@ export interface HistoryState {
   index: number;
   viewTransition?: boolean;
   viewTransitionTypes?: string[];
+}
+
+/**
+ * Navigation type for browser "Back/Forward" within the same route
+ * prefer-update - always return via update
+ * current-type - return with current navigation type
+ * previous-type - return with the navigation type of the target route
+ */
+export enum BackNavigationType {
+  CURRENT_TYPE = 'current-type',
+  PREFER_UPDATE = 'prefer-update',
+  PREVIOUS_TYPE = 'previous-type',
 }

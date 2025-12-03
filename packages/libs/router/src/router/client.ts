@@ -12,10 +12,21 @@ export abstract class ClientRouter extends AbstractRouter {
 
   constructor(options: Options) {
     super(options);
-    this.history = new ClientHistory();
+    this.history = new ClientHistory({
+      backNavigationWithinRouteType: options.backNavigationWithinRouteType,
+    });
 
     this.history.listen(
-      async ({ type, url, navigateState, replace, history, hasUAVisualTransition, ...rest }) => {
+      async ({
+        type,
+        url,
+        navigateState,
+        replace,
+        history,
+        hasUAVisualTransition,
+        isBack,
+        ...rest
+      }) => {
         const currentUrl = this.getCurrentUrl();
         const { pathname, query, hash } = this.resolveUrl({ url });
         const isSameUrlNavigation =
@@ -50,6 +61,7 @@ export abstract class ClientRouter extends AbstractRouter {
               hash,
               replace,
               navigateState,
+              isBack,
             },
             { history }
           );
@@ -60,6 +72,7 @@ export abstract class ClientRouter extends AbstractRouter {
               replace,
               navigateState,
               hasUAVisualTransition,
+              isBack,
               ...rest,
             },
             { history }

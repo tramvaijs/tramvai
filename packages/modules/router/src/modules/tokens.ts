@@ -1,5 +1,11 @@
 import { createToken } from '@tinkoff/dippy';
-import type { NavigationHook, AbstractRouter, NavigationSyncHook, Route } from '@tinkoff/router';
+import {
+  NavigationHook,
+  AbstractRouter,
+  NavigationSyncHook,
+  Route,
+  BackNavigationType,
+} from '@tinkoff/router';
 import type { RouteTransform } from '@tramvai/tokens-router';
 
 export const routerClassToken =
@@ -39,4 +45,8 @@ export const routerBundleInfoAdditionalToken = createToken<() => Promise<Route[]
 
 export const ROUTER_VIEW_TRANSITIONS_ENABLED = createToken<boolean>(
   'router viewTransitionsEnabled'
+);
+
+export const BACK_NAVIGATION_WITHIN_ROUTE_TYPE = createToken<BackNavigationType>(
+  'router backNavigationWithinRouteType'
 );
