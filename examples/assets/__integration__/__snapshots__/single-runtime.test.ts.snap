@@ -252,10 +252,10 @@ exports[`assets runtime chunk snapshot 1`] = `
 /******/ 			var promises = [];
 /******/ 			switch(name) {
 /******/ 				case "default": {
-/******/ 					register("react-dom", "19.0.0", function() { return function() { return __webpack_require__("../../node_modules/react-dom/index.js"); }; }, 1);
-/******/ 					register("react/jsx-dev-runtime", "19.0.0", function() { return function() { return __webpack_require__("../../node_modules/react/jsx-dev-runtime.js"); }; }, 1);
-/******/ 					register("react/jsx-runtime", "19.0.0", function() { return function() { return __webpack_require__("../../node_modules/react/jsx-runtime.js"); }; }, 1);
-/******/ 					register("react", "19.0.0", function() { return function() { return __webpack_require__("../../node_modules/react/index.js"); }; }, 1);
+/******/ 					register("react-dom", "19.0.1", function() { return function() { return __webpack_require__("../../node_modules/react-dom/index.js"); }; }, 1);
+/******/ 					register("react/jsx-dev-runtime", "19.0.1", function() { return function() { return __webpack_require__("../../node_modules/react/jsx-dev-runtime.js"); }; }, 1);
+/******/ 					register("react/jsx-runtime", "19.0.1", function() { return function() { return __webpack_require__("../../node_modules/react/jsx-runtime.js"); }; }, 1);
+/******/ 					register("react", "19.0.1", function() { return function() { return __webpack_require__("../../node_modules/react/index.js"); }; }, 1);
 /******/ 				}
 /******/ 				break;
 /******/ 			}

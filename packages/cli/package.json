@@ -197,7 +197,7 @@
     "@types/webpack-dev-middleware": "^5.0.2",
     "@types/webpack-stats-plugin": "^0.3.2",
     "babel-plugin-tester": "^10.1.0",
-    "react": "19.0.0",
+    "react": "19.0.1",
     "sharp": "0.34.3"
   },
   "peerDependencies": {

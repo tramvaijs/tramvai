@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@tramvai/react": "0.0.0-stub",
-    "react": "19.0.0"
+    "react": "19.0.1"
   },
   "peerDependencies": {
     "@tramvai/module-child-app": "0.0.0-stub"
