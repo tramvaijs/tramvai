@@ -29,3 +29,18 @@ export const appBundleInfo = async (configManager: ConfigManager) => {
 
   return propOr('payload', [], response);
 };
+
+export const appPrerenderRoutes = async (configManager: ConfigManager) => {
+  const { name } = configManager;
+
+  const response = await appRequest<BundleInfoResponse>(
+    configManager,
+    `/${name}/papi/prerenderRoutes`,
+    {
+      timeout: 5000,
+      retry: 3,
+    }
+  );
+
+  return propOr('payload', [], response);
+};

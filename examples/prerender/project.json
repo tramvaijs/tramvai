@@ -1,0 +1,6 @@
+{
+  "name": "prerender",
+  "sourceRoot": "examples/prerender/src",
+  "projectType": "library",
+  "targets": {}
+}

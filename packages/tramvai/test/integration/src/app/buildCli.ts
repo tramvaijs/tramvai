@@ -35,7 +35,7 @@ export const buildCli = async (
     stderr,
     // build cache made tests unstable in CI, because of cache writing process are async,
     // and there is no way to wait this process (`idleTimeoutForInitialStore: 0` helps sometimes, but no guarantees)
-    fileCache: !ciInfo.isCi,
+    fileCache: cliOptions.fileCache ?? !ciInfo.isCi,
     // faster builds with debug flag, sm still will be disabled by default
     sourceMap: cliOptions.sourceMap ?? false,
     ...(typeof targetOrConfig === 'string'

@@ -1,6 +1,7 @@
 import { resolve, join } from 'path';
 import PQueue from 'promise-queue';
 import { outputFile } from 'fs-extra';
+import { getHeaders } from '@tinkoff/request-plugin-protocol-http';
 import type { Context } from '../../models/context';
 import type { ConfigManager } from '../../config/configManager';
 import type { ApplicationConfigEntry } from '../../typings/configEntry/application';
@@ -8,7 +9,6 @@ import { appRequest } from '../../utils/dev-app/request';
 import type { Params } from './command';
 
 const MAX_CONCURRENT = 10;
-const DYNAMIC_PAGE_REGEX = /\/:.+\//g;
 
 export const generateStatic = async (
   context: Context,
@@ -28,7 +28,9 @@ export const generateStatic = async (
 
       return result;
     },
-    {} as Record<string, string>
+    {
+      'x-tramvai-prerender': 'true',
+    } as Record<string, string>
   );
 
   const { rootDir, output } = configManager;
@@ -37,15 +39,7 @@ export const generateStatic = async (
   for (const path of paths) {
     promises.push(
       q.add(async () => {
-        // @todo need something similar to https://nextjs.org/docs/basic-features/data-fetching#getstaticpaths-static-generation
-        if (DYNAMIC_PAGE_REGEX.test(path)) {
-          context.logger.event({
-            type: 'warning',
-            event: 'COMMAND:STATIC:DYNAMIC_PAGE_UNSUPPORTED',
-            message: `path: ${path}, message: export dynamic pages to HTML is not supported`,
-          });
-          return;
-        }
+        let response: any;
 
         try {
           context.logger.event({
@@ -54,7 +48,8 @@ export const generateStatic = async (
             message: `path: ${path}, message: start fetching page`,
           });
 
-          const html = await appRequest(configManager, path, { headers });
+          response = appRequest(configManager, path, { headers });
+          const html = await response;
 
           await outputFile(join(staticPath, path, 'index.html'), html);
 
@@ -64,6 +59,18 @@ export const generateStatic = async (
             message: `path: ${path}, message: page created successfully`,
           });
         } catch (e) {
+          const responseHeaders = response ? getHeaders(response) : {};
+
+          if (responseHeaders['x-tramvai-prerender-skip'] === 'true') {
+            context.logger.event({
+              type: 'debug',
+              event: 'COMMAND:STATIC:PAGE_SKIP',
+              message: `path: ${path}, message: page prerender skipped`,
+            });
+
+            return;
+          }
+
           context.logger.event({
             type: 'error',
             event: 'COMMAND:STATIC:ERROR',

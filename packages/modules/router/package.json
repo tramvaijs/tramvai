@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@tinkoff/errors": "0.0.0-stub",
+    "@tinkoff/hook-runner": "0.0.0-stub",
     "@tinkoff/router": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
     "@tramvai/experiments": "0.0.0-stub",

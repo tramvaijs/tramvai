@@ -2,6 +2,8 @@ import { format } from '@tinkoff/url';
 import type { Request } from '@tinkoff/request-core';
 import requestFactory from '@tinkoff/request-core';
 import httpPlugin from '@tinkoff/request-plugin-protocol-http';
+import { ExtractDependencyType } from '@tramvai/core';
+import { CACHE_WARMUP_HOOKS_TOKEN } from './tokens';
 
 const request = requestFactory([httpPlugin()]);
 
@@ -13,24 +15,19 @@ type QueueReuestsOptions<T> = {
    * @default 2
    */
   maxSimultaneous?: number;
+  hooks: ExtractDependencyType<typeof CACHE_WARMUP_HOOKS_TOKEN>;
 };
 
 export async function queueRequests<T>(options: QueueReuestsOptions<T>) {
   const { maxSimultaneous = 2, makeRequest, requestsOptions } = options;
 
   const req = async (option: T) => {
-    try {
-      await makeRequest(option);
-      return {
-        option,
-        result: 'resolved',
-      };
-    } catch {
-      return {
-        option,
-        result: 'rejected',
-      };
-    }
+    const result = await options.hooks['cache-warmup:request'].callPromise({
+      request: makeRequest as (parameters: Request) => Promise<unknown>,
+      parameters: option as Request,
+    });
+
+    return result;
   };
 
   const queue: Promise<any>[] = [];
@@ -74,7 +71,7 @@ export function createRequestsOptions(options: {
           url: format({
             hostname: 'localhost',
             port,
-            path: url.replace(/:\w+/g, '0'),
+            path: url,
           }),
           headers: {
             'User-Agent': userAgent,

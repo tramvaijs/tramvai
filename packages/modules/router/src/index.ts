@@ -24,6 +24,7 @@ export {
   routerBundleInfoAdditionalToken,
   routeTransformToken,
   ROUTER_VIEW_TRANSITIONS_ENABLED,
+  PRERENDER_HOOKS_TOKEN,
 } from './modules/tokens';
 
 declare module '@tinkoff/router' {

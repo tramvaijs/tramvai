@@ -69,6 +69,9 @@
         },
         {
             "path": "../../tokens/render"
+        },
+        {
+            "path": "../../libs/hooks"
         }
     ]
 }

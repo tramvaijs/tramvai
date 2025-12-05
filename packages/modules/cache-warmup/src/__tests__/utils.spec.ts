@@ -1,7 +1,32 @@
 import { startMockServer } from '@tramvai/internal-test-utils/utils/simpleMockServer';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import { queueRequests, sendWarmUpRequest } from '../utils';
 
 const flushPromises = () => new Promise(setImmediate);
+
+const createHooks = () => {
+  const hooks = new TapableHooks();
+  const requestHook = hooks.createAsync<any, any>('cache-warmup:request');
+
+  requestHook.tapPromise('CacheWarmupPlugin', async (_, { request, parameters }) => {
+    try {
+      await request(parameters);
+      return {
+        parameters,
+        result: 'resolved',
+      };
+    } catch {
+      return {
+        parameters,
+        result: 'rejected',
+      };
+    }
+  });
+
+  return {
+    'cache-warmup:request': requestHook,
+  };
+};
 
 describe('warmup/utils', () => {
   describe('queueRequests', () => {
@@ -13,8 +38,9 @@ describe('warmup/utils', () => {
         (timeout: number) => new Promise((resolve) => setTimeout(resolve, timeout))
       );
       const max = 3;
+      const hooks = createHooks();
 
-      const result = queueRequests({ makeRequest, requestsOptions, maxSimultaneous: max });
+      const result = queueRequests({ makeRequest, requestsOptions, maxSimultaneous: max, hooks });
 
       expect(makeRequest).toHaveBeenCalledTimes(3);
 
@@ -30,10 +56,10 @@ describe('warmup/utils', () => {
       jest.runAllTimers();
 
       await expect(result).resolves.toEqual([
-        { option: 1000, result: 'resolved' },
-        { option: 1500, result: 'resolved' },
-        { option: 1500, result: 'resolved' },
-        { option: 1000, result: 'resolved' },
+        { parameters: 1000, result: 'resolved' },
+        { parameters: 1500, result: 'resolved' },
+        { parameters: 1500, result: 'resolved' },
+        { parameters: 1000, result: 'resolved' },
       ]);
     });
 
@@ -44,8 +70,9 @@ describe('warmup/utils', () => {
           new Promise((resolve, reject) => setTimeout(timeout >= 1500 ? reject : resolve, timeout))
       );
       const max = 2;
+      const hooks = createHooks();
 
-      const result = queueRequests({ makeRequest, requestsOptions, maxSimultaneous: max });
+      const result = queueRequests({ makeRequest, requestsOptions, maxSimultaneous: max, hooks });
 
       expect(makeRequest).toHaveBeenCalledTimes(2);
 
@@ -57,10 +84,10 @@ describe('warmup/utils', () => {
       jest.runAllTimers();
 
       await expect(result).resolves.toEqual([
-        { option: 1500, result: 'rejected' },
-        { option: 1500, result: 'rejected' },
-        { option: 1000, result: 'resolved' },
-        { option: 2000, result: 'rejected' },
+        { parameters: 1500, result: 'rejected' },
+        { parameters: 1500, result: 'rejected' },
+        { parameters: 1000, result: 'resolved' },
+        { parameters: 2000, result: 'rejected' },
       ]);
     });
   });

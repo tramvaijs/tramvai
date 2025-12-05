@@ -11,6 +11,8 @@ import type { AppTarget as _AppTarget } from './types';
 export type AppServerType = {
   port: number;
   staticPort: number;
+  stdout: string[];
+  stderr: string[];
 };
 export type AppServerOptionsType = {
   env?: Record<string, string>;
@@ -100,9 +102,23 @@ export const appServerFixture: [
         NODE_ENV: 'production',
         CACHE_WARMUP_DISABLED: 'true',
         DEV_STATIC: 'true',
+        DANGEROUS_UNSAFE_ENV_FILES: 'true',
         ASSETS_PREFIX: `http://localhost:${staticPort}/${clientOutput}/`,
         ...env,
       },
+    });
+
+    const stdout: string[] = [];
+    const stderr: string[] = [];
+
+    server.stdout?.on('data', (chunk: any) => {
+      const log = chunk.toString();
+      stdout.push(...log.split('\n'));
+    });
+
+    server.stderr?.on('data', (chunk: any) => {
+      const log = chunk.toString();
+      stderr.push(...log.split('\n'));
     });
 
     // playwright can only collect string-form stdio into the test report
@@ -128,6 +144,8 @@ export const appServerFixture: [
     const app: BuildAppTypes.AppServer = {
       port,
       staticPort,
+      stdout,
+      stderr,
     };
 
     await use(app);

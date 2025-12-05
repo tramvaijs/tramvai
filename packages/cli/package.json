@@ -198,7 +198,7 @@
     "@types/stoppable": "^1.1.1",
     "@types/webpack-dev-middleware": "^5.0.2",
     "@types/webpack-stats-plugin": "^0.3.2",
-    "react": "19.0.0",
+    "react": "19.0.1",
     "sharp": "0.34.3"
   },
   "peerDependencies": {

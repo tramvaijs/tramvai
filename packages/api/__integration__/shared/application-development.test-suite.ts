@@ -2673,9 +2673,9 @@ export default Cmp;`,
           );
           const runtimeCode = await runtimeResponse.text();
 
-          test.expect(runtimeCode).toContain('register("react-dom", "19.0.0"');
-          test.expect(runtimeCode).toContain('register("react/jsx-dev-runtime", "19.0.0"');
-          test.expect(runtimeCode).toContain('register("react", "19.0.0"');
+          test.expect(runtimeCode).toContain('register("react-dom", "19.0.1"');
+          test.expect(runtimeCode).toContain('register("react/jsx-dev-runtime", "19.0.1"');
+          test.expect(runtimeCode).toContain('register("react", "19.0.1"');
           test.expect(runtimeCode).toContain('register("@tinkoff/dippy", "0.0.0-stub"');
         });
 
@@ -2728,7 +2728,7 @@ export default Cmp;`,
               },
             },
             'react/jsx-dev-runtime': {
-              '19.0.0': { eager: true, from: 'application:app-mf-host:0.0.0-stub', loaded: 1 },
+              '19.0.1': { eager: true, from: 'application:app-mf-host:0.0.0-stub', loaded: 1 },
             },
           });
         });
@@ -2780,7 +2780,7 @@ export default Cmp;`,
               },
             },
             'react/jsx-dev-runtime': {
-              '19.0.0': {
+              '19.0.1': {
                 eager: true,
                 from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
                 loaded: 1,

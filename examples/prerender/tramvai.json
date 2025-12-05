@@ -1,0 +1,29 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "analytics": {
+    "enabled": false
+  },
+  "projects": {
+    "prerender": {
+      "name": "prerender",
+      "root": "src",
+      "type": "application",
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "postcss": {
+        "config": "src/postcss"
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc"
+        }
+      }
+    }
+  }
+}

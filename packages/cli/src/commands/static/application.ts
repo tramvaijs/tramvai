@@ -16,7 +16,7 @@ import { app } from '../index';
 import { startStaticServer } from './staticServer';
 import { startServer } from './server';
 import { handleServerOutput } from './utils/handle-server-output';
-import { appBundleInfo } from '../../utils/dev-app/request';
+import { appPrerenderRoutes } from '../../utils/dev-app/request';
 import { PortManager } from '../../models/port-manager';
 
 // eslint-disable-next-line max-statements
@@ -94,10 +94,10 @@ export const staticApp = async (
           ...safeRequire(path.resolve(process.cwd(), 'env'), true),
         }
       : {}),
+    CACHE_WARMUP_DISABLED: 'true',
     ...process.env,
     NODE_ENV: 'production',
     TRAMVAI_CLI_COMMAND: 'static',
-    CACHE_WARMUP_DISABLED: 'true',
     PORT: `${port}`,
     PORT_SERVER: `${port}`,
     TRAMVAI_CLI_ASSETS_PREFIX: staticAssetsPrefix,
@@ -105,7 +105,7 @@ export const staticApp = async (
   };
 
   const server = node(path.resolve(root, 'server.js'), [], {
-    cwd: root,
+    cwd: process.cwd(),
     env: envVariables,
   });
 
@@ -118,6 +118,13 @@ export const staticApp = async (
     });
   });
   server.stdout.on('data', (chunk: Buffer) => {
+    if (server.killed) {
+      return;
+    }
+
+    handleServerOutput(context.logger, chunk);
+  });
+  server.stderr.on('data', (chunk: Buffer) => {
     if (server.killed) {
       return;
     }
@@ -145,7 +152,7 @@ export const staticApp = async (
     message: `message: server started, fetch application routes`,
   });
 
-  let paths = await appBundleInfo(serverConfigManager);
+  let paths = await appPrerenderRoutes(serverConfigManager);
 
   if (isString(rootErrorBoundaryPath)) {
     // implicit connection with packages/modules/server/src/server/error.ts

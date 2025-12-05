@@ -9,21 +9,31 @@ import { getPapiParameters } from '@tramvai/papi';
 import { FASTIFY_REQUEST, FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
 import type { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
 import { PAPI_EXECUTOR } from '@tramvai/tokens-server-private';
+import { ASYNC_LOCAL_STORAGE_TOKEN } from '@tramvai/tokens-common';
 import { comparePathWithPattern, getPathParams } from '../utils';
+
+declare module '@tramvai/tokens-common' {
+  export interface AsyncLocalStorageState {
+    tramvaiRequestDi?: ExtractDependencyType<typeof DI_TOKEN>;
+  }
+}
 
 export interface Deps {
   di: ExtractDependencyType<typeof DI_TOKEN>;
   papi: ExtractDependencyType<typeof SERVER_MODULE_PAPI_PUBLIC_ROUTE> | null;
+  storage: ExtractDependencyType<typeof ASYNC_LOCAL_STORAGE_TOKEN>;
 }
 
 export class PapiService extends BaseHttpClient {
   papi: Deps['papi'];
   di: Deps['di'];
+  storage: Deps['storage'];
 
-  constructor({ papi, di }: Deps) {
+  constructor({ papi, di, storage }: Deps) {
     super();
     this.papi = flatten(papi || []);
     this.di = di;
+    this.storage = storage;
   }
 
   async request<R = any>({
@@ -65,7 +75,14 @@ export class PapiService extends BaseHttpClient {
 
     const papiExecutor = childDi.get(PAPI_EXECUTOR);
 
-    const payload = await papiExecutor(papiRoute);
+    const payload = await this.storage.run(
+      {
+        tramvaiRequestDi: childDi,
+      },
+      () => {
+        return papiExecutor(papiRoute);
+      }
+    );
 
     return { payload, status: 200, headers: {} };
   }
