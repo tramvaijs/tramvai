@@ -51,4 +51,8 @@ export class NpmPackageManager extends PackageManager {
   getLockFileName() {
     return 'package-lock.json';
   }
+
+  async getRegistryUrl(): Promise<string> {
+    return (await this.run('npm config get registry', {})).stdout.trim();
+  }
 }

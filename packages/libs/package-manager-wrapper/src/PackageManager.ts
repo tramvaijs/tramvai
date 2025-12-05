@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises';
+
 import type { Options } from 'execa';
 import { command } from 'execa';
 import { WorkspacesParser } from './WorkspacesParser';
@@ -51,6 +53,7 @@ export abstract class PackageManager {
   abstract remove(options: RemoveOptions): Promise<void>;
   abstract dedupe(options?: DedupeOptions): Promise<void>;
   abstract getLockFileName(): string;
+  abstract getRegistryUrl(): Promise<string>;
 
   async exists(options: ExistsOptions): Promise<boolean> {
     const { name } = options;
@@ -94,5 +97,14 @@ export abstract class PackageManager {
 
   get workspaces() {
     return this.worskpacesParser.workspaces;
+  }
+
+  async isFileExists(absoluteFilePath: string) {
+    try {
+      await fs.stat(absoluteFilePath);
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 }

@@ -33,4 +33,8 @@ export class UnknownPackageManager extends PackageManager {
       'The package manager used on the project is not supported, or the lock-file was not found'
     );
   }
+
+  async getRegistryUrl() {
+    return this.throwUnknownError();
+  }
 }

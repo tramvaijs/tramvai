@@ -62,4 +62,12 @@ export class YarnBerryPackageManager extends PackageManager {
   getLockFileName() {
     return 'yarn.lock';
   }
+
+  async getRegistryUrl(): Promise<string> {
+    if (await this.isFileExists(`${this.rootDir}/.yarnrc.yml`)) {
+      return (await this.run('yarn config get npmRegistryServer', {})).stdout.trim();
+    }
+
+    return (await this.run('npm config get registry', {})).stdout.trim();
+  }
 }

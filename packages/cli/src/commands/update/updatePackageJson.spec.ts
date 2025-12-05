@@ -76,7 +76,12 @@ it('should update tramvai deps to latest versions', async () => {
     return {};
   });
 
-  await updatePackageJson(LATEST_TRAMVAI_VERSION, LATEST_TRAMVAI_VERSION, CURRENT_TRAMVAI_VERSION);
+  await updatePackageJson(
+    LATEST_TRAMVAI_VERSION,
+    LATEST_TRAMVAI_VERSION,
+    CURRENT_TRAMVAI_VERSION,
+    'fake-registry'
+  );
 
   // eslint-disable-next-line jest/no-interpolation-in-snapshots
   expect(mockFsWrite.mock.calls[0]).toMatchInlineSnapshot(`
@@ -138,7 +143,12 @@ it('prerelease should be resolved and used for dependant libs', async () => {
     return {};
   });
 
-  await updatePackageJson('prerelease', LATEST_TRAMVAI_VERSION, CURRENT_TRAMVAI_VERSION);
+  await updatePackageJson(
+    'prerelease',
+    LATEST_TRAMVAI_VERSION,
+    CURRENT_TRAMVAI_VERSION,
+    'fake-registry'
+  );
 
   // eslint-disable-next-line jest/no-interpolation-in-snapshots
   expect(mockFsWrite.mock.calls[0]).toMatchInlineSnapshot(`
@@ -201,7 +211,13 @@ it('dist tag should be used for dependant libs', async () => {
     return {};
   });
 
-  await updatePackageJson('prerelease', 'prerelease', CURRENT_TRAMVAI_VERSION, true);
+  await updatePackageJson(
+    'prerelease',
+    'prerelease',
+    CURRENT_TRAMVAI_VERSION,
+    'fake-registry',
+    true
+  );
 
   // eslint-disable-next-line jest/no-interpolation-in-snapshots
   expect(mockFsWrite.mock.calls[0]).toMatchInlineSnapshot(`

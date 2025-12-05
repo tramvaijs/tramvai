@@ -13,6 +13,7 @@ const updateDependencies = (
   resolvedVersion: string,
   currentVersion: string,
   tag: boolean,
+  registryUrl: string,
   spinner: Ora
 ) => {
   return pMap<string, void>(
@@ -25,12 +26,12 @@ const updateDependencies = (
       } else if (isDependantLib(dep)) {
         const libVersion = tag
           ? resolvedVersion
-          : await getLibPackageVersion(dep, version, resolvedVersion, spinner);
+          : await getLibPackageVersion(dep, version, resolvedVersion, registryUrl, spinner);
         nextVersion = libVersion;
       }
 
       if (nextVersion) {
-        const depHasVersion = await packageHasVersion(dep, nextVersion);
+        const depHasVersion = await packageHasVersion(dep, nextVersion, registryUrl);
 
         // clear the spinner to be able to log info that should be preserved in the output
         // the idea borrowed from [here](https://github.com/sindresorhus/ora/issues/120)
@@ -62,6 +63,7 @@ export const updatePackageJson = async (
   version: string,
   resolvedVersion: string,
   currentVersion: string,
+  registryUrl: string,
   tag?: boolean,
   path = '.'
 ) => {
@@ -78,6 +80,7 @@ export const updatePackageJson = async (
       resolvedVersion,
       currentVersion,
       tag,
+      registryUrl,
       spinner
     );
     await updateDependencies(
@@ -86,6 +89,7 @@ export const updatePackageJson = async (
       resolvedVersion,
       currentVersion,
       tag,
+      registryUrl,
       spinner
     );
     await updateDependencies(
@@ -94,6 +98,7 @@ export const updatePackageJson = async (
       resolvedVersion,
       currentVersion,
       tag,
+      registryUrl,
       spinner
     );
 
