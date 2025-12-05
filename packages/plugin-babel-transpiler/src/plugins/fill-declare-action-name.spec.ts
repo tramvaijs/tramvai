@@ -1,8 +1,8 @@
 import path from 'path';
-import pluginTester from 'babel-plugin-tester';
 import { configFactory } from '../config-factory';
+import { patchedPluginTester } from './utils';
 
-pluginTester({
+patchedPluginTester(__dirname, {
   plugin: {}, // плагин уже есть в основном конфиге, если подключить ещё тут то babel упадёт
   pluginName: 'fill-declare-action-name',
   filename: path.join(__dirname, '__fixtures__', 'fill-declare-action-name', 'test'),

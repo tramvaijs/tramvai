@@ -1,9 +1,9 @@
 import path from 'path';
-import pluginTester from 'babel-plugin-tester';
 import { configFactory } from '../config-factory';
 import { providerStackPlugin } from './provider-stack';
+import { patchedPluginTester } from './utils';
 
-pluginTester({
+patchedPluginTester(__dirname, {
   plugin: providerStackPlugin,
   pluginName: 'provider-stack',
   filename: path.join(__dirname, '__fixtures__', 'provider-stack', 'test'),
@@ -36,7 +36,7 @@ pluginTester({
   },
 });
 
-pluginTester({
+patchedPluginTester(__dirname, {
   plugin: providerStackPlugin,
   pluginName: 'provider-stack',
   filename: path.join(__dirname, '__fixtures__', 'provider-stack', 'test'),

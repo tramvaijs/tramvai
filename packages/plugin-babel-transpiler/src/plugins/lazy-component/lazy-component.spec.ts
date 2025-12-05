@@ -1,8 +1,8 @@
 import path from 'path';
-import pluginTester from 'babel-plugin-tester';
 import { configFactory } from '../../config-factory';
+import { patchedPluginTester } from '../utils';
 
-pluginTester({
+patchedPluginTester(__dirname, {
   plugin: {}, // плагин уже есть в основном конфиге, если подключить ещё тут то babel упадёт
   pluginName: 'lazy-component',
   filename: path.join(__dirname, '..', '__fixtures__', 'lazy-component', 'test'),

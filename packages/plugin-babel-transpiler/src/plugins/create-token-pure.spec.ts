@@ -1,9 +1,9 @@
 import path from 'path';
-import pluginTester from 'babel-plugin-tester';
 import { configFactory } from '../config-factory';
 import { createTokenPurePlugin } from './create-token-pure';
+import { patchedPluginTester } from './utils';
 
-pluginTester({
+patchedPluginTester(__dirname, {
   plugin: createTokenPurePlugin,
   pluginName: 'create-token-pure',
   filename: path.join(__dirname, '__fixtures__', 'create-token-pure', 'test'),

@@ -42,6 +42,7 @@ exports[`polyfills stable list of polyfills: default 1`] = `
     "../../node_modules/core-js/modules/es.array.at.js",
     "../../node_modules/core-js/modules/es.array.reduce-right.js",
     "../../node_modules/core-js/modules/es.array.reduce.js",
+    "../../node_modules/core-js/modules/es.json.stringify.js",
     "../../node_modules/core-js/modules/es.object.has-own.js",
     "../../node_modules/core-js/modules/es.promise.any.js",
     "../../node_modules/core-js/modules/es.reflect.to-string-tag.js",
@@ -49,6 +50,6 @@ exports[`polyfills stable list of polyfills: default 1`] = `
     "../../node_modules/core-js/modules/es.string.replace-all.js",
     "webpack/runtime/global",
   ],
-  "polyfillsCount": 12,
+  "polyfillsCount": 13,
 }
 `;
