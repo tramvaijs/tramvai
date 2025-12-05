@@ -205,7 +205,7 @@ export const addMetricsForFetch = ({
       request: RequestWithMetrics;
       response: DiagnosticsChannel.RequestHeadersMessage['response'];
     }) => {
-      const { labelsValues } = request[requestMetricsSymbol];
+      const labelsValues = request[requestMetricsSymbol]?.labelsValues ?? {};
       const { statusCode } = response;
 
       labelsValues.status = statusCode;
@@ -219,14 +219,16 @@ export const addMetricsForFetch = ({
   );
 
   subscribe('undici:request:trailers', ({ request }: { request: RequestWithMetrics }) => {
-    const { timerDone, labelsValues } = request[requestMetricsSymbol];
-    timerDone(labelsValues);
+    const labelsValues = request[requestMetricsSymbol]?.labelsValues ?? {};
+    const timerDone = request[requestMetricsSymbol]?.timerDone;
+    timerDone?.(labelsValues);
   });
 
   subscribe(
     'undici:request:error',
     ({ request, error }: { request: RequestWithMetrics; error: UndiciError }) => {
-      const { timerDone, labelsValues } = request[requestMetricsSymbol];
+      const labelsValues = request[requestMetricsSymbol]?.labelsValues ?? {};
+      const timerDone = request[requestMetricsSymbol]?.timerDone;
 
       if (error instanceof UndiciError) {
         labelsValues.status = request.aborted ? 'aborted' : error.code;
@@ -234,7 +236,7 @@ export const addMetricsForFetch = ({
 
       requestsTotal.inc(labelsValues);
       requestsErrors.inc(labelsValues);
-      timerDone(labelsValues);
+      timerDone?.(labelsValues);
     }
   );
 };
