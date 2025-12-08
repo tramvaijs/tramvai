@@ -338,6 +338,7 @@ export default appConfig;`;
         'process.env.APP_VERSION': process.env.APP_VERSION
           ? JSON.stringify(process.env.APP_VERSION)
           : undefined,
+        'typeof window': JSON.stringify('undefined'),
         'process.env.HOST_STATIC': JSON.stringify(config.staticHost),
         'process.env.PORT_STATIC': JSON.stringify(config.staticPort),
         ...configToEnv({ config }),

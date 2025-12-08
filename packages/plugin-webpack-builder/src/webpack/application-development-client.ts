@@ -390,6 +390,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         'process.env.APP_VERSION': process.env.APP_VERSION
           ? JSON.stringify(process.env.APP_VERSION)
           : undefined,
+        'typeof window': JSON.stringify('object'),
         ...configToEnv({ config }),
         ...defineOptions.reduce((allOptions, options) => {
           return {

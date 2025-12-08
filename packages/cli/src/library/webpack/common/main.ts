@@ -124,6 +124,10 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
         'process.env.ENABLE_DEVTOOLS':
           process.env.ENABLE_DEVTOOLS || configManager.env === 'development',
 
+        'typeof window': JSON.stringify(
+          configManager.buildType === 'server' ? 'undefined' : 'object'
+        ),
+
         'process.env.DISABLE_EXTERNAL_SCRIPTS': process.env.DISABLE_EXTERNAL_SCRIPTS || false,
       },
     ]);

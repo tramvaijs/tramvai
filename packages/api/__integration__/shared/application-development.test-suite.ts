@@ -1301,8 +1301,8 @@ export default createPapiMethod({
               .expect(statsJson.integrities['platform.js'])
               .toEqual(
                 transpiler === 'swc'
-                  ? 'sha256-Scl9WC7VB4SG7qTweQNdToPnEF46/qgxAq8CsJ9PERI='
-                  : 'sha256-ms4Xs27s61wu/BhvcPNwzSegNFoQXNkhSmZgiOnZQuY='
+                  ? 'sha256-Z3Wrm1PV7SR/hs/E6QR427E7hNaxLUpY3yGqvAbfXu8='
+                  : 'sha256-bvsWSLFePua//2VHjyZYcdpE+pD+KWolMTTwGKaj7Zo='
               );
           });
         });
