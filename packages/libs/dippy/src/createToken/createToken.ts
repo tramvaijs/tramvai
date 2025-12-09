@@ -34,7 +34,7 @@ export class TokenClass<T> implements TokenType<T> {
   }
 
   /**
-   * toString будет использоваться для получения индитификатора токена
+   * toString будет использоваться для получения идентификатора токена
    */
   toString() {
     return this.stringName;
