@@ -9,6 +9,15 @@ Telemetry and distributed tracing is a important part of complete application mo
 
 Tramvai provides a deep integration with [OpenTelemetry](https://opentelemetry.io/) Node.js SDK, with custom automatic instrumentation for internal Node.js modules and core Tramvai mechanisms.
 
+:::warning
+
+Browser OpenTelemetry SDK is not supported yet, because of it limitations:
+- experimental status
+- requires `zone.js` dependency
+- minimum 30+ kb gzip to bundle size and some performance overhead
+
+:::
+
 ## Usage
 
 ### Installation
@@ -144,29 +153,23 @@ Naming and attributes follow [semantic conventions](https://opentelemetry.io/doc
 
 `OpenTelemetryModule` provides [context propagation](https://opentelemetry.io/docs/languages/js/propagation/) for incoming and outgoing requests.
 
-### Logs correlation
-
-`OpenTelemetryModule` inject context for [logs correlation](https://opentelemetry.io/docs/specs/otel/logs/#log-correlation).
-
-All application logs will be extended with current span and trace ids in `spanId` and `traceId` properties.
-
 ### Pass `traceparent` context
+
+#### Server-side
 
 `OpenTelemetryModule` inject `traceparent` header to all external API requests via Tramvai [HTTP Clients](03-features/09-data-fetching/02-http-client.md).
 
 On the server-side module includes `traceparent` meta-tag in resulting html according to [W3C](https://www.w3.org/TR/trace-context/) format. Also, it bypasses `traceparent` [header](https://www.w3.org/TR/trace-context/#traceparent-header) to external APIs.
 
-On the client-side, if `traceparent` meta-tag exists it will be used as header to all external API requests. You can extract in at follows:
+#### Client-side
+
+On the client-side, if `traceparent` meta-tag exists need to be used, you can extract in at follows:
 
 ```typescript
-const extractTraceparent = (): string | undefined => {
-  const tags = Array.from(document.getElementsByTagName('meta')).filter(
-    (element) => element.name === 'traceparent'
-  );
+import { extractTraceparentHeader } from '@tramvai/module-opentelemetry';
 
-  if (tags.length !== 1) {
-    return undefined;
-  }
+const extractTraceparent = (): string | undefined => {
+  const traceparent = extractTraceparentHeader();
 
   const [version, traceId, spanId, sampled] = tags[0].content.split('-');
 
@@ -174,7 +177,10 @@ const extractTraceparent = (): string | undefined => {
 };
 ```
 
-#### Filter out `traceparent` header
+`traceparent` header is not added to outgoing requests in a browser context, because of it will connect current SSR trace and all corresponding backend's traces for current browser session, which can leads to huge traces and inefficient debugging.
+
+<!-- TODO: wait for TCORE-5381 -->
+<!-- #### Filter out `traceparent` header
 
 In a browser context, some cross-origin requests can be blocked by CORS policy (or preflight requests can be not supported) if `traceparent` header is added.
 
@@ -192,7 +198,19 @@ const provider = provide({
     envManager: ENV_MANAGER_TOKEN,
   },
 });
-```
+``` -->
+
+### Logs correlation
+
+#### Server-side
+
+`OpenTelemetryModule` inject context for [logs correlation](https://opentelemetry.io/docs/specs/otel/logs/#log-correlation).
+
+All application logs will be extended with current span and trace ids in `spanId` and `traceId` properties.
+
+#### Client-side
+
+In a browser context, `spanId` and `traceId` properties is not added to client logs, because of it will connect current SSR logs and all corresponding backend's logs for current browser session, which can leads to huge amount of logs and inefficient debugging.
 
 ## Debug and testing
 

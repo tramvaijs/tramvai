@@ -8,7 +8,7 @@ import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { RESOURCES_REGISTRY, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
-
+import { SpanKind } from '@opentelemetry/api';
 import {
   OPENTELEMETRY_PROVIDER_CONFIG_TOKEN,
   OPENTELEMETRY_PROVIDER_RESOURCE_ATTRIBUTES_TOKEN,
@@ -72,18 +72,20 @@ export * from './tokens';
       },
     }),
     provide({
-      provide: commandLineListTokens.customerStart,
+      provide: commandLineListTokens.generatePage,
       useFactory: ({ tracer, resourcesRegistry }) => {
         return function insertTraceIdToResourcesRegistry() {
-          const traceparent = getTraceparentHeader(tracer);
+          tracer.startActiveSpan('BROWSER', { kind: SpanKind.CLIENT }, () => {
+            const traceparent = getTraceparentHeader(tracer);
 
-          if (traceparent !== undefined) {
-            resourcesRegistry.register({
-              slot: ResourceSlot.HEAD_META,
-              type: ResourceType.meta,
-              payload: `<meta name="traceparent" content="${traceparent}">`,
-            });
-          }
+            if (traceparent !== undefined) {
+              resourcesRegistry.register({
+                slot: ResourceSlot.HEAD_META,
+                type: ResourceType.meta,
+                payload: `<meta name="traceparent" content="${traceparent}">`,
+              });
+            }
+          });
         };
       },
       deps: {
