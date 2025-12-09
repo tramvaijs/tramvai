@@ -57,47 +57,49 @@ test.describe('packages/modules/opentelemetry', () => {
       test.expect(response.text).toMatch(/<meta name="traceparent" content="\S+">/);
     });
 
-    test('should bypass `traceparent` header on client API call', async ({
-      app,
-      page,
-      spyRequest,
-    }) => {
-      await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
+    // TODO: wait for TCORE-5381
+    // test('should bypass `traceparent` header on client API call', async ({
+    //   app,
+    //   page,
+    //   spyRequest,
+    // }) => {
+    //   await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
 
-      await expect
-        .poll(
-          async () => {
-            const request = await spyRequest.getFirstRequest('/json');
+    //   await expect
+    //     .poll(
+    //       async () => {
+    //         const request = await spyRequest.getFirstRequest('/json');
 
-            return request?.headers.traceparent;
-          },
-          {
-            timeout: 1000,
-          }
-        )
-        .toBeTruthy();
-    });
+    //         return request?.headers.traceparent;
+    //       },
+    //       {
+    //         timeout: 1000,
+    //       }
+    //     )
+    //     .toBeTruthy();
+    // });
 
-    test('should filter client API calls before add `traceparent` header', async ({
-      app,
-      page,
-      spyRequest,
-    }) => {
-      await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
+    // TODO: wait for TCORE-5381
+    // test('should filter client API calls before add `traceparent` header', async ({
+    //   app,
+    //   page,
+    //   spyRequest,
+    // }) => {
+    //   await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
 
-      await expect
-        .poll(
-          async () => {
-            const request = await spyRequest.getFirstRequest('/filtered-json');
+    //   await expect
+    //     .poll(
+    //       async () => {
+    //         const request = await spyRequest.getFirstRequest('/filtered-json');
 
-            return request?.headers.traceparent;
-          },
-          {
-            timeout: 1000,
-          }
-        )
-        .toBeFalsy();
-    });
+    //         return request?.headers.traceparent;
+    //       },
+    //       {
+    //         timeout: 1000,
+    //       }
+    //     )
+    //     .toBeFalsy();
+    // });
 
     // todo http-client instrumentation
 

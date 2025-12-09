@@ -97,6 +97,7 @@ export const OPENTELEMETRY_TRACER_TOKEN = createToken<TramvaiTracer>(
   { scope: Scope.SINGLETON }
 );
 
+// TODO: not used for now, wait for TCORE-5381
 export const OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN = createToken<
   (url: string) => boolean
->('tramvai opentelemetry http client browser traceparent header filter');
+>('tramvai opentelemetry http client browser headers filter');
