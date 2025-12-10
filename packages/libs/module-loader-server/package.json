@@ -21,7 +21,7 @@
     "@tinkoff/request-core": "^0.10.0",
     "@tinkoff/request-plugin-cache-deduplicate": "^0.10.3",
     "@tinkoff/request-plugin-circuit-breaker": "^0.5.0",
-    "@tinkoff/request-plugin-protocol-http": "0.15.0",
+    "@tinkoff/request-plugin-protocol-http": "0.16.0",
     "@tinkoff/utils": "^2.1.2",
     "minipass": "^3.1.1",
     "ssri": "^7.1.0",

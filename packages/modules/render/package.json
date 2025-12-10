@@ -26,7 +26,7 @@
     "@tinkoff/htmlpagebuilder": "0.0.0-stub",
     "@tinkoff/layout-factory": "0.0.0-stub",
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "0.15.0",
+    "@tinkoff/request-plugin-protocol-http": "0.16.0",
     "@tinkoff/url": "0.0.0-stub",
     "@tinkoff/user-agent": "0.0.0-stub",
     "@tramvai/experiments": "0.0.0-stub",

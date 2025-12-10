@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "0.15.0",
+    "@tinkoff/request-plugin-protocol-http": "0.16.0",
     "@tramvai/build": "0.0.0-stub"
   },
   "peerDependencies": {

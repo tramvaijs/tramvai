@@ -24,11 +24,11 @@
   "dependencies": {
     "@tinkoff/request-core": "^0.10.0",
     "@tinkoff/request-plugin-cache-deduplicate": "^0.10.3",
-    "@tinkoff/request-plugin-cache-etag": "^0.5.0",
+    "@tinkoff/request-plugin-cache-etag": "^0.5.3",
     "@tinkoff/request-plugin-cache-memory": "^0.10.2",
     "@tinkoff/request-plugin-circuit-breaker": "^0.5.0",
     "@tinkoff/request-plugin-log": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "0.15.0",
+    "@tinkoff/request-plugin-protocol-http": "0.16.0",
     "@tinkoff/request-plugin-retry": "^0.3.0",
     "@tinkoff/request-plugin-transform-url": "^0.10.0",
     "@tinkoff/request-plugin-validate": "^0.10.0",

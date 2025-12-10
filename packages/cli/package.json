@@ -70,7 +70,7 @@
     "@tinkoff/minicss-class-generator": "0.0.0-stub",
     "@tinkoff/package-manager-wrapper": "0.0.0-stub",
     "@tinkoff/request-core": "^0.10.0",
-    "@tinkoff/request-plugin-protocol-http": "0.15.0",
+    "@tinkoff/request-plugin-protocol-http": "0.16.0",
     "@tinkoff/request-plugin-retry": "^0.3.0",
     "@tinkoff/utils": "^2.1.3",
     "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",

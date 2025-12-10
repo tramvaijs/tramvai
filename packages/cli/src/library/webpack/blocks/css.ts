@@ -73,17 +73,33 @@ export const cssWebpackRulesFactory =
         typeof postcssConfig === 'undefined'
       ) ?? {};
 
-    const postcssOptionsFn = (...args) => ({
-      ...postcssCfg,
-      plugins: [
-        require('postcss-modules-tilda'),
-        require('postcss-modules-values-replace')({ importsAsModuleRequests: true }),
+    // https://github.com/webpack-contrib/postcss-loader/blob/master/src/config.d.ts
+    const postcssOptionsFn = (loaderContext: any) => {
+      const isFnConfig = typeof postcssCfg === 'function';
+      // TODO: async config fn support?
+      const defaultConfig = isFnConfig ? postcssCfg(loaderContext) : postcssCfg;
+      // eslint-disable-next-line no-nested-ternary
+      const defaultPlugins = defaultConfig.plugins ? defaultConfig.plugins : [];
+
+      return {
+        config: false,
+        ...defaultConfig,
         // TODO: придумать как прокинуть настройки browserslist в autoprefixer - сейчас autoprefixer добавляется в самом приложении и из
         // конфига нет возможности задавать динамический env в зависимости от сборки. Подсунуть в сам autoprefixer после его инициализации тоже
         // тоже не получится - https://github.com/postcss/autoprefixer/blob/10.3.1/lib/autoprefixer.js#L108
-        ...(applyOrReturn(args, postcssCfg.plugins) || []),
-      ],
-    });
+        plugins: Array.isArray(defaultPlugins)
+          ? [
+              require('postcss-modules-tilda'),
+              require('postcss-modules-values-replace')({ importsAsModuleRequests: true }),
+              ...defaultPlugins,
+            ]
+          : {
+              'postcss-modules-tilda': {},
+              'postcss-modules-values-replace': { importsAsModuleRequests: true },
+              ...defaultPlugins,
+            },
+      };
+    };
 
     // otherwise postcss-loader will use cosmiconfig to resolve postcss configuration file
     // https://github.com/webpack-contrib/postcss-loader/blob/6f470db420f6febbea729080921050e8fe353226/src/index.js#L38
