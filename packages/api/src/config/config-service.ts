@@ -822,7 +822,7 @@ export class ConfigService {
   }
 
   get fileCache() {
-    return this.#parameters.fileCache ?? true;
+    return this.#parameters.fileCache ?? !process.env.CI;
   }
 
   get cacheProfile() {

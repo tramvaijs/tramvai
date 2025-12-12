@@ -45,11 +45,6 @@ export const createCacheConfig = ({
   transpilerParameters: WebpackTranspilerInputParameters;
   target: 'client' | 'server';
 }): Configuration['cache'] => {
-  // always disable build cache in CI
-  if (process.env.CI) {
-    return false;
-  }
-
   const transpilerParametersHash = crypto.createHash('sha256');
   transpilerParametersHash.update(JSON.stringify(transpilerParameters));
 
