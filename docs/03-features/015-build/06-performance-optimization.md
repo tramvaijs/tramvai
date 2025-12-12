@@ -3,13 +3,11 @@ id: build-performance-optimization
 title: Build performance optimization
 ---
 
-# About build
-
 By default, Tramvai uses Webpack and Babel for the build process, which are not known for high performance. There are several options that require manual configuration and testing but can significantly improve build performance.
 
-# Universal
+## Universal
 
-## Update source-map library
+### Update source-map library
 
 Use the latest version of `source-map`.
 
@@ -24,7 +22,7 @@ Explicitly install the newer versions in your project:
 }
 ```
 
-## SWC transpiler
+### SWC transpiler
 
 Use SWC instead of Babel - it's roughly 2× faster because it's written in Rust.
 
@@ -55,9 +53,9 @@ If you have issues building with SWC or concerns about its impact on production,
 }
 ```
 
-# Prod build (CI)
+## Prod build (CI)
 
-## Separate builds
+### Separate builds
 
 Split the CI build into separate jobs:
 
@@ -71,13 +69,13 @@ Client:
 
 This can noticeably speed up the build thanks to parallel execution on separate hosts.
 
-::: caution
+:::caution
 
 After the build, you must also copy `stats.json` from the client build into the server build.
 
 :::
 
-## Disable filesystem cache
+### Disable filesystem cache
 
 Disable webpack’s fileCache option — it only makes sense during local development. In CI, in most cases, there is no benefit in reusing the cache between builds or storing it.
 
@@ -85,9 +83,9 @@ In Tramvai 6+, it is disabled by default in CI.
 
 `yarn tramvai build --fileCache=false`
 
-# Dev build (local)
+## Dev build (local)
 
-## Disable sourcemaps
+### Disable sourcemaps
 
 Source map generation significantly impacts build speed.
 
@@ -100,11 +98,13 @@ You can disable it in dev mode:
 }
 ```
 
-## Disable checkAsyncTs
+### Disable checkAsyncTs
 
 Type checking, despite running in a separate thread, still negatively affects build performance.
 
-## Selective transpiling
+It is turned off by default and we do not recommend turning it on.
+
+### Selective transpiling
 
 By default, Tramvai performs partial transpilation of dependencies inside `node_modules`.
 
@@ -174,13 +174,13 @@ If you have problems transpiling locally or in CI, you can enable transpilation 
 }
 ```
 
-::: caution
+:::caution
 
 It is recommended to avoid using `'all'` because it severely degrades build performance.
 
 :::
 
-## Single runtime chunk
+### Single runtime chunk
 
 By default, webpack adds its runtime code to the main entrypoint chunk of the bundle — in our case, `platform.js`.
 
@@ -196,13 +196,13 @@ To avoid unnecessary rebuilds of the main chunk, you can extract the runtime int
 }
 ```
 
-::: caution
+:::caution
 
 This option affects proudction build and runtime performance, so perform performance measurements before enabling it.
 
 :::
 
-## Worker threads for start command (Tramvai 6+)
+### Worker threads for start command (Tramvai 6+)
 
 Starting from version 6, Tramvai provides a new local development option:
 
@@ -210,11 +210,11 @@ Starting from version 6, Tramvai provides a new local development option:
 
 It runs Webpack builds for both client and server in separate threads using `worker_threads`, accelerating cold builds by 30-40%.
 
-# Build performance analysis
+## Build performance analysis
 
 Tramvai includes special tooling for evaluating build performance via the commands `analyze` and `benchmark`.
 
-## Analyze
+### Analyze
 
 `tramvai start --analyze=<plugin>`
 
@@ -230,7 +230,7 @@ You can also run `analyze` with the `build` command:
 
 `tramvai build --analyze=rsdoctor`
 
-## Benchmark
+### Benchmark
 
 `tramvai bencmark <command>`
 
@@ -242,9 +242,9 @@ By default, the build runs 3 times. Major build stages and the slowest loaders/p
 
 This produces less volatile timing data, which you can use to make informed decisions.
 
-# Known build performance issues
+## Known build performance issues
 
-## Barrel exports
+### Barrel exports
 
 Some libraries may export their functionality using so-called barrel imports. This approach can significantly slow down build performance and can also lead to incorrect tree shaking.
 
