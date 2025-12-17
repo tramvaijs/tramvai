@@ -13,7 +13,7 @@ export function addEnvVariables({
 }: {
   webpackConfig: Config;
   configManager: ConfigManager<CliConfigEntry>;
-  options: StorybookOptions;
+  options?: StorybookOptions;
 }) {
   const rootDir = getAppRootDir(options);
   let envFromFile: Record<string, string> = {};
@@ -35,6 +35,7 @@ export function addEnvVariables({
       'process.env.SERVER': false,
       // pass `env.development.js` content to client code for env manager
       'process.env.TRAMVAI_ENV_FROM_FILE': JSON.stringify(envFromFile),
+      'typeof window': JSON.stringify('object'),
     },
   ]);
 

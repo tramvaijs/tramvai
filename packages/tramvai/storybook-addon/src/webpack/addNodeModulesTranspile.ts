@@ -1,14 +1,37 @@
 import type { Configuration } from 'webpack';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
 import { babelConfigFactory } from '../babel/babelConfigFactory';
+import { StorybookOptions } from '../types';
 
-export function addNodeModulesTranspile({ baseConfig }: { baseConfig: Configuration }) {
+export function addNodeModulesTranspile({
+  baseConfig,
+  options,
+}: {
+  baseConfig: Configuration;
+  options?: StorybookOptions;
+}) {
   baseConfig.module?.rules?.push({
     test: /\.[cm]?js[x]?$/,
-    include: modernLibsFilter,
+    include: getLoaderInclude(options?.dependenciesTranspiling),
     // already processed in storybook loaders
     exclude: /node_modules\/acorn-jsx/,
     loader: 'babel-loader',
     options: babelConfigFactory({ typescript: false }),
   });
+}
+
+function getLoaderInclude(include: StorybookOptions['dependenciesTranspiling']) {
+  if (include === 'only-modern' || !include) {
+    return modernLibsFilter;
+  }
+
+  if (Array.isArray(include)) {
+    return include.map((item) => new RegExp(item));
+  }
+
+  if (include === 'none') {
+    return [];
+  }
+
+  return [/node_modules/];
 }

@@ -26,13 +26,13 @@ export const config = (entry: string[]): string[] => {
   return [...entry, require.resolve('./preview')];
 };
 
-export const babel = (cfg: TransformOptions): TransformOptions => {
+export const babel = (_cfg: TransformOptions): Record<string, any> => {
   return babelConfigFactory();
 };
 
 export const webpackFinal = async (
   baseConfig: Configuration,
-  options: StorybookOptions
+  options?: StorybookOptions
 ): Promise<Configuration> => {
   const configManager = buildConfigManager(options);
   const webpackConfig = new Config();
@@ -41,7 +41,7 @@ export const webpackFinal = async (
   addFilesRules({ baseConfig, webpackConfig, configManager });
   addStylesRules({ baseConfig, webpackConfig, configManager });
   addPathsResolver({ webpackConfig, options });
-  addNodeModulesTranspile({ baseConfig });
+  addNodeModulesTranspile({ baseConfig, options });
 
   const finalConfig = merge(baseConfig, webpackConfig.toConfig());
 

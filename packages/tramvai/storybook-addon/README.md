@@ -14,8 +14,8 @@ And connect addon in the storybook configuration file:
 
 ```js title=".storybook/main.js"
 module.exports = {
-  addons: ["@tramvai/storybook-addon"]
-}
+  addons: ['@tramvai/storybook-addon'],
+};
 ```
 
 ## Features
@@ -26,6 +26,98 @@ module.exports = {
 - Page actions support
 - tramvai `babel` configuration
 - tramvai `postcss` configuration
+
+## Webpack plugin only
+
+In some cases, adding the addon may be difficult due to conflicts.
+
+In such situations, you can use only the webpack plugin from the addon:
+
+```js
+// .storybook/main.js
+import { webpackFinal } from '@tramvai/storybook-addon';
+
+export default {
+  webpackFinal,
+};
+```
+
+Or if you have your own webpack overrides:
+
+```js
+// .storybook/main.js
+import { webpackFinal as tramvaiWebpackFinal } from '@tramvai/storybook-addon';
+
+export default {
+  webpackFinal: async (config) => {
+    const webpackConfig = await tramvaiWebpackFinal(config);
+
+    // Do something with config
+    webpackConfig.optimization = {
+      minimize: false,
+    };
+
+    return webpackConfig;
+  },
+};
+```
+
+We strongly recommend to use at least tramvai webpack plugin in storybook tests.
+
+## Webpack build optimization
+
+We recommend configuring selective transpilation of `node_modules` for the webpack build that Tramvai performs by default. To do this, use the `include` option in the addon/webpack config options.
+
+This significantly speeds up the build (up to 2x with Babel).
+
+By default, the value `only-modern` is used, which, based on certain heuristics, tries to apply transpilation only to modern dependencies.
+
+We recommend using the value `none` to completely skip `node_modules` transpilation:
+
+```js
+const webpackConfig = await tramvaiWebpackFinal(config, { include: 'none' });
+```
+
+Also, for the storybook addon:
+
+```js
+export default = {
+  addons: {
+    name: '@tramvai/storybook-addon',
+    options: {
+      include: 'none'
+    },
+  }
+}
+```
+
+If you encounter issues, specify the list of dependencies to transpile as an array:
+
+```js
+const webpackConfig = await tramvaiWebpackFinal(config, { include: ['@tramvai/module-dev-tools'] });
+```
+
+## Babel configuration
+
+You can also use only the Babel config from the Tramvai plugin, but in that case you must implement all the missing build machinery for Tramvai by yourself:
+
+```js
+import { babel } from '@tramvai/storybook-addon';
+
+export default {
+  webpackFinal: (config) => {
+    // Find babel rule you want to update
+    const babelRule = config.module.rules.find(({ use }) =>
+      use?.find(({ loader }) => loader.includes('babel-loader'))
+    );
+
+    const tramvaiBabelOptions = babel(config);
+    Object.assign(babelRule.use[0].options, tramvaiBabelOptions);
+
+    return config;
+  },
+};
+```
 
 ## How to
 
@@ -42,10 +134,8 @@ export const Page = () => {
 
   logger.info('render');
 
-  return (
-    <h1>Page</h1>
-  );
-}
+  return <h1>Page</h1>;
+};
 ```
 
   </TabItem>
@@ -96,7 +186,7 @@ export const Page = () => {
       </p>
     </>
   );
-}
+};
 ```
 
   </TabItem>
@@ -133,7 +223,6 @@ export const PageStory = () => <Page />;
 ```tsx
 import { createQuery, useQuery } from '@tramvai/react-query';
 
-
 const query = createQuery({
   key: 'base',
   fn: async () => {
@@ -147,12 +236,10 @@ export const Page = () => {
   return (
     <>
       <h1>Page</h1>
-      <p>
-        {isLoading ? 'Loading...' : data.foo}
-      </p>
+      <p>{isLoading ? 'Loading...' : data.foo}</p>
     </>
   );
-}
+};
 ```
 
   </TabItem>
@@ -216,10 +303,8 @@ const browserAction = declareAction({
 });
 
 export const Page = () => {
-  return (
-    <h1>Page</h1>
-  );
-}
+  return <h1>Page</h1>;
+};
 
 Page.actions = [serverAction, browserAction];
 ```
@@ -269,10 +354,8 @@ const httpRequestAction = declareAction({
 });
 
 export const Page = () => {
-  return (
-    <h1>Page</h1>
-  );
-}
+  return <h1>Page</h1>;
+};
 
 Page.actions = [httpRequestAction];
 ```
@@ -343,7 +426,7 @@ module.exports = {
   reactOptions: {
     fastRefresh: true,
     strictMode: true,
-  }
+  },
 };
 ```
 
@@ -353,7 +436,7 @@ Works:
 module.exports = {
   reactOptions: {
     fastRefresh: true,
-  }
+  },
 };
 ```
 

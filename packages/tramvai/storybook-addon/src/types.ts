@@ -6,6 +6,7 @@ import type { ReactElement, ComponentType } from 'react';
 export interface StorybookOptions {
   tramvaiAppName?: string;
   tramvaiDir?: string;
+  dependenciesTranspiling?: 'all' | 'only-modern' | 'none' | string[];
 }
 
 export type StorybookDecorator<Params> = (

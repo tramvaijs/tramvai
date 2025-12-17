@@ -8,7 +8,7 @@ export function addPathsResolver({
   options,
   webpackConfig,
 }: {
-  options: StorybookOptions;
+  options?: StorybookOptions;
   webpackConfig: Config;
 }) {
   const rootDir = getAppRootDir(options);
