@@ -46,6 +46,7 @@ describe('actionPageRunnerBrowser', () => {
       executionContextManager,
       commandLineExecutionContext: () => null,
       router,
+      isChildAppRunner: false,
     });
 
     jest.spyOn(router, 'registerHook');
@@ -85,6 +86,7 @@ describe('actionPageRunnerBrowser', () => {
         executionContextManager,
         commandLineExecutionContext: () => null,
         router: new Router({}),
+        isChildAppRunner: false,
       });
 
       expect.assertions(1);
@@ -123,6 +125,7 @@ describe('actionPageRunnerBrowser', () => {
         executionContextManager,
         commandLineExecutionContext: () => null,
         router: new Router({}),
+        isChildAppRunner: false,
       });
 
       const stopRunAtError = (error: Error) => {
