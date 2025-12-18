@@ -2,11 +2,11 @@ import path from 'path';
 import type Config from 'webpack-chain';
 import ExtractCssChunks from 'mini-css-extract-plugin';
 import { createGenerator } from '@tinkoff/minicss-class-generator';
-import lightningcss from 'lightningcss';
 
 import { safeRequire } from '../../../utils/safeRequire';
 import type { ConfigManager } from '../../../config/configManager';
 import type { CliConfigEntry } from '../../../typings/configEntry/cli';
+import { getActualTarget, getBrowserslistTargets } from '../utils/browserslist';
 
 const cssLocalIdentNameDevDefault = '[name]__[local]_[minicss]';
 const cssLocalIdentNameProdDefault = '[minicss]';
@@ -22,8 +22,9 @@ interface Options {
 export const cssWebpackRulesFactory =
   (configManager: ConfigManager<CliConfigEntry>, options: Options = {}) =>
   (config: Config) => {
-    const { env, sourceMap, buildType, experiments } = configManager;
+    const { env, sourceMap, buildType, experiments, target } = configManager;
     const {
+      rootDir,
       postcss: {
         config: postcssConfig,
         cssLocalIdentName = env === 'production'
@@ -32,6 +33,9 @@ export const cssWebpackRulesFactory =
         cssModulePattern,
       },
     } = configManager;
+    const isServer = configManager.buildType === 'server';
+    const actualTarget = getActualTarget(target, isServer);
+    const browsersListTargets = getBrowserslistTargets(rootDir, actualTarget);
     const localIdentName = options.localIdentName ?? cssLocalIdentName;
 
     const configCssLoader = (cfg) => {
@@ -112,15 +116,19 @@ export const cssWebpackRulesFactory =
       .batch(configCssLoader)
       .when(
         experiments.lightningcss,
-        (cfg) =>
-          cfg
+        (cfg) => {
+          const lightningcss = require('lightningcss');
+
+          return cfg
             .use('lightningcss')
             .loader('lightningcss-loader')
             .options({
               options: {
                 implementation: lightningcss,
+                targets: browsersListTargets,
               },
-            }),
+            });
+        },
         (cfg) =>
           cfg.use('postcss').loader('postcss-loader').options({
             sourceMap,
