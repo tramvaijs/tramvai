@@ -67,6 +67,12 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
     actions: Array<Action | TramvaiAction<any[], any, any>>,
     stopRunAtError: (error: Error) => boolean = () => false
   ) {
+    const actionNames = actions.map((action) => {
+      const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
+      const actionName = parameters?.name ?? 'unknown';
+      return actionName;
+    });
+
     return this.deps.executionContextManager.withContext(
       this.deps.commandLineExecutionContext(),
       { name: 'pageActions', values: { pageActions: true } },
@@ -76,7 +82,7 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
             const unfinishedActions: string[] = [];
 
             this.deps.actionExecution.execution.forEach((value, key) => {
-              if (value.status === 'pending') {
+              if (actionNames.includes(key) && value.status === 'pending') {
                 unfinishedActions.push(key);
               }
             });
@@ -104,8 +110,8 @@ You can find more detailed information from "action-execution-error" logs, and f
             const result: Record<string, any> = {};
             // TODO: dehydrate only actions on first level as inner actions are running on client despite their execution on server
             this.deps.actionExecution.execution.forEach((value, key) => {
-              // достаем значения экшенов, которые успешно выполнились, остальные выполнятся на клиенте
-              if (value.status === 'success') {
+              // get completed actions values, others will be executed on client
+              if (actionNames.includes(key) && value.status === 'success') {
                 result[key] = value;
               }
             });

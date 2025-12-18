@@ -52,6 +52,7 @@ describe('execution', () => {
       deferredMap: new Map(),
       responseTaskManager: null as any,
       serverResponseStream: null as any,
+      isChildAppRunner: false,
     });
     const result: any[] = [];
     const action1 = createAction({
@@ -109,6 +110,7 @@ describe('errors', () => {
       deferredMap: new Map(),
       responseTaskManager: null as any,
       serverResponseStream: null as any,
+      isChildAppRunner: false,
     });
     const result: number[] = [];
     await instance.runActions([
@@ -159,6 +161,7 @@ describe('errors', () => {
       deferredMap: new Map(),
       responseTaskManager: null as any,
       serverResponseStream: null as any,
+      isChildAppRunner: false,
     });
 
     expect.assertions(1);
@@ -201,6 +204,7 @@ describe('errors', () => {
       deferredMap: new Map(),
       responseTaskManager: null as any,
       serverResponseStream: null as any,
+      isChildAppRunner: false,
     });
 
     const stopRunAtError = (error: Error) => {
@@ -256,6 +260,7 @@ describe('limits', () => {
       deferredMap: new Map(),
       responseTaskManager: null as any,
       serverResponseStream: null as any,
+      isChildAppRunner: false,
     });
     const result: number[] = [];
     const prom = instance.runActions([
@@ -324,6 +329,7 @@ describe('limits', () => {
       deferredMap: new Map(),
       responseTaskManager: null as any,
       serverResponseStream: null as any,
+      isChildAppRunner: false,
     });
     const result: number[] = [];
 
@@ -360,6 +366,12 @@ describe('limits', () => {
         },
         name: 'root action',
       }),
+      declareAction({
+        async fn() {
+          result.push(5);
+        },
+        name: 'another page',
+      }),
     ]);
 
     await exhaustPromiseQueue(5);
@@ -376,7 +388,7 @@ describe('limits', () => {
       expect(dispatcherPayload).toMatchInlineSnapshot(`
         {
           "payload": {
-            "action 1": {
+            "another page": {
               "state": {},
               "status": "success",
             },
@@ -385,7 +397,7 @@ describe('limits', () => {
           "type": "action state execution in server",
         }
       `);
-      expect(result).toEqual([0, 1, 2]);
+      expect(result).toEqual([0, 5, 1, 2]);
     });
   });
 });
