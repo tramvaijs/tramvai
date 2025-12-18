@@ -124,6 +124,8 @@
     "less": "^3.13.1",
     "less-loader": "^8.1.1",
     "lightning-pool": "^2.4.0",
+    "lightningcss": "^1.30.2",
+    "lightningcss-loader": "^3.0.0",
     "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "2.7.6",
     "node-plop": "^0.26.0",

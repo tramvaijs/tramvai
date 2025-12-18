@@ -1,8 +1,9 @@
-import applyOrReturn from '@tinkoff/utils/function/applyOrReturn';
 import path from 'path';
 import type Config from 'webpack-chain';
 import ExtractCssChunks from 'mini-css-extract-plugin';
 import { createGenerator } from '@tinkoff/minicss-class-generator';
+import lightningcss from 'lightningcss';
+
 import { safeRequire } from '../../../utils/safeRequire';
 import type { ConfigManager } from '../../../config/configManager';
 import type { CliConfigEntry } from '../../../typings/configEntry/cli';
@@ -21,7 +22,7 @@ interface Options {
 export const cssWebpackRulesFactory =
   (configManager: ConfigManager<CliConfigEntry>, options: Options = {}) =>
   (config: Config) => {
-    const { env, sourceMap, buildType } = configManager;
+    const { env, sourceMap, buildType, experiments } = configManager;
     const {
       postcss: {
         config: postcssConfig,
@@ -109,12 +110,23 @@ export const cssWebpackRulesFactory =
       .rule('css')
       .test(/\.css$/)
       .batch(configCssLoader)
-      .use('postcss')
-      .loader('postcss-loader')
-      .options({
-        sourceMap,
-        postcssOptions: postcssOptionsFn,
-      });
+      .when(
+        experiments.lightningcss,
+        (cfg) =>
+          cfg
+            .use('lightningcss')
+            .loader('lightningcss-loader')
+            .options({
+              options: {
+                implementation: lightningcss,
+              },
+            }),
+        (cfg) =>
+          cfg.use('postcss').loader('postcss-loader').options({
+            sourceMap,
+            postcssOptions: postcssOptionsFn,
+          })
+      );
   };
 
 export default cssWebpackRulesFactory;

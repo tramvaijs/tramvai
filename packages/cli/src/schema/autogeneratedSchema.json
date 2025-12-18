@@ -869,6 +869,10 @@
               },
               "additionalProperties": false
             },
+            "lightningcss": {
+              "title": "experimental css building by [lightningcss](https://lightningcss.dev/)",
+              "type": "boolean"
+            },
             "transpilation": {
               "title": "experimental settings for code transpilation",
               "default": {},
@@ -1351,23 +1355,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6895": {
+                        "__@match@6896": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6897": {
+                        "__@replace@6898": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6900": {
+                        "__@search@6901": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6902": {
+                        "__@split@6903": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6904": {
+                        "__@matchAll@6905": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1833,6 +1837,10 @@
               },
               "additionalProperties": false
             },
+            "lightningcss": {
+              "title": "experimental css building by [lightningcss](https://lightningcss.dev/)",
+              "type": "boolean"
+            },
             "transpilation": {
               "title": "experimental settings for code transpilation",
               "default": {},
@@ -2208,23 +2216,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6895": {
+                        "__@match@6896": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6897": {
+                        "__@replace@6898": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6900": {
+                        "__@search@6901": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6902": {
+                        "__@split@6903": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6904": {
+                        "__@matchAll@6905": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2690,6 +2698,10 @@
               },
               "additionalProperties": false
             },
+            "lightningcss": {
+              "title": "experimental css building by [lightningcss](https://lightningcss.dev/)",
+              "type": "boolean"
+            },
             "transpilation": {
               "title": "experimental settings for code transpilation",
               "default": {},
@@ -3065,23 +3077,23 @@
                         "hasIndices": {
                           "type": "boolean"
                         },
-                        "__@match@6895": {
+                        "__@match@6896": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@6897": {
+                        "__@replace@6898": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@6900": {
+                        "__@search@6901": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@6902": {
+                        "__@split@6903": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@6904": {
+                        "__@matchAll@6905": {
                           "type": "object",
                           "additionalProperties": false
                         }
