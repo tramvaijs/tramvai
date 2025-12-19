@@ -127,9 +127,13 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const transpilerParameters = resolveWebpackTranspilerParameters({ di });
   const workerPoolConfig = createWorkerPoolConfig({ di });
 
+  const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
+  const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
+
   const stylesConfiguration = createStylesConfiguration({
     di,
     emitCssChunks: true,
+    browserslistConfig: normalizedBrowserslistConfig.defaults,
     extractCssPluginOptions: {
       filename: '[name].css',
       chunkFilename: '[name].chunk.css',
@@ -138,9 +142,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
     },
   });
-
-  const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
-  const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
 
   const virtualModulesPlugin = new VirtualModulesPlugin({
     // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/browserslist.js`,

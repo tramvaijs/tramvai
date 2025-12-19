@@ -895,6 +895,10 @@
                     },
                     "additionalProperties": false
                   },
+                  "lightningcss": {
+                    "title": "experimental css building by [lightningcss](https://lightningcss.dev/)",
+                    "type": "boolean"
+                  },
                   "transpilation": {
                     "title": "experimental settings for code transpilation",
                     "default": {},
@@ -1377,23 +1381,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@10839": {
+                              "__@match@10840": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@10841": {
+                              "__@replace@10842": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@10844": {
+                              "__@search@10845": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@10846": {
+                              "__@split@10847": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@10848": {
+                              "__@matchAll@10849": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1872,6 +1876,10 @@
                       },
                       "additionalProperties": false
                     },
+                    "lightningcss": {
+                      "title": "experimental css building by [lightningcss](https://lightningcss.dev/)",
+                      "type": "boolean"
+                    },
                     "transpilation": {
                       "title": "experimental settings for code transpilation",
                       "default": {},
@@ -2247,23 +2255,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@10839": {
+                                "__@match@10840": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@10841": {
+                                "__@replace@10842": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@10844": {
+                                "__@search@10845": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@10846": {
+                                "__@split@10847": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@10848": {
+                                "__@matchAll@10849": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2742,6 +2750,10 @@
                         },
                         "additionalProperties": false
                       },
+                      "lightningcss": {
+                        "title": "experimental css building by [lightningcss](https://lightningcss.dev/)",
+                        "type": "boolean"
+                      },
                       "transpilation": {
                         "title": "experimental settings for code transpilation",
                         "default": {},
@@ -3117,23 +3129,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@10839": {
+                                  "__@match@10840": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@10841": {
+                                  "__@replace@10842": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@10844": {
+                                  "__@search@10845": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@10846": {
+                                  "__@split@10847": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@10848": {
+                                  "__@matchAll@10849": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }

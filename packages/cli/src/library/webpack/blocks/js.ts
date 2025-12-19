@@ -1,4 +1,3 @@
-import path from 'node:path';
 import type Config from 'webpack-chain';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
 import { applyThreadLoader } from '../utils/threadLoader';

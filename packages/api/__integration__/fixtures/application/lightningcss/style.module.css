@@ -1,0 +1,10 @@
+@value unit: 8px;
+
+a {
+  user-select: none;
+}
+
+.my-component {
+  background: image-set(url(logo.png) 2x, url(logo.png) 1x);
+  padding: unit;
+}

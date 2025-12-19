@@ -104,10 +104,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const transpilerParameters = resolveWebpackTranspilerParameters({ di });
   const workerPoolConfig = createWorkerPoolConfig({ di });
 
+  const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
+  const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
+
   const stylesConfiguration = createStylesConfiguration({
     di,
     // we don't need the css on server, but it's needed to generate proper classnames in js
     emitCssChunks: false,
+    browserslistConfig: normalizedBrowserslistConfig.node,
     extractCssPluginOptions: {
       filename: 'server.css',
       ignoreOrder: true,
@@ -119,9 +123,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const virtualTramvaiConfig = `const appConfig = ${JSON.stringify(config.dehydrate())};
 export { appConfig };
 export default appConfig;`;
-
-  const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
-  const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
 
   const virtualModulesPlugin = new VirtualModulesPlugin({
     // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/config.js`,

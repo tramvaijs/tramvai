@@ -96,6 +96,11 @@ export interface Experiments {
   minicss: MinicssExperiments;
 
   /**
+   * @title experimental css building by [lightningcss](https://lightningcss.dev/)
+   */
+  lightningcss?: boolean;
+
+  /**
    * @title experimental settings for code transpilation
    * @default {}
    */

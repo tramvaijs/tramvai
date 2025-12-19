@@ -148,6 +148,11 @@ export type ApplicationExperiments = {
    * @default false
    */
   autoResolveSharedRequiredVersions?: boolean;
+  /**
+   * @title Enable Lightningcss for css transpiling as Postcss alternative
+   * @default false
+   */
+  lightningcss?: boolean;
 };
 
 export type TranspilationOptions = {
@@ -746,6 +751,7 @@ export class ConfigService {
     return {
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
+      lightningcss: experiments.lightningcss ?? false,
       autoResolveSharedRequiredVersions: experiments.autoResolveSharedRequiredVersions ?? false,
     };
   }

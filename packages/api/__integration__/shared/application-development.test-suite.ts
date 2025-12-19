@@ -232,6 +232,18 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         config: 'postcss.config.js',
       },
     },
+    'app-lightningcss': {
+      name: 'app-lightningcss',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      experiments: {
+        lightningcss: true,
+      },
+      sourceDir: path.join(fixturesFolder, 'application', 'lightningcss'),
+      entryFile: 'index.ts',
+    },
     'app-fs-routing': {
       name: 'app-fs-routing',
       type: 'application',
@@ -1768,6 +1780,34 @@ export default bar;`,
             ).text();
 
             test.expect(platformCss).toContain('-webkit-user-select: none;');
+            test.expect(platformCss).toContain('padding: 8px;');
+          });
+        });
+
+        test.describe('app-lightningcss', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-lightningcss',
+              rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('lightningcss: should correctly vendor prefix css', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const platformCss = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.css`)
+            ).text();
+
+            test.expect(platformCss).toContain('-webkit-user-select: none;');
+            test.expect(platformCss).toContain('-webkit-image-set(url(');
             test.expect(platformCss).toContain('padding: 8px;');
           });
         });

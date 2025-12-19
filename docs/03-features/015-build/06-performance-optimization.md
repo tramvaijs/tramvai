@@ -53,6 +53,20 @@ If you have issues building with SWC or concerns about its impact on production,
 }
 ```
 
+### Lightningcss
+
+As an alternative, you can use Lightning CSS instead of PostCSS for transpilingby using the [lightningcss-loader](https://github.com/fz6m/lightningcss-loader).
+
+LightningCSS is very limited in terms of functionality: it has few plugins and no configuration options when used as a loader.
+
+To enable it, use the tramvai configuration:
+
+```json
+"experiments": {
+  "lightningcss": true
+}
+```
+
 ## Prod build (CI)
 
 ### Separate builds
