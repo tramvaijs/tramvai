@@ -47,7 +47,7 @@ describe('default utility port', () => {
     // file from test/public/test.json
     const response = await getApp().request('/test.json');
 
-    expect(response.headers['content-type']).toEqual('application/json; charset=UTF-8');
+    expect(response.headers['content-type']).toEqual('application/json; charset=utf-8');
     expect(response.body).toEqual({ key: 'value' });
   });
 

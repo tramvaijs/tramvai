@@ -1,5 +1,5 @@
 import isNil from '@tinkoff/utils/is/nil';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyError, FastifyInstance } from 'fastify';
 import { isRedirectFoundError } from '@tinkoff/errors';
 import type { LOGGER_TOKEN } from '@tramvai/module-common';
 import type { FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
@@ -52,7 +52,7 @@ export const errorHandler = async (
     });
   }
 
-  app.setErrorHandler(async (error, request, reply) => {
+  app.setErrorHandler(async (error: FastifyError, request, reply) => {
     const runHandlers = runHandlersFactory(error, request, reply);
     const requestInfo = getRequestInfo(request);
 
@@ -72,7 +72,7 @@ More information about redirects - https://tramvai.dev/docs/features/routing/red
 
       reply
         .header('cache-control', 'no-store, no-cache, must-revalidate')
-        .redirect(error.httpStatus || 307, error.nextUrl);
+        .redirect(error.nextUrl, error.httpStatus || 307);
       return;
     }
 

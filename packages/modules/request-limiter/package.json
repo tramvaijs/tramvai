@@ -25,7 +25,7 @@
   "dependencies": {
     "@tinkoff/errors": "0.0.0-stub",
     "@tramvai/tokens-metrics": "0.0.0-stub",
-    "fastify-plugin": "^4.2.1",
+    "fastify-plugin": "^5.1.0",
     "on-finished": "^2.3.0"
   },
   "peerDependencies": {
@@ -33,7 +33,7 @@
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub",
-    "fastify": "^4.6.0",
+    "fastify": "^5.6.2",
     "tslib": "^2.4.0"
   }
 }

@@ -21,7 +21,7 @@
     "@tramvai/test-mocks": "0.0.0-stub",
     "@types/express": "^4.17.1",
     "@types/supertest": "^6.0.3",
-    "fastify": "^4.6.0",
+    "fastify": "^5.6.2",
     "node-html-parser": "^3.0.4",
     "prettier": "^2.0.0",
     "supertest": "^7.1.4"

@@ -55,7 +55,8 @@ export const providers = [
           // todo useful because always get `*`, rewrite with tramvai router route?
           const httpRoute = req.routeOptions?.url
             ? req.routeOptions.url // since fastify@4.10.0
-            : req.routerPath;
+            : // @ts-ignore
+              req.routerPath;
           const parsedUrl = new URL(`http://localhost${req.url}`);
 
           // https://github.com/open-telemetry/semantic-conventions/blob/main/docs/http/http-spans.md#name

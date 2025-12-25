@@ -1,3 +1,6 @@
+import type { ServerResponse } from 'node:http';
+import type { Socket } from 'node:net';
+
 import type { FASTIFY_RESPONSE, EARLY_HINTS_MANAGER_TOKEN } from '@tramvai/tokens-server-private';
 import type { PageResource, RESOURCES_REGISTRY } from '@tramvai/tokens-render';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
@@ -83,7 +86,7 @@ export class EarlyHintsManager implements EarlyHintsInterface {
 
   private writeToSocket(hints: Array<string>): Promise<void> {
     return new Promise((resolve) => {
-      const { socket } = this.response.raw;
+      const { socket } = <ServerResponse & { socket: Socket }>this.response.raw;
 
       // Socket will be null if the connection has been closed already
       if (socket === null || hints.length === 0) {

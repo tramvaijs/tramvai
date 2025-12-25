@@ -21,9 +21,9 @@
     "@tramvai/papi": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@fastify/cookie": "^8.3.0",
+    "@fastify/cookie": "^11.0.2",
     "@tinkoff/dippy": "0.0.0-stub",
-    "fastify": "^4.14.1",
+    "fastify": "^5.6.2",
     "tslib": "^2.4.0"
   },
   "license": "Apache-2.0"

@@ -30,7 +30,10 @@ app.get<{ Querystring: Querystring }>(
   {
     schema: {
       querystring: {
-        bundle: { type: 'string' },
+        type: 'object',
+        properties: {
+          bundle: { type: 'string' },
+        },
       },
     },
   },
@@ -85,7 +88,7 @@ app.get('/virtual/pages', async () => {
 
 const port = +(process.env.PORT ?? 3000);
 
-app.listen(port).then((address) => {
+app.listen({ port }).then((address) => {
   console.log(`start server in ${port} port`);
   console.log('server address', address);
 });

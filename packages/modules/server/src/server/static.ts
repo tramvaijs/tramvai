@@ -26,7 +26,7 @@ export const staticAppCommand = ({
     'localhost',
     '0.0.0.0'
   );
-  const appVersion = envManager.get('APP_VERSION');
+  const appVersion = envManager.get('APP_VERSION') ?? 'unknown';
 
   return async function staticApp() {
     const appStatic = fastify();
@@ -44,7 +44,18 @@ export const staticAppCommand = ({
         res.setHeader('X-Host', os.hostname());
       },
     });
-    appStatic.listen({ host, port }, () => log.info(`Running static server on ${host}:${port}`));
+
+    let resolveStaticServerStart;
+    const staticServerWaiter = new Promise((resolve) => {
+      resolveStaticServerStart = resolve;
+    });
+
+    appStatic.listen({ host, port }, () => {
+      log.info(`Running static server on ${host}:${port}`);
+      resolveStaticServerStart();
+    });
+
+    await staticServerWaiter;
 
     return appStatic;
   };

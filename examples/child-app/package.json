@@ -40,9 +40,9 @@
     "react-dom": ">=16.14.0"
   },
   "devDependencies": {
-    "@fastify/http-proxy": "^8.4.0",
+    "@fastify/http-proxy": "^11.4.1",
     "@tramvai/cli": "0.0.0-stub",
-    "fastify": "^4.14.1",
+    "fastify": "^5.6.2",
     "ts-node": "^10.9.1"
   }
 }
