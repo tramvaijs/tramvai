@@ -6,16 +6,11 @@ const Header = ()=>{
 };
 export const Component = ()=>{
     return <div data-qa-file="tag_from_user">
-
       <Header data-qa-file="tag_from_user"/>
-
       <p className="hello" data-qa-file="tag_from_user" style={{
         color: 'red'
     }}>
-
         Opapapa
-
       </p>
-
     </div>;
 };

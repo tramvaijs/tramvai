@@ -14,14 +14,18 @@ strip = "symbols"
 
 [workspace]
 members = ["plugins/*"]
+resolver = "2"
 
 [workspace.dependencies]
-swc_common = { version = "0.33.10" }
-swc_ecma_parser = { version = "0.141.30" }
-if_chain = { version = "1.0.2" }
+swc_common = { version = "18.0.1" }
+swc_ecma_parser = { version = "30.0.0" }
+if_chain = { version = "1.0.3" }
+swc_ecma_visit = { version = "19.0.0" }
+log = { version = "0.4" }
+env_logger = { version = "0.11.8" }
 
 [workspace.dependencies.swc_core]
-version = "0.86.100"
+version = "52.0.0"
 features = [
   "ecma_plugin_transform",
   "ecma_utils",

@@ -6,10 +6,7 @@ const Header = ()=>{
 };
 export const Component = ()=>{
     return <div data-qa-file="jsx_add_file_tag">
-
       <Header data-qa-file="jsx_add_file_tag"/>
-
       <p className="hello" data-qa-file="jsx_add_file_tag">Opapapa</p>
-
     </div>;
 };

@@ -586,8 +586,16 @@ export class ConfigService {
     return this.#parameters?.staticPort ?? 4000;
   }
 
+  get port() {
+    return this.#parameters.port ?? 3000;
+  }
+
   get staticHost() {
     return this.#parameters?.staticHost ?? 'localhost';
+  }
+
+  get host() {
+    return this.#parameters?.host ?? 'localhost';
   }
 
   get benchmark() {

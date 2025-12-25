@@ -263,7 +263,7 @@ exports[`server: lazy-component.tsx 1`] = `
                       const key = this.resolve(props);
                       return !!__webpack_require__.m[key];
                   },
-                  importAsync: () => Promise.resolve().then(() => (0, _swc_helpers__WEBPACK_IMPORTED_MODULE_1__ /* ._interop_require_wildcard */ .U)(__webpack_require__(/* webpackChunkName: "components-lazy-inner" */ "./src/library/swc/__integration__/components/lazy-inner.tsx"))),
+                  importAsync: () => Promise.resolve().then(() => (0, _swc_helpers__WEBPACK_IMPORTED_MODULE_1__._)(__webpack_require__(/* webpackChunkName: "components-lazy-inner" */ "./src/library/swc/__integration__/components/lazy-inner.tsx"))),
                   requireAsync(props) {
                       return this.importAsync(props).then(resolved => resolved);
                   },

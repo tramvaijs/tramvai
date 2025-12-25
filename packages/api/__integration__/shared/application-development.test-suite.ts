@@ -194,6 +194,14 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'broken-ssr', 'index.ts'),
     },
+    ssr: {
+      name: 'ssr',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'ssr', 'index.ts'),
+    },
     'app-jsx': {
       name: 'app-jsx',
       type: 'application',
@@ -1026,6 +1034,31 @@ export default createPapiMethod({
             test.expect(serverJs).toContain('this.property');
           });
         });
+
+        test.describe('server', () => {
+          test.use({
+            inputParameters: {
+              name: 'ssr',
+              host: '0.0.0.0',
+              rootDir: testSuiteFolder,
+              buildType: 'server',
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('custom host', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const response = await (await fetch(`http://localhost:${devServer.port}`)).text();
+
+            test.expect(response).toBe(`0.0.0.0:${devServer.port}`);
+          });
+        });
       });
 
       test.describe('pwa', () => {
@@ -1313,7 +1346,7 @@ export default createPapiMethod({
               .expect(statsJson.integrities['platform.js'])
               .toEqual(
                 transpiler === 'swc'
-                  ? 'sha256-Z3Wrm1PV7SR/hs/E6QR427E7hNaxLUpY3yGqvAbfXu8='
+                  ? 'sha256-nwx5ZhIdpcIxC4VBg9ciUltyBT1mJtG2XJY5GFxzx28='
                   : 'sha256-bvsWSLFePua//2VHjyZYcdpE+pD+KWolMTTwGKaj7Zo='
               );
           });

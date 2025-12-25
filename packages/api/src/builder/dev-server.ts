@@ -16,8 +16,8 @@ export type DevServer = {
   buildPromise: Promise<void>;
   port: number;
   staticPort: number;
-  httpServer?: Server;
-  staticHttpServer?: Server;
+  server?: Server;
+  staticServer?: Server;
 };
 
 export const DEV_SERVER_TOKEN = createToken<DevServerApi>('tramvai dev-server');

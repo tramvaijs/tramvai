@@ -1,14 +1,12 @@
 //! forked from [babel-plugin-dynamic-import-node](https://github.com/airbnb/babel-plugin-dynamic-import-node)
 //! but without full compatibility as we intend to use this plugin only with webpack and on server side
 //! because of it's performance impact on webpack builds - see related [comment](https://github.com/webpack/webpack/issues/12102#issuecomment-1337109118)
-
 use if_chain::if_chain;
-use swc_core::common::DUMMY_SP;
+use swc_core::common::{SyntaxContext, DUMMY_SP};
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 use swc_core::{
     ecma::{
         ast::*,
-        utils::{private_ident, quote_ident},
         visit::{VisitMut, VisitMutWith},
     },
     quote,
@@ -23,7 +21,11 @@ impl ReplaceDynamicImport {
     fn new() -> Self {
         ReplaceDynamicImport {
             has_dynamic_import: false,
-            helper_ref: private_ident!("_interopRequireWildcard"),
+            helper_ref: Ident::new(
+                "_interopRequireWildcard".into(),
+                DUMMY_SP,
+                SyntaxContext::empty(),
+            ),
         }
     }
 }
@@ -37,17 +39,27 @@ impl VisitMut for ReplaceDynamicImport {
                 0,
                 ModuleItem::ModuleDecl(ModuleDecl::Import(ImportDecl {
                     span: DUMMY_SP,
-                    type_only: false,
-                    with: None,
-                    src: Box::new("@swc/helpers".into()),
                     specifiers: vec![ImportSpecifier::Named(ImportNamedSpecifier {
                         span: DUMMY_SP,
                         local: self.helper_ref.clone(),
-                        imported: Some(ModuleExportName::Ident(quote_ident!(
-                            "_interop_require_wildcard"
-                        ))),
+                        imported: Some(
+                            ModuleExportName::Ident(Ident::new(
+                                "_interop_require_wildcard".into(),
+                                DUMMY_SP,
+                                SyntaxContext::empty(),
+                            ))
+                            .into(),
+                        ),
                         is_type_only: false,
                     })],
+                    phase: ImportPhase::Evaluation,
+                    type_only: false,
+                    with: None,
+                    src: Box::new(Str {
+                        span: DUMMY_SP,
+                        value: "@swc/helpers".into(),
+                        raw: None,
+                    }),
                 })),
             );
         }
@@ -87,10 +99,10 @@ pub fn dynamic_import_to_require(
 mod tests {
     use std::path::PathBuf;
 
-    use swc_core::ecma::transforms::testing::test_fixture;
-    use swc_core::ecma::visit::as_folder;
+    use swc_core::ecma::transforms::testing::{FixtureTestConfig, test_fixture};
     use swc_core::{ecma::transforms::testing::test, testing};
-    use swc_ecma_parser::{Syntax, TsConfig};
+    use swc_ecma_parser::{Syntax, TsSyntax};
+    use swc_ecma_visit::visit_mut_pass;
 
     use super::*;
 
@@ -99,14 +111,17 @@ mod tests {
         let output = input.with_extension("js");
 
         test_fixture(
-            Syntax::Typescript(TsConfig {
+            Syntax::Typescript(TsSyntax {
                 tsx: input.to_string_lossy().ends_with(".tsx"),
                 ..Default::default()
             }),
-            &|_metadata| as_folder(ReplaceDynamicImport::new()),
+            &|_metadata| visit_mut_pass(ReplaceDynamicImport::new()),
             &input,
             &output,
-            Default::default(),
+            FixtureTestConfig {
+                module: Some(true),
+                ..Default::default()
+            }
         );
     }
 }

@@ -41,6 +41,8 @@ export class ServerRunnerWorkerBridge {
   create() {
     const env: Record<string, string | undefined> = {
       ...process.env,
+      HOST: this.#config.host,
+      PORT: this.#config.port?.toString(),
       // force color output for worker - https://github.com/chalk/supports-color#info
       FORCE_COLOR: '1',
     };

@@ -31,9 +31,8 @@ impl<C: Comments> VisitMut for TransformVisitor<C> {
         let ImportDecl {
             src, specifiers, ..
         } = import;
-        let name: &str = &src.value;
 
-        if name == "@tramvai/core" || name == "@tinkoff/dippy" {
+        if src.value == *"@tramvai/core" || src.value == *"@tinkoff/dippy" {
             for specifier in specifiers {
                 if let ImportSpecifier::Named(specifier) = specifier {
                     self.has_create_token = &specifier.local.sym == "createToken";
@@ -73,11 +72,9 @@ mod tests {
     use std::path::PathBuf;
 
     use swc_core::ecma::transforms::testing::test_fixture;
-    use swc_core::{
-        ecma::{transforms::testing::test, visit::as_folder},
-        testing,
-    };
-    use swc_ecma_parser::{Syntax, TsConfig};
+    use swc_core::{ecma::transforms::testing::test, testing};
+    use swc_ecma_parser::{Syntax, TsSyntax};
+    use swc_ecma_visit::visit_mut_pass;
 
     use super::*;
 
@@ -86,11 +83,11 @@ mod tests {
         let output = input.with_extension("js");
 
         test_fixture(
-            Syntax::Typescript(TsConfig {
+            Syntax::Typescript(TsSyntax {
                 tsx: input.to_string_lossy().ends_with(".tsx"),
                 ..Default::default()
             }),
-            &|metadata| as_folder(TransformVisitor::new(metadata.comments.clone())),
+            &|metadata| visit_mut_pass(TransformVisitor::new(metadata.comments.clone())),
             &input,
             &output,
             Default::default(),

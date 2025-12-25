@@ -96,9 +96,8 @@ impl<C: Comments> VisitMut for LazyComponent<C> {
         let ImportDecl {
             src, specifiers, ..
         } = import;
-        let name: &str = &src.value;
 
-        if name == "@tramvai/react" {
+        if src.value == *"@tramvai/react" {
             tracing::debug!("Has `@tramvai/react` import");
             for specifier in specifiers {
                 if_chain! {
@@ -175,11 +174,9 @@ mod tests {
     use std::path::PathBuf;
 
     use swc_core::ecma::transforms::testing::test_fixture;
-    use swc_core::{
-        ecma::{transforms::testing::test, visit::as_folder},
-        testing,
-    };
-    use swc_ecma_parser::{Syntax, TsConfig};
+    use swc_core::{ecma::transforms::testing::test, testing};
+    use swc_ecma_parser::{Syntax, TsSyntax};
+    use swc_ecma_visit::visit_mut_pass;
 
     use super::*;
 
@@ -188,11 +185,11 @@ mod tests {
         let output = input.with_extension("js");
 
         test_fixture(
-            Syntax::Typescript(TsConfig {
+            Syntax::Typescript(TsSyntax {
                 tsx: input.to_string_lossy().ends_with(".tsx"),
                 ..Default::default()
             }),
-            &|metadata| as_folder(LazyComponent::new(metadata.comments.clone())),
+            &|metadata| visit_mut_pass(LazyComponent::new(metadata.comments.clone())),
             &input,
             &output,
             Default::default(),

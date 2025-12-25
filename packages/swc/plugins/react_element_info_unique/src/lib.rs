@@ -27,15 +27,14 @@
 //! ## Notes:
 //! - The plugin skips React Fragment elements
 //! - Handles various import patterns for React and createElement
-use std::option::Option::Some;
 use std::collections::HashSet;
+use std::option::Option::Some;
 use swc_common::DUMMY_SP;
 use swc_core::{
     ecma::{
         ast::{
-            CallExpr, Expr, JSXAttr, JSXAttrName, JSXAttrOrSpread, JSXAttrValue,
-            JSXOpeningElement, Lit, Program, Str,
-            ImportDecl, ImportSpecifier, ModuleExportName,
+            CallExpr, Expr, ImportDecl, ImportSpecifier, JSXAttr, JSXAttrName, JSXAttrOrSpread,
+            JSXAttrValue, JSXOpeningElement, ModuleExportName, Program, Str,
         },
         utils::quote_ident,
         visit::{VisitMut, VisitMutWith},
@@ -78,7 +77,8 @@ impl<'a> ReactElementInfoUniqueConfig<'a> {
         let mut config = Self::default();
         if let Some(filename) = source_filename {
             config.source_filename = filename.clone();
-            config.filename = utils::get_file_name_without_extension(source_filename, UNKNOWN_FILENAME);
+            config.filename =
+                utils::get_file_name_without_extension(source_filename, UNKNOWN_FILENAME);
         }
         config
     }
@@ -96,18 +96,21 @@ impl VisitMut for ReactElementInfoUniqueConfig<'_> {
     /// that need to be transformed with file source information.
     fn visit_mut_import_decl(&mut self, import_decl: &mut ImportDecl) {
         // Check that the import is from 'react'
-        if import_decl.src.value.to_string() == REACT_PACKAGE_NAME {
+        if import_decl.src.value == *REACT_PACKAGE_NAME {
             for specifier in &import_decl.specifiers {
                 match specifier {
                     // Handle default import: import React from 'react'
                     ImportSpecifier::Default(default_spec) => {
-                        self.react_imports.insert(default_spec.local.sym.to_string());
-                    },
+                        self.react_imports
+                            .insert(default_spec.local.sym.to_string());
+                    }
                     // Handle named imports: import { createElement } from 'react'
                     ImportSpecifier::Named(named_spec) => {
                         let imported_name = match &named_spec.imported {
                             Some(ModuleExportName::Ident(ident)) => ident.sym.to_string(),
-                            Some(ModuleExportName::Str(str)) => str.value.to_string(),
+                            Some(ModuleExportName::Str(str)) => {
+                                str.value.as_str().expect("non-utf8 string").to_string()
+                            }
                             None => named_spec.local.sym.to_string(),
                         };
 
@@ -116,11 +119,12 @@ impl VisitMut for ReactElementInfoUniqueConfig<'_> {
                         if imported_name == "createElement" {
                             self.create_element_imports.insert(local_name);
                         }
-                    },
+                    }
                     // Handle namespace import: import * as React from 'react'
                     ImportSpecifier::Namespace(namespace_spec) => {
-                        self.react_imports.insert(namespace_spec.local.sym.to_string());
-                    },
+                        self.react_imports
+                            .insert(namespace_spec.local.sym.to_string());
+                    }
                 }
             }
         }
@@ -144,11 +148,11 @@ impl VisitMut for ReactElementInfoUniqueConfig<'_> {
                 .attrs
                 .push(JSXAttrOrSpread::JSXAttr(JSXAttr {
                     name: JSXAttrName::Ident(quote_ident!(self.file_name_attr)),
-                    value: Some(JSXAttrValue::Lit(Lit::Str(Str {
+                    value: Some(JSXAttrValue::Str(Str {
                         span: DUMMY_SP,
                         value: self.filename.clone().into(),
                         raw: None,
-                    }))),
+                    })),
                     span: DUMMY_SP,
                 }));
         }
@@ -177,7 +181,7 @@ impl VisitMut for ReactElementInfoUniqueConfig<'_> {
                             &self.file_name_attr.to_string(),
                         );
                     }
-                },
+                }
 
                 // Check React.createElement
                 Expr::Member(member_expr) => {
@@ -217,8 +221,8 @@ impl VisitMut for ReactElementInfoUniqueConfig<'_> {
                             &self.file_name_attr.to_string(),
                         );
                     }
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
     }
@@ -242,11 +246,9 @@ mod tests {
     use std::path::PathBuf;
 
     use swc_core::ecma::transforms::testing::test_fixture;
-    use swc_core::{
-        ecma::{transforms::testing::test, visit::as_folder},
-        testing,
-    };
-    use swc_ecma_parser::{Syntax, TsConfig};
+    use swc_core::{ecma::transforms::testing::test, testing};
+    use swc_ecma_parser::{Syntax, TsSyntax};
+    use swc_ecma_visit::visit_mut_pass;
 
     use super::*;
 
@@ -258,13 +260,11 @@ mod tests {
         let source_filename: Option<String> = Some(input.as_path().to_str().unwrap().to_string());
 
         test_fixture(
-            Syntax::Typescript(TsConfig {
+            Syntax::Typescript(TsSyntax {
                 tsx: input.to_string_lossy().ends_with(".tsx"),
                 ..Default::default()
             }),
-            &|_| {
-                as_folder(ReactElementInfoUniqueConfig::new(&source_filename))
-            },
+            &|_| visit_mut_pass(ReactElementInfoUniqueConfig::new(&source_filename)),
             &input,
             &output,
             Default::default(),

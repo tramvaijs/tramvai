@@ -1,6 +1,6 @@
+var _ref, _ref1, _ref2;
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
-var _ref, _ref1, _ref2;
 import { Module, Scope } from '@tramvai/core';
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 @Module({

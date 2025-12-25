@@ -60,7 +60,7 @@ fn sanitize_chunk_name_template_literal(node: Expr) -> Expr {
             .as_arg(),
             "-".as_arg(),
         ],
-        type_args: Default::default(),
+        ..Default::default()
     })
 }
 
@@ -69,10 +69,13 @@ fn chunk_name_from_template_literal(node: &Expr) -> String {
         Expr::Tpl(t) => {
             let v1 = t.quasis[0].cooked.clone().unwrap_or_default();
             if t.exprs.is_empty() {
-                return v1.to_string();
+                return v1.as_str().expect("non-utf8 string").to_string();
             }
 
-            format!("{}[request]", v1)
+            format!(
+                "{}[request]",
+                v1.as_str().expect("non-utf8 string").to_string()
+            )
         }
         _ => unreachable!(),
     }
@@ -117,9 +120,9 @@ fn transform_quasi(quasi: &TplElement, first: bool, single: bool) -> TplElement 
         tail: quasi.tail,
         cooked: quasi.cooked.as_ref().map(|cooked| {
             if single {
-                module_to_chunk(cooked).into()
+                module_to_chunk(cooked.as_str().expect("non-utf8 string")).into()
             } else {
-                replace_quasi(cooked, first).into()
+                replace_quasi(cooked.as_str().expect("non-utf8 string"), first).into()
             }
         }),
         raw: if single {
@@ -209,7 +212,7 @@ impl<'a, C: Comments> CommentParser<'a, C> {
             Expr::Lit(Lit::Str(s)) => s.value.clone(),
             _ => return "".into(),
         };
-        module_to_chunk(&value).into()
+        module_to_chunk(value.as_str().expect("non-utf8 string")).into()
     }
 
     fn add_or_replace_chunk_name_comment(&self, import: &CallExpr, values: serde_json::Value) {
@@ -265,7 +268,7 @@ impl<'a, C: Comments> CommentParser<'a, C> {
             webpack_chunk_name = Some(chunk_name_from_template_literal(&chunk_name_node));
             chunk_name_node = sanitize_chunk_name_template_literal(chunk_name_node);
         } else if let Expr::Lit(Lit::Str(s)) = &chunk_name_node {
-            webpack_chunk_name = Some(s.value.to_string());
+            webpack_chunk_name = Some(s.value.as_str().expect("non-utf8 string").to_string());
         }
         let mut values = values.unwrap_or_default();
 
@@ -298,11 +301,11 @@ pub fn create_chunk_name_method(
                     span: DUMMY_SP,
                     arg: Some(Box::new(chunk_name)),
                 })],
+                ..Default::default()
             }),
             is_generator: false,
             is_async: false,
-            type_params: Default::default(),
-            return_type: Default::default(),
+            ..Default::default()
         }),
     }
 }

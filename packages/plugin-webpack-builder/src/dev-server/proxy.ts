@@ -9,9 +9,11 @@ export const createProxy = ({
   serverRunnerPort,
   serverBuildPort,
   browserBuildPort,
+  hostname,
   compilationWatcher,
 }: {
   port: number;
+  hostname: string;
   staticPort: number;
   serverRunnerPort: number;
   serverBuildPort: number;
@@ -63,12 +65,12 @@ export const createProxy = ({
   });
 
   return {
-    httpServer: devServer,
-    staticHttpServer: staticServer,
+    server: devServer,
+    staticServer,
     listen: () => {
       return Promise.all([
         new Promise<void>((resolve) => {
-          devServer.listen(port, () => {
+          devServer.listen(port, hostname, () => {
             logger.event({
               type: 'info',
               event: 'dev-proxy',

@@ -62,6 +62,7 @@ export function createDevServer({
       const proxy = createProxy({
         port: portManager.port!,
         staticPort: portManager.staticPort!,
+        hostname: config.host,
         serverBuildPort,
         browserBuildPort,
         serverRunnerPort,
@@ -311,8 +312,8 @@ export function createDevServer({
       return {
         port: portManager.port!,
         staticPort: portManager.staticPort!,
-        httpServer: proxy.httpServer,
-        staticHttpServer: proxy.staticHttpServer,
+        server: proxy.server,
+        staticServer: proxy.staticServer,
         getStats: () => ({
           client: clientStats!,
           server: serverStats!,

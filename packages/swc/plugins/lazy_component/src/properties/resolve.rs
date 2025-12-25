@@ -25,8 +25,7 @@ pub fn create_resolve_method(import: &CallExpr, func: &Expr) -> MethodProp {
             ),
             is_generator: false,
             is_async: false,
-            type_params: Default::default(),
-            return_type: Default::default(),
+            ..Default::default()
         }),
     }
 }

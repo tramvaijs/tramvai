@@ -2,10 +2,10 @@ use std::mem;
 
 use if_chain::if_chain;
 use swc_common::DUMMY_SP;
-use swc_core::ecma::utils::{prepend_stmt, private_ident, StmtLike};
+use swc_core::ecma::utils::{prepend_stmt, private_ident, StmtLike, StmtOrModuleItem};
 use swc_core::ecma::{
     ast::*,
-    visit::{as_folder, FoldWith, VisitMut, VisitMutWith},
+    visit::{VisitMut, VisitMutWith},
 };
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 use swc_core::quote;
@@ -76,7 +76,7 @@ impl VisitMut for TransformVisitor {
 impl TransformVisitor {
     fn visit_mut_stmt_like<T>(&mut self, stmts: &mut Vec<T>)
     where
-        T: Send + Sync + StmtLike + VisitMutWith<Self> + std::fmt::Debug,
+        T: Send + Sync + StmtLike + StmtOrModuleItem + VisitMutWith<Self> + std::fmt::Debug,
         Vec<T>: VisitMutWith<Self>,
     {
         let prev_ref_list = mem::take(&mut self.ref_list);
@@ -98,6 +98,7 @@ impl TransformVisitor {
                         definite: false,
                     })
                     .collect(),
+                ..Default::default()
             };
 
             prepend_stmt(
@@ -111,8 +112,14 @@ impl TransformVisitor {
 }
 
 #[plugin_transform]
-pub fn process_transform(program: Program, _metadata: TransformPluginProgramMetadata) -> Program {
-    program.fold_with(&mut as_folder(&mut TransformVisitor::new()))
+
+pub fn process_transform(
+    mut program: Program,
+    _metadata: TransformPluginProgramMetadata,
+) -> Program {
+    program.visit_mut_with(&mut TransformVisitor::new());
+
+    program
 }
 
 #[cfg(test)]
@@ -120,11 +127,9 @@ mod tests {
     use std::path::PathBuf;
 
     use swc_core::ecma::transforms::testing::test_fixture;
-    use swc_core::{
-        ecma::{transforms::testing::test, visit::as_folder},
-        testing,
-    };
-    use swc_ecma_parser::{Syntax, TsConfig};
+    use swc_core::{ecma::transforms::testing::test, testing};
+    use swc_ecma_parser::{Syntax, TsSyntax};
+    use swc_ecma_visit::visit_mut_pass;
 
     use super::*;
 
@@ -133,12 +138,12 @@ mod tests {
         let output = input.with_extension("js");
 
         test_fixture(
-            Syntax::Typescript(TsConfig {
+            Syntax::Typescript(TsSyntax {
                 tsx: input.to_string_lossy().ends_with(".tsx"),
                 decorators: true,
                 ..Default::default()
             }),
-            &|_metadata| as_folder(TransformVisitor::new()),
+            &|_metadata| visit_mut_pass(TransformVisitor::new()),
             &input,
             &output,
             Default::default(),

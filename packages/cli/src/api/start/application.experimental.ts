@@ -94,8 +94,8 @@ export const startApplicationExperimental = async (di: Container): Result => {
   }
 
   return {
-    server: devServer.httpServer,
-    staticServer: devServer.staticHttpServer,
+    server: devServer.server,
+    staticServer: devServer.staticServer,
     close: async () => {
       await devServer.close();
     },

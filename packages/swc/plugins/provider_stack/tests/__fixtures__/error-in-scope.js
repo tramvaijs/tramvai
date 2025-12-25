@@ -1,6 +1,6 @@
+var _ref, _ref1, _ref2;
 // @ts-ignore
 // eslint-disable-next-line import/no-unresolved
-var _ref, _ref1, _ref2;
 import { Provider, Scope, Error } from '@tramvai/core';
 export const providers: Provider[] = [
     (_ref = {

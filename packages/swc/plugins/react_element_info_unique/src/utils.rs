@@ -1,7 +1,7 @@
 use std::path::Path;
-use swc_common::DUMMY_SP;
+use swc_common::{SyntaxContext, DUMMY_SP};
 use swc_core::ecma::ast::{
-    CallExpr, Callee, Expr, ExprOrSpread, Ident, JSXAttr, JSXAttrName, JSXAttrOrSpread,
+    CallExpr, Callee, Expr, ExprOrSpread, Ident, IdentName, JSXAttr, JSXAttrName, JSXAttrOrSpread,
     JSXOpeningElement, KeyValueProp, Lit, MemberExpr, MemberProp, ObjectLit, Prop, PropName,
     PropOrSpread, Str,
 };
@@ -67,11 +67,14 @@ pub fn is_react_create_element_member_expr(
 pub fn create_obj_assign(first_expr: &Expr, second_expr: &Expr) -> CallExpr {
     CallExpr {
         callee: Callee::Expr(Box::new(Expr::Member(MemberExpr {
-            obj: Box::new(Expr::Ident(Ident::new("Object".into(), DUMMY_SP))),
-            prop: MemberProp::Ident(Ident {
+            obj: Box::new(Expr::Ident(Ident::new(
+                "Object".into(),
+                DUMMY_SP,
+                SyntaxContext::empty(),
+            ))),
+            prop: MemberProp::Ident(IdentName {
                 span: DUMMY_SP,
                 sym: "assign".into(),
-                optional: false,
             }),
             span: DUMMY_SP,
         }))),
@@ -87,13 +90,14 @@ pub fn create_obj_assign(first_expr: &Expr, second_expr: &Expr) -> CallExpr {
             },
         ],
         type_args: None,
+        ..Default::default()
     }
 }
 
 pub fn find_attr_by_name(jsx_opening_element: &mut JSXOpeningElement, attr_name: &str) -> bool {
     jsx_opening_element.attrs.iter().any(|attr_or_spread| {
         if let JSXAttrOrSpread::JSXAttr(JSXAttr { name, .. }) = &attr_or_spread {
-            if let JSXAttrName::Ident(Ident { sym, .. }) = name {
+            if let JSXAttrName::Ident(IdentName { sym, .. }) = name {
                 return sym.as_str() == attr_name;
             } else {
                 return false;
@@ -133,9 +137,7 @@ pub fn clone_call_expr_with_props_change(
         }
         // Case 2.2: Props is an object literal, add property directly
         else if let Expr::Object(obj_lit) = expr.as_mut() {
-            obj_lit
-                .props
-                .push(create_prop(filename, file_name_attr));
+            obj_lit.props.push(create_prop(filename, file_name_attr));
         }
         // Case 2.3: Props is some other expression (variable, etc.), use Object.assign
         else {
@@ -154,6 +156,7 @@ pub fn clone_call_expr_with_props_change(
         args: new_args,
         span: orig_call_expr.span,
         type_args: orig_call_expr.type_args,
+        ..Default::default()
     }
 }
 

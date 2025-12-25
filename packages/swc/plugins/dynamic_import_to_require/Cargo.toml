@@ -10,3 +10,4 @@ crate-type = ["cdylib"]
 swc_core = { workspace = true }
 swc_ecma_parser = { workspace = true }
 if_chain = { workspace = true }
+swc_ecma_visit = { workspace = true }

@@ -12,7 +12,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@swc/core": "1.3.100",
+    "@swc/core": "1.15.7",
     "@tinkoff/dippy": "0.0.0-stub",
     "@tinkoff/package-manager-wrapper": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.3",
