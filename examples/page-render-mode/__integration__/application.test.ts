@@ -283,6 +283,8 @@ describe('page-render-mode', () => {
 
     it('/papi/revalidate by path', async () => {
       const res1 = await fetch(`${app.serverUrl}/static/`);
+      // time to background fetch unpersonalized page
+      await sleep(150);
 
       await fetch(`${app.serverUrl}/page-render-mode/private/papi/revalidate`, {
         method: 'POST',

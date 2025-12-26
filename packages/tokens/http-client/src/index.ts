@@ -42,8 +42,8 @@ export const HTTP_CLIENT = createToken<HttpClient>('HTTP_CLIENT');
  * @see https://undici.nodejs.org/#/docs/api/Agent.md
  */
 export const HTTP_CLIENT_AGENT = createToken<{
-  http: Agent;
-  https: Agent;
+  http: Dispatcher;
+  https: Dispatcher;
 }>('HTTP_CLIENT_AGENT', { scope: Scope.SINGLETON });
 
 /**

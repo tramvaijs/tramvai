@@ -16,7 +16,7 @@ export interface ApiServer {
 
 export const apiServerFixture: [
   WorkerFixture<ApiServer, {}>,
-  { scope: 'worker'; timeout: number }
+  { scope: 'worker'; timeout: number },
 ] = [
   // eslint-disable-next-line no-empty-pattern
   async ({}, use) => {
@@ -53,7 +53,7 @@ export interface ProxyServer {
 
 export const proxyServerFixture: [
   WorkerFixture<ProxyServer, { apiServer: ApiServer }>,
-  { scope: 'worker'; timeout: number }
+  { scope: 'worker'; timeout: number },
 ] = [
   // eslint-disable-next-line no-empty-pattern
   async ({}, use) => {

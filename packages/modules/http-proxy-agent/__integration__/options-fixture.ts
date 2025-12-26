@@ -4,7 +4,7 @@ import type { ProxyServer } from './server-fixture';
 
 export const optionsAppFixture: [
   WorkerFixture<CreateApp.OptionsApp, { proxyServer: ProxyServer }>,
-  { scope: 'worker'; timeout: 60000; auto: true; option: true }
+  { scope: 'worker'; timeout: 60000; auto: true; option: true },
 ] = [
   async ({ proxyServer }, use) => {
     const proxy = `http://localhost:${proxyServer.getPort()}`;

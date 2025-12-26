@@ -21,6 +21,9 @@
         },
         {
             "path": "../../tokens/metrics"
+        },
+        {
+            "path": "../../tokens/http-client"
         }
     ]
 }

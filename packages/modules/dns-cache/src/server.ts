@@ -2,18 +2,56 @@ import noop from '@tinkoff/utils/function/noop';
 import http from 'http';
 import https from 'https';
 import dns from 'dns';
+import { interceptors } from 'undici';
 import type { CacheInstance } from 'cacheable-lookup';
 import CacheableLookup from 'cacheable-lookup';
 import { declareModule, provide, commandLineListTokens, Scope, createToken } from '@tramvai/core';
-import { DEFAULT_HTTP_CLIENT_INTERCEPTORS } from '@tramvai/tokens-http-client';
-import { CREATE_CACHE_TOKEN, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
+import {
+  DEFAULT_HTTP_CLIENT_INTERCEPTORS,
+  HTTP_CLIENT_AGENT_INTERCEPTORS,
+} from '@tramvai/tokens-http-client';
+import {
+  CREATE_CACHE_TOKEN,
+  Cache,
+  ENV_MANAGER_TOKEN,
+  ENV_USED_TOKEN,
+} from '@tramvai/tokens-common';
 
-const DNS_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsLookupCache');
+const DNS_LOOKUP_LRU_CACHE_TOKEN = createToken<Cache<any>>('dnsLookupLruCache');
+const DNS_CACHEABLE_LOOKUP_CACHE_TOKEN = createToken<any>('dnsCacheableLookupCache');
+const DNS_UNDICI_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsUndiciLookupCache');
 
 export const TramvaiDnsCacheModule = declareModule({
   name: 'TramvaiDnsCacheModule',
   imports: [],
   providers: [
+    provide({
+      provide: HTTP_CLIENT_AGENT_INTERCEPTORS,
+      useFactory: ({ envManager, storage }) => {
+        const dnsLookupEnabled = envManager.get('DNS_LOOKUP_CACHE_ENABLE') === 'true';
+        const maxTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+        const maxItems = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
+
+        if (!dnsLookupEnabled) {
+          return function noopInterceptor(dispatch) {
+            return function noopInterceptorDispatch(opts, handler) {
+              return dispatch(opts, handler);
+            };
+          };
+        }
+
+        return interceptors.dns({
+          maxTTL,
+          maxItems,
+          // TODO: wait for https://github.com/nodejs/undici/pull/4589 release
+          // storage,
+        });
+      },
+      deps: {
+        envManager: ENV_MANAGER_TOKEN,
+        storage: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
+      },
+    }),
     provide({
       provide: commandLineListTokens.init,
       multi: true,
@@ -74,7 +112,7 @@ export const TramvaiDnsCacheModule = declareModule({
       },
       deps: {
         envManager: ENV_MANAGER_TOKEN,
-        cache: DNS_LOOKUP_CACHE_TOKEN,
+        cache: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
       },
     }),
     provide({
@@ -103,11 +141,11 @@ export const TramvaiDnsCacheModule = declareModule({
       },
       deps: {
         envManager: ENV_MANAGER_TOKEN,
-        cache: DNS_LOOKUP_CACHE_TOKEN,
+        cache: DNS_LOOKUP_LRU_CACHE_TOKEN,
       },
     }),
     provide({
-      provide: DNS_LOOKUP_CACHE_TOKEN,
+      provide: DNS_LOOKUP_LRU_CACHE_TOKEN,
       scope: Scope.SINGLETON,
       useFactory: ({ createCache, envManager }) => {
         const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
@@ -115,6 +153,17 @@ export const TramvaiDnsCacheModule = declareModule({
 
         const cache = createCache('memory', { name: 'dns-lookup', max, ttl: dnsTTL });
 
+        return cache;
+      },
+      deps: {
+        createCache: CREATE_CACHE_TOKEN,
+        envManager: ENV_MANAGER_TOKEN,
+      },
+    }),
+    provide({
+      provide: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
+      scope: Scope.SINGLETON,
+      useFactory: ({ cache }) => {
         const adapter: CacheInstance = {
           set: (hostname: string, entries: any[], ttl: number): any => {
             return cache.set(hostname, entries, { ttl });
@@ -133,8 +182,32 @@ export const TramvaiDnsCacheModule = declareModule({
         return adapter;
       },
       deps: {
-        createCache: CREATE_CACHE_TOKEN,
-        envManager: ENV_MANAGER_TOKEN,
+        cache: DNS_LOOKUP_LRU_CACHE_TOKEN,
+      },
+    }),
+    provide({
+      provide: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
+      scope: Scope.SINGLETON,
+      useFactory: ({ cache }) => {
+        const adapter: any = {
+          set: (hostname: string, records: any, opts: { ttl: number }): void => {
+            cache.set(hostname, records, opts);
+          },
+          get: (hostname: string): any => {
+            return cache.get(hostname);
+          },
+          delete: (hostname: string) => {
+            cache.delete(hostname);
+          },
+          full: (): boolean => {
+            return false;
+          },
+        };
+
+        return adapter;
+      },
+      deps: {
+        cache: DNS_LOOKUP_LRU_CACHE_TOKEN,
       },
     }),
     provide({

@@ -10,15 +10,17 @@ You need to install `@tramvai/module-http-proxy-agent`
 yarn add @tramvai/module-http-proxy-agent
 ```
 
-And connect in the project
+And connect in the project **after** `@tramvai/module-http-client` module
 
 ```tsx
 import { createApp } from '@tramvai/core';
+import { HttpClientModule } from '@tramvai/module-http-client';
 import { HttpProxyAgentModule } from '@tramvai/module-http-proxy-agent';
 
 createApp({
   name: 'tincoin',
-  modules: [ HttpProxyAgentModule ],
+  // need to be placed after HttpClientModule to override HTTP_AGENT_TOKEN
+  modules: [HttpClientModule, HttpProxyAgentModule],
 });
 ```
 

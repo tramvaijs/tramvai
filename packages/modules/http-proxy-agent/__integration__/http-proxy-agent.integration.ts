@@ -17,7 +17,7 @@ import { test } from './test-fixture';
  * 1. We made request to fake API domain `non-proxied.mylocalhost.com`
  * 2. Request will be sended to `127.0.0.1` IP resolved through our `dns.lookup` mock
  */
-// @todo return after CI will be fixed
+// TODO: for local testing, not working in CI because of "Error: listen EACCES: permission denied 0.0.0.0:443"
 test.describe.skip('packages/modules/http-proxy-agent', () => {
   test.beforeEach(({ apiServer, proxyServer }) => {
     proxyServer.clearUrls();

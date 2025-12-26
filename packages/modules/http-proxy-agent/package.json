@@ -22,13 +22,18 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
+  "devDependencies": {
+    "undici": "^7.16.0"
+  },
   "dependencies": {
-    "@tramvai/tokens-common": "0.0.0-stub"
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-http-client": "0.0.0-stub",
+    "@tramvai/tokens-metrics": "0.0.0-stub"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
-    "@tramvai/tokens-metrics": "0.0.0-stub",
-    "tslib": "^2.4.0"
+    "tslib": "^2.4.0",
+    "undici": "*"
   }
 }
