@@ -18,7 +18,7 @@ async function publishPublicPackages() {
 
     try {
       channel = await exec(
-        `npm publish --access public --tag latest --registry https://registry.npmjs.org/`,
+        `npm publish --access public --tag stable-v5.x.x --registry https://registry.npmjs.org/`,
         {
           cwd: pkgPath,
         }
