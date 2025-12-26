@@ -118,7 +118,7 @@ const docusaurusConfig = {
       items: [
         process.env.DOCS_VERSIONING_DISABLE !== 'true' && {
           to: '/versions',
-          label: 'v6.x.x',
+          label: 'v7.x.x',
           position: 'right',
         },
         { to: 'docs/get-started/overview', label: 'Docs', position: 'right' },
