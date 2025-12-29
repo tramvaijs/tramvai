@@ -7,10 +7,6 @@ declare global {
   var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
 }
 
-// to use V8's code cache to speed up instantiation time
-// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-import('v8-compile-cache');
-
 handleErrors();
 fixYarnSettingsOverride();
 
