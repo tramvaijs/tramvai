@@ -2603,24 +2603,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pvm/app-framework@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@pvm/app-framework@npm:1.0.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40pvm%2Fapp-framework%2F-%2Fapp-framework-1.0.1.tgz"
-  dependencies:
-    "@iarna/toml": "npm:^2.2.5"
-    "@tinkoff/dippy": "npm:^0.10.11"
-    ajv: "npm:^8.12.0"
-    ajv-keywords: "npm:^5.1.0"
-    bin-version-check: "npm:^5.1.0"
-    chalk: "npm:^4.1.2"
-    cosmiconfig: "npm:^9.0.0"
-    json5: "npm:^2.2.3"
-    semver: "npm:^7.5.4"
-    yargs: "npm:^17.7.2"
-  checksum: 10c0/90d526aade5f70e2a5d41aa61d087e34e70e02d84243a9a2ac4f2e0143fe4055aaa305ca8aac4046a076efd5dde81acf02abe8a38507cdb6ab93a6dba3e0fb3e
-  languageName: node
-  linkType: hard
-
 "@pvm/app-framework@npm:^2.0.4":
   version: 2.0.4
   resolution: "@pvm/app-framework@npm:2.0.4"
@@ -2727,57 +2709,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pvm/pvm@npm:^1.22.0":
-  version: 1.22.0
-  resolution: "@pvm/pvm@npm:1.22.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40pvm%2Fpvm%2F-%2Fpvm-1.22.0.tgz"
-  dependencies:
-    "@hutson/parse-repository-url": "npm:^5.0.0"
-    "@iarna/toml": "npm:^2.2.5"
-    "@pvm/app-framework": "npm:^1.0.1"
-    "@tinkoff/dippy": "npm:^0.10.11"
-    "@viz-js/viz": "npm:^3.2.3"
-    ajv: "npm:^8.12.0"
-    ajv-keywords: "npm:^5.1.0"
-    bytes: "npm:^3.1.2"
-    chalk: "npm:^4.1.2"
-    chokidar: "npm:^3.5.3"
-    cli-table: "npm:^0.3.11"
-    cosmiconfig: "npm:^9.0.0"
-    date-fns: "npm:^2.30.0"
-    fast-deep-equal: "npm:^3.1.3"
-    fast-glob: "npm:^3.3.1"
-    front-matter: "npm:^4.0.2"
-    fs-extra: "npm:^11.1.1"
-    get-stdin: "npm:^9.0.0"
-    git-log-parser: "npm:^1.2.0"
-    git-url-parse: "npm:^13.1.1"
-    ignore: "npm:^5.2.4"
-    ini: "npm:^4.1.1"
-    lodash: "npm:^4.17.21"
-    micromatch: "npm:^3"
-    mri: "npm:^1.2.0"
-    ms: "npm:^2.1.3"
-    nunjucks: "npm:^3.2.4"
-    p-map: "npm:^6.0.0"
-    proper-lockfile: "npm:^4.1.2"
-    remarkable: "npm:^2.0.1"
-    resolve-from: "npm:^5.0.0"
-    rfc6902: "npm:^5.0.1"
-    semver: "npm:^7.5.4"
-    shuffle-seed: "npm:^1.1.6"
-    signales: "npm:^2.0.5"
-    string-to-color: "npm:^2.2.2"
-    superheroes: "npm:^3.0.0"
-    tempy: "npm:^3.1.0"
-    through2: "npm:^4.0.2"
-    type-fest: "npm:^4.6.0"
-    uniq: "npm:^1.0.1"
-    yargs: "npm:^17.7.2"
-  checksum: 10c0/d940b9948c544f9c762177d5a00f4df5e54e07693062e88d9b9abb5e19e998627f7c95be88da645311777010cac63889c4820140840fb1c7ed29f120bfafbe44
-  languageName: node
-  linkType: hard
-
-"@pvm/pvm@npm:^1.24.0":
+"@pvm/pvm@npm:^1.22.0, @pvm/pvm@npm:^1.24.0":
   version: 1.24.0
   resolution: "@pvm/pvm@npm:1.24.0"
   dependencies:
@@ -3056,15 +2988,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tinkoff/dippy@npm:^0.10.11":
-  version: 0.10.11
-  resolution: "@tinkoff/dippy@npm:0.10.11::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40tinkoff%2Fdippy%2F-%2Fdippy-0.10.11.tgz"
-  dependencies:
-    tslib: "npm:^2.4.0"
-  checksum: 10c0/9152710fc84f3c5a02a90576481823265d2a0e98a563ed5d00b6182097f479585efb2a6df5b01c35a965628b9da716bc62d5ed7430bfbbea0269e2dfac008b7d
-  languageName: node
-  linkType: hard
-
 "@tinkoff/dippy@npm:^0.11.5":
   version: 0.11.7
   resolution: "@tinkoff/dippy@npm:0.11.7::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40tinkoff%2Fdippy%2F-%2F%40tinkoff%2Fdippy-0.11.7.tgz"
@@ -3298,18 +3221,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/keyv@npm:^3.1.1":
+"@types/keyv@npm:^3.1.1, @types/keyv@npm:^3.1.4":
   version: 3.1.4
   resolution: "@types/keyv@npm:3.1.4::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F%40types%2Fkeyv%2F-%2Fkeyv-3.1.4.tgz"
-  dependencies:
-    "@types/node": "npm:*"
-  checksum: 10c0/ff8f54fc49621210291f815fe5b15d809fd7d032941b3180743440bd507ecdf08b9e844625fa346af568c84bf34114eb378dcdc3e921a08ba1e2a08d7e3c809c
-  languageName: node
-  linkType: hard
-
-"@types/keyv@npm:^3.1.4":
-  version: 3.1.4
-  resolution: "@types/keyv@npm:3.1.4"
   dependencies:
     "@types/node": "npm:*"
   checksum: 10c0/ff8f54fc49621210291f815fe5b15d809fd7d032941b3180743440bd507ecdf08b9e844625fa346af568c84bf34114eb378dcdc3e921a08ba1e2a08d7e3c809c
@@ -3835,7 +3749,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv-keywords@npm:^5.0.0, ajv-keywords@npm:^5.1.0":
+"ajv-keywords@npm:^5.0.0":
   version: 5.1.0
   resolution: "ajv-keywords@npm:5.1.0::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fajv-keywords%2F-%2Fajv-keywords-5.1.0.tgz"
   dependencies:
@@ -3858,21 +3772,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:^8.0.0, ajv@npm:^8.12.0, ajv@npm:^8.8.0":
+"ajv@npm:^8.0.0, ajv@npm:^8.17.1, ajv@npm:^8.8.0":
   version: 8.17.1
   resolution: "ajv@npm:8.17.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2Fajv%2F-%2Fajv-8.17.1.tgz"
-  dependencies:
-    fast-deep-equal: "npm:^3.1.3"
-    fast-uri: "npm:^3.0.1"
-    json-schema-traverse: "npm:^1.0.0"
-    require-from-string: "npm:^2.0.2"
-  checksum: 10c0/ec3ba10a573c6b60f94639ffc53526275917a2df6810e4ab5a6b959d87459f9ef3f00d5e7865b82677cb7d21590355b34da14d1d0b9c32d75f95a187e76fff35
-  languageName: node
-  linkType: hard
-
-"ajv@npm:^8.17.1":
-  version: 8.17.1
-  resolution: "ajv@npm:8.17.1::__archiveUrl=https%3A%2F%2Fregistry.npmjs.org%2F_relative%2Frepository%2Fnpm-registry-npmjs-org-proxy%2Fajv%2F-%2Fajv-8.17.1.tgz"
   dependencies:
     fast-deep-equal: "npm:^3.1.3"
     fast-uri: "npm:^3.0.1"
