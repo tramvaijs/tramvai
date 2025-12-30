@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@tinkoff/browser-timings": "0.0.0-stub",
-    "@tinkoff/logger": "^0.10.507",
+    "@tinkoff/logger": "^0.10.516",
     "@tinkoff/measure-fastify-requests": "0.0.0-stub",
     "@tinkoff/metrics-noop": "0.0.0-stub",
     "@tinkoff/monkeypatch": "0.0.0-stub",
