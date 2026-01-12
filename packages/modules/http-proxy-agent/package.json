@@ -23,7 +23,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "undici": "^7.16.0"
+    "undici": "^7.18.2"
   },
   "dependencies": {
     "@tramvai/tokens-common": "0.0.0-stub",

@@ -25,6 +25,7 @@ import {
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   PUBSUB_TOKEN,
   PUBSUB_FACTORY_TOKEN,
+  ACTION_EXECUTION_HOOKS_TOKEN,
 } from '@tramvai/tokens-common';
 import { RENDER_SLOTS } from '@tramvai/tokens-render';
 import {
@@ -105,6 +106,7 @@ export const getChildProviders = (appDi: Container, loadableStats: LoadableStats
         PUBSUB_FACTORY_TOKEN,
         TAPABLE_HOOK_FACTORY_TOKEN,
         COMMAND_LINE_RUNNER_PLUGIN,
+        ACTION_EXECUTION_HOOKS_TOKEN,
       ],
     }),
     ...getChildEndProviders(appDi),

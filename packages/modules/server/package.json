@@ -40,7 +40,7 @@
     "afterframe": "^1.0.2",
     "fastify": "^5.6.2",
     "http-proxy-middleware": "^2.0.2",
-    "undici": "^7.16.0"
+    "undici": "^7.18.2"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "0.0.0-stub",

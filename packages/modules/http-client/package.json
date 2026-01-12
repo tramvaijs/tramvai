@@ -36,7 +36,7 @@
     "@tramvai/tokens-server": "0.0.0-stub",
     "@tramvai/tokens-server-private": "0.0.0-stub",
     "jest": "^29.7.0",
-    "undici": "^7.16.0"
+    "undici": "^7.18.2"
   },
   "devDependencies": {
     "@tinkoff/request-core": "^0.10.0",

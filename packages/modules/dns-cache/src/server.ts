@@ -3,6 +3,7 @@ import http from 'http';
 import https from 'https';
 import dns from 'dns';
 import { interceptors } from 'undici';
+import type Interceptors from 'undici/types/interceptors';
 import type { CacheInstance } from 'cacheable-lookup';
 import CacheableLookup from 'cacheable-lookup';
 import { declareModule, provide, commandLineListTokens, Scope, createToken } from '@tramvai/core';
@@ -17,9 +18,11 @@ import {
   ENV_USED_TOKEN,
 } from '@tramvai/tokens-common';
 
+type UndiciDnsCacheStorage = Required<Interceptors.DNSInterceptorOpts>['storage'];
+
 const DNS_LOOKUP_LRU_CACHE_TOKEN = createToken<Cache<any>>('dnsLookupLruCache');
-const DNS_CACHEABLE_LOOKUP_CACHE_TOKEN = createToken<any>('dnsCacheableLookupCache');
-const DNS_UNDICI_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsUndiciLookupCache');
+const DNS_CACHEABLE_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsCacheableLookupCache');
+const DNS_UNDICI_LOOKUP_CACHE_TOKEN = createToken<UndiciDnsCacheStorage>('dnsUndiciLookupCache');
 
 export const TramvaiDnsCacheModule = declareModule({
   name: 'TramvaiDnsCacheModule',
@@ -43,8 +46,8 @@ export const TramvaiDnsCacheModule = declareModule({
         return interceptors.dns({
           maxTTL,
           maxItems,
-          // TODO: wait for https://github.com/nodejs/undici/pull/4589 release
-          // storage,
+          // https://github.com/nodejs/undici/pull/4589
+          storage,
         });
       },
       deps: {
@@ -189,7 +192,7 @@ export const TramvaiDnsCacheModule = declareModule({
       provide: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
       scope: Scope.SINGLETON,
       useFactory: ({ cache }) => {
-        const adapter: any = {
+        const adapter: UndiciDnsCacheStorage = {
           set: (hostname: string, records: any, opts: { ttl: number }): void => {
             cache.set(hostname, records, opts);
           },
@@ -201,6 +204,9 @@ export const TramvaiDnsCacheModule = declareModule({
           },
           full: (): boolean => {
             return false;
+          },
+          get size(): number {
+            return cache.size;
           },
         };
 
