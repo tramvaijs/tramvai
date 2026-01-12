@@ -36,7 +36,7 @@
     "@tramvai/http-client": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "tslib": "^2.4.0",
-    "undici": "^7.16.0"
+    "undici": "^7.18.2"
   },
   "sideEffects": false,
   "license": "Apache-2.0",

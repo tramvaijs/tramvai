@@ -26,7 +26,7 @@
     "minipass": "^3.1.1",
     "ssri": "^7.1.0",
     "tslib": "^2.4.0",
-    "undici": "^7.16.0"
+    "undici": "^7.18.2"
   },
   "sideEffects": false,
   "devDependencies": {

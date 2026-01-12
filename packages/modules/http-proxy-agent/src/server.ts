@@ -22,21 +22,21 @@ import { addProxyToHttpsAgent } from './add-proxy-to-https-agent/add-proxy-to-ht
           const proxyEnv = getHttpsProxy();
           const noProxyEnv = getNoProxy();
 
-          // TODO: will work after https://github.com/nodejs/undici/pull/4659 release
-          // const metricsConnectionCounter = metrics.counter({
-          //   name: 'http_proxy_undici_connect_total',
-          //   help: 'Number of proxy connects with Undici',
-          //   labelNames: ['host'],
-          // });
+          const metricsConnectionCounter = metrics.counter({
+            name: 'http_proxy_undici_connect_total',
+            help: 'Number of proxy connects with Undici',
+            labelNames: ['host'],
+          });
 
-          // diagnosticsChannel.channel('undici:proxy:connected').subscribe(({ connectParams }) => {
-          //   logger.debug({
-          //     event: 'proxy undici connection',
-          //     connection: connectParams,
-          //   });
+          // https://github.com/nodejs/undici/pull/4659
+          diagnosticsChannel.channel('undici:proxy:connected').subscribe(({ connectParams }) => {
+            logger.debug({
+              event: 'proxy undici connection',
+              connection: connectParams,
+            });
 
-          //   metricsConnectionCounter.inc({ host: new URL(connectParams.origin).host });
-          // });
+            metricsConnectionCounter.inc({ host: new URL(connectParams.origin).host });
+          });
 
           const agent = new EnvHttpProxyAgent({
             httpProxy: proxyEnv,
