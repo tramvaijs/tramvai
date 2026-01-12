@@ -4,6 +4,7 @@ import noop from '@tinkoff/utils/function/noop';
 import { CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN } from '@tramvai/tokens-child-app';
 import {
   ACTION_CONDITIONALS,
+  ACTION_EXECUTION_HOOKS_TOKEN,
   ACTION_EXECUTION_TOKEN,
   ACTION_PAGE_RUNNER_TOKEN,
   COMBINE_REDUCERS,
@@ -16,7 +17,12 @@ export const actionsProviders: Provider[] = [
   provide({
     provide: CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN,
     multi: true,
-    useValue: [ACTION_EXECUTION_TOKEN, ACTION_PAGE_RUNNER_TOKEN, DEFERRED_ACTIONS_MAP_TOKEN],
+    useValue: [
+      ACTION_EXECUTION_TOKEN,
+      ACTION_PAGE_RUNNER_TOKEN,
+      DEFERRED_ACTIONS_MAP_TOKEN,
+      ACTION_EXECUTION_HOOKS_TOKEN,
+    ],
   }),
   provide({
     provide: COMBINE_REDUCERS,
