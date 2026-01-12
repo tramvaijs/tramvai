@@ -69,13 +69,6 @@ const docusaurusConfig = {
         ],
       },
     ],
-    process.env.OPEN_SOURCE_PUBLICATION !== 'true' && [
-      require.resolve('@pvm/docusaurus-changelog-plugin'),
-      {
-        // eslint-disable-next-line import/no-extraneous-dependencies
-        pvm: new (require('@tinkoff/pvm').Pvm)({ cwd: resolve('../../') }),
-      },
-    ],
   ].filter(Boolean),
 
   onBrokenLinks: 'throw',
@@ -126,11 +119,6 @@ const docusaurusConfig = {
         {
           href: 'https://github.com/tramvaijs/tramvai',
           label: 'Repository',
-          position: 'right',
-        },
-        process.env.OPEN_SOURCE_PUBLICATION !== 'true' && {
-          to: 'changelog',
-          label: 'Changelog',
           position: 'right',
         },
       ].filter(Boolean),
