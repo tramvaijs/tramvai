@@ -1,4 +1,3 @@
-import path from 'node:path';
 import type Config from 'webpack-chain';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
 import { applyThreadLoader } from '../utils/threadLoader';
@@ -64,10 +63,8 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
       applyNodeModulesRules(rule, configManager);
 
       if (shouldSelectiveTranspile) {
-        const includeForTranspiling = (<string[]>include).map((includePath) =>
-          // require.resolve return absolute path to entrypoint of dependency
-          // but we need root dirname of dependency inside node_modules
-          path.dirname(require.resolve(`${includePath}/package.json`))
+        const includeForTranspiling = (<string[]>include).map(
+          (includePath) => new RegExp(includePath)
         );
 
         includeForTranspiling.forEach((includePath) => {

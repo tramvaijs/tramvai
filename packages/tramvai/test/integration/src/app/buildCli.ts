@@ -49,6 +49,11 @@ export const buildCli = async (
               experiments: {
                 transpilation: {
                   loader: 'swc',
+                  include: [
+                    '@tinkoff/request',
+                    '@tramvai/module-dev-tools',
+                    '@tramvai-tinkoff/module-push-web',
+                  ],
                 },
               },
             },

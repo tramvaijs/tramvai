@@ -66,6 +66,11 @@ export const startCli = async (
               experiments: {
                 transpilation: {
                   loader: 'swc',
+                  include: [
+                    '@tinkoff/request',
+                    '@tramvai/module-dev-tools',
+                    '@tramvai-tinkoff/module-push-web',
+                  ],
                 },
                 // Playwright Inspector collects a stack trace for the ability to show in which file or step of the test a transition occurred
                 // internak stack trace utility uses process.cwd() to correctly calculate the path to the files

@@ -20,6 +20,12 @@ export const startRootApp = ({
       define: {
         development: define,
       },
+      sourceMap: false,
+      experiments: {
+        transpilation: {
+          loader: 'swc',
+        },
+      },
     },
     {
       rootDir: EXAMPLE_DIR,
@@ -54,6 +60,12 @@ export const startChildApp = async (
         enabled: true,
       },
       shared,
+      sourceMap: false,
+      experiments: {
+        transpilation: {
+          loader: 'swc',
+        },
+      },
     },
     port,
     staticPort,

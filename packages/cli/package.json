@@ -86,7 +86,7 @@
     "babel-plugin-transform-define": "^2.0.1",
     "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "boxen": "^4.2.0",
-    "browserslist": "^4.21.3",
+    "browserslist": "^4.28.1",
     "case-sensitive-paths-webpack-plugin": "^2.4.0",
     "chalk": "^4.1.2",
     "chokidar": "^3.6.0",

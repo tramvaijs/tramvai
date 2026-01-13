@@ -23,7 +23,14 @@
         "production": true
       },
       "experiments": {
-        "runtimeChunk": "single"
+        "runtimeChunk": "single",
+        "transpilation": {
+          "loader": {
+            "development": "swc",
+            "production": "babel"
+          },
+          "include": "none"
+        }
       }
     }
   }
