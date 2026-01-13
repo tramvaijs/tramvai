@@ -30,7 +30,8 @@
         "transpilation": {
           "loader": {
             "development": "swc"
-          }
+          },
+          "include": "none"
         },
         "pwa": {
           "sw": {

@@ -7,8 +7,6 @@ import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
-// @ts-expect-error
-import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { optional } from '@tinkoff/dippy';
@@ -355,8 +353,16 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     plugins: [
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
-      config.benchmark && new RsdoctorWebpackPlugin(getBenchmarkRsdoctorOptions('client')),
-      config.analyze && new RsdoctorWebpackPlugin(getAnalyzeRsdoctorOptions()),
+      config.benchmark &&
+        // require `@rsdoctor/webpack-plugin` here to speed up webpack worker initialization when benchmarking is not used
+        new (require('@rsdoctor/webpack-plugin').RsdoctorWebpackPlugin)(
+          getBenchmarkRsdoctorOptions('client')
+        ),
+      config.analyze &&
+        // require `@rsdoctor/webpack-plugin` here to speed up webpack worker initialization when analyze is not used
+        new (require('@rsdoctor/webpack-plugin').RsdoctorWebpackPlugin)(
+          getAnalyzeRsdoctorOptions()
+        ),
       ...stylesConfiguration.plugins,
       new StatsWriterPlugin({
         filename: STATS_FILE_NAME,

@@ -23,6 +23,16 @@ export const startRootApp = ({
       define: {
         development: define,
       },
+      experiments: {
+        transpilation: {
+          loader: 'swc',
+          include: [
+            '@tinkoff/request',
+            '@tramvai/module-dev-tools',
+            '@tramvai-tinkoff/module-push-web',
+          ],
+        },
+      },
     },
     {
       rootDir: EXAMPLE_DIR,
@@ -57,6 +67,17 @@ export const startChildApp = async (
         enabled: true,
       },
       shared,
+      sourceMap: false,
+      experiments: {
+        transpilation: {
+          loader: 'swc',
+          include: [
+            '@tinkoff/request',
+            '@tramvai/module-dev-tools',
+            '@tramvai-tinkoff/module-push-web',
+          ],
+        },
+      },
     },
     port,
     staticPort,

@@ -1,5 +1,5 @@
 import { parentPort } from 'worker_threads';
-import { installServerWrapper, requireFromString } from '../base/worker';
+import { installServerWrapper, requireFromString, warmupWorker } from '../base/worker';
 
 installServerWrapper((port) => {
   parentPort.postMessage({ cmd: 'listen', port });
@@ -12,3 +12,5 @@ parentPort.on('message', ({ filename, script }) => {
     console.error(err);
   }
 });
+
+warmupWorker();

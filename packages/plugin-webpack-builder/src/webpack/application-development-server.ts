@@ -4,8 +4,6 @@ import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
-// @ts-expect-error
-import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
@@ -315,8 +313,16 @@ export default appConfig;`;
       new webpack.optimize.LimitChunkCountPlugin({
         maxChunks: 1,
       }),
-      config.benchmark && new RsdoctorWebpackPlugin(getBenchmarkRsdoctorOptions('server')),
-      config.analyze && new RsdoctorWebpackPlugin(getAnalyzeRsdoctorOptions()),
+      config.benchmark &&
+        // require `@rsdoctor/webpack-plugin` here to speed up webpack worker initialization when benchmarking is not used
+        new (require('@rsdoctor/webpack-plugin').RsdoctorWebpackPlugin)(
+          getBenchmarkRsdoctorOptions('server')
+        ),
+      config.analyze &&
+        // require `@rsdoctor/webpack-plugin` here to speed up webpack worker initialization when analyze is not used
+        new (require('@rsdoctor/webpack-plugin').RsdoctorWebpackPlugin)(
+          getAnalyzeRsdoctorOptions()
+        ),
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       ...stylesConfiguration.plugins,

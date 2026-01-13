@@ -3,6 +3,12 @@ import { modernLibsFilter } from '@tinkoff/is-modern-lib';
 import { babelConfigFactory } from '../babel/babelConfigFactory';
 import { StorybookOptions } from '../types';
 
+export const defaultIncludeList = [
+  /[\\/]cli[\\/]lib[\\/]external[\\/]/,
+  /[\\/]api[\\/]lib[\\/]virtual[\\/]/,
+  /virtual:tramvai/,
+];
+
 export function addNodeModulesTranspile({
   baseConfig,
   options,
@@ -26,11 +32,11 @@ function getLoaderInclude(include: StorybookOptions['dependenciesTranspiling']) 
   }
 
   if (Array.isArray(include)) {
-    return include.map((item) => new RegExp(item));
+    return include.map((item) => new RegExp(item)).concat(defaultIncludeList);
   }
 
   if (include === 'none') {
-    return [];
+    return defaultIncludeList;
   }
 
   return [/node_modules/];

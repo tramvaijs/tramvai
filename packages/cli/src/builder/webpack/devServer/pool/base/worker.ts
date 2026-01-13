@@ -68,3 +68,15 @@ export const requireFromString = (code: string, filename: string) => {
 
   return newModule.exports;
 };
+
+export const warmupWorker = () => {
+  const warmupModules = ['fastify'];
+
+  warmupModules.forEach((moduleName) => {
+    try {
+      require(moduleName);
+    } catch (e) {
+      // ignore
+    }
+  });
+};

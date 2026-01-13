@@ -13,7 +13,18 @@
         "config": "apps/{{configEntry.name}}/postcss"
       },
       "fileSystemPages": {
-        "enabled": true
+        "enabled": true,
+        "pagesDir": false
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc",
+          "include": {
+            "development": "none",
+            "production": "only-modern"
+          }
+        },
+        "runtimeChunk": "single"
       }
     }
   }

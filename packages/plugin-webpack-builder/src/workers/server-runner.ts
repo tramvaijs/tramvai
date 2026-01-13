@@ -1,4 +1,5 @@
 import '../utils/inspector';
+import '@tramvai/api/lib/utils/cpu-profile';
 // speed up sequential server.js compilations after restarts
 import '@tramvai/api/lib/utils/compile-cache';
 import path from 'node:path';
@@ -32,19 +33,22 @@ const requireFromString = (code: string, filename: string) => {
   return newModule.exports;
 };
 
+const warmupModules = ['fastify'];
+
 interface NetServerListenAsyncEndMessage {
   server: Server;
 }
 
 const originalAddress = Server.prototype.address;
 const originalListen = Server.prototype.listen;
-const initListenHandler = (onListen: (port: number | undefined) => void) => {
+const initListenHandler = (onListen: (port: number | undefined) => boolean) => {
   const listenHandler = (msg: unknown) => {
     const address = <AddressInfo>(<NetServerListenAsyncEndMessage>msg).server.address();
     const { port } = address;
 
-    onListen(port);
-    unsubscribe('tracing:net.server.listen:asyncEnd', listenHandler);
+    if (onListen(port)) {
+      unsubscribe('tracing:net.server.listen:asyncEnd', listenHandler);
+    }
   };
 
   subscribe('tracing:net.server.listen:asyncEnd', listenHandler);
@@ -89,12 +93,17 @@ async function runServer() {
   process.env.PORT = String(proxyPort);
 
   monkeyPatchPort(port);
+
   initListenHandler((startedPort) => {
     if (Number(port) === startedPort) {
       parentPort!.postMessage({
         event: APPLICATION_SERVER_STARTED,
       } as ServerRunnerOutgoingEventsPayload['application-server-started']);
+
+      // we can open different port for metrics, so unsubscribe only when our port is started
+      return true;
     }
+    return false;
   });
 
   parentPort?.on(
@@ -138,6 +147,16 @@ async function runServer() {
       }
     }
   );
+
+  // warm up modules to speed up server.js start,
+  // because this worker always idle when initial build is running
+  warmupModules.forEach((moduleName) => {
+    try {
+      require(moduleName);
+    } catch {
+      // ignore
+    }
+  });
 }
 
 runServer();

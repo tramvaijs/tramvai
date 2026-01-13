@@ -6,7 +6,7 @@ describe('serveRootErrorBoundary', () => {
     const app = Fastify();
     const text = 'Error Text';
 
-    serveRootErrorBoundary({ app, response: text });
+    serveRootErrorBoundary({ app, render: async () => text });
 
     const response = await app.inject('/_errors/5xx');
 

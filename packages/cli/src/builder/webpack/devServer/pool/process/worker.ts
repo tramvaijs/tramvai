@@ -1,4 +1,4 @@
-import { installServerWrapper, requireFromString } from '../base/worker';
+import { installServerWrapper, requireFromString, warmupWorker } from '../base/worker';
 
 installServerWrapper((port) => {
   process.send({ cmd: 'listen', port });
@@ -11,3 +11,5 @@ process.on('message', ({ filename, script }) => {
     console.error(err);
   }
 });
+
+warmupWorker();

@@ -26,6 +26,12 @@ export const startRootApp = ({
             definePlugin: {
               dev: define,
             },
+            sourceMap: false,
+            experiments: {
+              transpilation: {
+                loader: 'swc',
+              },
+            },
           },
         },
       },
@@ -64,6 +70,12 @@ export const startChildApp = async (
         serve: {
           configurations: {
             hotRefresh: true,
+            sourceMap: false,
+            experiments: {
+              transpilation: {
+                loader: 'swc',
+              },
+            },
           },
         },
       },

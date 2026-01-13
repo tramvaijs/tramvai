@@ -31,7 +31,8 @@
           "loader": {
             "development": "swc",
             "production": "babel"
-          }
+          },
+          "include": "none"
         }
       }
     }

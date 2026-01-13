@@ -21,7 +21,8 @@
       },
       "experiments": {
         "transpilation": {
-          "loader": "swc"
+          "loader": "swc",
+          "include": "none"
         }
       }
     }

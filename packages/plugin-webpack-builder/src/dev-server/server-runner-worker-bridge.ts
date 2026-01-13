@@ -51,6 +51,10 @@ export class ServerRunnerWorkerBridge {
       env.INSPECT_WORKER_THREAD = 'break';
       env.INSPECT_WORKER_THREAD_PORT = '9229';
     }
+    if (process.env.TRAMVAI_CPU_PROFILE) {
+      env.TRAMVAI_CPU_PROFILE = process.env.TRAMVAI_CPU_PROFILE;
+      env.__TRAMVAI_CPU_PROFILE_FILENAME = `tramvai.server-runner-worker`;
+    }
 
     this.#worker = new Worker(this.#workerPath, {
       workerData: this.#workerData,
