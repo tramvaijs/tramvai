@@ -49,32 +49,22 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
       rule.oneOf(nodeModuleRulesName).include.add(modernLibsFilter);
     }
   } else {
-    const shouldSkipTranspiling = include === 'none';
-    const shouldSelectiveTranspile = Array.isArray(include);
+    const shouldSkipTranspile = include === 'none';
+    const shouldTranspileManualList = Array.isArray(include);
+    const defaultIncludeList = [/[\\/]cli[\\/]lib[\\/]external[\\/]/];
+    const manualIncludeList = Array.isArray(include)
+      ? include.map((dependencyPath) => new RegExp(dependencyPath)).concat(defaultIncludeList)
+      : defaultIncludeList;
 
-    if (shouldSkipTranspiling) {
-      rule.exclude
-        .add(/node_modules/)
-        .end()
-        .use('transpiler')
-        .batch(addTranspilerLoader(configManager, getTranspilerConfig(configManager)));
-    } else {
-      applyProjectRules(rule, configManager);
-      applyNodeModulesRules(rule, configManager);
+    applyProjectRules(rule, configManager);
+    applyNodeModulesRules(rule, configManager);
 
-      if (shouldSelectiveTranspile) {
-        const includeForTranspiling = (<string[]>include).map(
-          (includePath) => new RegExp(includePath)
-        );
-
-        includeForTranspiling.forEach((includePath) => {
-          rule.oneOf(nodeModuleRulesName).include.add(includePath);
-        });
-      } else if (shouldTranspileOnlyModern) {
-        if (shouldTranspileOnlyModern) {
-          rule.oneOf(nodeModuleRulesName).include.add(modernLibsFilter);
-        }
-      }
+    if (shouldSkipTranspile || shouldTranspileManualList) {
+      manualIncludeList.forEach((includePath) => {
+        rule.oneOf(nodeModuleRulesName).include.add(includePath);
+      });
+    } else if (shouldTranspileOnlyModern) {
+      rule.oneOf(nodeModuleRulesName).include.add(modernLibsFilter);
     }
   }
 };

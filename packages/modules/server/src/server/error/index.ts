@@ -32,22 +32,25 @@ export const errorHandler = async (
     >;
   }
 ) => {
-  const webpackStats = await fetchWebpackStats();
   const RootErrorBoundary = getRootErrorBoundary();
   const isRootErrorBoundaryExist = RootErrorBoundary !== null;
 
   if (process.env.TRAMVAI_CLI_COMMAND === 'static' && isRootErrorBoundaryExist) {
     serveRootErrorBoundary({
-      response: renderErrorBoundaryPageToString({
-        element: RootErrorBoundary,
-        requestUrl: '/5xx.html',
-        error: staticRootErrorBoundaryError ?? {
-          name: 'STATIC_ROOT_ERROR_BOUNDARY_ERROR',
-          message: 'Default error for root error boundary',
-        },
-        httpStatus: 500,
-        webpackStats,
-      }),
+      render: async () => {
+        const webpackStats = await fetchWebpackStats();
+
+        return renderErrorBoundaryPageToString({
+          element: RootErrorBoundary,
+          requestUrl: '/5xx.html',
+          error: staticRootErrorBoundaryError ?? {
+            name: 'STATIC_ROOT_ERROR_BOUNDARY_ERROR',
+            message: 'Default error for root error boundary',
+          },
+          httpStatus: 500,
+          webpackStats,
+        });
+      },
       app,
     });
   }
@@ -96,6 +99,8 @@ More information about redirects - https://tramvai.dev/docs/features/routing/red
 
     if (isRootErrorBoundaryExist) {
       try {
+        const webpackStats = await fetchWebpackStats();
+
         const response = renderErrorBoundaryPageToString({
           element: RootErrorBoundary,
           requestUrl: requestInfo.url,

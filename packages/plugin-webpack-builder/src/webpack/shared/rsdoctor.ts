@@ -1,5 +1,5 @@
-// @ts-ignore
-import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
+// @ts-expect-error
+import type { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 type options = ConstructorParameters<typeof RsdoctorWebpackPlugin<[]>>[0];
 

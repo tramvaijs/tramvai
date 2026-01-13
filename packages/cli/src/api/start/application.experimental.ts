@@ -277,7 +277,7 @@ function mapTramvaiJsonToNewTsConfig({ rootDir }: { rootDir: string }) {
         }
         mappedProject.webpack.devtool = applicationProject.webpack.devtool;
       }
-      if (applicationProject.experiments?.transpilation) {
+      if (applicationProject.experiments?.transpilation?.include) {
         const applicationProjectInclude = applicationProject.experiments.transpilation.include;
         mappedProject.transpilation = {
           include: {

@@ -24,7 +24,12 @@
       },
       "experiments": {
         "transpilation": {
-          "loader": "swc"
+          "loader": "swc",
+          "include": [
+            "@tinkoff/request",
+            "@tramvai/module-dev-tools",
+            "@tramvai-tinkoff/module-push-web"
+          ]
         }
       },
       "webpack": {

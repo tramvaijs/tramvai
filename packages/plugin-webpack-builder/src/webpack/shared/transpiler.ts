@@ -159,15 +159,20 @@ export const createTranspilerRules = ({
       ? transpilerParameters.include?.production
       : transpilerParameters.include?.development;
   const shouldSkipTranspile = include === 'none';
+  const shouldTranspileManualList = Array.isArray(include);
   const shouldTranspileOnlyModern = include === 'only-modern';
+  const defaultIncludeList = [
+    /[\\/]cli[\\/]lib[\\/]external[\\/]/,
+    /[\\/]api[\\/]lib[\\/]virtual[\\/]/,
+    /virtual:tramvai/,
+  ];
   const manualIncludeList = Array.isArray(include)
-    ? include.map((dependencyPath) => new RegExp(dependencyPath))
-    : undefined;
+    ? include.map((dependencyPath) => new RegExp(dependencyPath)).concat(defaultIncludeList)
+    : defaultIncludeList;
 
   return [
     {
       test: /\.[cm]?js[x]?$/,
-      // test: [/\.[cm]?js[x]?$/, /^virtual:/],
       exclude: /node_modules/,
       use: [
         transpiler.useThreadLoader && {
@@ -180,26 +185,29 @@ export const createTranspilerRules = ({
         },
       ].filter(Boolean),
     },
-    shouldSkipTranspile
-      ? {}
-      : {
-          test: /\.[cm]?js[x]?$/,
-          include:
-            manualIncludeList ?? (shouldTranspileOnlyModern ? modernLibsFilter : /node_modules/),
-          // thread-loader trying to resolve virtual modules and fail webpack build,
-          // so we should ignore such modules in our filter
-          exclude: [/virtual:tramvai/, /[\\/]cli[\\/]lib[\\/]external/],
-          use: [
-            transpiler.useThreadLoader && {
-              loader: 'thread-loader',
-              options: workerPoolConfig,
-            },
-            {
-              loader: transpiler.loader,
-              options: transpiler.configFactory({ ...transpilerParameters, hot: false }),
-            },
-          ].filter(Boolean),
+    {
+      test: /\.[cm]?js[x]?$/,
+      include:
+        // eslint-disable-next-line no-nested-ternary
+        shouldSkipTranspile || shouldTranspileManualList
+          ? manualIncludeList
+          : shouldTranspileOnlyModern
+            ? modernLibsFilter
+            : /node_modules/,
+      // thread-loader trying to resolve virtual modules as real files and fail webpack build,
+      // so we should ignore such modules in our filter
+      exclude: [/virtual:tramvai/],
+      use: [
+        transpiler.useThreadLoader && {
+          loader: 'thread-loader',
+          options: workerPoolConfig,
         },
+        {
+          loader: transpiler.loader,
+          options: transpiler.configFactory({ ...transpilerParameters, hot: false }),
+        },
+      ].filter(Boolean),
+    },
     {
       test: /\.ts[x]?$/,
       // test: [/\.ts[x]?$/, /^virtual:/],

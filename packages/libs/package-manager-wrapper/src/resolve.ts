@@ -13,6 +13,26 @@ const checkLockFile = (rootDir: string, lockName: string) => {
 };
 
 const getYarnPackageManager = (options: PackageManagerOptions) => {
+  // first, fastest, check for yarn version looking at the package.json "packageManager" field
+  const packageJson = require(resolve(options.rootDir, 'package.json'));
+  const packageManagerField: string = packageJson?.packageManager;
+
+  if (packageManagerField?.startsWith('yarn@')) {
+    const version = packageManagerField.replace('yarn@', '').trim();
+
+    if (version.startsWith('1')) {
+      return new YarnPackageManager(options);
+    }
+
+    return new YarnBerryPackageManager(options);
+  }
+
+  // then, check for the presence of .yarnrc.yml file (Yarn Berry)
+  if (checkLockFile(options.rootDir, '.yarnrc.yml')) {
+    return new YarnBerryPackageManager(options);
+  }
+
+  // at last, use slow method of executing `yarn -v` (500-1500ms on different machines)
   const yarnVersion = execSync('yarn -v', { cwd: options.rootDir }).toString().trim();
 
   if (yarnVersion.startsWith('1')) {

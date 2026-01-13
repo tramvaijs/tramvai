@@ -32,6 +32,7 @@
     "@tramvai/react": "3.0.1",
     "@tramvai/react-query": "3.0.1",
     "@tramvai/state": "3.0.1",
+    "@tramvai/swc-integration": "3.0.1",
     "@tramvai/tokens-child-app": "3.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"

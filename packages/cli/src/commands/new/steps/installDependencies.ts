@@ -54,6 +54,7 @@ const devDependencies = [
   '@tinkoff/eslint-config',
   '@tinkoff/eslint-config-react',
   '@tinkoff/eslint-plugin-tramvai',
+  '@tramvai/swc-integration',
   '@types/react',
   'postcss-custom-media',
   'postcss-custom-properties',
@@ -63,6 +64,8 @@ const devDependencies = [
   'lint-staged',
   '@tramvai/prettier-config',
   'typescript',
+  'source-map',
+  'webpack-sources',
 ];
 
 const rootDependencies = {
