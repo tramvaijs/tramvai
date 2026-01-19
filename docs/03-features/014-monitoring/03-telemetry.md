@@ -70,7 +70,7 @@ const provider = {
 };
 ```
 
-For more flexibility methods [Tracer.startActiveSpan](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Tracer.html#startActiveSpan) and [Tracer.startSpan](https://open-telemetry.github.io/opentelemetry-js/interfaces/_opentelemetry_api.Tracer.html#startSpan) is available.
+For more flexibility methods [ProxyTracer.startActiveSpan](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api._opentelemetry_api.ProxyTracer.html#startactivespan) and [ProxyTracer.startSpan](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_api._opentelemetry_api.ProxyTracer.html#startspan) is available.
 
 `Tracer.trace` and other span creation methods calls can be nested, with [automatic](https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks) context propagation.
 
@@ -214,6 +214,6 @@ In a browser context, `spanId` and `traceId` properties is not added to client l
 
 ## Debug and testing
 
-By default, in `development` mode [ConsoleSpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.ConsoleSpanExporter.html) is used, which prints all spans to the console.
+By default, in `development` mode [ConsoleSpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk-trace-base.ConsoleSpanExporter.html) is used, which prints all spans to the console.
 
-For testing purposes, you can use [InMemorySpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.InMemorySpanExporter.html).
+For testing purposes, you can use [InMemorySpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk-trace-base.InMemorySpanExporter.html).
