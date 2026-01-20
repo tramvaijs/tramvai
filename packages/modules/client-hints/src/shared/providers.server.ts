@@ -4,10 +4,12 @@ import { commandLineListTokens } from '@tramvai/core';
 import { CONTEXT_TOKEN } from '@tramvai/tokens-common';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/tokens-cookie';
 import { readMediaCommand } from '../server/readMedia';
+import { serverUserLanguageProvider } from '../server/language';
 import { commonProviders } from './providers';
 
 export const serverProviders: Provider[] = [
   ...commonProviders,
+  serverUserLanguageProvider,
   provide({
     provide: commandLineListTokens.resolveUserDeps,
     multi: true,

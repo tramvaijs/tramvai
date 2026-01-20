@@ -1,0 +1,31 @@
+{
+  "name": "i18n",
+  "version": "0.0.0-stub",
+  "private": true,
+  "scripts": {
+    "start": "tramvai start i18n --debug",
+    "start:prod": "tramvai start-prod i18n",
+    "build": "tramvai build i18n"
+  },
+  "devDependencies": {
+    "@tramvai/cli": "0.0.0-stub"
+  },
+  "dependencies": {
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-client-hints": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/module-error-interceptor": "0.0.0-stub",
+    "@tramvai/module-i18n": "0.0.0-stub",
+    "@tramvai/module-render": "0.0.0-stub",
+    "@tramvai/module-router": "0.0.0-stub",
+    "@tramvai/module-seo": "0.0.0-stub",
+    "@tramvai/module-server": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "react": "19.0.1",
+    "react-dom": "19.0.1",
+    "tslib": "^2.4.0"
+  }
+}

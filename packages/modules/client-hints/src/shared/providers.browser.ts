@@ -4,6 +4,7 @@ import { commandLineListTokens } from '@tramvai/core';
 import { CONTEXT_TOKEN, STORE_TOKEN } from '@tramvai/tokens-common';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/tokens-cookie';
 import { matchMediaCommand } from '../browser/matchMedia';
+import { browserUserLanguageProvider } from '../browser/language';
 import { USER_AGENT_TOKEN } from '../tokens';
 import { UserAgentStore } from './stores/userAgent';
 
@@ -11,6 +12,7 @@ import { commonProviders } from './providers';
 
 export const browserProviders: Provider[] = [
   ...commonProviders,
+  browserUserLanguageProvider,
   provide({
     provide: commandLineListTokens.clear,
     multi: true,

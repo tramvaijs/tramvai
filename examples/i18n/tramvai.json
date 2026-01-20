@@ -1,0 +1,26 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "analytics": {
+    "enabled": false
+  },
+  "projects": {
+    "i18n": {
+      "name": "i18n",
+      "root": "src",
+      "type": "application",
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc"
+        }
+      }
+    }
+  }
+}
