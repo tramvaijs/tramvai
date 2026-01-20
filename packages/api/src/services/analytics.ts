@@ -73,9 +73,13 @@ export type SystemProperties = {
   };
 };
 
+export type TranspilationType = 'custom' | 'all' | 'none' | 'only-modern';
+
 export type FeaturesProperties = {
   swc?: boolean;
   fileSystemRouting?: boolean;
+  lightningCss?: boolean;
+  selectiveTranspilation?: TranspilationType;
   reactCompiler?: boolean;
   devTools?: boolean;
   moduleImage?: boolean;

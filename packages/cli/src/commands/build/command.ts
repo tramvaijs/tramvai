@@ -92,7 +92,11 @@ class BuildCommand extends CLICommand<Params> {
       command: 'build',
       parameters,
       project: getProjectProperties({ parameters, configManager: this.context.config }),
-      features: getFeaturesProperties({ parameters, configManager: this.context.config }),
+      features: getFeaturesProperties({
+        parameters,
+        configManager: this.context.config,
+        env: 'production',
+      }),
     });
 
     // used require for lazy code execution
