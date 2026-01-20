@@ -185,7 +185,7 @@ async function runWebpackDevServer() {
   });
 
   const devMiddleware = webpackDevMiddleware(compiler, {
-    writeToDisk: false,
+    writeToDisk: config.writeToDisk,
     publicPath: resolvePublicPathDirectory(
       target === 'server' ? config.outputServer : config.outputClient
     ),

@@ -1381,23 +1381,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@10840": {
+                              "__@match@10841": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@10842": {
+                              "__@replace@10843": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@10845": {
+                              "__@search@10846": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@10847": {
+                              "__@split@10848": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@10849": {
+                              "__@matchAll@10850": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -1422,6 +1422,11 @@
                       }
                     },
                     "additionalProperties": false
+                  },
+                  "writeToDisk": {
+                    "title": "Configure webpack dev server writeToDisk option",
+                    "default": false,
+                    "type": "boolean"
                   },
                   "devtool": {
                     "title": "Use the specified type of source maps for building in development mode",
@@ -2255,23 +2260,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@10840": {
+                                "__@match@10841": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@10842": {
+                                "__@replace@10843": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@10845": {
+                                "__@search@10846": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@10847": {
+                                "__@split@10848": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@10849": {
+                                "__@matchAll@10850": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -2296,6 +2301,11 @@
                         }
                       },
                       "additionalProperties": false
+                    },
+                    "writeToDisk": {
+                      "title": "Configure webpack dev server writeToDisk option",
+                      "default": false,
+                      "type": "boolean"
                     },
                     "devtool": {
                       "title": "Use the specified type of source maps for building in development mode",
@@ -3129,23 +3139,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@10840": {
+                                  "__@match@10841": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@10842": {
+                                  "__@replace@10843": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@10845": {
+                                  "__@search@10846": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@10847": {
+                                  "__@split@10848": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@10849": {
+                                  "__@matchAll@10850": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
@@ -3170,6 +3180,11 @@
                           }
                         },
                         "additionalProperties": false
+                      },
+                      "writeToDisk": {
+                        "title": "Configure webpack dev server writeToDisk option",
+                        "default": false,
+                        "type": "boolean"
                       },
                       "devtool": {
                         "title": "Use the specified type of source maps for building in development mode",
