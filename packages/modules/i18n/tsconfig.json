@@ -1,0 +1,47 @@
+{
+    "extends": "../../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true
+    },
+    "references": [
+        {
+            "path": "../../tramvai/core"
+        },
+        {
+            "path": "../../libs/dippy"
+        },
+        {
+            "path": "../../tokens/common"
+        },
+        {
+            "path": "../../tramvai/state"
+        },
+        {
+            "path": "../client-hints"
+        },
+        {
+            "path": "../../tokens/cookie"
+        },
+        {
+            "path": "../../tokens/router"
+        },
+        {
+            "path": "../../tokens/render"
+        },
+        {
+            "path": "../../libs/url"
+        },
+        {
+            "path": "../../libs/errors"
+        },
+        {
+            "path": "../../tramvai/react"
+        }
+    ]
+}

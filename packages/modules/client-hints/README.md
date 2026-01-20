@@ -225,7 +225,7 @@ const App = () => {
 
 Object as a result of parsing user-agent headers or string with [@tinkoff/user-agent](../libs/user-agent.md). Parsing happens only on server-side and parsed info is reused on client-side. If header info is unavailable then takes user-agent and parse it with ua-parser-js lib.
 
-### Example of usage
+#### Example
 
 Here userAgent is used to determine the mobile device.
 
@@ -259,6 +259,23 @@ export const IS_MOBILE_BANNER = createToken<boolean>('IS_MOBILE_BANNER');
 })
 export class BannerModule {}
 ```
+
+### `USER_LANGUAGE_TOKEN`:
+
+`USER_LANGUAGE_TOKEN` is responsible for determining the user's preferred languages based on this algorithm:
+
+- **Server:** Parses `Accept-Language` header from the HTTP request
+- **Client:** Reads `navigator.languages` array
+
+Example `Accept-Language` header:
+
+```
+Accept-Language: en-US,en;q=0.9,ru;q=0.8
+```
+
+Parsed to: `['en-US', 'en', 'ru']`
+
+The language detection algorithm checks these values against `availableLanguages` to find the best match.
 
 ## Env variables
 

@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-i18n",
+  "sourceRoot": "packages/modules/i18n/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/i18n/package.json",
+        "packages/modules/i18n/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@tramvai/module-i18n",
+  "version": "0.0.0-stub",
+  "description": "Internationalization (i18n) module for Tramvai",
+  "main": "lib/server.js",
+  "module": "lib/server.es.js",
+  "browser": "lib/browser.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@tinkoff/errors": "0.0.0-stub",
+    "@tinkoff/url": "0.0.0-stub",
+    "@tramvai/module-client-hints": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-cookie": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub"
+  },
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/logger": "^0.10.507",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  },
+  "license": "Apache-2.0"
+}

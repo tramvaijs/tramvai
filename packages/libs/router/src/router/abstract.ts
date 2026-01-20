@@ -22,6 +22,7 @@ import {
   HistoryOptions,
   RouterPlugin,
   BackNavigationType,
+  NavigationRoute,
 } from '../types';
 import type { History } from '../history/base';
 import type { RouteTree } from '../tree/tree';
@@ -94,6 +95,14 @@ export abstract class AbstractRouter {
   >;
 
   public readonly syncHooks: Map<SyncHookName, SyncTapableHookInstance<{ navigation: Navigation }>>;
+
+  public readonly internalHooks: {
+    'router:resolve-route': SyncTapableHookInstance<
+      Parameters<AbstractRouter['_resolveRoute']>,
+      NavigationRoute | undefined
+    >;
+    'router:resolve-url': SyncTapableHookInstance<NavigateOptions, Url>;
+  };
 
   public readonly navigateHook: AsyncTapableHookInstance<{
     navigateOptions: NavigateOptions | string;
@@ -215,6 +224,18 @@ export abstract class AbstractRouter {
     });
     this.blockHook.tapPromise('router', async (_, { navigation }) => {
       await this.onBlock?.(navigation);
+    });
+
+    this.internalHooks = {
+      'router:resolve-route': this.hooksFactory.createSync('router:resolve-route'),
+      'router:resolve-url': this.hooksFactory.createSync('router:resolve-url'),
+    };
+
+    this.internalHooks['router:resolve-route'].tap('router', (_, args) => {
+      return this._resolveRoute(...args);
+    });
+    this.internalHooks['router:resolve-url'].tap('router', (_, navigation) => {
+      return this._resolveUrl(navigation);
     });
 
     this.plugins.forEach((plugin) => {
@@ -511,64 +532,12 @@ export abstract class AbstractRouter {
     return normalized;
   }
 
-  protected resolveUrl({ url, query = {}, params, preserveQuery, hash }: NavigateOptions) {
-    const currentRoute = this.getCurrentRoute();
-    const currentUrl = this.getCurrentUrl();
-
-    const resultUrl = url ? rawResolveUrl(currentUrl?.href ?? '', url) : rawParse(currentUrl.href);
-
-    let { pathname } = resultUrl;
-
-    if (params) {
-      if (url) {
-        pathname = makePath(resultUrl.pathname, params);
-      } else if (currentRoute) {
-        pathname = makePath(currentRoute.path, { ...currentRoute.params, ...params });
-      }
-    }
-
-    if (isSameHost(resultUrl)) {
-      pathname = this.normalizePathname(pathname);
-    }
-
-    return convertRawUrl(
-      rawAssignUrl(resultUrl, {
-        pathname,
-        search: url ? resultUrl.search : '',
-        query: {
-          ...(preserveQuery ? this.getCurrentUrl().query : {}),
-          ...query,
-        },
-        hash: hash ?? resultUrl.hash,
-      })
-    );
+  protected resolveUrl(navigation: NavigateOptions) {
+    return this.internalHooks['router:resolve-url'].call(navigation);
   }
 
-  protected resolveRoute(
-    { url, params, navigateState }: { url?: Url; params?: Params; navigateState?: any },
-    { wildcard }: { wildcard?: boolean } = {}
-  ) {
-    let route = url ? this.tree?.getRoute(url.pathname) : this.getCurrentRoute();
-
-    if (wildcard && !route && url) {
-      // if ordinary route not found look for a wildcard route
-      route = this.tree?.getWildcard(url.pathname);
-    }
-
-    if (!route) {
-      return;
-    }
-
-    // if condition is true route data not changed, so no need to create new reference for route object
-    if (!params && navigateState === route.navigateState) {
-      return route;
-    }
-
-    return {
-      ...route,
-      params: { ...route.params, ...params },
-      navigateState,
-    };
+  protected resolveRoute(...args: Parameters<AbstractRouter['_resolveRoute']>) {
+    return this.internalHooks['router:resolve-route'].call(args);
   }
 
   protected async runGuards(navigation: Navigation) {
@@ -693,5 +662,65 @@ export abstract class AbstractRouter {
 
   private uuid() {
     return this.currentUuid++;
+  }
+
+  protected _resolveUrl({ url, query = {}, params, preserveQuery, hash }: NavigateOptions) {
+    const currentRoute = this.getCurrentRoute();
+    const currentUrl = this.getCurrentUrl();
+
+    const resultUrl = url ? rawResolveUrl(currentUrl?.href ?? '', url) : rawParse(currentUrl.href);
+
+    let { pathname } = resultUrl;
+
+    if (params) {
+      if (url) {
+        pathname = makePath(resultUrl.pathname, params);
+      } else if (currentRoute) {
+        pathname = makePath(currentRoute.path, { ...currentRoute.params, ...params });
+      }
+    }
+
+    if (isSameHost(resultUrl)) {
+      pathname = this.normalizePathname(pathname);
+    }
+
+    return convertRawUrl(
+      rawAssignUrl(resultUrl, {
+        pathname,
+        search: url ? resultUrl.search : '',
+        query: {
+          ...(preserveQuery ? this.getCurrentUrl().query : {}),
+          ...query,
+        },
+        hash: hash ?? resultUrl.hash,
+      })
+    );
+  }
+
+  protected _resolveRoute(
+    { url, params, navigateState }: { url?: Url; params?: Params; navigateState?: any },
+    { wildcard }: { wildcard?: boolean } = {}
+  ) {
+    let route = url ? this.tree?.getRoute(url.pathname) : this.getCurrentRoute();
+
+    if (wildcard && !route && url) {
+      // if ordinary route not found look for a wildcard route
+      route = this.tree?.getWildcard(url.pathname);
+    }
+
+    if (!route) {
+      return;
+    }
+
+    // if condition is true route data not changed, so no need to create new reference for route object
+    if (!params && navigateState === route.navigateState) {
+      return route;
+    }
+
+    return {
+      ...route,
+      params: { ...route.params, ...params },
+      navigateState,
+    };
   }
 }
