@@ -1,7 +1,7 @@
 import type { PageComponent } from '@tramvai/react';
 
 export const SecondPage: PageComponent = () => {
-  return <div>Main Page</div>;
+  return <div>Second Page</div>;
 };
 
 export default SecondPage;

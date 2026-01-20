@@ -218,26 +218,7 @@ export class Router extends ClientRouter {
   }
 
   private async flattenDelayedNavigation(navigation: Navigation) {
-    const flatten = async (nav: Navigation) => {
-      await this.resolveIfDelayFound(super.run(nav));
-
-      // if new navigation has been called while this navigation lasts
-      // call new navigation execution
-      if (this.delayedNavigation) {
-        const { delayedNavigation } = this;
-
-        logger.info({
-          event: 'delay-navigation-run',
-          navigation: delayedNavigation,
-        });
-
-        this.delayedNavigation = null;
-
-        return flatten(delayedNavigation);
-      }
-    };
-
-    return flatten(navigation)
+    return this._flatten(navigation)
       .then(
         () => {
           this.delayedResolve?.();
@@ -357,6 +338,25 @@ export class Router extends ClientRouter {
     if (!navigation || navigation === this.currentNavigation) {
       this.currentNavigation.skipped = true;
       this.currentNavigation = null;
+    }
+  }
+
+  private async _flatten(nav: Navigation) {
+    await this.resolveIfDelayFound(super.run(nav));
+
+    // if new navigation has been called while this navigation lasts
+    // call new navigation execution
+    if (this.delayedNavigation) {
+      const { delayedNavigation } = this;
+
+      logger.info({
+        event: 'delay-navigation-run',
+        navigation: delayedNavigation,
+      });
+
+      this.delayedNavigation = null;
+
+      return this._flatten(delayedNavigation);
     }
   }
 }

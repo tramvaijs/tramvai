@@ -35,5 +35,14 @@
     "react-compiler-runtime": "^19.0.0-beta-decd7b8-20250118",
     "react-dom": "19.0.1",
     "tslib": "^2.4.0"
+  },
+  "browserslist": {
+    "node": [
+      "extends @tinkoff/browserslist-config"
+    ],
+    "defaults": [
+      "extends @tinkoff/browserslist-config",
+      "chrome > 27"
+    ]
   }
 }
