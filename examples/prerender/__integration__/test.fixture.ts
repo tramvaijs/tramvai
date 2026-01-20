@@ -1,6 +1,8 @@
 import path from 'path';
 import { test as base } from '@playwright/test';
 import { buildAllureTree } from '@tramvai/internal-test-utils/fixtures/build-allure-tree';
+import { TramvaiFixture } from '@tramvai/internal-test-utils/fixtures/tramvai';
+import type { ModuleTramvai } from '@tramvai/internal-test-utils/fixtures/tramvai';
 import type { BuildAppTypes } from '@tramvai/test-pw';
 import { appServerFixture, buildAppFixture } from '@tramvai/test-pw';
 
@@ -9,6 +11,7 @@ const rootDir = path.resolve(__dirname, '..');
 type TestFixture = {
   buildAllureTree: void;
   appServer: BuildAppTypes.AppServer;
+  tramvai: ModuleTramvai;
 };
 
 type WorkerFixture = {
@@ -46,4 +49,5 @@ export const test = base.extend<TestFixture, WorkerFixture>({
     },
     { scope: 'worker', auto: true, option: true },
   ],
+  tramvai: TramvaiFixture,
 });
