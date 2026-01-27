@@ -77,14 +77,6 @@ export class ActionPageRunner {
               });
 
               if (stopRunAtError(error)) {
-                if (process.env.NODE_ENV === 'development') {
-                  if (this.isChildAppRunner) {
-                    // eslint-disable-next-line no-console
-                    console.error(
-                      `Throwing error ${error.errorName} is not supported in Child Apps, host application command line will not be aborted!`
-                    );
-                  }
-                }
                 throw error;
               }
             });

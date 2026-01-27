@@ -97,4 +97,18 @@ export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
       bundle: 'contracts',
     },
   },
+  {
+    name: 'redirect',
+    path: '/redirect',
+    config: {
+      bundle: 'redirect',
+    },
+  },
+  {
+    name: 'not-found',
+    path: '/not-found',
+    config: {
+      bundle: 'not-found',
+    },
+  },
 ];

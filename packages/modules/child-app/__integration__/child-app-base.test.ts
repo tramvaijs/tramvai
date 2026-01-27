@@ -54,13 +54,22 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
   let childAppReactQuery: PromiseType<ReturnType<typeof start>>;
   let childAppError: PromiseType<ReturnType<typeof start>>;
   let rootApp: PromiseType<ReturnType<typeof startCli>>;
+  let childAppRedirect: PromiseType<ReturnType<typeof start>>;
+  let childAppNotFound: PromiseType<ReturnType<typeof start>>;
 
   beforeAll(async () => {
     const { startChildApp } = await import(`./cross-version-tests/${childAppsVersion}/cli`);
 
     await outputFile(REFRESH_CMP_PATH, REFRESH_CMP_CONTENT_START);
 
-    [childAppBase, childAppRouter, childAppError, childAppReactQuery] = await Promise.all([
+    [
+      childAppBase,
+      childAppRouter,
+      childAppError,
+      childAppReactQuery,
+      childAppRedirect,
+      childAppNotFound,
+    ] = await Promise.all([
       startChildApp('base'),
       startChildApp('router'),
       startChildApp('error'),
@@ -69,6 +78,8 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
           deps: ['@tramvai/react-query', '@tramvai/module-react-query'],
         },
       }),
+      startChildApp('redirect'),
+      startChildApp('not-found'),
     ]);
   });
 
@@ -103,6 +114,12 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
           // imitate long loading for child-app files
           await new Promise((resolve) => setTimeout(resolve, 2000));
           return reply.from(`${getStaticUrl(childAppRouter)}/router/${filename}`);
+
+        case 'redirect':
+          return reply.from(`${getStaticUrl(childAppRedirect)}/redirect/${filename}`);
+
+        case 'not-found':
+          return reply.from(`${getStaticUrl(childAppNotFound)}/not-found/${filename}`);
 
         case 'react-query':
           return reply.from(`${getStaticUrl(childAppReactQuery)}/react-query/${filename}`);
@@ -139,6 +156,8 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
       childAppRouter.close(),
       childAppReactQuery.close(),
       childAppError.close(),
+      childAppRedirect.close(),
+      childAppNotFound.close(),
       rootApp.close(),
     ]);
   });
@@ -325,6 +344,20 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
 
       expect(reactQueryAssets).toHaveLength(router.prefetchScriptsCount);
     });
+
+    if (rootAppVersion === 'latest') {
+      it('should successfully redirect from child app', async () => {
+        const { request } = rootApp;
+
+        await request('/redirect/').expect(301).expect('Location', '/base/');
+      });
+
+      it('should successfully response 404 from child app', async () => {
+        const { request } = rootApp;
+
+        await request('/not-found/').expect(404);
+      });
+    }
 
     if (router.nonBlockingSpa) {
       it('should not block spa navigations with child-app preload', async () => {

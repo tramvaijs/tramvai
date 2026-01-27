@@ -1,6 +1,7 @@
 import { isSilentError } from '@tinkoff/errors';
 import type { CommandLineDescription, CommandLines } from '@tramvai/core';
 import { COMMAND_LINE_RUNNER_TOKEN, provide } from '@tramvai/core';
+import { stopRunAtError } from '@tramvai/module-router';
 import type {
   ChildAppCommandLineRunner,
   ChildAppDiManager,
@@ -88,16 +89,21 @@ export class CommandLineRunner implements ChildAppCommandLineRunner {
       }
     } catch (error: any) {
       if (error.code !== 'E_STUB') {
-        this.log[
-          // for example, we don't need to log Child App run as failed in case of RedirectFoundError
-          isSilentError(error) || (error.reason && isSilentError(error.reason)) ? 'debug' : 'error'
-        ]({
-          event: 'run-failed',
-          error,
-          type,
-          status,
-          childApp: { name: config.name, version: config.version, tag: config.tag },
-        });
+        if (stopRunAtError(error)) {
+          throw error;
+        } else {
+          this.log[
+            isSilentError(error) || (error.reason && isSilentError(error.reason))
+              ? 'debug'
+              : 'error'
+          ]({
+            event: 'run-failed',
+            error,
+            type,
+            status,
+            childApp: { name: config.name, version: config.version, tag: config.tag },
+          });
+        }
       }
     }
   }

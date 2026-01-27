@@ -203,14 +203,6 @@ Also, the necessary network accesses may not be present.`,
               .catch((error) => {
                 const isStopCommandLineError = stopRunAtError(error);
 
-                if (process.env.NODE_ENV === 'development') {
-                  if (isStopCommandLineError && this.isChildAppRunner) {
-                    console.error(
-                      `Throwing error ${error.errorName} is not supported in Child Apps, host application command line will not be aborted!`
-                    );
-                  }
-                }
-
                 const parameters = isTramvaiAction(action) ? action : action[ACTION_PARAMETERS];
 
                 this.log[isSilentError(error) ? 'info' : 'error']({
