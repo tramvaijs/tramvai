@@ -1,6 +1,7 @@
 import type { Route } from '@tinkoff/router';
 import type { ExtractDependencyType, Provider } from '@tramvai/core';
 import { commandLineListTokens, provide } from '@tramvai/core';
+import { stopRunAtError } from '@tramvai/module-router';
 import { resolveLazyComponent } from '@tramvai/react';
 import type { ChildAppRequestConfig } from '@tramvai/tokens-child-app';
 import {
@@ -37,8 +38,10 @@ const pagePreload = async (
         preloadManager.saveNotPreloadedForSpaNavigation(request);
       }
 
-      return preloadManager[mode](request, route).catch(() => {
-        // actual error will be logged internally
+      return preloadManager[mode](request, route).catch((error) => {
+        if (stopRunAtError(error)) {
+          throw error;
+        }
       });
     })
   );

@@ -60,6 +60,9 @@
         },
         {
             "path": "../../libs/errors"
+        },
+        {
+            "path": "../router"
         }
     ]
 }

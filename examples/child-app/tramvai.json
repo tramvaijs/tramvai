@@ -94,6 +94,16 @@
       "name": "contracts",
       "root": "child-apps/contracts",
       "type": "child-app"
+    },
+    "redirect": {
+      "name": "redirect",
+      "root": "child-apps/redirect",
+      "type": "child-app"
+    },
+    "not-found": {
+      "name": "not-found",
+      "root": "child-apps/not-found",
+      "type": "child-app"
     }
   }
 }

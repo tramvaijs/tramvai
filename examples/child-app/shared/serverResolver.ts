@@ -14,6 +14,8 @@ const portMapping = {
   state: 4048,
   loadable: 4049,
   contracts: 4050,
+  redirect: 4051,
+  'not-found': 4052,
 };
 
 const cliStarts: Array<ReturnType<typeof start>> = [];

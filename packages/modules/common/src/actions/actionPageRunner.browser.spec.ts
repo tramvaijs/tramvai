@@ -106,7 +106,7 @@ describe('actionPageRunnerBrowser', () => {
         });
     });
 
-    it('При кастомных обработка ошибка раннер падает', async () => {
+    it('При кастомной обработке ошибок раннер падает', async () => {
       const store: any = { getState: () => ({}), dispatch: () => {} };
       const executionContextManager = new ExecutionContextManager();
       const instanceExecution = new ActionExecution({

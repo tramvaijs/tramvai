@@ -84,6 +84,8 @@ createApp({
     loadable: () => import(/* webpackChunkName: "loadable" */ './bundles/loadable'),
     contracts: () => import(/* webpackChunkName: "contracts" */ './bundles/contracts'),
     monitoring: () => import(/* webpackChunkName: "monitoring" */ './bundles/monitoring'),
+    redirect: () => import(/* webpackChunkName: "redirect" */ './bundles/redirect'),
+    'not-found': () => import(/* webpackChunkName: "not-found" */ './bundles/not-found'),
   },
   modules: [
     CommonModule,
@@ -414,6 +416,24 @@ createApp({
         },
         {
           name: 'contracts',
+          byTag: {
+            latest: {
+              version: '0.0.0-stub',
+              withoutCss: true,
+            },
+          },
+        },
+        {
+          name: 'redirect',
+          byTag: {
+            latest: {
+              version: '0.0.0-stub',
+              withoutCss: true,
+            },
+          },
+        },
+        {
+          name: 'not-found',
           byTag: {
             latest: {
               version: '0.0.0-stub',
