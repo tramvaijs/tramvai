@@ -1,4 +1,8 @@
-import { FeaturesProperties, ProjectProperties } from '@tramvai/api/lib/services/analytics';
+import {
+  FeaturesProperties,
+  ProjectProperties,
+  TranspilationType,
+} from '@tramvai/api/lib/services/analytics';
 import { ConfigEntry } from '../../typings/configEntry/common';
 import { ConfigManager } from '../config';
 import { ApplicationConfigEntry, ChildAppConfigEntry } from '../../api';
@@ -46,9 +50,11 @@ export function getProjectProperties({
 export function getFeaturesProperties({
   parameters,
   configManager,
+  env,
 }: {
   parameters: { target?: string; experimentalWebpackWorkerThreads?: boolean };
   configManager: ConfigManager;
+  env: 'development' | 'production';
 }): FeaturesProperties {
   const projectName = parameters.target ?? 'unknown';
   let project: ConfigEntry;
@@ -68,14 +74,20 @@ export function getFeaturesProperties({
   if (project) {
     if (project.type === 'application') {
       const applicationProject = project as ApplicationConfigEntry;
-      const transpilationLoader = applicationProject.experiments?.transpilation?.loader;
+      const transpilationOptions = applicationProject.experiments?.transpilation;
+      const transpilationLoader = transpilationOptions?.loader;
 
       featuresCache[projectName].swc =
         // @ts-expect-error incorrect branded type
-        (transpilationLoader === 'swc' ||
-          transpilationLoader?.development === 'swc' ||
-          transpilationLoader?.production === 'swc') ??
-        false;
+        (transpilationLoader === 'swc' || transpilationLoader?.[env] === 'swc') ?? false;
+
+      featuresCache[projectName].lightningCss =
+        applicationProject.experiments.lightningcss ?? false;
+
+      featuresCache[projectName].selectiveTranspilation = getTranspilationType(
+        transpilationOptions?.include,
+        env
+      );
 
       featuresCache[projectName].fileSystemRouting =
         applicationProject.fileSystemPages?.enabled ?? false;
@@ -112,10 +124,7 @@ export function getFeaturesProperties({
 
       featuresCache[projectName].swc =
         // @ts-expect-error incorrect branded type
-        (transpilationLoader === 'swc' ||
-          transpilationLoader?.development === 'swc' ||
-          transpilationLoader?.production === 'swc') ??
-        false;
+        (transpilationLoader === 'swc' || transpilationLoader?.[env] === 'swc') ?? false;
 
       featuresCache[projectName].reactCompiler =
         !!childAppProject.experiments?.reactCompiler ?? false;
@@ -123,4 +132,16 @@ export function getFeaturesProperties({
   }
 
   return featuresCache[projectName];
+}
+
+function getTranspilationType(include, env?: 'development' | 'production'): TranspilationType {
+  if (Array.isArray(include)) {
+    return 'custom';
+  }
+
+  if (env && include[env]) {
+    return getTranspilationType(include[env]);
+  }
+
+  return include;
 }

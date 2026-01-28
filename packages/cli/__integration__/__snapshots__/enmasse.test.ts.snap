@@ -478,9 +478,11 @@ exports[`enmasse test react-app platform build react-app: monitoring 1`] = `
         "features": {
           "devTools": true,
           "fileSystemRouting": false,
+          "lightningCss": false,
           "moduleImage": true,
           "modulePwa": true,
           "reactCompiler": false,
+          "selectiveTranspilation": "only-modern",
           "swc": false,
           "transitionsRouterProvider": false,
           "viewTransitions": false,

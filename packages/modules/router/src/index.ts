@@ -14,6 +14,7 @@ export { routerForRoot, generateForRoot } from './modules/utils/forRoot';
 export * from './stores/RouterStore';
 export * from './stores/PageErrorStore';
 export * from './hooks/usePageService';
+export { stopRunAtError } from './modules/utils/stopRunAtError';
 export {
   onChangeHooksToken,
   beforeNavigateHooksToken,

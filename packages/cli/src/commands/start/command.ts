@@ -158,7 +158,11 @@ export class StartCommand extends CLICommand<Params> {
       command: 'start',
       parameters,
       project: getProjectProperties({ parameters, configManager: this.context.config }),
-      features: getFeaturesProperties({ parameters, configManager: this.context.config }),
+      features: getFeaturesProperties({
+        parameters,
+        configManager: this.context.config,
+        env: 'development',
+      }),
     });
 
     // used require for lazy code execution
