@@ -98,4 +98,15 @@ describe('initContainer', () => {
 
     expect(di.get(token)).toBe('provider log');
   });
+
+  it('show deprecation warning', () => {
+    const logSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    initContainer();
+
+    expect(logSpy).toHaveBeenCalledWith(
+      'initContainer is deprecated, use Container constructor instead',
+      'example: new Container({ modules, providers })'
+    );
+  });
 });

@@ -1,6 +1,7 @@
 /* eslint-disable jest/no-conditional-expect */
 import { Container } from './Container';
 import { createToken, optional } from './createToken/createToken';
+import { Module } from './modules/module';
 
 describe('DI Container', () => {
   it('Использование useValue провайдеров', () => {
@@ -771,6 +772,265 @@ describe('DI Container', () => {
       // "dep" exists and value is unique
       expect(container.get('dep')[0]).not.toBe(from.get('dep')[0]);
       expect(container.get('dep')[1]).not.toBe(from.get('dep')[0]);
+    });
+  });
+
+  describe('registerModule', () => {
+    it('modules resolved manually', () => {
+      const loggerToken = createToken('logger');
+      const dependencyToken = createToken('dependency');
+      const dependencyFn = jest.fn();
+
+      const LoggerModule = Module({
+        providers: [{ provide: loggerToken, useValue: 'log' }],
+        deps: { dependency: dependencyToken },
+      })(
+        class LoggerModule {
+          constructor({ dependency }) {
+            dependency();
+          }
+        }
+      );
+
+      const di = new Container([{ provide: dependencyToken, useValue: dependencyFn }]);
+
+      di.registerModules([LoggerModule]);
+
+      expect(di.get(loggerToken)).toBe('log');
+      expect(dependencyFn).toHaveBeenCalled();
+    });
+
+    it('imports', () => {
+      const loggerToken = createToken<string>('logger');
+
+      const LoggerModule = Module({
+        providers: [{ provide: loggerToken, useValue: 'log' }],
+      })(class LoggerModule {});
+
+      const AppModule = Module({
+        providers: [],
+        imports: [LoggerModule],
+      })(class AppModule {});
+
+      const di = new Container();
+
+      di.registerModules([AppModule]);
+
+      expect(di.get(loggerToken)).toBe('log');
+    });
+
+    it('register module with similar name log warning', () => {
+      const loggerToken = createToken('logger');
+      const logSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const LoggerModule = Module({
+        providers: [{ provide: loggerToken, useValue: 'log1' }],
+      })(class LoggerClass {});
+      const LoggerModule2 = Module({
+        providers: [{ provide: loggerToken, useValue: 'log2' }],
+      })(class LoggerClass {});
+
+      const di = new Container();
+
+      di.registerModules([LoggerModule]);
+      di.registerModules([LoggerModule2]);
+
+      expect(di.get(loggerToken)).toBe('log2');
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringContaining('has already been initialized'),
+        expect.anything(),
+        expect.anything()
+      );
+    });
+
+    it('register similar token', () => {
+      const container = new Container();
+
+      const A = createToken('A');
+
+      const FirstModule = Module({
+        providers: [{ provide: A, useValue: { a: 1 } }],
+      })(class FirstModule {});
+
+      const SecondModule = Module({
+        providers: [{ provide: A, useValue: { a: 2 } }],
+      })(class SecondModule {});
+
+      container.registerModules([FirstModule]);
+      container.registerModules([SecondModule]);
+
+      expect(container.get(A)).toEqual({ a: 2 });
+    });
+
+    it('register multi after use', () => {
+      const container = new Container();
+      const logSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+      const A = createToken('A');
+      const ValFromFirstModule = createToken('ValFromFirstModule');
+      const ValFromSecondModule = createToken('ValFromSecondModule');
+
+      const FirstModule = Module({
+        providers: [
+          { provide: ValFromFirstModule, useValue: 1 },
+          { provide: A, useValue: { a: 1 }, multi: true },
+          { provide: A, useValue: { b: 2 }, multi: true },
+        ],
+      })(class FirstModule {});
+
+      const SecondModule = Module({
+        providers: [
+          { provide: ValFromSecondModule, useValue: 2 },
+          { provide: A, useValue: { c: 3 }, multi: true },
+        ],
+      })(class SecondModule {});
+
+      container.registerModules([FirstModule]);
+
+      expect(container.get(A)).toEqual([{ a: 1 }, { b: 2 }]);
+      expect(logSpy).not.toHaveBeenCalledWith(
+        'multi provider "A" is already in use, but attempt to register a new was detected after this'
+      );
+
+      container.registerModules([SecondModule]);
+
+      expect(container.get(A)).toEqual([{ a: 1 }, { b: 2 }]);
+      expect(logSpy).toHaveBeenCalledWith(
+        'multi provider "A" is already in use, but attempt to register a new was detected after this'
+      );
+
+      // убедимся что остальные провайды зареганы у обоих модулей
+      expect(container.get(ValFromFirstModule)).toBe(1);
+      expect(container.get(ValFromSecondModule)).toBe(2);
+    });
+
+    it('register non-multi after use', () => {
+      const container = new Container();
+
+      const A = createToken('A');
+
+      const FirstModule = Module({
+        providers: [{ provide: A, useValue: { a: 1 } }],
+      })(class FirstModule {});
+
+      const SecondModule = Module({
+        providers: [{ provide: A, useValue: { a: 2 } }],
+      })(class SecondModule {});
+
+      container.registerModules([FirstModule]);
+
+      expect(container.get(A)).toEqual({ a: 1 });
+
+      container.registerModules([SecondModule]);
+
+      expect(container.get(A)).toEqual({ a: 2 });
+    });
+  });
+
+  describe('initialize', () => {
+    it('providers', () => {
+      const di = new Container();
+      const loggerToken = createToken('logger');
+
+      di.initialize({
+        providers: [
+          {
+            provide: loggerToken,
+            useValue: 'log',
+          },
+        ],
+      });
+
+      expect(di.get(loggerToken)).toBe('log');
+    });
+
+    it('modules', () => {
+      const di = new Container();
+      const loggerToken = createToken('logger');
+
+      const LoggerModule = Module({
+        providers: [{ provide: loggerToken, useValue: 'log' }],
+      })(class LoggerClass {});
+
+      di.initialize({ modules: [LoggerModule] });
+
+      expect(di.get(loggerToken)).toBe('log');
+    });
+
+    it('init providers before module resolve', () => {
+      const di = new Container();
+      const loggerToken = createToken('logger');
+      const fn = jest.fn();
+
+      const LoggerModule = Module({
+        providers: [],
+        deps: {
+          log: loggerToken,
+        },
+      })(
+        class LoggerClass {
+          constructor({ log }: { log: string }) {
+            fn(`call ${log}`);
+          }
+        }
+      );
+
+      di.initialize({
+        providers: [
+          {
+            provide: loggerToken,
+            useValue: 'log',
+          },
+        ],
+        modules: [LoggerModule],
+      });
+
+      expect(fn).toHaveBeenCalledWith('call log');
+    });
+  });
+
+  describe('constructor', () => {
+    it('initialProviders', () => {
+      const loggerToken = createToken('logger');
+      const di = new Container([
+        {
+          provide: loggerToken,
+          useValue: 'log',
+        },
+      ]);
+
+      expect(di.get(loggerToken)).toBe('log');
+    });
+
+    it('init providers before module resolve', () => {
+      const loggerToken = createToken('logger');
+      const fn = jest.fn();
+
+      const LoggerModule = Module({
+        providers: [],
+        deps: {
+          log: loggerToken,
+        },
+      })(
+        class LoggerClass {
+          constructor({ log }: { log: string }) {
+            fn(`call ${log}`);
+          }
+        }
+      );
+
+      const di = new Container({
+        providers: [
+          {
+            provide: loggerToken,
+            useValue: 'log',
+          },
+        ],
+        modules: [LoggerModule],
+      });
+
+      expect(fn).toHaveBeenCalledWith('call log');
+      expect(di.get(loggerToken)).toBe('log');
     });
   });
 });

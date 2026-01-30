@@ -1,11 +1,8 @@
-import { createContainer } from '../createContainer/createContainer';
-import { getModuleParameters } from '../modules/getModuleParameters';
-import { isExtendedModule } from '../modules/isExtendedModule';
-import { MODULE_PARAMETERS } from '../modules/module';
-import type { ExtendedModule, ModuleParameters, ModuleType } from '../modules/module.h';
-import { walkOfModules } from '../modules/walkOfModules';
+import { Container } from '../Container';
+import type { ExtendedModule, ModuleType } from '../modules/module.h';
 import type { Provider } from '../Provider';
 
+/** @deprecated use Container constructor instead */
 export const initContainer = ({
   modules = [],
   initialProviders = [],
@@ -15,43 +12,17 @@ export const initContainer = ({
   initialProviders?: Provider[];
   providers?: Provider[];
 } = {}) => {
-  const di = createContainer();
-  const modulesToResolve = new Set<ModuleType>();
+  if (process.env.NODE_ENV !== 'production') {
+    // eslint-disable-next-line no-console
+    console.warn(
+      'initContainer is deprecated, use Container constructor instead',
+      'example: new Container({ modules, providers })'
+    );
+  }
 
-  const walkOfProviders = (providersForWalk: Provider[]) => {
-    providersForWalk.forEach((provide) => {
-      di.register(provide);
-    });
-  };
+  const di = new Container(initialProviders);
 
-  const resolveModuleDeps = (module: ModuleType) => {
-    const { deps } = module[MODULE_PARAMETERS] as ModuleParameters;
-
-    if (deps) {
-      return di.getOfDeps(deps);
-    }
-  };
-
-  const resolveModules = () => {
-    modulesToResolve.forEach((ModuleToResolve) => {
-      // eslint-disable-next-line no-new
-      new ModuleToResolve(resolveModuleDeps(ModuleToResolve));
-    });
-  };
-
-  walkOfProviders(initialProviders);
-
-  walkOfModules(modules).forEach((mod) => {
-    const moduleParameters = getModuleParameters(mod);
-
-    modulesToResolve.add(isExtendedModule(mod) ? mod.mainModule : mod);
-
-    walkOfProviders(moduleParameters.providers);
-  });
-
-  walkOfProviders(providers);
-
-  resolveModules();
+  di.initialize({ providers, modules });
 
   return di;
 };

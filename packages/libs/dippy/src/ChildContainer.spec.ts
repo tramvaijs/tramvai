@@ -2,6 +2,7 @@ import { ChildContainer } from './ChildContainer';
 import { Container } from './Container';
 import { Scope } from './constant';
 import { createToken } from './createToken/createToken';
+import { Module } from './modules/module';
 
 describe('new ChildContainer', () => {
   it('Обработка создания child версий инстансов', () => {
@@ -635,5 +636,297 @@ describe('new ChildContainer, scoped tokens', () => {
       expect(childContainer.get(b)).toBe('root:root');
       expect(rootContainer.get(b)).toBe('root:root');
     });
+  });
+});
+
+describe('ChildContainer/registerModules', () => {
+  it('request провайдер корректно резолвится', () => {
+    const A = createToken('A');
+
+    const ModuleForRoot = Module({
+      providers: [{ provide: A, useValue: 'rootVal' }],
+    })(class ModuleForRoot {});
+
+    const ModuleForChild = Module({
+      providers: [{ provide: A, useValue: 'childVal' }],
+    })(class ModuleForChild {});
+
+    const rootContainer = new Container();
+    const childContainer = new ChildContainer(rootContainer);
+
+    rootContainer.registerModules([ModuleForRoot]);
+    expect(childContainer.get(A)).toBe('rootVal');
+
+    childContainer.registerModules([ModuleForChild]);
+    expect(childContainer.get(A)).toBe('childVal');
+  });
+
+  it('singleton провайдеры должны иметь доступ только к провайдерам из родительского контейнера', () => {
+    const calls: { name: string; de: string }[] = [];
+    const de = createToken<any>('de', { scope: Scope.SINGLETON });
+    const rootTest = createToken<any>('rootTest', { scope: Scope.SINGLETON });
+    const rootDelay = createToken<any>('rootDelay', { scope: Scope.SINGLETON });
+    const request = createToken<any>('request', { scope: Scope.REQUEST });
+
+    const ModuleForRoot = Module({
+      providers: [
+        {
+          provide: de,
+          scope: Scope.SINGLETON,
+          useFactory: () => {
+            return 'root';
+          },
+        },
+        {
+          provide: rootTest,
+          scope: Scope.SINGLETON,
+          useFactory: ({ de }) => {
+            calls.push({ name: 'rootTest', de });
+          },
+          deps: {
+            de,
+          },
+        },
+        {
+          provide: rootDelay,
+          useFactory: ({ de }) => {
+            calls.push({ name: 'rootDelay', de });
+          },
+          deps: {
+            de,
+          },
+        },
+        {
+          provide: request,
+          useFactory: ({ de, root }) => {
+            calls.push({ name: 'request', de });
+          },
+          deps: {
+            de,
+            root: rootDelay,
+          },
+        },
+      ],
+    })(class ModuleForRoot {});
+
+    const ModuleForChild = Module({
+      providers: [{ provide: de, scope: Scope.REQUEST, useFactory: () => 'child' }],
+    })(class ModuleForChild {});
+
+    const rootContainer = new Container();
+    const childContainer = new ChildContainer(rootContainer);
+
+    rootContainer.registerModules([ModuleForRoot]);
+    childContainer.registerModules([ModuleForChild]);
+
+    expect(rootContainer.get(de)).toBe('root');
+    expect(childContainer.get(de)).toBe('child');
+
+    rootContainer.get(rootTest);
+    childContainer.get(rootTest);
+    childContainer.get(request);
+
+    expect(calls).toEqual([
+      { name: 'rootTest', de: 'root' },
+      { name: 'rootDelay', de: 'root' },
+      { name: 'request', de: 'child' },
+    ]);
+  });
+
+  it('register multi after use', () => {
+    const rootContainer = new Container();
+    const logSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+    const A = createToken('A');
+    const ValFromFirstModule = createToken('ValFromFirstModule');
+    const ValFromSecondModule = createToken('ValFromSecondModule');
+
+    const FirstModule = Module({
+      providers: [
+        { provide: ValFromFirstModule, useValue: 1 },
+        { provide: A, useValue: { a: 1 }, multi: true },
+        { provide: A, useValue: { b: 2 }, multi: true },
+      ],
+    })(class FirstModule {});
+
+    const SecondModule = Module({
+      providers: [
+        { provide: ValFromSecondModule, useValue: 2 },
+        { provide: A, useValue: { c: 3 }, multi: true },
+      ],
+    })(class SecondModule {});
+
+    const container = new ChildContainer(rootContainer);
+
+    container.registerModules([FirstModule]);
+
+    expect(container.get(A)).toEqual([{ a: 1 }, { b: 2 }]);
+    expect(logSpy).not.toHaveBeenCalledWith(
+      'multi provider "A" is already in use, but attempt to register a new was detected after this'
+    );
+
+    container.registerModules([SecondModule]);
+
+    expect(container.get(A)).toEqual([{ a: 1 }, { b: 2 }]);
+    expect(logSpy).toHaveBeenCalledWith(
+      'multi provider "A" is already in use, but attempt to register a new was detected after this'
+    );
+
+    // убедимся что остальные провайды зареганы у обоих модулей
+    expect(container.get(ValFromFirstModule)).toBe(1);
+    expect(container.get(ValFromSecondModule)).toBe(2);
+  });
+
+  it('children инстансы и multi провайдеры резолвятся по одному разу', () => {
+    const result: string[] = [];
+
+    const TestModule = Module({
+      providers: [
+        {
+          provide: 'A',
+          useClass: class A {
+            constructor() {
+              result.push('create A');
+            }
+          },
+          multi: true,
+        },
+        {
+          provide: 'A',
+          useClass: class A2 {
+            constructor() {
+              result.push('create A2');
+            }
+          },
+          multi: true,
+        },
+      ],
+    })(class TestModule {});
+
+    const rootContainer = new Container();
+    const childContainer1 = new ChildContainer(rootContainer);
+    const childContainer2 = new ChildContainer(rootContainer);
+
+    rootContainer.registerModules([TestModule]);
+
+    childContainer1.get('A');
+    childContainer2.get('A');
+    childContainer1.get('A');
+    childContainer2.get('A');
+    childContainer1.get('A');
+    childContainer2.get('A');
+
+    expect(result).toEqual(['create A', 'create A2', 'create A', 'create A2']);
+
+    rootContainer.get('A');
+    expect(result).toEqual([
+      'create A',
+      'create A2',
+      'create A',
+      'create A2',
+      'create A',
+      'create A2',
+    ]);
+    rootContainer.get('A');
+    childContainer1.get('A');
+    childContainer2.get('A');
+    expect(result).toEqual([
+      'create A',
+      'create A2',
+      'create A',
+      'create A2',
+      'create A',
+      'create A2',
+    ]);
+  });
+
+  it('should override parent multi provider', () => {
+    const RootModule = Module({
+      providers: [
+        {
+          provide: 'b',
+          useFactory: ({ a }) => {
+            return `root:${a}`;
+          },
+          deps: {
+            a: 'a',
+          },
+        },
+        {
+          provide: 'a',
+          multi: true,
+          useValue: 'child',
+        },
+      ],
+    })(class RootModule {});
+    const SubRootdModule = Module({
+      providers: [
+        {
+          provide: 'a',
+          multi: true,
+          useValue: 'sub-child',
+        },
+        {
+          provide: 'b',
+          useFactory: ({ a }) => {
+            return `sub:${a}`;
+          },
+          deps: {
+            a: 'a',
+          },
+        },
+      ],
+    })(class SubRootdModule {});
+
+    const rootContainer = new Container();
+    const subRootContainer = new Container(undefined, rootContainer);
+
+    const childContainer = new ChildContainer(rootContainer);
+
+    const subChildContainer = new ChildContainer(subRootContainer, childContainer);
+
+    rootContainer.registerModules([RootModule]);
+    subRootContainer.registerModules([SubRootdModule]);
+
+    expect(subChildContainer.get('b')).toBe('sub:sub-child');
+    expect(childContainer.get('b')).toBe('root:child');
+  });
+
+  it('модули уже зареганные в руте не регистрируется еще раз в childContainer', () => {
+    const logSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const A = createToken('A');
+    const B = createToken('B');
+    const C = createToken('C');
+
+    const DepModule = Module({
+      providers: [{ provide: A, useValue: 'A' }],
+    })(class DepModule {});
+    const DepModule2 = Module({
+      providers: [
+        { provide: A, useValue: 'A2' },
+        { provide: C, useValue: 'C' },
+      ],
+    })(class DepModule {});
+
+    const MainModule = Module({
+      imports: [DepModule],
+      providers: [{ provide: B, useValue: 'B' }],
+    })(class MainModule {});
+
+    const rootContainer = new Container();
+    const childContainer = new ChildContainer(rootContainer);
+
+    rootContainer.registerModules([MainModule]);
+    expect(childContainer.get(A)).toBe('A');
+    expect(childContainer.get(B)).toBe('B');
+
+    childContainer.registerModules([DepModule2]);
+    expect(childContainer.get(A)).toBe('A2');
+    expect(childContainer.get(C)).toBe('C');
+    expect(logSpy).toHaveBeenCalledWith(
+      expect.stringContaining('has already been initialized'),
+      expect.anything(),
+      expect.anything()
+    );
   });
 });
