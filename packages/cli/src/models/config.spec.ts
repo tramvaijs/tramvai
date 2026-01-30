@@ -128,7 +128,9 @@ it('should populate defaults for config', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "application",
-          "webpack": {},
+          "webpack": {
+            "writeToDisk": false,
+          },
           "withModulesStats": false,
         },
         "child-app": {
@@ -187,7 +189,9 @@ it('should populate defaults for config', () => {
           },
           "transpileOnlyModernLibs": true,
           "type": "child-app",
-          "webpack": {},
+          "webpack": {
+            "writeToDisk": false,
+          },
         },
       },
     }
@@ -393,6 +397,7 @@ it('should populate defaults for overridable options', () => {
           "type": "application",
           "webpack": {
             "devtool": "eval-source-map",
+            "writeToDisk": false,
           },
           "withModulesStats": false,
         },
@@ -473,6 +478,7 @@ it('should populate defaults for overridable options', () => {
             "resolveAlias": {
               "stream": "browser-stream",
             },
+            "writeToDisk": false,
           },
         },
       },

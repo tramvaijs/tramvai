@@ -273,6 +273,11 @@ export interface CliConfigEntry extends ConfigEntry {
      */
     watchOptions?: Configuration['watchOptions'];
     /**
+     * @title Configure webpack dev server writeToDisk option
+     * @default false
+     */
+    writeToDisk?: boolean;
+    /**
      * @title Use the specified type of source maps for building in development mode
      */
     devtool:

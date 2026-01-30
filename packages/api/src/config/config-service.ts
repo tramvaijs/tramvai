@@ -297,6 +297,12 @@ export interface BaseProject {
   hotRefresh?: HotRefreshOptions;
 
   /**
+   * @title Configure webpack dev server writeToDisk option
+   * @default false
+   */
+  writeToDisk?: boolean;
+
+  /**
    * Image optimization options
    */
   imageOptimization?: {
@@ -812,6 +818,10 @@ export class ConfigService {
         ...this.#project.hotRefresh?.options,
       },
     };
+  }
+
+  get writeToDisk(): BaseProject['writeToDisk'] {
+    return this.#project.writeToDisk ?? false;
   }
 
   get imageOptimization() {

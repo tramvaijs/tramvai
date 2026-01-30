@@ -64,7 +64,9 @@ export const createDevServer = ({
       next();
     });
 
-    const devMiddleware = webpackDevMiddleware(compiler);
+    const devMiddleware = webpackDevMiddleware(compiler, {
+      writeToDisk: configManager.webpack.writeToDisk ?? false,
+    });
 
     app.use(getPrefix(configManager), devMiddleware);
 

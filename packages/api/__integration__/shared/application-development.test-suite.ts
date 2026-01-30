@@ -354,6 +354,15 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
+    'app-write-to-disk': {
+      name: 'app-assets',
+      type: 'application',
+      writeToDisk: true,
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
+    },
     'app-cache': {
       name: 'app-cache',
       type: 'application',
@@ -2230,6 +2239,40 @@ export default Cmp;`,
             );
 
             test.expect(cacheFiles.length).toBe(2);
+          });
+        });
+
+        test.describe('app-write-to-disk', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-write-to-disk',
+              rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
+              fileCache: true,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test.beforeEach(async () => {
+            await fs.promises.rm(path.resolve(__dirname, `../webpack-${transpiler}/dist`), {
+              recursive: true,
+              force: true,
+            });
+          });
+
+          test('devServer: should write assets to disk', async ({ devServer }) => {
+            await devServer.buildPromise;
+            await devServer.close();
+
+            const assetsPath = await fs.readdirSync(
+              path.resolve(__dirname, `../webpack-${transpiler}/dist`)
+            );
+
+            test.expect(assetsPath).toEqual(['client', 'server']);
           });
         });
 

@@ -157,7 +157,9 @@ describe('JSON schema для tramvai.json', () => {
             },
             "transpileOnlyModernLibs": true,
             "type": "application",
-            "webpack": {},
+            "webpack": {
+              "writeToDisk": false,
+            },
             "withModulesStats": false,
           },
           "module": {
@@ -216,7 +218,9 @@ describe('JSON schema для tramvai.json', () => {
             },
             "transpileOnlyModernLibs": true,
             "type": "module",
-            "webpack": {},
+            "webpack": {
+              "writeToDisk": false,
+            },
           },
         },
       }
