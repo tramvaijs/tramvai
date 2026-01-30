@@ -18,6 +18,7 @@ import { createDevServer } from './dev-server/dev-server';
 export { PolyfillConditionPlugin } from './webpack/plugins/polyfill-condition-plugin';
 export { AssetsIntegritiesPlugin } from './webpack/plugins/AssetsIntegritiesPlugin';
 export { PatchAutoPublicPathPlugin } from './webpack/plugins/AutoPublicPathPlugin';
+export { RuntimePathPlugin } from './webpack/plugins/RuntimePathPlugin';
 export {
   ModuleFederationFixRange,
   ModuleFederationFixRangeOptions,

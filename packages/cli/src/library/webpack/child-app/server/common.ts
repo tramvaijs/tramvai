@@ -1,11 +1,12 @@
 import path from 'path';
 import type Config from 'webpack-chain';
 
+import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+
 import type { ConfigManager } from '../../../../config/configManager';
 
 import common from '../common';
 import files from '../../blocks/filesServer';
-import RuntimePathPlugin from '../../plugins/RuntimePathPlugin';
 import type { ChildAppConfigEntry } from '../../../../typings/configEntry/child-app';
 
 export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: Config) => {

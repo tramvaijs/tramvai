@@ -64,6 +64,7 @@ import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
 import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
 import { getSharedModules } from './shared/shared-modules';
 import { getAnalyzeRsdoctorOptions, getBenchmarkRsdoctorOptions } from './shared/rsdoctor';
+import { RuntimePathPlugin } from './plugins/RuntimePathPlugin';
 
 const mainFields = ['browser', 'module', 'main'];
 
@@ -376,6 +377,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         name: 'host',
         shared: getSharedModules(config),
       }),
+      // window.ap is set in packages/modules/render/src/server/blocks/bundleResource/bundleResource.ts
+      // in the development build, window.ap is assigned only if there is a valid ASSETS_PREFIX
+      // so we change publicPath to window.ap only under the same condition
+      process.env.ASSETS_PREFIX &&
+        process.env.ASSETS_PREFIX !== 'static' &&
+        new RuntimePathPlugin({
+          publicPath: 'window.ap',
+        }),
       new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
       new ModuleFederationFixRange({
         flexibleTramvaiVersions: config.shared!.flexibleTramvaiVersions,

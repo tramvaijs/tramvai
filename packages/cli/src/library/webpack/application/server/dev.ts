@@ -2,10 +2,11 @@ import path from 'path';
 import Config from 'webpack-chain';
 import WebpackBar from 'webpackbar';
 
+import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
 
-import RuntimePathPlugin from '../../plugins/RuntimePathPlugin';
 import common from './common';
 import commonDev from '../../common/dev';
 import { commonApplicationDev } from '../dev';

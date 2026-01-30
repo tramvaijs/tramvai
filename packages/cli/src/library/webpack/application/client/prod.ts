@@ -4,10 +4,10 @@ import path from 'path';
 
 import isObject from '@tinkoff/utils/is/object';
 import isUndefined from '@tinkoff/utils/is/undefined';
+import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
 
 // eslint-disable-next-line no-restricted-imports
 import type { ForkTsCheckerWebpackPluginOptions } from 'fork-ts-checker-webpack-plugin/lib/plugin-options';
-import RuntimePathPlugin from '../../plugins/RuntimePathPlugin';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
