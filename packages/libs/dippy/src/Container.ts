@@ -17,6 +17,13 @@ import type {
   OptionalTokenDependency,
 } from './createToken/createToken';
 import { tokenToString } from './createToken/createToken';
+import { MODULE_PARAMETERS } from './modules/module';
+import { getModuleParameters } from './modules/getModuleParameters';
+import { isExtendedModule } from './modules/isExtendedModule';
+import { ModuleWalker } from './modules/ModuleWalker';
+import type { ExtendedModule, ModuleParameters, ModuleType } from './modules/module.h';
+
+type UsedMultiProviderMap = Map<RecordProvide<any>, /* token name */ string>;
 
 /**
  * Маркер, который указывает, что значение еще не создано. Для проверки по ссылке.
@@ -116,6 +123,18 @@ function checkCircularDeps(record: RecordProvide<any>, token: symbol, value: any
   }
 }
 
+function checkUsedMultiProvider(
+  multiRecord: RecordProvide<any>,
+  usedMultiProvider: UsedMultiProviderMap
+) {
+  if (usedMultiProvider.has(multiRecord)) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `multi provider "${usedMultiProvider.get(multiRecord)}" is already in use, but attempt to register a new was detected after this`
+    );
+  }
+}
+
 // eslint-disable-next-line max-params
 function makeRecord<T>(
   factory: ((deps: ProvideDepsIterator<any>) => T) | undefined,
@@ -193,14 +212,49 @@ export class Container {
   protected recordValues = new Map<RecordProvide<any>, any>();
   private readonly fallback?: Container;
 
-  constructor(additionalProviders?: Provider[], fallback?: Container) {
-    if (additionalProviders) {
-      additionalProviders.forEach((provider) => this.register(provider));
+  protected usedMultiProvider: UsedMultiProviderMap = new Map();
+  protected modulesToResolve = new Set<ModuleType>();
+  __moduleWalker = new ModuleWalker();
+
+  constructor(initialProviders?: Provider[], fallback?: Container);
+  constructor(
+    options?: {
+      modules?: (ModuleType | ExtendedModule)[];
+      providers?: Provider[];
+    },
+    fallback?: Container
+  );
+
+  constructor(
+    options?:
+      | Provider[]
+      | {
+          modules?: (ModuleType | ExtendedModule)[];
+          providers?: Provider[];
+        },
+    fallback?: Container
+  ) {
+    if (options) {
+      const initOptions = Array.isArray(options) ? { providers: options } : options;
+
+      this.initialize(initOptions);
     }
 
     this.fallback = fallback;
 
     this.register({ provide: DI_TOKEN, useValue: this, scope: Scope.SINGLETON });
+  }
+
+  initialize({
+    modules = [],
+    providers = [],
+  }: {
+    modules?: (ModuleType | ExtendedModule)[];
+    providers?: Provider[];
+  } = {}) {
+    this.prepareModules(modules);
+    providers.forEach((provider) => this.register(provider));
+    this.resolveModules();
   }
 
   get<T>(obj: { token: BaseTokenInterface<T>; optional: true; multi?: false }): T | null;
@@ -341,12 +395,48 @@ export class Container {
         this.recordValues.set(multiRecord, NOT_YET);
       }
 
+      if (process.env.NODE_ENV !== 'production') {
+        checkUsedMultiProvider(multiRecord, this.usedMultiProvider);
+      }
+
       (multiRecord.multi as any[]).push(record);
     } else {
       this.records.set(token, record);
     }
 
     this.recordValues.set(record, value);
+  }
+
+  prepareModules(modules: (ModuleType | ExtendedModule)[]) {
+    this.__moduleWalker.walk(modules).forEach((mod) => {
+      const moduleParameters = getModuleParameters(mod);
+
+      this.modulesToResolve.add(isExtendedModule(mod) ? mod.mainModule : mod);
+
+      moduleParameters.providers.forEach((provide) => this.register(provide));
+    });
+  }
+
+  resolveModules() {
+    const resolveModuleDeps = (module: ModuleType) => {
+      const { deps } = module[MODULE_PARAMETERS] as ModuleParameters;
+
+      if (deps) {
+        return this.getOfDeps(deps);
+      }
+    };
+
+    this.modulesToResolve.forEach((ModuleToResolve) => {
+      // eslint-disable-next-line no-new
+      new ModuleToResolve(resolveModuleDeps(ModuleToResolve));
+    });
+
+    this.modulesToResolve.clear();
+  }
+
+  registerModules(modules: (ModuleType | ExtendedModule)[]) {
+    this.prepareModules(modules);
+    this.resolveModules();
   }
 
   protected hydrateDeps<T>(record: RecordProvide<T>) {
@@ -367,6 +457,7 @@ export class Container {
       try {
         // мульти провайдеры не могут быть optional
         value = record.multi.map((rec) => this.hydrate(rec, token, false));
+        this.usedMultiProvider.set(record, tokenToString(token));
       } catch (e: any) {
         // reset circular mark for broken multi provider,
         // otherwise it will be cached and in subsequent calls we will get circular dependency error

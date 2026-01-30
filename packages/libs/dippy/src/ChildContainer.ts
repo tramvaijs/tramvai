@@ -3,6 +3,7 @@ import type { RecordProvide } from './Container.h';
 import { Container, NOT_YET } from './Container';
 import { DI_TOKEN } from './tokens';
 import { Scope } from './constant';
+import { ModuleWalker } from './modules/ModuleWalker';
 
 export const IS_DI_CHILD_CONTAINER_TOKEN =
   /* #__PURE__*/ createToken<boolean>('isDiChildContainer');
@@ -16,6 +17,7 @@ export class ChildContainer extends Container {
   constructor(root: Container, fallback?: Container) {
     super(undefined, fallback);
     this.root = root;
+    this.__moduleWalker = new ModuleWalker(this.root.__moduleWalker);
 
     this.register({ provide: DI_TOKEN, useValue: this, scope: Scope.REQUEST });
     this.register({ provide: IS_DI_CHILD_CONTAINER_TOKEN, useValue: true });
