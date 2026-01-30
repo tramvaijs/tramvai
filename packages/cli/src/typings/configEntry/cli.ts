@@ -249,6 +249,7 @@ export interface CliConfigEntry extends ConfigEntry {
   };
   /**
    * @title transpile libs based only on %40tinkoff/is-modern-lib
+   * @deprecated
    * @default true
    */
   transpileOnlyModernLibs: boolean;

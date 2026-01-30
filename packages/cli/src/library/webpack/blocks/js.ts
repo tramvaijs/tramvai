@@ -34,7 +34,7 @@ const applyNodeModulesRules = (rule, configManager) => {
 export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config) => {
   const { transpileOnlyModernLibs } = configManager;
   const { include } = configManager.experiments.transpilation;
-  const shouldTranspileOnlyModern = transpileOnlyModernLibs || include === 'only-modern';
+  const shouldTranspileOnlyModern = transpileOnlyModernLibs && include === 'only-modern';
 
   const rule = config.module
     .rule('js')
