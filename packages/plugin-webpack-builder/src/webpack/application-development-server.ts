@@ -51,6 +51,8 @@ import { getSharedModules } from './shared/shared-modules';
 import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
 import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
 import { getAnalyzeRsdoctorOptions, getBenchmarkRsdoctorOptions } from './shared/rsdoctor';
+import { RuntimePathPlugin } from './plugins/RuntimePathPlugin';
+import { getApplicationUrl } from './utils/getApplicationUrl';
 
 const mainFields = ['module', 'main'];
 
@@ -359,6 +361,15 @@ export default appConfig;`;
       new webpack.ProvidePlugin({
         process: 'process',
         ...provideList,
+      }),
+      new RuntimePathPlugin({
+        publicPath: process.env.ASSETS_PREFIX
+          ? 'process.env.ASSETS_PREFIX'
+          : `"${getApplicationUrl({
+              host: config.staticHost,
+              port: config.staticPort,
+              protocol: config.httpProtocol,
+            })}/${config.outputClient.replace(/\/$/, '')}/"`,
       }),
       config.dedupe.enabledDev &&
         new DedupePlugin({

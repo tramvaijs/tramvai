@@ -1,9 +1,11 @@
 import type Config from 'webpack-chain';
 import webpack from 'webpack';
 import path from 'path';
+
+import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+
 import externals from './externals';
 import common from '../common/main';
-import RuntimePathPlugin from '../plugins/RuntimePathPlugin';
 
 import type { ConfigManager } from '../../../config/configManager';
 import type { ModuleConfigEntry } from '../../../typings/configEntry/module';

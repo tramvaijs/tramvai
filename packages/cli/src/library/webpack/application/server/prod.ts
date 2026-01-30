@@ -1,10 +1,11 @@
 import Config from 'webpack-chain';
 import TerserPlugin from 'terser-webpack-plugin';
 
+import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
 
-import RuntimePathPlugin from '../../plugins/RuntimePathPlugin';
 import common from './common';
 import sourcemaps from '../../blocks/sourcemaps';
 import commonProd from '../../common/server/prod';

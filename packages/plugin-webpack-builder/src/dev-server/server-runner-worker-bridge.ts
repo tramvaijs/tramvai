@@ -45,6 +45,7 @@ export class ServerRunnerWorkerBridge {
       PORT: this.#config.port?.toString(),
       // force color output for worker - https://github.com/chalk/supports-color#info
       FORCE_COLOR: '1',
+      ASSETS_PREFIX: this.#config.assetsPrefix!,
     };
 
     if (process.env.TRAMVAI_INSPECT_SERVER_RUNTIME || this.#config.inspectServerRuntime) {
