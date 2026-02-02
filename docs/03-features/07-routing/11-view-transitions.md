@@ -53,6 +53,32 @@ provide({
 
 Third, you should pass property named `viewTransion` to your navigation. It can be either prop of a `Link` component or a navigation parameter:
 
+:::warning
+
+`reactTransitions` is incompatible with direct [`router` store](03-features/07-routing/03-working-with-url.md#routerstore-reducer) usage in React components.
+
+Bad:
+
+```ts
+const route = useStore(RouterStore);
+```
+
+```ts
+const route = useSelector('router', (state) => state.router);
+```
+
+Good:
+
+```ts
+const route = useRoute();
+```
+
+```ts
+const route = pageService.getCurrentRoute();
+```
+
+:::
+
 :::tip
 
 Using the view transitions assumes, that all actions should be executed before navigation, so consider to set `ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN: 'before'`.
