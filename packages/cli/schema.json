@@ -1294,11 +1294,6 @@
                 },
                 "additionalProperties": false
               },
-              "transpileOnlyModernLibs": {
-                "title": "transpile libs based only on @tinkoff/is-modern-lib",
-                "default": true,
-                "type": "boolean"
-              },
               "webpack": {
                 "title": "Webpack specific settings",
                 "default": {},
@@ -1381,23 +1376,23 @@
                               "hasIndices": {
                                 "type": "boolean"
                               },
-                              "__@match@10844": {
+                              "__@match@10843": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@10846": {
+                              "__@replace@10845": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@10849": {
+                              "__@search@10848": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@10851": {
+                              "__@split@10850": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@10853": {
+                              "__@matchAll@10852": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -2173,11 +2168,6 @@
                   },
                   "additionalProperties": false
                 },
-                "transpileOnlyModernLibs": {
-                  "title": "transpile libs based only on @tinkoff/is-modern-lib",
-                  "default": true,
-                  "type": "boolean"
-                },
                 "webpack": {
                   "title": "Webpack specific settings",
                   "default": {},
@@ -2260,23 +2250,23 @@
                                 "hasIndices": {
                                   "type": "boolean"
                                 },
-                                "__@match@10844": {
+                                "__@match@10843": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@10846": {
+                                "__@replace@10845": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@10849": {
+                                "__@search@10848": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@10851": {
+                                "__@split@10850": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@10853": {
+                                "__@matchAll@10852": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -3052,11 +3042,6 @@
                     },
                     "additionalProperties": false
                   },
-                  "transpileOnlyModernLibs": {
-                    "title": "transpile libs based only on @tinkoff/is-modern-lib",
-                    "default": true,
-                    "type": "boolean"
-                  },
                   "webpack": {
                     "title": "Webpack specific settings",
                     "default": {},
@@ -3139,23 +3124,23 @@
                                   "hasIndices": {
                                     "type": "boolean"
                                   },
-                                  "__@match@10844": {
+                                  "__@match@10843": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@10846": {
+                                  "__@replace@10845": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@10849": {
+                                  "__@search@10848": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@10851": {
+                                  "__@split@10850": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@10853": {
+                                  "__@matchAll@10852": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }

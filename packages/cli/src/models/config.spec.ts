@@ -126,7 +126,6 @@ it('should populate defaults for config', () => {
           "terser": {
             "parallel": true,
           },
-          "transpileOnlyModernLibs": true,
           "type": "application",
           "webpack": {
             "writeToDisk": false,
@@ -187,7 +186,6 @@ it('should populate defaults for config', () => {
           "terser": {
             "parallel": true,
           },
-          "transpileOnlyModernLibs": true,
           "type": "child-app",
           "webpack": {
             "writeToDisk": false,
@@ -393,7 +391,6 @@ it('should populate defaults for overridable options', () => {
           "terser": {
             "parallel": true,
           },
-          "transpileOnlyModernLibs": true,
           "type": "application",
           "webpack": {
             "devtool": "eval-source-map",
@@ -465,7 +462,6 @@ it('should populate defaults for overridable options', () => {
           "terser": {
             "parallel": true,
           },
-          "transpileOnlyModernLibs": true,
           "type": "child-app",
           "webpack": {
             "devtool": "eval-source-map",

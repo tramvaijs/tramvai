@@ -86,10 +86,6 @@ Path to the postcss.config file
 
 Specifies identifier for the css class names
 
-### transpileOnlyModernLibs
-
-Transpile only part of node_modules that require transpilation. If option is disabled all of the node_modules are got transpiled
-
 ### hotRefresh
 
 React hot-refresh

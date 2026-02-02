@@ -248,11 +248,6 @@ export interface CliConfigEntry extends ConfigEntry {
     options?: Record<string, any>;
   };
   /**
-   * @title transpile libs based only on %40tinkoff/is-modern-lib
-   * @default true
-   */
-  transpileOnlyModernLibs: boolean;
-  /**
    * @title Webpack specific settings
    * @default {}
    */

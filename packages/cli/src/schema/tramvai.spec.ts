@@ -155,7 +155,6 @@ describe('JSON schema для tramvai.json', () => {
             "terser": {
               "parallel": true,
             },
-            "transpileOnlyModernLibs": true,
             "type": "application",
             "webpack": {
               "writeToDisk": false,
@@ -216,7 +215,6 @@ describe('JSON schema для tramvai.json', () => {
             "terser": {
               "parallel": true,
             },
-            "transpileOnlyModernLibs": true,
             "type": "module",
             "webpack": {
               "writeToDisk": false,
