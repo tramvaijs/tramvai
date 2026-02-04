@@ -5,9 +5,9 @@ exports[`client: create-token-pure.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   TEST_TOKEN: function() { return /* binding */ TEST_TOKEN; }
 /* harmony export */ });
-/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts");
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mocks/tramvai-core.ts");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 
 const TEST_TOKEN = /*#__PURE__*/ (0,_tramvai_core__WEBPACK_IMPORTED_MODULE_0__.createToken)('TEST_TOKEN');
@@ -139,9 +139,9 @@ exports[`client: lazy-component.tsx 1`] = `
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-dev-runtime/react/jsx-dev-runtime");
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _tramvai_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-react.ts");
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* harmony import */ var _tramvai_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./mocks/tramvai-react.ts");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 
 
@@ -156,12 +156,12 @@ const LazyComponent = (0,_tramvai_react__WEBPACK_IMPORTED_MODULE_1__.lazy)({
         const key = this.resolve(props);
         return !!__webpack_require__.m[key];
     },
-    importAsync: ()=>__webpack_require__.e(/* import() | components-lazy-inner */ "components-lazy-inner").then(__webpack_require__.bind(__webpack_require__, "./src/library/swc/__integration__/components/lazy-inner.tsx")),
+    importAsync: ()=>__webpack_require__.e(/* import() | components-lazy-inner */ "components-lazy-inner").then(__webpack_require__.bind(__webpack_require__, "./components/lazy-inner.tsx")),
     requireAsync (props) {
         return this.importAsync(props).then((resolved)=>resolved);
     },
     resolve () {
-        return /*require.resolve*/("./src/library/swc/__integration__/components/lazy-inner.tsx");
+        return /*require.resolve*/("./components/lazy-inner.tsx");
     }
 });
 _c = LazyComponent;
@@ -228,8 +228,8 @@ exports[`client: node-env.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   func: function() { return /* binding */ func; }
 /* harmony export */ });
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 let internalFunc;
 if (true) {
@@ -281,10 +281,10 @@ exports[`client: provider-stack.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   providers: function() { return /* binding */ providers; }
 /* harmony export */ });
-/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts");
-/* harmony import */ var _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/create-token-pure.ts");
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mocks/tramvai-core.ts");
+/* harmony import */ var _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./create-token-pure.ts");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 var _ref;
 
@@ -341,9 +341,9 @@ exports[`client: react-svg.tsx 1`] = `
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-dev-runtime/react/jsx-dev-runtime");
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/images/logo.svg?react");
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* harmony import */ var _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./images/logo.svg?react");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 
 
@@ -404,9 +404,9 @@ exports[`client: server.inline.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ForBrowser: function() { return /* binding */ ForBrowser; }
 /* harmony export */ });
-/* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js");
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../../../../../node_modules/@swc/helpers/esm/_define_property.js");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 
 class ForBrowser {
@@ -461,8 +461,8 @@ exports[`client: typeof-window.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   func: function() { return /* binding */ func; }
 /* harmony export */ });
-/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
-__webpack_require__.$Refresh$.runtime = __webpack_require__("../../node_modules/react-refresh/runtime.js");
+/* provided dependency */ var __react_refresh_utils__ = __webpack_require__("../../../../../../node_modules/@pmmmwh/react-refresh-webpack-plugin/lib/runtime/RefreshUtils.js");
+__webpack_require__.$Refresh$.runtime = __webpack_require__("../../../../../../node_modules/react-refresh/runtime.js");
 
 let internalFunc;
 if (true) {
@@ -514,7 +514,7 @@ exports[`server: create-token-pure.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   TEST_TOKEN: function() { return /* binding */ TEST_TOKEN; }
 /* harmony export */ });
-/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts");
+/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mocks/tramvai-core.ts");
 
 const TEST_TOKEN = /*#__PURE__*/ (0,_tramvai_core__WEBPACK_IMPORTED_MODULE_0__.createToken)('TEST_TOKEN');
 
@@ -611,8 +611,8 @@ exports[`server: lazy-component.tsx 1`] = `
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-dev-runtime/react/jsx-dev-runtime");
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _swc_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_interop_require_wildcard.js");
-/* harmony import */ var _tramvai_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-react.ts");
+/* harmony import */ var _swc_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../../../../../node_modules/@swc/helpers/esm/_interop_require_wildcard.js");
+/* harmony import */ var _tramvai_react__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__("./mocks/tramvai-react.ts");
 
 
 
@@ -627,12 +627,12 @@ const LazyComponent = (0,_tramvai_react__WEBPACK_IMPORTED_MODULE_2__.lazy)({
         const key = this.resolve(props);
         return !!__webpack_require__.m[key];
     },
-    importAsync: ()=>Promise.resolve().then(()=>(0,_swc_helpers__WEBPACK_IMPORTED_MODULE_1__._)(__webpack_require__(/* webpackChunkName: "components-lazy-inner" */ "./src/library/swc/__integration__/components/lazy-inner.tsx"))),
+    importAsync: ()=>Promise.resolve().then(()=>(0,_swc_helpers__WEBPACK_IMPORTED_MODULE_1__._)(__webpack_require__(/* webpackChunkName: "components-lazy-inner" */ "./components/lazy-inner.tsx"))),
     requireAsync (props) {
         return this.importAsync(props).then((resolved)=>resolved);
     },
     resolve () {
-        return /*require.resolve*/("./src/library/swc/__integration__/components/lazy-inner.tsx");
+        return /*require.resolve*/("./components/lazy-inner.tsx");
     }
 });
 const Component = ()=>{
@@ -682,8 +682,8 @@ exports[`server: provider-stack.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   providers: function() { return /* binding */ providers; }
 /* harmony export */ });
-/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts");
-/* harmony import */ var _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/create-token-pure.ts");
+/* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mocks/tramvai-core.ts");
+/* harmony import */ var _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./create-token-pure.ts");
 var _ref;
 
 
@@ -708,7 +708,7 @@ exports[`server: react-svg.tsx 1`] = `
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-dev-runtime/react/jsx-dev-runtime");
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/images/logo.svg?react");
+/* harmony import */ var _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./images/logo.svg?react");
 
 
 const Component = ()=>{

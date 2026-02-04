@@ -3,7 +3,7 @@ import { createCommand } from '../../commands/createCommand';
 
 export interface Params {
   target: string;
-  plugin?: 'bundle' | 'whybundled' | 'statoscope';
+  plugin?: 'bundle' | 'whybundled' | 'statoscope' | 'stats' | 'rsdoctor';
   showConfig?: boolean;
   fileCache?: boolean;
   verboseWebpack?: boolean;

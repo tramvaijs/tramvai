@@ -46,12 +46,12 @@ describe('test/integration/app/runFakeApp', () => {
     const { application } = await app.render('/');
     expect(application).toMatchInlineSnapshot(`
       "
-            <div class="layout__layout_yfynK">
+            <div class="layout__layout_DhfOv">
               <div>
                 <h1>Tramvai<span role="img" aria-label="dummy icon">🥳</span></h1>
               </div>
               <div>Main Page <button>click link</button></div>
-              <div class="Footer__footer_a6x7v"><div>this Footer in bootstrap</div></div>
+              <div class="Footer__footer_A7xEb"><div>this Footer in bootstrap</div></div>
             </div>
           "
     `);

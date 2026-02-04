@@ -54,7 +54,7 @@ describe('page-render-mode', () => {
               </h1>
             </div>
             <div>Main Page loading...</div>
-            <div class="Footer__footer_adktz"><div>this Footer in page-render-mode</div></div>
+            <div class="Footer__footer_A7xEb"><div>this Footer in page-render-mode</div></div>
           "
     `);
   });
@@ -85,7 +85,7 @@ describe('page-render-mode', () => {
               </h1>
             </div>
             <div>Loading...</div>
-            <div class="Footer__footer_adktz"><div>this Footer in page-render-mode</div></div>
+            <div class="Footer__footer_A7xEb"><div>this Footer in page-render-mode</div></div>
           "
     `);
   });
@@ -138,7 +138,7 @@ describe('page-render-mode', () => {
               </h1>
             </div>
             <div>Auth Client Page <button type="button">to main page</button></div>
-            <div class="Footer__footer_adktz"><div>this Footer in page-render-mode</div></div>
+            <div class="Footer__footer_A7xEb"><div>this Footer in page-render-mode</div></div>
           "
     `);
 

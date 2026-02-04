@@ -8,7 +8,7 @@ exports[`client: create-token-pure.ts 1`] = `
                       /* binding */ return TEST_TOKEN;
                   }
                   /* harmony export */              });
-              const TEST_TOKEN = /*#__PURE__*/ /*#__PURE__*/ (0, __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts").E)("TEST_TOKEN");
+              const TEST_TOKEN = /*#__PURE__*/ /*#__PURE__*/ (0, __webpack_require__("./mocks/tramvai-core.ts").E)("TEST_TOKEN");
               "
 `;
 
@@ -73,7 +73,7 @@ exports[`client: lazy-component.tsx 1`] = `
                   }
                   /* harmony export */              });
               /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime");
-              /* harmony import */              const LazyComponent = (0, __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-react.ts").R)({
+              /* harmony import */              const LazyComponent = (0, __webpack_require__("./mocks/tramvai-react.ts").R)({
                   chunkName: () => "components-lazy-inner",
                   requireSync(props) {
                       return __webpack_require__(this.resolve(props));
@@ -82,11 +82,11 @@ exports[`client: lazy-component.tsx 1`] = `
                       const key = this.resolve(props);
                       return !!__webpack_require__.m[key];
                   },
-                  importAsync: () => __webpack_require__.e(/* import() | components-lazy-inner */ "components-lazy-inner").then(__webpack_require__.bind(__webpack_require__, "./src/library/swc/__integration__/components/lazy-inner.tsx")),
+                  importAsync: () => __webpack_require__.e(/* import() | components-lazy-inner */ "components-lazy-inner").then(__webpack_require__.bind(__webpack_require__, "./components/lazy-inner.tsx")),
                   requireAsync(props) {
                       return this.importAsync(props).then(resolved => resolved);
                   },
-                  resolve: () => /*require.resolve*/ "./src/library/swc/__integration__/components/lazy-inner.tsx"
+                  resolve: () => /*require.resolve*/ "./components/lazy-inner.tsx"
               }), Component = () => /*#__PURE__*/ /*#__PURE__*/ (0, react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                   children: [ 
                   /*#__PURE__*/
@@ -121,7 +121,7 @@ exports[`client: provider-stack.ts 1`] = `
                       /* binding */ return providers;
                   }
                   /* harmony export */              });
-              /* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts"), _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/create-token-pure.ts");
+              /* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mocks/tramvai-core.ts"), _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./create-token-pure.ts");
               /* harmony import */              const providers = [ (0, _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ /* .provide */ .G)({
                   provide: _create_token_pure__WEBPACK_IMPORTED_MODULE_1__.TEST_TOKEN,
                   useValue: "test"
@@ -137,7 +137,7 @@ exports[`client: react-svg.tsx 1`] = `
                       /* binding */ return Component;
                   }
                   /* harmony export */              });
-              /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime"), _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/images/logo.svg?react");
+              /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime"), _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./images/logo.svg?react");
               /* harmony import */              const Component = () => /*#__PURE__*/ /*#__PURE__*/ (0, 
               react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
                   children: /*#__PURE__*/ /*#__PURE__*/ (0 /* ["default"] */ , react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__.A, {})
@@ -153,7 +153,7 @@ exports[`client: server.inline.ts 1`] = `
                       /* binding */ return ForBrowser;
                   }
                   /* harmony export */              });
-              /* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_define_property.js");
+              /* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../../../../../node_modules/@swc/helpers/esm/_define_property.js");
               class ForBrowser {
                   test() {
                       console.log("Ok");
@@ -189,7 +189,7 @@ exports[`server: create-token-pure.ts 1`] = `
                       /* binding */ return TEST_TOKEN;
                   }
                   /* harmony export */              });
-              const TEST_TOKEN = /*#__PURE__*/ /*#__PURE__*/ (0, __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts").E)("TEST_TOKEN");
+              const TEST_TOKEN = /*#__PURE__*/ /*#__PURE__*/ (0, __webpack_require__("./mocks/tramvai-core.ts").E)("TEST_TOKEN");
               "
 `;
 
@@ -251,8 +251,8 @@ exports[`server: lazy-component.tsx 1`] = `
                       /* binding */ return Component;
                   }
                   /* harmony export */              });
-              /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime"), _swc_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../node_modules/@swc/helpers/esm/_interop_require_wildcard.js");
-              /* harmony import */              const LazyComponent = (0, __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-react.ts").R)({
+              /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime"), _swc_helpers__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("../../../../../../node_modules/@swc/helpers/esm/_interop_require_wildcard.js");
+              /* harmony import */              const LazyComponent = (0, __webpack_require__("./mocks/tramvai-react.ts").R)({
                   chunkName() {
                       return "components-lazy-inner";
                   },
@@ -263,13 +263,13 @@ exports[`server: lazy-component.tsx 1`] = `
                       const key = this.resolve(props);
                       return !!__webpack_require__.m[key];
                   },
-                  importAsync: () => Promise.resolve().then(() => (0, _swc_helpers__WEBPACK_IMPORTED_MODULE_1__._)(__webpack_require__(/* webpackChunkName: "components-lazy-inner" */ "./src/library/swc/__integration__/components/lazy-inner.tsx"))),
+                  importAsync: () => Promise.resolve().then(() => (0, _swc_helpers__WEBPACK_IMPORTED_MODULE_1__._)(__webpack_require__(/* webpackChunkName: "components-lazy-inner" */ "./components/lazy-inner.tsx"))),
                   requireAsync(props) {
                       return this.importAsync(props).then(resolved => resolved);
                   },
                   resolve() {
                       /*require.resolve*/
-                      return "./src/library/swc/__integration__/components/lazy-inner.tsx";
+                      return "./components/lazy-inner.tsx";
                   }
               }), Component = () => /*#__PURE__*/ /*#__PURE__*/ (0, react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                   children: [ 
@@ -303,7 +303,7 @@ exports[`server: provider-stack.ts 1`] = `
                       /* binding */ return providers;
                   }
                   /* harmony export */              });
-              /* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/library/swc/__integration__/mocks/tramvai-core.ts"), _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/create-token-pure.ts");
+              /* harmony import */ var _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./mocks/tramvai-core.ts"), _create_token_pure__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./create-token-pure.ts");
               /* harmony import */              const providers = [ (0, _tramvai_core__WEBPACK_IMPORTED_MODULE_0__ /* .provide */ .G)({
                   provide: _create_token_pure__WEBPACK_IMPORTED_MODULE_1__.TEST_TOKEN,
                   useValue: "test"
@@ -318,7 +318,7 @@ exports[`server: react-svg.tsx 1`] = `
                       /* binding */ return Component;
                   }
                   /* harmony export */              });
-              /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime"), _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./src/library/swc/__integration__/images/logo.svg?react");
+              /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-runtime/react/jsx-runtime"), _images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("./images/logo.svg?react");
               /* harmony import */              const Component = () => /*#__PURE__*/ /*#__PURE__*/ (0, 
               react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)("div", {
                   children: /*#__PURE__*/ /*#__PURE__*/ (0 /* ["default"] */ , react_jsx_runtime__WEBPACK_IMPORTED_MODULE_0__.jsx)(_images_logo_svg_react__WEBPACK_IMPORTED_MODULE_1__.A, {})

@@ -18,10 +18,16 @@ export const startSharedProviders: Provider[] = [
   provide({
     provide: WEBPACK_COMPILER_TOKEN,
     useFactory: ({ clientConfig, serverConfig, analyzePlugin }) => {
-      const configs = [clientConfig, serverConfig]
-        .filter(Boolean)
-        .map((config) => (analyzePlugin ? analyzePlugin.patchConfig(config) : config))
-        .map(toWebpackConfig);
+      if (analyzePlugin) {
+        // analyze server only if no client build found
+        if (clientConfig) {
+          analyzePlugin.patchConfig(clientConfig);
+        } else {
+          analyzePlugin.patchConfig(serverConfig);
+        }
+      }
+
+      const configs = [clientConfig, serverConfig].filter(Boolean).map(toWebpackConfig);
       const multiCompiler = webpack(configs);
       const { inputFileSystem } = multiCompiler.compilers[0];
 

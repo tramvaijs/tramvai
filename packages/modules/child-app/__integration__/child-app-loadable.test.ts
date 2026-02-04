@@ -137,7 +137,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
             'loadable_client@0.0.0-stub.js',
             'granular-node_modules_date-fns_esm_index_js-node_modules_mini-css-extract-plugin_dist_hmr_hot-04ede6_client.chunk',
             'lazy-cmp_client.chunk',
-            'examples_child-app_child-apps_loadable_index_ts_client.chunk',
+            'child-apps_loadable_index_ts_client.chunk',
           ].every((assets) => {
             return loadableAssets.some((url) => url.includes(assets));
           })
@@ -180,7 +180,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
             'loadable_client@0.0.0-stub.js',
             'granular-node_modules_date-fns_esm_index_js-node_modules_mini-css-extract-plugin_dist_hmr_hot-04ede6_client.chunk',
             'lazy-cmp_client.chunk',
-            'examples_child-app_child-apps_loadable_index_ts_client.chunk',
+            'child-apps_loadable_index_ts_client.chunk',
           ].every((assets) => {
             return loadableAssets.some((url) => url.includes(assets));
           })

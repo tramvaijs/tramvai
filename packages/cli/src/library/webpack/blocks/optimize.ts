@@ -6,7 +6,7 @@ import type { ConfigManager } from '../../../config/configManager';
 import type { CliConfigEntry } from '../../../typings/configEntry/cli';
 
 export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config) => {
-  const { debug, disableProdOptimization } = configManager;
+  const { debug, disableProdOptimization, readableOutput } = configManager;
 
   const isProductionProfilingEnabled = !!process.env.TRAMVAI_REACT_PROFILE;
   const tramvaiReactProfileTerserOptions = {
@@ -49,6 +49,13 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
     ]);
 
     return;
+  }
+
+  if (readableOutput) {
+    // with this option for id of module path to file will be used
+    config.optimization.set('moduleIds', 'named');
+    // prevent modules from concatenation in single module to easier debug
+    config.optimization.set('concatenateModules', false);
   }
 
   const { terser } = configManager;

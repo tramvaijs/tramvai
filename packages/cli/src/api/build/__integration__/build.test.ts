@@ -27,13 +27,13 @@ describe('@tramvai/cli build command', () => {
 
       expect(normalizeFiles(clientFiles)).toMatchInlineSnapshot(`
         [
+          "app_bundles_first_ts.js",
+          "app_bundles_main_ts.js",
+          "app_bundles_second_ts.js",
+          "app_bundles_third_ts.js",
           "platform.css",
           "platform.js",
           "react.js",
-          "src_api_build___integration_____fixtures___app_bundles_first_ts.js",
-          "src_api_build___integration_____fixtures___app_bundles_main_ts.js",
-          "src_api_build___integration_____fixtures___app_bundles_second_ts.js",
-          "src_api_build___integration_____fixtures___app_bundles_third_ts.js",
           "stats.json",
         ]
       `);
@@ -69,13 +69,13 @@ describe('@tramvai/cli build command', () => {
 
       expect(normalizeFiles(clientFiles)).toMatchInlineSnapshot(`
         [
+          "app_bundles_first_ts.js",
+          "app_bundles_main_ts.js",
+          "app_bundles_second_ts.js",
+          "app_bundles_third_ts.js",
           "platform.css",
           "platform.js",
           "react.js",
-          "src_api_build___integration_____fixtures___app_bundles_first_ts.js",
-          "src_api_build___integration_____fixtures___app_bundles_main_ts.js",
-          "src_api_build___integration_____fixtures___app_bundles_second_ts.js",
-          "src_api_build___integration_____fixtures___app_bundles_third_ts.js",
           "stats.json",
         ]
       `);

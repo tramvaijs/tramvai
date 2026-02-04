@@ -17,7 +17,7 @@ class AnalyzeCommand extends CLICommand<Params> {
     {
       name: '-p, --plugin',
       value: '[plugin]',
-      description: 'Analysis plugin type <bundle|whybundled|statoscope|rsdoctor>',
+      description: 'Analysis plugin type <bundle|whybundled|statoscope|rsdoctor|stats>',
       defaultValue: 'bundle',
     },
     {

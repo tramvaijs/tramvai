@@ -45,7 +45,7 @@ export default (configManager: ConfigManager<CliConfigEntry>) => (config: Config
     config.set('ignoreWarnings', ignoreWarnings);
   }
 
-  config.context(path.resolve(__dirname, '..', '..', '..', '..'));
+  config.context(configManager.rootDir);
   config.batch(resolve(configManager));
   config.batch(ignoreLocales());
 

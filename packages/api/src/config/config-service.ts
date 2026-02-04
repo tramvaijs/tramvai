@@ -201,7 +201,7 @@ export type InputParameters = {
   port?: number;
   host?: string;
   benchmark?: boolean;
-  analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor';
+  analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   staticPort?: number;
   staticHost?: string;
   https?: boolean;

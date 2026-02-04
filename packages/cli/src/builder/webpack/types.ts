@@ -1,4 +1,6 @@
 import type Config from 'webpack-chain';
+import { Configuration } from 'webpack';
+
 import type { ConfigManager } from '../../config/configManager';
 
 export type ConfigGenerator = (arg: {
@@ -9,7 +11,7 @@ export type ConfigGenerator = (arg: {
 export abstract class AnalyzePlugin {
   requireDeps?: string[];
 
-  protected options?;
+  protected options?: (webpackConfig: Configuration) => any[] = () => [];
 
   protected abstract plugin;
 
@@ -24,7 +26,8 @@ export abstract class AnalyzePlugin {
   };
 
   protected patchConfigInternal(config: Config): Config {
-    config.plugin('analyze').use(this.plugin, this.options);
+    const pureWebpackConfig = config.toConfig();
+    config.plugin('analyze').use(this.plugin, this.options(pureWebpackConfig));
 
     return config;
   }

@@ -6,7 +6,7 @@ let clientCode: string;
 let serverCode: string;
 
 const getModuleCode = (code: string, name: string) => {
-  const regexp = new RegExp(`swc/__integration__/${name}":\\s*\n.+?{\n(.+?)/\\*{3}/\\s`, 's');
+  const regexp = new RegExp(`\\./${name}":\\s*\n.+?{\n(.+?)/\\*{3}/\\s`, 's');
 
   const match = code.match(regexp);
 

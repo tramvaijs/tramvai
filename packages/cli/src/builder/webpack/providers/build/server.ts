@@ -9,6 +9,7 @@ import {
   PROCESS_HANDLER_TOKEN,
   SERVER_CONFIG_MANAGER_TOKEN,
   WEBPACK_ANALYZE_PLUGIN_TOKEN,
+  WEBPACK_CLIENT_CONFIG_TOKEN,
   WEBPACK_SERVER_COMPILER_TOKEN,
   WEBPACK_SERVER_CONFIG_TOKEN,
 } from '../../tokens';
@@ -19,15 +20,19 @@ import { createCompiler } from '../../utils/compiler';
 export const buildServerProviders: Provider[] = [
   provide({
     provide: WEBPACK_SERVER_COMPILER_TOKEN,
-    useFactory: ({ webpackConfig, di, analyzePlugin }) => {
+    useFactory: ({ webpackConfig, di, analyzePlugin, clientConfig }) => {
+      // analyze server only if no client build found
+      const shouldAnalyze = !clientConfig && analyzePlugin;
+
       return createCompiler(
-        toWebpackConfig(analyzePlugin ? analyzePlugin.patchConfig(webpackConfig) : webpackConfig),
+        toWebpackConfig(shouldAnalyze ? analyzePlugin.patchConfig(webpackConfig) : webpackConfig),
         di
       );
     },
     deps: {
       webpackConfig: WEBPACK_SERVER_CONFIG_TOKEN,
       di: DI_TOKEN,
+      clientConfig: { token: WEBPACK_CLIENT_CONFIG_TOKEN, optional: true },
       analyzePlugin: { token: WEBPACK_ANALYZE_PLUGIN_TOKEN, optional: true },
     },
   }),

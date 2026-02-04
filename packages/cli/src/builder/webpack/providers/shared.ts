@@ -19,6 +19,7 @@ import { BundleAnalyzePlugin } from '../analyzePlugins/bundle';
 import { StatoscopeAnalyzePlugin } from '../analyzePlugins/statoscope';
 import { WhyBundledAnalyzePlugin } from '../analyzePlugins/whyBundled';
 import { RsdoctorAnalyzePlugin } from '../analyzePlugins/rsdoctor';
+import { StatsAnalyzePlugin } from '../analyzePlugins/stats';
 import type { AnalyzePlugin } from '../types';
 
 interface Type<T> extends Function {
@@ -29,6 +30,7 @@ const pluginMap: Record<string, Type<AnalyzePlugin>> = {
   bundle: BundleAnalyzePlugin,
   whybundled: WhyBundledAnalyzePlugin,
   statoscope: StatoscopeAnalyzePlugin,
+  stats: StatsAnalyzePlugin,
   rsdoctor: RsdoctorAnalyzePlugin,
 };
 
