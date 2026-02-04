@@ -12,7 +12,7 @@ export class WhyBundledAnalyzePlugin extends AnalyzePlugin {
   statsFilePath: string;
 
   plugin = FileStatsPlugin;
-  options: [FileStatsOptions] = [
+  options = (): [FileStatsOptions] => [
     {
       filename: this.statsFileName,
       stats: {

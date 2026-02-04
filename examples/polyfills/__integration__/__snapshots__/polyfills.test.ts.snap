@@ -3,7 +3,6 @@
 exports[`polyfills modern list of polyfills: modern 1`] = `
 {
   "polyfills": [
-    "../../examples/polyfills/src/modern.polyfill.ts",
     "../../node_modules/core-js/modules/es.array.find-last-index.js",
     "../../node_modules/core-js/modules/es.array.find-last.js",
     "../../node_modules/core-js/modules/es.array.push.js",
@@ -24,6 +23,7 @@ exports[`polyfills modern list of polyfills: modern 1`] = `
     "../../node_modules/core-js/modules/web.url-search-params.size.js",
     "../../node_modules/core-js/modules/web.url.can-parse.js",
     "../../node_modules/core-js/modules/web.url.parse.js",
+    "./src/modern.polyfill.ts",
     "webpack/runtime/compat get default export",
     "webpack/runtime/define property getters",
     "webpack/runtime/global",
@@ -36,7 +36,6 @@ exports[`polyfills modern list of polyfills: modern 1`] = `
 exports[`polyfills stable list of polyfills: default 1`] = `
 {
   "polyfills": [
-    "../../examples/polyfills/src/polyfill.ts + 1 modules",
     "../../node_modules/core-js/modules/es.aggregate-error.constructor.js",
     "../../node_modules/core-js/modules/es.aggregate-error.js",
     "../../node_modules/core-js/modules/es.array.at.js",
@@ -48,6 +47,7 @@ exports[`polyfills stable list of polyfills: default 1`] = `
     "../../node_modules/core-js/modules/es.reflect.to-string-tag.js",
     "../../node_modules/core-js/modules/es.string.at-alternative.js",
     "../../node_modules/core-js/modules/es.string.replace-all.js",
+    "./src/polyfill.ts + 1 modules",
     "webpack/runtime/global",
   ],
   "polyfillsCount": 13,

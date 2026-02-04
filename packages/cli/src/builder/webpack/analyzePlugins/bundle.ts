@@ -2,7 +2,7 @@ import type ChainConfig from 'webpack-chain';
 import { AnalyzePlugin } from '../types';
 
 export class BundleAnalyzePlugin extends AnalyzePlugin {
-  options = [
+  options = () => [
     {
       analyzerMode: 'server',
     },

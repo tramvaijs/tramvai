@@ -5,8 +5,6 @@ type options = ConstructorParameters<typeof RsdoctorWebpackPlugin<[]>>;
 export class RsdoctorAnalyzePlugin extends AnalyzePlugin {
   requireDeps = [];
 
-  options: options = [];
-
   // rsdoctor поднимает dev server
   afterBuild = () => new Promise(() => null);
 

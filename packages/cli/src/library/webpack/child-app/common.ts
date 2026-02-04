@@ -144,18 +144,10 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
               type: 'assign',
             },
       exposes: {
-        // 1) define path as relative to webpack context
-        // as ChunkCorrelationPlugin fails to resolve
-        // entry otherwise.
-        // Way to reproduce: build and compare stats file for child-app with absolute and relative paths
-        // -----
-        // 2) path.relative should use the posix separator because
+        // path.relative should use the posix separator because
         // @module-federation/node is parsing relative path incorrectly
         // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
-        entry: path
-          .relative(config.get('context'), entry)
-          .split(path.win32.sep)
-          .join(path.posix.sep),
+        entry: entry.split(path.win32.sep).join(path.posix.sep),
       },
       shared: sharedModules,
     } as UniversalFederationPluginOptions,

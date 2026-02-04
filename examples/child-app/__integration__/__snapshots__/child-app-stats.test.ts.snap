@@ -41,39 +41,39 @@ exports[`latest stats generation test stats should build stats.json 1`] = `
       ]
     },
     {
-      "id": "examples_child-app_child-apps_header_index_ts-examples_child-app_child-apps_header_logo_svg",
+      "id": "child-apps_header_index_ts-child-apps_header_logo_svg",
       "files": [
-        "examples_child-app_child-apps_header_index_ts-examples_child-app_child-apps_header_logo_svg_client.chunk.js"
+        "child-apps_header_index_ts-child-apps_header_logo_svg_client.chunk.js"
       ]
     },
     {
-      "id": "libs_dippy_lib_di_js",
+      "id": "packages_libs_dippy_lib_di_js",
       "files": [
-        "libs_dippy_lib_di_js_client.chunk.js"
+        "packages_libs_dippy_lib_di_js_client.chunk.js"
       ]
     },
     {
-      "id": "tramvai_core_lib_index_js",
+      "id": "packages_tramvai_core_lib_index_js",
       "files": [
-        "tramvai_core_lib_index_js"
+        "packages_tramvai_core_lib_index_js"
       ]
     },
     {
-      "id": "tramvai_react_lib_react_js",
+      "id": "packages_tramvai_react_lib_react_js",
       "files": [
-        "tramvai_react_lib_react_js"
+        "packages_tramvai_react_lib_react_js"
       ]
     },
     {
-      "id": "tramvai_core_lib_index_js",
+      "id": "packages_tramvai_core_lib_index_js",
       "files": [
-        "tramvai_core_lib_index_js"
+        "packages_tramvai_core_lib_index_js"
       ]
     },
     {
-      "id": "tramvai_react_lib_react_js",
+      "id": "packages_tramvai_react_lib_react_js",
       "files": [
-        "tramvai_react_lib_react_js"
+        "packages_tramvai_react_lib_react_js"
       ]
     }
   ]
