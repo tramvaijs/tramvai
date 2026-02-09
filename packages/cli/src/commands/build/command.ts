@@ -40,6 +40,11 @@ class BuildCommand extends CLICommand<Params> {
       description: 'Disable optimization of bundle sizes for production (minification, etc.)',
     },
     {
+      name: '--readableOutput',
+      value: '[readableOutput]',
+      description: 'Disable hashed names and concatenated modules for better debug/analyze purpose',
+    },
+    {
       name: '--showConfig',
       value: '[showConfig]',
       description: 'Show config with which cli was launched',
@@ -58,7 +63,7 @@ class BuildCommand extends CLICommand<Params> {
       name: '--analyze',
       value: '[analyze]',
       description:
-        'Run build with analyze, supported plugins: <bundle|whybundled|statoscope|rsdoctor>',
+        'Run build with analyze, supported plugins: <bundle|whybundled|statoscope|rsdoctor|stats>',
     },
     {
       name: '--fileCache',

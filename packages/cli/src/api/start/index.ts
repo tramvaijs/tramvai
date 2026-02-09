@@ -27,6 +27,7 @@ export type Params = WithConfig<{
   noClientRebuild?: boolean;
   resolveSymlinks?: boolean;
   showConfig?: boolean;
+  analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   benchmark?: boolean;
   withBuildStats?: boolean;
   // @todo: not working?

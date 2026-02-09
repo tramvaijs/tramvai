@@ -47,7 +47,14 @@ Statoscope is a toolkit for analyzing (with a UI-based report) and validate stat
 npx tramvai build APP_ID --analyze=statoscope
 ```
 
-When the command is finished, pass the result file to https://statoscope.tech/ tool.
+When the command is finished html report will be opened in browser.
+
+Also you can use `stats` engine for stats report generation only.
+
+```sh
+# generates result json file
+npx tramvai build APP_ID --analyze=stats
+```
 
 ## Figure out why build is slow
 

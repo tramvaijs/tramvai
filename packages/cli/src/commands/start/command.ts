@@ -99,7 +99,7 @@ export class StartCommand extends CLICommand<Params> {
       name: '--analyze',
       value: '[analyze]',
       description:
-        'Run build with analyze, supported plugins: <bundle|whybundled|statoscope|rsdoctor>',
+        'Run build with analyze, supported plugins: <bundle|whybundled|statoscope|rsdoctor|stats>',
     },
     {
       name: '--onlyBundles',
