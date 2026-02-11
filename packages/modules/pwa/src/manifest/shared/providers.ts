@@ -24,13 +24,13 @@ export const validateRelativeUrlProvider = provide({
 
 export const registerWebManifestProvider = provide({
   provide: commandLineListTokens.init,
-  useFactory: ({ manifestCommandLine, manifestUrl, di }) =>
+  useFactory: ({ manifestCommandLine, di }) =>
     function registerWebManifestCommandLine() {
       di.register({
         provide: manifestCommandLine
           ? commandLineListTokens[manifestCommandLine]
           : commandLineListTokens.customerStart,
-        useFactory: ({ resourcesRegistry }) =>
+        useFactory: ({ resourcesRegistry, manifestUrl }) =>
           function registerWebManifestAsResource() {
             resourcesRegistry.register({
               type: ResourceType.asIs,
@@ -40,12 +40,12 @@ export const registerWebManifestProvider = provide({
             });
           },
         deps: {
+          manifestUrl: PWA_MANIFEST_URL_TOKEN,
           resourcesRegistry: RESOURCES_REGISTRY,
         },
       });
     },
   deps: {
-    manifestUrl: PWA_MANIFEST_URL_TOKEN,
     di: DI_TOKEN,
     manifestCommandLine: { token: PWA_MANIFEST_INIT_COMMAND_LINE, optional: true },
   },
