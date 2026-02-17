@@ -65,7 +65,8 @@ export const CHROMIUM_BASED_BROWSERS = [
   'android browser',
   'yandex',
   'blink',
-  'vivaldi' /* , 'chrome webview', 'opera', 'samsung' */,
+  'vivaldi',
+  'duckduckgo',
 ];
 
 export const DEVICE_TYPES: Record<string, string> = {
