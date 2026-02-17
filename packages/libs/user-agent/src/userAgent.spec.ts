@@ -18,9 +18,9 @@ describe('modern browsers', () => {
           "architecture": undefined,
         },
         "device": {
-          "model": undefined,
+          "model": "Macintosh",
           "type": undefined,
-          "vendor": undefined,
+          "vendor": "Apple",
         },
         "engine": {
           "name": "Blink",
@@ -43,9 +43,9 @@ describe('modern browsers', () => {
       {
         "browser": {
           "browserEngine": "chrome",
-          "major": "4",
-          "name": "android browser",
-          "version": "4.0",
+          "major": "5",
+          "name": "duckduckgo",
+          "version": "5",
         },
         "cpu": {
           "architecture": undefined,
@@ -84,9 +84,9 @@ describe('modern browsers', () => {
           "architecture": undefined,
         },
         "device": {
-          "model": undefined,
+          "model": "Macintosh",
           "type": undefined,
-          "vendor": undefined,
+          "vendor": "Apple",
         },
         "engine": {
           "name": "WebKit",
@@ -119,9 +119,9 @@ describe('supported browsers', () => {
           "architecture": undefined,
         },
         "device": {
-          "model": undefined,
+          "model": "Macintosh",
           "type": undefined,
-          "vendor": undefined,
+          "vendor": "Apple",
         },
         "engine": {
           "name": "Blink",
@@ -185,9 +185,9 @@ describe('supported browsers', () => {
           "architecture": undefined,
         },
         "device": {
-          "model": undefined,
+          "model": "Macintosh",
           "type": undefined,
-          "vendor": undefined,
+          "vendor": "Apple",
         },
         "engine": {
           "name": "WebKit",
