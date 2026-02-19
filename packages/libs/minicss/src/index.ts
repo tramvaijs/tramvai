@@ -9,7 +9,7 @@ interface Options {
 
 export const createGenerator = ({
   baseName = '',
-  baseInterpolateName = '[hash:base64:5]',
+  baseInterpolateName = '[hash:base64safe:5]',
 }: Options = {}) => {
   const files = {};
 
