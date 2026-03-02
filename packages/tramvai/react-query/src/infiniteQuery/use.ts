@@ -1,16 +1,11 @@
 import { useMemo } from 'react';
-import type {
-  InfiniteData,
-  InfiniteQueryObserverResult,
-  QueryKey,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
-} from '@tanstack/react-query';
+import type { InfiniteData, QueryKey, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { useInfiniteQuery as useOriginalInfiniteQuery } from '@tanstack/react-query';
 import type { ProviderDeps } from '@tinkoff/dippy';
 import { useDiContainer } from '@tramvai/react';
 import type { InfiniteQuery } from './types';
 import { isQuery } from '../baseQuery/types';
+import { SafeUseInfiniteQueryOptions } from './create';
 
 // Different types for useInfiniteQuery result between v4 and v5
 type SafeUnpackUseInfiniteQueryResult<
@@ -24,29 +19,29 @@ type SafeUnpackUseInfiniteQueryResult<
 
 function useInfiniteQuery<Options extends void, PageParam, Result, Deps extends ProviderDeps>(
   query:
-    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey>
+    | SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey>
     | InfiniteQuery<Options, PageParam, Result, Deps>
 ): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
 function useInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>(
   query:
-    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey>
+    | SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey>
     | InfiniteQuery<Options, PageParam, Result, Deps>,
   options: Options
 ): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
 function useInfiniteQuery<Options extends void, PageParam, Result, Deps extends ProviderDeps>(
   query:
-    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+    | SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam>
     | InfiniteQuery<Options, PageParam, Result, Deps>
 ): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
 function useInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>(
   query:
-    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+    | SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam>
     | InfiniteQuery<Options, PageParam, Result, Deps>,
   options: Options
 ): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>>;
 function useInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>(
   query:
-    | UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+    | SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam>
     | InfiniteQuery<Options, PageParam, Result, Deps>,
   options?: Options
 ): SafeUnpackUseInfiniteQueryResult<Result, Error, UseInfiniteQueryResult<Result, Error>> {

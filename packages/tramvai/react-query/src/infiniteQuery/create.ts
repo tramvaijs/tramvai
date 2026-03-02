@@ -1,5 +1,9 @@
 import identity from '@tinkoff/utils/function/identity';
-import type { InfiniteData, QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query';
+import type {
+  QueryKey,
+  UseInfiniteQueryOptions,
+  InfiniteQueryObserverOptions,
+} from '@tanstack/react-query';
 import type { ActionContext } from '@tramvai/core';
 import { declareAction } from '@tramvai/core';
 import { QUERY_CLIENT_TOKEN } from '@tramvai/module-react-query';
@@ -14,11 +18,25 @@ import { resolveDI } from '../shared/resolveDI';
 import { mapQuerySignalToxecutionContext } from '../shared/signal';
 import { createUniqueActionKeyForQuery } from '../shared/createUniqueActionKeyForQuery';
 
+// `UseInfiniteQueryOptions` types is incompatible between v4 and v5
+// also, this helper will work properly only for v4 or >=5.80,
+// because for >=5 <5.80 range there is 6 generic parameters in `UseInfiniteQueryOptions`
+export type SafeUseInfiniteQueryOptions<
+  TQueryFnData = unknown,
+  TError = unknown,
+  TData = TQueryFnData,
+  TQueryKey extends QueryKey = QueryKey,
+  TPageParam = unknown,
+> = InfiniteQueryObserverOptions extends { experimental_prefetchInRender?: boolean }
+  ? UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>
+  : // @ts-expect-error backward compatibility with RQ v4
+    UseInfiniteQueryOptions<TQueryFnData, TError, TData, TData, TQueryKey>;
+
 const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps>(
   query: InfiniteQuery<Options, PageParam, Result, Deps>,
   di: Container,
   options: Options
-): UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam> => {
+): SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam> => {
   const {
     key = identity,
     fn,
@@ -85,7 +103,7 @@ export const createInfiniteQuery = <
     [QUERY_PARAMETERS]: queryParameters,
     actionNamePostfix: createUniqueActionKeyForQuery(queryParameters),
     fork: (
-      options: Partial<UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>>
+      options: Partial<SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam>>
     ) => {
       return createInfiniteQuery({
         ...queryParameters,
