@@ -1,4 +1,5 @@
 import { provide, isValidModule } from '@tinkoff/dippy';
+import { nanoid } from 'nanoid';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -28,8 +29,12 @@ export async function start(
     category: ['api'],
   });
 
+  const buildId = inputParameters.buildId ?? nanoid();
   const logger = new Logger();
-  const config = new ConfigService({ mode: 'development', ...inputParameters }, extraConfiguration);
+  const config = new ConfigService(
+    { mode: 'development', buildId, ...inputParameters },
+    extraConfiguration
+  );
 
   await tracer.wrap(
     {

@@ -51,7 +51,7 @@ export const ForceCSRModule = declareModule({
       useFactory: ({ componentRegistry, fallback, envManager }) => {
         return function addCSRFallbackCompnent() {
           if (envManager.get(FORCE_RENDER_ENV_KEY) === 'true') {
-            componentRegistry.add(FALLBACK_NAME, fallback, FALLBACK_GROUP);
+            componentRegistry.add(FALLBACK_NAME, fallback!, FALLBACK_GROUP);
           }
         };
       },

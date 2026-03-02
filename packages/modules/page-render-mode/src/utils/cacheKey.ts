@@ -1,17 +1,10 @@
-export const getCacheKey = ({
-  method,
-  host,
-  path,
-  deviceType,
-}: {
-  method: string;
-  host: string;
-  path: string;
-  deviceType: 'desktop' | 'mobile';
-}) => {
-  return `${method}=${host}=${path}=${deviceType}`;
+// unsafe url symbol, cannot be used in pathname without encoding
+const SEPARATOR = '^';
+
+export const getCacheKey = ({ pathname, key }: { pathname: string; key: string }) => {
+  return `${pathname}${SEPARATOR}${key}`;
 };
 
-export const parseCacheKey = (key: string): string[] => {
-  return key.split('=');
+export const parseCacheKey = (key: string): [pathname: string, key: string] => {
+  return key.split(SEPARATOR) as [pathname: string, key: string];
 };

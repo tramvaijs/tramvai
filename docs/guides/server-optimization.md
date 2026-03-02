@@ -60,15 +60,16 @@ As a start, you can calculate size by the following formula: `0.75 * memory.limi
 For setting this parameter you need to run `server.js` using the `node` command with the `--max-old-space-size` parameter. This command is typically located in the `Dockerfile`:
 
 ```Dockerfile title="Dockerfile"
-FROM node:20-buster-slim
+FROM node:24-buster-slim
 WORKDIR /app
 COPY dist/server /app/
+COPY node_modules /app/
 COPY package.json /app/
 ENV NODE_ENV='production'
 
 EXPOSE 3000
 // highlight-next-line
-CMD [ "node", "--max-old-space-size=350", "/app/server.js" ]
+CMD npx tramvai static {appName} --buildType none && node --max-http-header-size=80000 /app/server.js
 ```
 
 Also, you can refer to k8s container resources when defining env variables:
@@ -166,7 +167,7 @@ A good balance between performance and memory usage is achieved with a semi spac
 For setting this parameter you need to run `server.js` using the `node` command with the `--max-semi-space-size` parameter. This command is typically located in the `Dockerfile`:
 
 ```Dockerfile title="Dockerfile"
-FROM node:20-buster-slim
+FROM node:24-buster-slim
 WORKDIR /app
 COPY dist/server /app/
 COPY package.json /app/

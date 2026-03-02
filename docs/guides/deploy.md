@@ -29,7 +29,7 @@ in APP_ID, you must pass the application identifier. After executing the command
 Recommended Dockerfile
 
 ```dockerfile
-FROM node:18-buster-slim
+FROM node:24-buster-slim
 WORKDIR /app
 COPY dist/server /app/
 COPY package.json /app/

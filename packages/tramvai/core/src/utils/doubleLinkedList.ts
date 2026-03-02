@@ -3,7 +3,7 @@
  * @interface
  * @template Value
  */
-interface ListNode<Value> {
+export interface ListNode<Value> {
   /** Reference to next node */
   next: ListNode<Value> | null;
   /** Reference to previous node */
@@ -57,7 +57,7 @@ export class DoubleLinkedList<Value> {
    * @example
    * list.push(42);
    */
-  push(value: Value): void {
+  push(value: Value): ListNode<Value> {
     const newNode = {
       value,
       next: null,
@@ -67,7 +67,7 @@ export class DoubleLinkedList<Value> {
     if (this.start === null) {
       this.start = newNode;
       this.end = newNode;
-      return;
+      return newNode;
     }
 
     const currentEnd = this.end;
@@ -76,6 +76,37 @@ export class DoubleLinkedList<Value> {
     if (currentEnd !== null) {
       currentEnd.next = this.end;
     }
+
+    return newNode;
+  }
+
+  /**
+   * Adds a value to the start of the list
+   * @param {Value} value The value to add
+   * @example
+   * list.unshift(42);
+   */
+  unshift(value: Value): ListNode<Value> {
+    const newNode = {
+      value,
+      next: null,
+      prev: null,
+    };
+    this.length++;
+    if (this.start === null) {
+      this.start = newNode;
+      this.end = newNode;
+      return newNode;
+    }
+
+    const currentStart = this.start;
+    this.start = newNode;
+    this.start.next = currentStart;
+    if (currentStart !== null) {
+      currentStart.prev = this.start;
+    }
+
+    return newNode;
   }
 
   /**

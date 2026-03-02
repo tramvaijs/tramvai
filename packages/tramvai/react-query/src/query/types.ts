@@ -7,7 +7,8 @@ export type CreateQueryOptions<Options, Result, Deps extends ProviderDeps> = Bas
   Options,
   Deps
 > & {
-  queryOptions?: UseQueryOptions<Result, Error>;
+  // broken tramvai `createQuery` typings if `queryKey` exists in `queryOptions` when @tanstack/react-query >= 5 version
+  queryOptions?: Omit<UseQueryOptions<Result, Error>, 'queryKey'>;
 
   fn: (
     this: ReactQueryContext<Deps>,

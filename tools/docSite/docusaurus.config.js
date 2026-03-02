@@ -162,11 +162,11 @@ const docusaurusConfig = {
           title: 'Links',
           items: [
             { label: 'Repository', href: 'https://github.com/tramvaijs/tramvai' },
-            
+            { label: 'Main site', href: 'https://www.tbank.ru/' },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} tinkoff.ru`,
+      copyright: `Copyright © ${new Date().getFullYear()} tbank.ru`,
     },
   },
 };

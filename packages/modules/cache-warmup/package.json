@@ -22,6 +22,7 @@
     "@tinkoff/request-core": "^0.10.0",
     "@tinkoff/request-plugin-protocol-http": "0.16.0",
     "@tinkoff/url": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
     "undici": "^7.18.2"
   },
   "peerDependencies": {

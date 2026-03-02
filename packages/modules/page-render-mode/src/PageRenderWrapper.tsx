@@ -1,30 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { PropsWithChildren, ComponentType } from 'react';
 import { useDi } from '@tramvai/react';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
-import { useRoute } from '@tramvai/module-router';
-import type { TramvaiRenderMode } from '@tramvai/tokens-render';
 import {
   PAGE_RENDER_FALLBACK_COMPONENT_PREFIX,
-  PAGE_RENDER_DEFAULT_MODE,
   PAGE_RENDER_DEFAULT_FALLBACK_COMPONENT,
 } from './tokens';
-import { getPageRenderMode } from './utils/getPageRenderMode';
+import { STATIC_PAGES_RESOLVE_PAGE_RENDER_MODE } from './private-tokens';
 
 export const PageRenderWrapper = ({ children }: PropsWithChildren<{}>) => {
   const [mounted, setMounted] = useState(false);
   const pageService = useDi(PAGE_SERVICE_TOKEN);
+  const resolvePageRenderMode = useDi(STATIC_PAGES_RESOLVE_PAGE_RENDER_MODE);
   const fallbackKey = useDi(PAGE_RENDER_FALLBACK_COMPONENT_PREFIX);
-  const defaultRenderMode = useDi(PAGE_RENDER_DEFAULT_MODE);
   const DefaultFallbackComponent = useDi({
     token: PAGE_RENDER_DEFAULT_FALLBACK_COMPONENT,
     optional: true,
   });
 
-  const FallbackComponent: ComponentType<any> =
+  const FallbackComponent: ComponentType<any> | null =
     pageService.resolveComponentFromConfig(fallbackKey as any) || DefaultFallbackComponent;
 
-  const mode = getPageRenderMode({ pageService, defaultRenderMode });
+  const mode = resolvePageRenderMode();
 
   useEffect(() => {
     if (mode === 'client') {
@@ -43,7 +40,7 @@ export const PageRenderWrapper = ({ children }: PropsWithChildren<{}>) => {
   return <>{children}</>;
 };
 
-export const pageRenderHOC = (WrapperPage) => (props) => {
+export const pageRenderHOC = (WrapperPage: any) => (props: any) => {
   return (
     <PageRenderWrapper>
       <WrapperPage {...props} />

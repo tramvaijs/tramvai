@@ -1,5 +1,5 @@
 import { commandLineListTokens, createApp, provide } from '@tramvai/core';
-import { COOKIE_MANAGER_TOKEN, CommonModule } from '@tramvai/module-common';
+import { COOKIE_MANAGER_TOKEN, CommonModule, REQUEST_MANAGER_TOKEN } from '@tramvai/module-common';
 import { PAGE_SERVICE_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { RenderModule } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
@@ -17,7 +17,11 @@ import {
   PageRenderModeModule,
   PAGE_RENDER_DEFAULT_FALLBACK_COMPONENT,
   PAGE_RENDER_WRAPPER_TYPE,
+  STATIC_PAGES_KEY_TOKEN,
+  STATIC_PAGES_FS_CACHE_ENABLED,
+  STATIC_PAGES_OPTIONS_TOKEN,
 } from '@tramvai/module-page-render-mode';
+import { USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
 
 import { Header } from './components/features/Header/Header';
 import { Footer } from './components/features/Footer/Footer';
@@ -85,6 +89,38 @@ createApp({
       deps: {
         pageService: PAGE_SERVICE_TOKEN,
       },
+    }),
+    provide({
+      provide: STATIC_PAGES_KEY_TOKEN,
+      useFactory: ({ userAgent, requestManager }) => {
+        return () => {
+          const isMobile = userAgent.device.type === 'mobile';
+          const host = requestManager.getHost();
+
+          // cache separate versions for mobile and desktop, also for different hosts
+          return [isMobile && 'mobile', !host.includes('localhost') && host]
+            .filter(Boolean)
+            .join('_');
+        };
+      },
+      deps: {
+        userAgent: USER_AGENT_TOKEN,
+        requestManager: REQUEST_MANAGER_TOKEN,
+      },
+    }),
+    provide({
+      provide: STATIC_PAGES_OPTIONS_TOKEN,
+      useValue: {
+        ttl: 5 * 60 * 1000,
+        maxSize: 100,
+        allowStale: true,
+        // if `User-Agent` and host headers is used for cache key, they should be included in allowedHeaders, to include that headers in background cache revalidation request
+        allowedHeaders: ['User-Agent', 'X-Original-Host', 'Host'],
+      },
+    }),
+    provide({
+      provide: STATIC_PAGES_FS_CACHE_ENABLED,
+      useValue: () => true,
     }),
   ],
 });

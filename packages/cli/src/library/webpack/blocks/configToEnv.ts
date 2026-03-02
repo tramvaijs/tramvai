@@ -1,3 +1,4 @@
+import path from 'node:path';
 import type Config from 'webpack-chain';
 import type { ConfigManager } from '../../../config/configManager';
 import { isApplication } from '../../../config/validate';
@@ -5,12 +6,13 @@ import type { ConfigEntry } from '../../../typings/configEntry/common';
 import { shouldUseReactRoot } from '../../../utils/shouldUseReactRoot';
 
 export const configToEnv = (configManager: ConfigManager<ConfigEntry>) => (config: Config) => {
-  const { fileSystemPages, shared, experiments } = isApplication(configManager)
+  const { fileSystemPages, shared, experiments, output } = isApplication(configManager)
     ? configManager
     : {
         fileSystemPages: { enabled: false, routesDir: false, pagesDir: false },
         shared: { criticalChunks: [] },
         experiments: {},
+        output: { static: 'dist/client' },
       };
 
   config.plugin('define').tap((args) => [
@@ -31,6 +33,7 @@ export const configToEnv = (configManager: ConfigManager<ConfigEntry>) => (confi
       'process.env.__TRAMVAI_REACT_TRANSITIONS': `'${JSON.stringify(
         experiments.reactTransitions
       )}'`,
+      'process.env.__TRAMVAI_OUTPUT_STATIC': `${JSON.stringify(configManager.env === 'development' ? path.join(output.static, configManager.buildId) : output.static)}`,
     },
   ]);
 };

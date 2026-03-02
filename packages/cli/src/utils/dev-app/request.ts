@@ -14,6 +14,22 @@ export const appRequest = <T>(configManager: ConfigManager, path: string, option
   return request<T>({ url: `${serverPath}${path}`, ...options });
 };
 
+export const appFetch = (
+  configManager: ConfigManager,
+  path: string,
+  { query = {}, ...options }: RequestInit & { query?: Record<string, string> } = {}
+) => {
+  const { host, port } = configManager;
+  const serverPath = `http://${host}:${port}/`;
+  const url = new URL(path, serverPath);
+
+  Object.entries(query).forEach(([key, value]) => {
+    url.searchParams.append(key, value);
+  });
+
+  return fetch(url, options);
+};
+
 interface BundleInfoResponse {
   resultCode: string;
   payload: string[];

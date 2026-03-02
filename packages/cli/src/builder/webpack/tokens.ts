@@ -58,3 +58,5 @@ export const CLOSE_HANDLER_TOKEN = createToken<() => Promise<void> | void>(
   'builder-webpack closeHandler',
   { multi: true }
 );
+
+export const BUILD_ID_TOKEN = createToken<string>('builder-webpack build id');

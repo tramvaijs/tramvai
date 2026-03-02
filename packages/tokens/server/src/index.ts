@@ -182,3 +182,12 @@ export type ProxyConfig =
 export type DepsFilter = (
   deps: Record<string, string>
 ) => Record<string, string> | Promise<Record<string, string>>;
+
+export const ETAG_OPTIONS_TOKEN = createToken<{
+  // TODO: page-level etag
+  enabled: boolean;
+  // TODO: custom weak etag function
+  weak?: boolean;
+}>('tramvai/server etag options', {
+  scope: Scope.SINGLETON,
+});

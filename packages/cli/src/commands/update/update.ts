@@ -58,6 +58,8 @@ export default async (
 
   await context.packageManager.install({ stdio: 'inherit' });
 
+  // todo если с --tag то для npm надо запустить `npm update --no-save`
+
   if (context.packageManager.name !== 'npm') {
     // npm dedupe is extremely slow in most cases
     // so execute it only for yarn

@@ -1,7 +1,8 @@
 import type { ProvideDepsIterator, ProviderDeps } from '@tinkoff/dippy';
-import type { UseInfiniteQueryOptions, InfiniteData, QueryKey } from '@tanstack/react-query';
+import type { InfiniteData, QueryKey } from '@tanstack/react-query';
 import type { TramvaiAction } from '@tramvai/core';
 import type { BaseCreateQueryOptions, BaseQuery, ReactQueryContext } from '../baseQuery/types';
+import { SafeUseInfiniteQueryOptions } from './create';
 
 export type CreateInfiniteQueryOptions<
   Options,
@@ -10,7 +11,7 @@ export type CreateInfiniteQueryOptions<
   Deps extends ProviderDeps,
 > = BaseCreateQueryOptions<Options, Deps> & {
   infiniteQueryOptions?: Partial<
-    UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+    SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam>
   >;
 
   fn: (
@@ -32,7 +33,7 @@ export type InfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>
   Options,
   CreateInfiniteQueryOptions<Options, PageParam, Result, Deps>,
   InfiniteQuery<Options, PageParam, Result, Deps>,
-  UseInfiniteQueryOptions<Result, Error, Result, Result, QueryKey, PageParam>
+  SafeUseInfiniteQueryOptions<Result, Error, Result, QueryKey, PageParam>
 > & {
   fetchAction(options?: Options): TramvaiAction<[], Promise<InfiniteData<Result>>, any>;
 };

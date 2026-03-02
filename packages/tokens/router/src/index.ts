@@ -1,4 +1,4 @@
-import { createToken } from '@tinkoff/dippy';
+import { Scope, createToken } from '@tinkoff/dippy';
 import type {
   AbstractRouter,
   NavigationGuard,
@@ -11,6 +11,10 @@ import type {
   RouteConfig,
   RouterPlugin,
 } from '@tinkoff/router';
+import type {
+  AsyncParallelTapableHookInstance,
+  AsyncTapableHookInstance,
+} from '@tinkoff/hook-runner';
 import type { TramvaiComponent } from '@tramvai/react';
 
 /**
@@ -122,3 +126,21 @@ export interface LinkPrefetchManager {
  * Token to provide router plugins
  */
 export const ROUTER_PLUGIN = createToken<RouterPlugin>('router plugin', { multi: true });
+
+export interface PrerenderRequest {
+  /**
+   * Page path, for example, '/product/123/', without query parameters
+   */
+  pathname: string;
+  headers?: Record<string, string>;
+  query?: Record<string, string>;
+}
+
+export type PrerenderHooksToken = {
+  'prerender:routes': AsyncParallelTapableHookInstance<Array<string | PrerenderRequest>>;
+  'prerender:generate': AsyncTapableHookInstance<NavigationRoute & { prerenderSkip?: boolean }>;
+};
+
+export const PRERENDER_HOOKS_TOKEN = createToken<PrerenderHooksToken>('tramvai prerender hooks', {
+  scope: Scope.SINGLETON,
+});

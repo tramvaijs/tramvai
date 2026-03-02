@@ -3,6 +3,7 @@ import type { Request } from '@tinkoff/request-core';
 import requestFactory from '@tinkoff/request-core';
 import httpPlugin from '@tinkoff/request-plugin-protocol-http';
 import { ExtractDependencyType } from '@tramvai/core';
+import type { PrerenderRequest } from '@tramvai/tokens-router';
 import { CACHE_WARMUP_HOOKS_TOKEN } from './tokens';
 
 const request = requestFactory([httpPlugin()]);
@@ -56,7 +57,7 @@ export async function queueRequests<T>(options: QueueReuestsOptions<T>) {
 }
 
 export function createRequestsOptions(options: {
-  urls: string[];
+  urls: Array<string | PrerenderRequest>;
   port: string;
   userAgents: string[];
 }): Request[] {
@@ -64,22 +65,42 @@ export function createRequestsOptions(options: {
 
   return urls.reduce((requestOptions, url) => {
     const ip = generateRandomIPv4Adress();
+    const prerenderRequest = typeof url === 'string' ? { pathname: url } : url;
+    const { pathname, headers, query } = prerenderRequest;
 
     requestOptions.push(
-      ...options.userAgents.map(
-        (userAgent): Request => ({
-          url: format({
-            hostname: 'localhost',
-            port,
-            path: url,
-          }),
-          headers: {
-            'User-Agent': userAgent,
-            'X-Real-IP': ip,
-            'x-tramvai-service-name': 'CACHE_WARMUP',
-          },
-        })
-      )
+      ...(typeof url === 'string'
+        ? options.userAgents.map(
+            (userAgent): Request => ({
+              url: format({
+                hostname: 'localhost',
+                port,
+                path: pathname,
+                query,
+              }),
+              headers: {
+                'User-Agent': userAgent,
+                'X-Real-IP': ip,
+                ...headers,
+                'x-tramvai-service-name': 'CACHE_WARMUP',
+              },
+            })
+          )
+        : [
+            {
+              url: format({
+                hostname: 'localhost',
+                port,
+                path: pathname,
+                query,
+              }),
+              headers: {
+                'X-Real-IP': ip,
+                ...headers,
+                'x-tramvai-service-name': 'CACHE_WARMUP',
+              },
+            },
+          ])
     );
 
     return requestOptions;

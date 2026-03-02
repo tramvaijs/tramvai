@@ -236,6 +236,36 @@ HTTP/1.1 200 OK
 
 ```
 
+### ETag header
+
+Tramvai support [ETag header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag) generation for application pages - it can speed up the page loading for repeated visits.
+
+:::warning
+
+ETag generation is a heavy operation for a big pages and can negatively affect the application performance.
+
+:::
+
+:::warning
+
+ETag generation is incompatible with `@tramvai/module-opentelementry`, because request trace id is injected to the page HTML content in `<meta name="traceparent" />` tag.
+
+:::
+
+To enable ETag header, provide `ETAG_OPTIONS_TOKEN` token:
+
+```ts
+const provider = provide({
+  provide: ETAG_OPTIONS_TOKEN,
+  useValue: {
+    enabled: true,
+    // by default, ETag is generated based on the content of the page, which is not the best option for performance,
+    // you can pass `weak: true` parameter to generate weak ETag based on the hash of the initial state of the page, which can be faster
+    weak: false,
+  },
+});
+```
+
 ## How to
 
 ### Setting `keepAliveTimeout` for the server

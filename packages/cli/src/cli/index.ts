@@ -68,6 +68,7 @@ export async function cliInitialized(cliArgs = process.argv) {
     }>('package.json');
     const { content: config } = getTramvaiConfig();
 
+    // todo: different build id here, can be a problem?
     const configManager = new ConfigManager({ config, syncConfigFile: syncJsonFile });
     const packageManager = resolvePackageManager({ rootDir: process.cwd() });
 

@@ -3,6 +3,7 @@
 // actual version to update will be calculated from the some of the @tramvai/module
 export const DEPENDANT_LIBS_MAP = new Map([
   ['@tinkoff/logger', '@tramvai/module-log'],
+  ['@tinkoff/env-validators', '@tramvai/module-client-hints'],
   ['@tinkoff/dippy', '@tramvai/core'],
   ['@tinkoff/router', '@tramvai/module-router'],
   ['@tinkoff/url', '@tramvai/module-common'],

@@ -1,5 +1,5 @@
 import { sleep } from '@tramvai/test-integration';
-import { test } from './test.fixture';
+import { testWarmup as test } from './test.fixture';
 
 test.describe('tramvai/cache-warmup', async () => {
   test('cache warmup should resolve extra routes from "prerender:routes" hook and support skipped requests in "cache-warmup:request" hook', async ({
@@ -19,16 +19,19 @@ test.describe('tramvai/cache-warmup', async () => {
       .toEqual([
         `Cache warmup URLs:
 /
+/redirect/
 /second/
+/third/
 /1/test/1/
 /2/test/2/
-/3/test/3/`,
+/3/test/3/
+/?utm_source=prerender&utm_medium=example`,
         `Cache warmup process 'SUCCESS', skipped URLs:
 /second/
 /second/
 /3/test/3/
 /3/test/3/`,
-        'Cache warmup made 6 requests for 5 URLs',
+        'Cache warmup made 13 requests for 10 URLs',
       ]);
   });
 });

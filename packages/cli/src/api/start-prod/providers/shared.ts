@@ -4,11 +4,13 @@ import fastify from 'fastify';
 import fastifyCompress from '@fastify/compress';
 import fastifyStatic from '@fastify/static';
 import zlib from 'zlib';
+import { nanoid } from 'nanoid';
 import { CLOSE_HANDLER_TOKEN, INIT_HANDLER_TOKEN, PROCESS_HANDLER_TOKEN } from '../tokens';
 import { CONFIG_MANAGER_TOKEN, PORT_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../di/tokens';
 import { stopServer } from '../../start/utils/stopServer';
 import { listenServer } from '../../start/utils/listenServer';
 import { isApplication, isChildApp } from '../../../config/validate';
+import { BUILD_ID_TOKEN } from '../../../builder/webpack/tokens';
 
 export const sharedProviders: readonly Provider[] = [
   provide({
@@ -87,6 +89,12 @@ export const sharedProviders: readonly Provider[] = [
     deps: {
       staticServer: STATIC_SERVER_TOKEN,
       portManager: PORT_MANAGER_TOKEN,
+    },
+  }),
+  provide({
+    provide: BUILD_ID_TOKEN,
+    useFactory: () => {
+      return nanoid();
     },
   }),
 ] as const;

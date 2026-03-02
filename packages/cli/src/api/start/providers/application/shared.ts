@@ -15,13 +15,15 @@ import { createConfigManager } from '../../../../config/configManager';
 import { createServer } from '../../utils/createServer';
 import { listenServer } from '../../utils/listenServer';
 import { selfSignedCertificateProvider } from '../../../shared/providers/selfSignedCertificateProvider';
+import { BUILD_ID_TOKEN } from '../../../../builder/webpack/tokens';
 
 export const sharedProviders: readonly Provider[] = [
   ...selfSignedCertificateProvider,
   provide({
     provide: CONFIG_MANAGER_TOKEN,
-    useFactory: ({ configEntry, parameters, portManager }) =>
+    useFactory: ({ configEntry, parameters, portManager, buildId }) =>
       createConfigManager(configEntry as ApplicationConfigEntry, {
+        buildId,
         ...parameters,
         appEnv: parameters.env,
         env: 'development',
@@ -32,6 +34,7 @@ export const sharedProviders: readonly Provider[] = [
       configEntry: CONFIG_ENTRY_TOKEN,
       parameters: COMMAND_PARAMETERS_TOKEN,
       portManager: PORT_MANAGER_TOKEN,
+      buildId: BUILD_ID_TOKEN,
     },
   }),
   provide({

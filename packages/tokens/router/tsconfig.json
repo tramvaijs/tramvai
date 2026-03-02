@@ -18,6 +18,9 @@
         },
         {
             "path": "../../tramvai/react"
+        },
+        {
+            "path": "../../libs/hooks"
         }
     ]
 }

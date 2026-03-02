@@ -1,5 +1,6 @@
 import type { PAPI_SERVICE } from '@tramvai/tokens-http-client';
 import type { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/module-common';
+import type { PrerenderRequest } from '@tramvai/tokens-router';
 import { ExtractDependencyType } from '@tramvai/core';
 import { createRequestsOptions, sendWarmUpRequest, queueRequests } from './utils';
 import { CACHE_WARMUP_HOOKS_TOKEN } from './tokens';
@@ -28,7 +29,7 @@ export async function warmUpCache(options: {
   log.info("Cache warmup process 'START'");
 
   try {
-    const { payload: urls } = await papiService.request<string[]>({
+    const { payload: urls } = await papiService.request<Array<string | PrerenderRequest>>({
       path: 'prerenderRoutes',
     });
 

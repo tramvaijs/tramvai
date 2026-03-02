@@ -2,10 +2,10 @@ import flatten from '@tinkoff/utils/array/flatten';
 import prop from '@tinkoff/utils/object/prop';
 
 import { createPapiMethod } from '@tramvai/papi';
-import { ROUTES_TOKEN } from '@tramvai/tokens-router';
+import { ROUTES_TOKEN, PRERENDER_HOOKS_TOKEN, PrerenderRequest } from '@tramvai/tokens-router';
 import { isWildcard, isHistoryFallback, Route } from '@tinkoff/router';
 import { ExtractDependencyType } from '@tinkoff/dippy';
-import { PRERENDER_HOOKS_TOKEN, routeTransformToken } from '../../tokens';
+import { routeTransformToken } from '../../tokens';
 import { routerBundleInfoAdditionalToken } from '../../tokens';
 
 export const deduplicateArray = <T>(list: T[]): T[] => {
@@ -79,7 +79,7 @@ export const prerenderRoutesPapi = createPapiMethod({
   method: 'get',
   path: '/prerenderRoutes',
   async handler() {
-    const routesList: string[] = [];
+    const routesList: Array<string | PrerenderRequest> = [];
 
     await this.deps.hooks['prerender:routes'].callPromise(routesList);
 

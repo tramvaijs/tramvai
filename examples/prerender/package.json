@@ -19,9 +19,11 @@
   "dependencies": {
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-cache-warmup": "0.0.0-stub",
+    "@tramvai/module-client-hints": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub",
     "@tramvai/module-error-interceptor": "0.0.0-stub",
     "@tramvai/module-http-client": "0.0.0-stub",
+    "@tramvai/module-page-render-mode": "0.0.0-stub",
     "@tramvai/module-render": "0.0.0-stub",
     "@tramvai/module-router": "0.0.0-stub",
     "@tramvai/module-seo": "0.0.0-stub",

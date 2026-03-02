@@ -130,6 +130,7 @@
     "lightningcss-loader": "^3.0.0",
     "loader-utils": "^3.2.1",
     "mini-css-extract-plugin": "2.7.6",
+    "nanoid": "^3.3.11",
     "node-plop": "^0.26.0",
     "noop-stream": "^0.1.0",
     "null-loader": "^4.0.1",

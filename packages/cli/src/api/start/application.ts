@@ -51,14 +51,26 @@ export const startApplication = async (di: Container): Result => {
   await runHandlers(di.get({ token: PROCESS_HANDLER_TOKEN, optional: true }));
   const builderStart = await builder.start({ strictError: di.get(STRICT_ERROR_HANDLE) });
 
+  const close = async () => {
+    await builderStart.close();
+    await runHandlers(di.get({ token: CLOSE_HANDLER_TOKEN, optional: true }));
+  };
+
+  // CLI will wait for this handlers before exiting
+  // @reference `packages/cli/src/cli/runCLI.ts`
+  if (!global.__TRAMVAI_EXIT_HANDLERS__) {
+    global.__TRAMVAI_EXIT_HANDLERS__ = [];
+  }
+
+  global.__TRAMVAI_EXIT_HANDLERS__.push(async () => {
+    await close();
+  });
+
   return {
     server,
     staticServer,
     builder,
     ...builderStart,
-    close: async () => {
-      await builderStart.close();
-      await runHandlers(di.get({ token: CLOSE_HANDLER_TOKEN, optional: true }));
-    },
+    close,
   };
 };

@@ -5,6 +5,7 @@ import prop from '@tinkoff/utils/object/prop';
 import mapObj from '@tinkoff/utils/object/map';
 import { resolve } from 'path';
 import fs from 'fs';
+import { nanoid } from 'nanoid';
 import type { BuildType } from '../typings/projectType';
 import type { Env } from '../typings/Env';
 import type { ConfigEntry, OverridableOption } from '../typings/configEntry/common';
@@ -25,6 +26,7 @@ export interface Settings<E extends Env> {
   rootDir?: string;
   version?: string;
   buildType?: BuildType;
+  buildId?: string;
   debug?: string | boolean;
   verboseWebpack?: boolean;
   trace?: boolean;
@@ -91,8 +93,10 @@ export type ConfigManager<
   E extends Env = Env,
 > = OmitOverridable<C> &
   Required<Settings<E>> & {
+    buildId: string;
     target: Target;
     buildPath: string;
+    prerenderPagesPath?: string;
     withSettings(settings: Settings<E>): ConfigManager<C, E>;
     dehydrate(): [C, Settings<E>];
     assetsPrefix?: string;
@@ -106,6 +110,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
   configEntry: C,
   settings: Settings<E>
 ): ConfigManager<C, E> => {
+  const buildId = settings.buildId ?? nanoid();
   const env: E = settings.env ?? ('development' as E);
   const normalizedConfigEntry = omitEnvOptions(env, configEntry);
 
@@ -122,6 +127,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
   }
 
   const config: ConfigManager<C, E> = {
+    buildId,
     ...normalizedConfigEntry,
     version:
       (type === 'module' ? moduleVersion(configEntry) : '') ||
@@ -179,6 +185,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
       return [
         configEntry,
         {
+          buildId,
           ...settings,
           // drop options that couldn't be serialized
           stdout: undefined,
@@ -199,6 +206,10 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
       rootDir,
       buildType === 'server' ? config.output.server : config.output.client
     );
+    config.prerenderPagesPath =
+      env === 'development'
+        ? resolve(rootDir, config.output.static, config.buildId)
+        : resolve(rootDir, config.output.static);
 
     const pwa = config.experiments?.pwa;
     if (pwa.webmanifest?.enabled) {

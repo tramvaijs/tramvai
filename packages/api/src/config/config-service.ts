@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import path from 'node:path';
 
 import type { Config as SvgoConfig } from 'svgo';
 import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
@@ -6,6 +7,7 @@ import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-inte
 import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import type { PluginOptions } from 'image-minimizer-webpack-plugin';
+import { nanoid } from 'nanoid';
 
 import { cosmiconfig } from 'cosmiconfig';
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
@@ -197,6 +199,7 @@ export type DedupeOptions = {
  */
 export type InputParameters = {
   name: string;
+  buildId?: string;
   mode?: 'development' | 'production';
   port?: number;
   host?: string;
@@ -496,6 +499,10 @@ export const CONFIGURATION_EXTENSION_TOKEN = createToken<ExtensionToken>(
 // TODO: как выделить типы для приложения или Child App'а?
 // фабрика отдельной сущности AppProject / ChildAppProject?
 export class ConfigService {
+  /**
+   * Unique build id
+   */
+  buildId: string;
   #parameters: InputParameters;
   #config!: Configuration;
   #extraConfig: Partial<Configuration>;
@@ -511,6 +518,7 @@ export class ConfigService {
   constructor(parameters: InputParameters, extraConfiguration?: Partial<Configuration>) {
     this.#parameters = parameters;
     this.#extraConfig = extraConfiguration ?? {};
+    this.buildId = parameters.buildId ?? nanoid();
   }
 
   async initialize() {
@@ -716,7 +724,15 @@ export class ConfigService {
     if (this.#project.type === 'child-app') {
       return this.#project.output ?? 'dist/child-app';
     }
-    return this.#project.output?.static ?? 'dist/static';
+
+    let result = this.#project.output?.static ?? 'dist/static';
+
+    // in development mode, we want to have separate static output for each build to avoid conflicts between multiple running
+    if (this.mode === 'development') {
+      result = path.join(result, this.buildId);
+    }
+
+    return result;
   }
 
   get fileSystemPages(): FileSystemPagesOptions | null {

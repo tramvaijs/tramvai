@@ -3,6 +3,7 @@ import { DI_TOKEN, provide } from '@tinkoff/dippy';
 import { COMMAND_PARAMETERS_TOKEN, CONFIG_MANAGER_TOKEN } from '../../../../di/tokens';
 import { toWebpackConfig } from '../../../../library/webpack/utils/toWebpackConfig';
 import {
+  BUILD_ID_TOKEN,
   CLIENT_CONFIG_MANAGER_TOKEN,
   CLOSE_HANDLER_TOKEN,
   PROCESS_HANDLER_TOKEN,
@@ -17,13 +18,15 @@ import { createCompiler } from '../../utils/compiler';
 export const buildClientProviders: Provider[] = [
   provide({
     provide: CLIENT_CONFIG_MANAGER_TOKEN,
-    useFactory: ({ configManager }) => {
+    useFactory: ({ configManager, buildId }) => {
       return configManager.withSettings({
         buildType: 'client',
+        buildId,
       });
     },
     deps: {
       configManager: CONFIG_MANAGER_TOKEN,
+      buildId: BUILD_ID_TOKEN,
     },
   }),
   provide({

@@ -14,18 +14,14 @@ declare global {
   }
 }
 
-const isTouch = !!(
-  'ontouchstart' in window ||
-  (window.DocumentTouch && document instanceof window.DocumentTouch)
-);
-
-const displayMode = getDisplayMode();
-
 const getMediaInfo = (): MediaInfo => ({
   width: window.innerWidth,
   height: window.innerHeight,
-  isTouch,
-  displayMode,
+  isTouch: !!(
+    'ontouchstart' in window ||
+    (window.DocumentTouch && document instanceof window.DocumentTouch)
+  ),
+  displayMode: getDisplayMode(),
   retina: window.matchMedia(mediaBreakpoints.retina).matches,
 });
 

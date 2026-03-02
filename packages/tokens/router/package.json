@@ -18,6 +18,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@tinkoff/hook-runner": "0.0.0-stub",
     "@tinkoff/router": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub"
   },

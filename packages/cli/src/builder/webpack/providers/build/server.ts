@@ -1,6 +1,7 @@
 import type { Provider } from '@tinkoff/dippy';
 import { DI_TOKEN, provide } from '@tinkoff/dippy';
-import rimraf from 'rimraf';
+import rimrafCb from 'rimraf';
+import { promisify } from 'util';
 import { toWebpackConfig } from '../../../../library/webpack/utils/toWebpackConfig';
 import { CONFIG_MANAGER_TOKEN } from '../../../../di/tokens';
 import {
@@ -16,6 +17,8 @@ import {
 import { closeWebpack } from '../../utils/closeWebpack';
 import { runWebpack } from '../../utils/runWebpack';
 import { createCompiler } from '../../utils/compiler';
+
+const rimraf = promisify(rimrafCb);
 
 export const buildServerProviders: Provider[] = [
   provide({
@@ -40,8 +43,11 @@ export const buildServerProviders: Provider[] = [
     provide: INIT_HANDLER_TOKEN,
     multi: true,
     useFactory: ({ configManager }) => {
-      return function clearBuildDir() {
-        return rimraf.sync(`${configManager.buildPath}/**`, {});
+      return async function clearBuildDir() {
+        await Promise.all([
+          rimraf(`${configManager.buildPath}/**`),
+          configManager.prerenderPagesPath && rimraf(`${configManager.prerenderPagesPath}/**`),
+        ]);
       };
     },
     deps: {

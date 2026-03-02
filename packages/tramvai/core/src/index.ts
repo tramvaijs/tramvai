@@ -25,4 +25,4 @@ export {
 } from '@tinkoff/dippy';
 
 export { Deferred } from './utils/deferred.inline';
-export { DoubleLinkedList } from './utils/doubleLinkedList';
+export { DoubleLinkedList, ListNode } from './utils/doubleLinkedList';

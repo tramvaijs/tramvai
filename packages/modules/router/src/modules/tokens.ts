@@ -1,12 +1,10 @@
 import { createToken, Scope } from '@tinkoff/dippy';
-import { AsyncParallelTapableHookInstance, AsyncTapableHookInstance } from '@tinkoff/hook-runner';
 import type {
   NavigationHook,
   AbstractRouter,
   NavigationSyncHook,
   Route,
   BackNavigationType,
-  NavigationRoute,
 } from '@tinkoff/router';
 import type { RouteTransform } from '@tramvai/tokens-router';
 
@@ -53,12 +51,3 @@ export const ROUTER_VIEW_TRANSITIONS_ENABLED = createToken<boolean>(
 export const BACK_NAVIGATION_WITHIN_ROUTE_TYPE = createToken<BackNavigationType>(
   'router backNavigationWithinRouteType'
 );
-
-export type PrerenderHooksToken = {
-  'prerender:routes': AsyncParallelTapableHookInstance<string[]>;
-  'prerender:generate': AsyncTapableHookInstance<NavigationRoute & { prerenderSkip?: boolean }>;
-};
-
-export const PRERENDER_HOOKS_TOKEN = createToken<PrerenderHooksToken>('tramvai prerender hooks', {
-  scope: Scope.SINGLETON,
-});

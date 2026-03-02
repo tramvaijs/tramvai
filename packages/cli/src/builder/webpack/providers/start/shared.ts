@@ -1,6 +1,8 @@
 import type { Provider } from '@tinkoff/dippy';
 import { DI_TOKEN, provide } from '@tinkoff/dippy';
 import webpack from 'webpack';
+import rimrafCb from 'rimraf';
+import { promisify } from 'util';
 import { toWebpackConfig } from '../../../../library/webpack/utils/toWebpackConfig';
 import {
   PROCESS_HANDLER_TOKEN,
@@ -10,9 +12,12 @@ import {
   WEBPACK_SERVER_COMPILER_TOKEN,
   WEBPACK_SERVER_CONFIG_TOKEN,
   WEBPACK_ANALYZE_PLUGIN_TOKEN,
+  CLOSE_HANDLER_TOKEN,
 } from '../../tokens';
 import { createDevServer } from '../../devServer/setup';
 import { CONFIG_MANAGER_TOKEN, STATIC_SERVER_TOKEN } from '../../../../di/tokens';
+
+const rimraf = promisify(rimrafCb);
 
 export const startSharedProviders: Provider[] = [
   provide({
@@ -110,6 +115,20 @@ export const startSharedProviders: Provider[] = [
       compiler: WEBPACK_COMPILER_TOKEN,
       configManager: CONFIG_MANAGER_TOKEN,
       staticServer: STATIC_SERVER_TOKEN,
+    },
+  }),
+  provide({
+    provide: CLOSE_HANDLER_TOKEN,
+    multi: true,
+    useFactory: ({ configManager }) => {
+      return async () => {
+        if (configManager.prerenderPagesPath) {
+          await rimraf(`${configManager.prerenderPagesPath}/**`);
+        }
+      };
+    },
+    deps: {
+      configManager: CONFIG_MANAGER_TOKEN,
     },
   }),
 ];

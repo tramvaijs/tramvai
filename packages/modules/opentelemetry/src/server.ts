@@ -8,6 +8,7 @@ import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
 import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { RESOURCES_REGISTRY, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
+import { STATIC_PAGES_SERVICE } from '@tramvai/module-page-render-mode';
 import { SpanKind } from '@opentelemetry/api';
 import {
   OPENTELEMETRY_PROVIDER_CONFIG_TOKEN,
@@ -73,12 +74,16 @@ export * from './tokens';
     }),
     provide({
       provide: commandLineListTokens.generatePage,
-      useFactory: ({ tracer, resourcesRegistry }) => {
+      useFactory: ({ tracer, resourcesRegistry, staticPageService }) => {
         return function insertTraceIdToResourcesRegistry() {
           tracer.startActiveSpan('BROWSER', { kind: SpanKind.CLIENT }, () => {
             const traceparent = getTraceparentHeader(tracer);
 
-            if (traceparent !== undefined) {
+            if (
+              traceparent !== undefined &&
+              // remove traceparent meta tag from cached page, because it can lead to incorrect traces correlation
+              !staticPageService?.shouldUseCache()
+            ) {
               resourcesRegistry.register({
                 slot: ResourceSlot.HEAD_META,
                 type: ResourceType.meta,
@@ -91,6 +96,7 @@ export * from './tokens';
       deps: {
         tracer: OPENTELEMETRY_TRACER_TOKEN,
         resourcesRegistry: RESOURCES_REGISTRY,
+        staticPageService: optional(STATIC_PAGES_SERVICE),
       },
     }),
     provide({
@@ -155,7 +161,7 @@ export * from './tokens';
       },
     }),
     // todo open telemetry debug flag or wrap ConsoleSpanExporter in logger
-    ...(process.env.NODE_ENV === 'development'
+    ...(process.env.TRAMVAI_OPENTELEMETRY_DEBUG === 'true'
       ? [
           provide({
             provide: OPENTELEMETRY_PROVIDER_SPAN_PROCESSOR_TOKEN,

@@ -1,6 +1,6 @@
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import path from 'path';
-import { node } from 'execa';
+import execa, { node } from 'execa';
 import waitOn from 'wait-on';
 import getPort from 'get-port';
 import type { WorkerFixture, TestFixture } from '@playwright/test';
@@ -26,7 +26,7 @@ export type AppServerOptionsType = {
 export namespace BuildAppTypes {
   export type Cwd = string;
   export type AppTarget = _AppTarget;
-  export type BuildOptions = BuildCliOptions;
+  export type BuildOptions = BuildCliOptions & { appPrerenderEnabled?: boolean };
   export type AppServer = AppServerType;
   export type AppServerOptions = AppServerOptionsType;
 }
@@ -47,6 +47,9 @@ export const buildAppFixture: [
   { scope: 'worker'; timeout: number },
 ] = [
   async ({ appTarget, buildOptions }, use) => {
+    const rootDir = appTarget.cwd ?? path.dirname(path.resolve(module.parent!.filename, '.'));
+    const { appPrerenderEnabled, ...options } = buildOptions ?? {};
+
     await buildCli(
       'target' in appTarget
         ? appTarget.target
@@ -56,8 +59,8 @@ export const buildAppFixture: [
             root: appTarget.cwd,
           }),
       {
-        ...buildOptions,
-        rootDir: appTarget.cwd ?? path.dirname(path.resolve(module.parent!.filename, '.')),
+        ...options,
+        rootDir,
       }
     );
 
@@ -81,11 +84,13 @@ export const appServerFixture: [
       appTarget: BuildAppTypes.AppTarget;
       appServerOptions: BuildAppTypes.AppServerOptions;
       buildApp: void;
+      buildOptions?: BuildAppTypes.BuildOptions;
     }
   >,
   { scope: 'test' },
 ] = [
-  async ({ appTarget, appServerOptions, buildApp }, use) => {
+  // eslint-disable-next-line max-statements
+  async ({ appTarget, appServerOptions, buildApp, buildOptions }, use) => {
     const { env = {}, output = {} } = appServerOptions;
     const root = appTarget.cwd ?? path.dirname(path.resolve(module.parent!.filename, '.'));
     const port = await getPort();
@@ -93,6 +98,40 @@ export const appServerFixture: [
     const readinessProbePath = `http://localhost:${port}/readyz`;
     const clientOutput = output.client ?? path.join('dist', 'client');
     const serverOutput = output.server ?? path.join('dist', 'server');
+    const { appPrerenderEnabled = false, ...options } = buildOptions ?? {};
+
+    const sharedEnv = {
+      PORT: String(port),
+      PORT_STATIC: String(staticPort),
+      NODE_ENV: 'production',
+      CACHE_WARMUP_DISABLED: 'true',
+      DEV_STATIC: 'true',
+      DANGEROUS_UNSAFE_ENV_FILES: 'true',
+      ASSETS_PREFIX: `http://localhost:${staticPort}/${clientOutput}/`,
+      ...env,
+    };
+
+    if (appPrerenderEnabled) {
+      // TODO: JS API for tramvai static
+      await execa(
+        'tramvai',
+        [
+          'static',
+          'target' in appTarget ? appTarget.target : appTarget.name,
+          '--buildType',
+          'none',
+        ],
+        {
+          cwd: root,
+          env: {
+            ...process.env,
+            ...options?.env,
+            ...sharedEnv,
+            DANGEROUS_UNSAFE_ENV_FILES: 'true',
+          },
+        }
+      );
+    }
 
     const server = node(path.resolve(root, serverOutput, 'server.js'), [], {
       cwd: root,

@@ -21,7 +21,7 @@ type WorkerFixture = {
   buildApp: void;
 };
 
-export const test = base.extend<TestFixture, WorkerFixture>({
+export const testWarmup = base.extend<TestFixture, WorkerFixture>({
   buildAllureTree,
   appTarget: [
     {
@@ -46,6 +46,33 @@ export const test = base.extend<TestFixture, WorkerFixture>({
           CACHE_WARMUP_DISABLED: 'false',
         },
       });
+    },
+    { scope: 'worker', auto: true, option: true },
+  ],
+});
+
+export const testPrerender = base.extend<TestFixture, WorkerFixture>({
+  buildAllureTree,
+  appTarget: [
+    {
+      target: 'prerender',
+      cwd: rootDir,
+    },
+    { scope: 'worker', auto: true },
+  ],
+  buildApp: buildAppFixture,
+  buildOptions: [
+    {
+      // to reuse build cache between prerender and cache-warmup tests
+      fileCache: true,
+      appPrerenderEnabled: true,
+    },
+    { scope: 'worker', auto: true, option: true },
+  ],
+  appServer: appServerFixture,
+  appServerOptions: [
+    async ({ appTarget }, use) => {
+      await use({});
     },
     { scope: 'worker', auto: true, option: true },
   ],

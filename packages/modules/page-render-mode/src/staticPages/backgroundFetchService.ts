@@ -1,16 +1,7 @@
 import { format } from '@tinkoff/url';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
-import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import type { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
 import type { STATIC_PAGES_BACKGROUND_FETCH_ENABLED } from '../tokens';
-
-const userAgentByDeviceType = {
-  /** Chrome on Mobile */
-  mobile:
-    'Mozilla/5.0 (Linux; Android 7.0; SM-G930V Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.3071.125 Mobile Safari/537.36',
-  /** Chrome on Desktop */
-  desktop:
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.3987.87 Safari/537.36',
-};
 
 type Logger = ExtractDependencyType<typeof LOGGER_TOKEN>;
 type BackgroundCacheEnabled = ExtractDependencyType<typeof STATIC_PAGES_BACKGROUND_FETCH_ENABLED>;
@@ -18,17 +9,23 @@ type BackgroundCacheEnabled = ExtractDependencyType<typeof STATIC_PAGES_BACKGROU
 export class BackgroundFetchService {
   private requests = new Set<string>();
 
+  private port: string;
+  private hostname: string;
   private log: ReturnType<Logger>;
   private backgroundFetchEnabled: BackgroundCacheEnabled;
 
   constructor({
     logger,
+    envManager,
     backgroundFetchEnabled,
   }: {
     logger: Logger;
+    envManager: ExtractDependencyType<typeof ENV_MANAGER_TOKEN>;
     backgroundFetchEnabled: BackgroundCacheEnabled;
   }) {
     this.log = logger('static-pages');
+    this.port = envManager.get('PORT')!;
+    this.hostname = (envManager.get('HOST') ?? 'localhost').replace('0.0.0.0', 'localhost');
     this.backgroundFetchEnabled = backgroundFetchEnabled;
   }
 
@@ -37,55 +34,55 @@ export class BackgroundFetchService {
   }
 
   async revalidate({
-    key,
-    path,
-    port,
-    deviceType,
+    cacheKey,
+    pathname,
+    headers,
   }: {
-    key: string;
-    path: string;
-    port: string;
-    deviceType: string;
+    cacheKey: string;
+    pathname: string;
+    headers: Record<string, string | string[] | undefined>;
   }) {
-    if (this.requests.has(key)) {
+    if (this.requests.has(cacheKey)) {
       return;
     }
 
     const revalidateUrl = format({
-      hostname: 'localhost',
-      port,
-      path,
+      hostname: this.hostname,
+      port: this.port,
+      path: pathname,
     });
 
-    this.requests.add(key);
+    this.requests.add(cacheKey);
 
     this.log.debug({
       event: 'background-fetch-init',
-      key,
+      cacheKey,
       revalidateUrl,
     });
 
     return fetch(revalidateUrl, {
       headers: {
-        'User-Agent': userAgentByDeviceType[`${deviceType}`],
+        ...headers,
         'X-Tramvai-Static-Page-Revalidate': 'true',
       },
       signal: AbortSignal.timeout(10000),
+      // we need to save raw redirect response status code and headers
+      redirect: 'manual',
     })
       .then(async (response) => {
         const body = await response.text();
-        const { headers, status } = response;
+        const { status } = response;
 
         this.log.debug({
           event: status >= 500 ? 'background-fetch-5xx' : 'background-fetch-success',
           status,
-          key,
+          cacheKey,
         });
 
         return {
           body,
           // @ts-ignore outdated typings for headers in typescript
-          headers: Object.fromEntries(headers.entries()),
+          headers: Object.fromEntries(response.headers.entries()),
           status,
         };
       })
@@ -93,11 +90,11 @@ export class BackgroundFetchService {
         this.log.warn({
           event: 'background-fetch-error',
           error,
-          key,
+          cacheKey,
         });
       })
       .finally(() => {
-        this.requests.delete(key);
+        this.requests.delete(cacheKey);
       });
   }
 }

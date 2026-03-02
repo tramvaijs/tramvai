@@ -13,6 +13,7 @@ import {
   WEBPACK_SERVER_COMPILER_TOKEN,
   WEBPACK_ANALYZE_PLUGIN_NAME_TOKEN,
   WEBPACK_ANALYZE_PLUGIN_TOKEN,
+  BUILD_ID_TOKEN,
 } from '../tokens';
 import { emitWebpackEvents } from '../utils/webpackEvents';
 import { BundleAnalyzePlugin } from '../analyzePlugins/bundle';

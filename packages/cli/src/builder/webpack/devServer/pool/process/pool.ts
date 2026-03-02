@@ -41,6 +41,7 @@ export const ProcessWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
         // https://nodejs.org/dist/latest-v15.x/docs/api/all.html#cluster_how_it_works
         PORT: `${configManager.port}`,
         PORT_SERVER: `${configManager.port}`,
+        HOST: `${configManager.host}`,
         HOST_STATIC: `${configManager.staticHost}`,
         PORT_STATIC: `${configManager.staticPort}`,
         TRAMVAI_CLI_WATCH_INITIAL_BUILD: firstWorker,

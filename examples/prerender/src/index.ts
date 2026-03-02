@@ -8,31 +8,48 @@ import { SeoModule } from '@tramvai/module-seo';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 import { HttpClientModule } from '@tramvai/module-http-client';
 import { CACHE_WARMUP_HOOKS_TOKEN } from '@tramvai/module-cache-warmup';
-import { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { LOGGER_TOKEN, REQUEST_MANAGER_TOKEN } from '@tramvai/tokens-common';
+import {
+  PageRenderModeModule,
+  STATIC_PAGES_FS_CACHE_ENABLED,
+  STATIC_PAGES_KEY_TOKEN,
+  STATIC_PAGES_OPTIONS_TOKEN,
+} from '@tramvai/module-page-render-mode';
+import { USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
 
 createApp({
   name: 'prerender',
   modules: [
     CommonModule,
-    SpaRouterModule,
+    SpaRouterModule.forRoot([
+      {
+        name: 'redirect',
+        path: '/redirect/',
+        redirect: '/',
+        config: {
+          pageRenderMode: 'static',
+        },
+      },
+    ]),
     RenderModule.forRoot({ useStrictMode: true }),
     SeoModule,
     ServerModule,
     HttpClientModule,
     ErrorInterceptorModule,
+    PageRenderModeModule,
   ],
-  providers: [
-    provide({
-      provide: RENDER_SLOTS,
-      multi: true,
-      useValue: {
-        type: ResourceType.asIs,
-        slot: ResourceSlot.HEAD_META,
-        payload: '<meta name="viewport" content="width=device-width, initial-scale=1">',
-      },
-    }),
-    ...(typeof window === 'undefined'
+  providers:
+    typeof window === 'undefined'
       ? [
+          provide({
+            provide: RENDER_SLOTS,
+            multi: true,
+            useValue: {
+              type: ResourceType.asIs,
+              slot: ResourceSlot.HEAD_META,
+              payload: '<meta name="viewport" content="width=device-width, initial-scale=1">',
+            },
+          }),
           provide({
             provide: commandLineListTokens.init,
             useFactory: ({ hooks }) => {
@@ -41,9 +58,31 @@ createApp({
                   'AddPrerenderRoutesPlugin',
                   async (_, routes) => {
                     await new Promise<void>((resolve) => setTimeout(resolve, 100));
+
                     routes.push('/1/test/1/');
                     routes.push('/2/test/2/');
                     routes.push('/3/test/3/');
+
+                    routes.push({
+                      pathname: '/',
+                      headers: {
+                        'User-Agent':
+                          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                      },
+                    });
+                    routes.push({
+                      pathname: '/',
+                      headers: {
+                        'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 13_2_3 like Mac OS X)',
+                      },
+                    });
+                    routes.push({
+                      pathname: '/',
+                      query: {
+                        utm_source: 'prerender',
+                        utm_medium: 'example',
+                      },
+                    });
                   }
                 );
               };
@@ -53,7 +92,7 @@ createApp({
             },
           }),
           provide({
-            provide: commandLineListTokens.listen,
+            provide: commandLineListTokens.init,
             useFactory: ({ hooks }) => {
               return async function filterPrerenderRoutes() {
                 hooks['prerender:generate'].tapPromise(
@@ -101,7 +140,43 @@ createApp({
               logger: LOGGER_TOKEN,
             },
           }),
+          provide({
+            provide: STATIC_PAGES_FS_CACHE_ENABLED,
+            useValue: () => true,
+          }),
+          provide({
+            provide: STATIC_PAGES_KEY_TOKEN,
+            useFactory: ({ userAgent, requestManager }) => {
+              return () => {
+                const { query } = requestManager.getParsedUrl();
+                const isMobile = userAgent.device.type === 'mobile';
+
+                if (query.utm_source === 'prerender' && query.utm_medium === 'example') {
+                  return 'query';
+                }
+
+                if (isMobile) {
+                  return 'mobile';
+                }
+
+                return 'desktop';
+              };
+            },
+            deps: {
+              userAgent: USER_AGENT_TOKEN,
+              requestManager: REQUEST_MANAGER_TOKEN,
+            },
+          }),
+          provide({
+            provide: STATIC_PAGES_OPTIONS_TOKEN,
+            useValue: {
+              ttl: 5 * 60 * 1000,
+              maxSize: 100,
+              allowStale: true,
+              // if `User-Agent` header is used for cache key, it should be included in allowedHeaders, to include that header in background cache revalidation request
+              allowedHeaders: ['User-Agent'],
+            },
+          }),
         ]
-      : []),
-  ],
+      : [],
 });

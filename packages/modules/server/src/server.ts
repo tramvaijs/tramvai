@@ -44,6 +44,7 @@ import { staticAppCommand } from './server/static';
 import { xHeadersFactory } from './server/xHeaders';
 import * as modules from './modules';
 import { ServerResponseTaskManager } from './server/taskManager';
+import { providers as etagProviders } from './server/etag/providers';
 
 export * from '@tramvai/tokens-server';
 
@@ -81,6 +82,7 @@ EventEmitter.defaultMaxListeners = 50;
     process.env.NODE_ENV !== 'production' && modules.DebugHttpRequestsModule,
   ].filter(Boolean),
   providers: [
+    ...etagProviders,
     provide({
       provide: SERVER_FACTORY_TOKEN,
       scope: Scope.SINGLETON,

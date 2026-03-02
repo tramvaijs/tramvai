@@ -18,7 +18,7 @@ describe('page-render-mode', () => {
     app = await startCli('page-render-mode', {
       rootDir: path.resolve(__dirname, '../'),
       env: {
-        LOG_ENABLE: 'trace:static-pages',
+        LOG_ENABLE: 'trace:static-pages*',
       },
     });
   }, 80000);
@@ -183,10 +183,16 @@ describe('page-render-mode', () => {
   });
 
   describe('static pages', () => {
-    afterEach(() => {
-      return fetch(`${app.serverUrl}/page-render-mode/private/papi/revalidate`, {
+    afterEach(async () => {
+      // wait for background revalidation to complete and cache to be filled
+      await sleep(100);
+
+      await fetch(`${app.serverUrl}/page-render-mode/private/papi/revalidate`, {
         method: 'POST',
       });
+
+      // wait for file-system cache to be cleared
+      await sleep(100);
     });
 
     it('static page works', async () => {
@@ -288,13 +294,46 @@ describe('page-render-mode', () => {
 
       await fetch(`${app.serverUrl}/page-render-mode/private/papi/revalidate`, {
         method: 'POST',
-        body: JSON.stringify({ path: 'static' }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pathname: '/static/' }),
       });
 
       const res2 = await fetch(`${app.serverUrl}/static/`);
 
       expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
       expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
+    });
+
+    it('/papi/revalidate by path and key for specific variation', async () => {
+      const res1 = await fetch(`${app.serverUrl}/static/`, {
+        headers: { 'User-Agent': desktopUA, cookie: 'foo=bar' },
+      });
+      const res2 = await fetch(`${app.serverUrl}/static/`, {
+        headers: { 'User-Agent': mobileUA, cookie: 'foo=bar' },
+      });
+
+      // time to background fetch unpersonalized page
+      await sleep(150);
+
+      // revalidate only mobile version
+      await fetch(`${app.serverUrl}/page-render-mode/private/papi/revalidate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pathname: '/static/', key: 'mobile' }),
+      });
+
+      const res3 = await fetch(`${app.serverUrl}/static/`, {
+        headers: { 'User-Agent': desktopUA, cookie: 'foo=bar' },
+      });
+      const res4 = await fetch(`${app.serverUrl}/static/`, {
+        headers: { 'User-Agent': mobileUA, cookie: 'foo=bar' },
+      });
+
+      expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
+      expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
+      // mobile cache was cleared, desktop cache still exists
+      expect(res3.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+      expect(res4.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
     });
 
     // eslint-disable-next-line jest/expect-expect
@@ -306,6 +345,29 @@ describe('page-render-mode', () => {
       await app
         .request('/metrics')
         .expect(200, /# TYPE static_pages_cache_hit counter\nstatic_pages_cache_hit \d+/);
+    });
+
+    describe('File-System cache', () => {
+      it('FS cache metrics are available', async () => {
+        await fetch(`${app.serverUrl}/static/`);
+        await fetch(`${app.serverUrl}/static/`);
+        await fetch(`${app.serverUrl}/static/`);
+
+        const { text: metrics } = await app.request('/metrics').expect(200);
+
+        expect(metrics).toMatch(
+          /# TYPE static_pages_fs_cache_hit counter\nstatic_pages_fs_cache_hit \d+/
+        );
+        expect(metrics).toMatch(
+          /# TYPE static_pages_fs_cache_miss counter\nstatic_pages_fs_cache_miss \d+/
+        );
+        expect(metrics).toMatch(
+          /# TYPE static_pages_fs_cache_size gauge\nstatic_pages_fs_cache_size \d+/
+        );
+        expect(metrics).toMatch(
+          /# TYPE static_pages_fs_cache_bytes gauge\nstatic_pages_fs_cache_bytes \d+/
+        );
+      });
     });
 
     describe('5xx errors', () => {

@@ -16,12 +16,15 @@ import {
   RESPONSE_MANAGER_TOKEN,
 } from '@tramvai/tokens-common';
 import { SERVER_MODULE_PAPI_PUBLIC_ROUTE } from '@tramvai/tokens-server';
-import { ROUTER_TOKEN, ROUTES_TOKEN } from '@tramvai/tokens-router';
+import {
+  ROUTER_TOKEN,
+  ROUTES_TOKEN,
+  PRERENDER_HOOKS_TOKEN,
+  PrerenderHooksToken,
+} from '@tramvai/tokens-router';
 import { HttpError, makeErrorSilent } from '@tinkoff/errors';
 import {
   additionalRouterParameters,
-  PRERENDER_HOOKS_TOKEN,
-  PrerenderHooksToken,
   routerBundleInfoAdditionalToken,
   routeTransformToken,
 } from '../../tokens';

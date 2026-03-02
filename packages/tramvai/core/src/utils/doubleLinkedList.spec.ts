@@ -66,6 +66,45 @@ describe('DoubleLinkedList', () => {
       expect(list.end?.prev?.prev?.value).toBe('first');
     });
   });
+  describe('unshift', () => {
+    test('should add element to empty list', () => {
+      const list = new DoubleLinkedList<number>();
+
+      list.unshift(42);
+
+      expect(list.length).toBe(1);
+      expect(list.start?.value).toBe(42);
+      expect(list.end?.value).toBe(42);
+      expect(list.start?.next).toBeNull();
+      expect(list.start?.prev).toBeNull();
+    });
+
+    test('should add element to non-empty list', () => {
+      const list = new DoubleLinkedList<number>([1, 2]);
+
+      list.unshift(3);
+
+      expect(list.length).toBe(3);
+      expect(list.start?.value).toBe(3);
+      expect(list.start?.next?.value).toBe(1);
+      expect(list.start?.prev).toBeNull();
+    });
+
+    test('should correctly link nodes when adding multiple elements', () => {
+      const list = new DoubleLinkedList<string>();
+
+      list.unshift('first');
+      list.unshift('second');
+      list.unshift('third');
+
+      expect(list.start?.value).toBe('third');
+      expect(list.start?.next?.value).toBe('second');
+      expect(list.start?.next?.next?.value).toBe('first');
+      expect(list.end?.value).toBe('first');
+      expect(list.end?.prev?.value).toBe('second');
+      expect(list.end?.prev?.prev?.value).toBe('third');
+    });
+  });
   describe('pop', () => {
     test('should return null when popping from empty list', () => {
       const list = new DoubleLinkedList<number>();

@@ -227,13 +227,9 @@ Page Error Boundary will be rendered for the client`,
             responseManager.setStatus(status);
           }
 
-          // Проставляем не кэширующие заголовки
-          // TODO Заменить после выкатки на прод и прохода всех тестов на cache-control = no-cache,no-store,max-age=0,must-revalidate
-          responseManager.setHeader('expires', '0');
-          responseManager.setHeader('pragma', 'no-cache');
           responseManager.setHeader(
             'cache-control',
-            `${bfcacheEnabled ? '' : 'no-store, '}no-cache, must-revalidate`
+            `${bfcacheEnabled ? '' : 'no-store, '}no-cache, max-age=0, must-revalidate`
           );
 
           responseManager.setBody(html);
