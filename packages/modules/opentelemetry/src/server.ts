@@ -6,9 +6,8 @@ import {
 } from '@opentelemetry/sdk-trace-node';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
-import { ENV_MANAGER_TOKEN, LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { ENV_MANAGER_TOKEN, LOGGER_TOKEN, REQUEST_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { RESOURCES_REGISTRY, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
-import { STATIC_PAGES_SERVICE } from '@tramvai/module-page-render-mode';
 import { SpanKind } from '@opentelemetry/api';
 import {
   OPENTELEMETRY_PROVIDER_CONFIG_TOKEN,
@@ -74,15 +73,16 @@ export * from './tokens';
     }),
     provide({
       provide: commandLineListTokens.generatePage,
-      useFactory: ({ tracer, resourcesRegistry, staticPageService }) => {
+      useFactory: ({ tracer, resourcesRegistry, requestManager }) => {
         return function insertTraceIdToResourcesRegistry() {
           tracer.startActiveSpan('BROWSER', { kind: SpanKind.CLIENT }, () => {
             const traceparent = getTraceparentHeader(tracer);
 
             if (
               traceparent !== undefined &&
-              // remove traceparent meta tag from cached page, because it can lead to incorrect traces correlation
-              !staticPageService?.shouldUseCache()
+              // remove traceparent meta tag from static pages, because it can lead to incorrect traces correlation
+              !requestManager.getHeader('x-tramvai-static-page-revalidate') &&
+              !requestManager.getHeader('x-tramvai-prerender')
             ) {
               resourcesRegistry.register({
                 slot: ResourceSlot.HEAD_META,
@@ -96,7 +96,7 @@ export * from './tokens';
       deps: {
         tracer: OPENTELEMETRY_TRACER_TOKEN,
         resourcesRegistry: RESOURCES_REGISTRY,
-        staticPageService: optional(STATIC_PAGES_SERVICE),
+        requestManager: REQUEST_MANAGER_TOKEN,
       },
     }),
     provide({

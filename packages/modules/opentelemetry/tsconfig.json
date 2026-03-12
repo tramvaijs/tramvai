@@ -41,9 +41,6 @@
         },
         {
             "path": "../../tokens/child-app"
-        },
-        {
-            "path": "../page-render-mode"
         }
     ]
 }
