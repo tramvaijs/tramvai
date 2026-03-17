@@ -61,7 +61,7 @@
     "@loadable/webpack-plugin": "^5.15.0",
     "@module-federation/node": "^0.15.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
-    "@rsdoctor/webpack-plugin": "^1.3.6",
+    "@rsdoctor/webpack-plugin": "^1.5.4",
     "@statoscope/webpack-plugin": "^5.29.0",
     "@svgr/webpack": "^8.1.0",
     "@tinkoff/browserslist-config": "0.0.0-stub",

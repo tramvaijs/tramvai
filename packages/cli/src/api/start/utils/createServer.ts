@@ -2,7 +2,8 @@ import { createServer as httpCreateServer } from 'http';
 import { createServer as httpsCreateServer } from 'https';
 import { readFileSync } from 'fs';
 import stoppable from 'stoppable';
-import type { Certificate } from '../../shared/types/base';
+
+import { Certificate } from '@tramvai/api/lib/utils/selfSignedCertificate/common';
 
 const createHttpsServer = ({ keyPath, certificatePath }: Certificate) => {
   const options = {

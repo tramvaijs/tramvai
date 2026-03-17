@@ -2,12 +2,13 @@ import path from 'path';
 import type { Provider } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
 import { fork } from 'child_process';
+import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+
 import {
   COMMAND_PARAMETERS_TOKEN,
   CONFIG_ENTRY_TOKEN,
   CONFIG_MANAGER_TOKEN,
   PORT_MANAGER_TOKEN,
-  SELF_SIGNED_CERTIFICATE_TOKEN,
   STATIC_SERVER_TOKEN,
 } from '../../../di/tokens';
 import type { ApplicationConfigEntry } from '../../../typings/configEntry/application';

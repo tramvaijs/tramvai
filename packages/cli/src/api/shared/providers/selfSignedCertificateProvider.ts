@@ -1,11 +1,11 @@
 import type { Provider } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
 import {
-  COMMAND_PARAMETERS_TOKEN,
-  CONFIG_MANAGER_TOKEN,
   SELF_SIGNED_CERTIFICATE_TOKEN,
-} from '../../../di/tokens';
-import { createSelfSignedCertificate } from '../utils/selfSignedCertificate/createSelfSignedCertificate';
+  createSelfSignedCertificate,
+} from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+
+import { COMMAND_PARAMETERS_TOKEN, CONFIG_MANAGER_TOKEN } from '../../../di/tokens';
 
 export const selfSignedCertificateProvider: Provider[] = [
   provide({

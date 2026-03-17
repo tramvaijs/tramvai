@@ -1,13 +1,34 @@
-import http from 'node:http';
+import http, { RequestListener } from 'node:http';
+import https from 'node:https';
+import fs from 'node:fs';
+
 import httpProxy from 'http-proxy';
 import { logger } from '@tramvai/api/lib/services/logger';
+import { ExtractDependencyType } from '@tinkoff/dippy';
+import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+
 import type { CompilationWatcher } from '../utils/compilation-watcher';
+
+type SelfSignedCertificate = ExtractDependencyType<typeof SELF_SIGNED_CERTIFICATE_TOKEN>;
+
+function createServer(selfSignedCertificate: SelfSignedCertificate, handler: RequestListener) {
+  return selfSignedCertificate
+    ? https.createServer(
+        {
+          cert: fs.readFileSync(selfSignedCertificate.certificatePath, 'utf8'),
+          key: fs.readFileSync(selfSignedCertificate.keyPath, 'utf8'),
+        },
+        handler
+      )
+    : http.createServer(handler);
+}
 
 export const createProxy = ({
   port,
   staticPort,
   serverRunnerPort,
   serverBuildPort,
+  selfSignedCertificate,
   browserBuildPort,
   hostname,
   compilationWatcher,
@@ -15,6 +36,7 @@ export const createProxy = ({
   port: number;
   hostname: string;
   staticPort: number;
+  selfSignedCertificate: SelfSignedCertificate;
   serverRunnerPort: number;
   serverBuildPort: number;
   browserBuildPort: number;
@@ -46,13 +68,14 @@ export const createProxy = ({
     }
   });
 
-  const devServer = http.createServer((req, res) => {
+  const devServer = createServer(selfSignedCertificate, (req, res) => {
     // TODO: HTML
     devProxy.web(req, res, {
       target: `http://localhost:${serverRunnerPort}`,
     });
   });
-  const staticServer = http.createServer((req, res) => {
+
+  const staticServer = createServer(selfSignedCertificate, (req, res) => {
     if (req.url!.includes('/server.js')) {
       devProxy.web(req, res, {
         target: `http://localhost:${serverBuildPort}`,

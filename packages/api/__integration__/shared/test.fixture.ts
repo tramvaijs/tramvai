@@ -26,6 +26,7 @@ export const test = base.extend<TestFixture, WorkerFixture>({
   extraConfiguration: [{}, { option: true }],
   devServer: async ({ inputParameters, extraConfiguration }, use) => {
     process.env.TRAMVAI_COMPILE_CACHE_DISABLED = 'true';
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
     const devServer = await start(inputParameters, extraConfiguration);
 
@@ -69,4 +70,5 @@ export const test = base.extend<TestFixture, WorkerFixture>({
 
     use({ logs });
   },
+  ignoreHTTPSErrors: true,
 });

@@ -1,13 +1,9 @@
 import type { Provider } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
-import { readFileSync } from 'fs';
-import { createProxyServer } from 'http-proxy';
+import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+
 import { INIT_HANDLER_TOKEN, CLOSE_HANDLER_TOKEN } from '../../tokens';
-import {
-  CONFIG_MANAGER_TOKEN,
-  SELF_SIGNED_CERTIFICATE_TOKEN,
-  SERVER_TOKEN,
-} from '../../../../di/tokens';
+import { CONFIG_MANAGER_TOKEN, SERVER_TOKEN } from '../../../../di/tokens';
 import { stopServer } from '../../utils/stopServer';
 import { createServer } from '../../utils/createServer';
 import { listenServer } from '../../utils/listenServer';

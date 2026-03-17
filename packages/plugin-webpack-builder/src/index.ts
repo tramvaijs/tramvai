@@ -13,6 +13,11 @@ import {
   Extension,
   INPUT_PARAMETERS_TOKEN,
 } from '@tramvai/api/lib/config';
+import {
+  createSelfSignedCertificate,
+  SELF_SIGNED_CERTIFICATE_TOKEN,
+} from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+
 import { createDevServer } from './dev-server/dev-server';
 
 export { PolyfillConditionPlugin } from './webpack/plugins/polyfill-condition-plugin';
@@ -184,10 +189,29 @@ export const WebpackBuilderPlugin = declareModule({
       useFactory: createDevServer,
       deps: {
         inputParameters: INPUT_PARAMETERS_TOKEN,
+        selfSignedCertificate: SELF_SIGNED_CERTIFICATE_TOKEN,
         portManager: PORT_MANAGER_TOKEN,
         config: CONFIG_SERVICE_TOKEN,
         tracer: TRACER_TOKEN,
         closeHandlers: DEV_SERVER_CLOSE_HANDLER_TOKEN,
+      },
+    }),
+    provide({
+      provide: SELF_SIGNED_CERTIFICATE_TOKEN,
+      useFactory: ({ configManager, parameters }) => {
+        const { host } = configManager;
+        if (configManager.httpProtocol === 'https') {
+          return createSelfSignedCertificate({
+            host,
+            certificatePath: parameters?.httpsCert,
+            keyPath: parameters?.httpsKey,
+          });
+        }
+        return null;
+      },
+      deps: {
+        configManager: CONFIG_SERVICE_TOKEN,
+        parameters: INPUT_PARAMETERS_TOKEN,
       },
     }),
     provide({
