@@ -16,7 +16,7 @@ Tramvai provides a powerful CLI for build and development processes - `@tramvai/
 You can generate a new application and install required dependencies by one command:
 
 ```sh
-npm init @tramvai@latest awesome-app
+npm init @tramvai@latest awesome-app --registry=https://registry.npmjs.org/
 ```
 
 After starting, you need to select settings - application type, project template, package manager and testing framework. For a quick start, the default settings are fine.

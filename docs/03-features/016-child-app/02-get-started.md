@@ -10,7 +10,7 @@ title: Get Started
 :hourglass: Run in your shell:
 
 ```sh
-npm init @tramvai@latest fancy-child
+npm init @tramvai@latest fancy-child --registry=https://registry.npmjs.org/
 ```
 
 :hourglass: Choose `Microfrontend implemented by tramvai child-app`

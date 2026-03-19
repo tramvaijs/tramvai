@@ -2,7 +2,7 @@ import React from 'react';
 import { Code } from '../code';
 import { BaseLink } from '../base-link';
 
-const code = `$ npm init @tramvai@latest new-app
+const code = `$ npm init @tramvai@latest new-app --registry=https://registry.npmjs.org/
 $ cd new-app && npm start`;
 
 export function QuickStart() {
