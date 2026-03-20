@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 import chalk from 'chalk';
 import { command } from 'execa';
 import inquirer from 'inquirer';
@@ -134,6 +135,15 @@ export default async function createNew(context: Context, params: Params): Promi
       },
       cwd: rootDir,
       stdio: 'inherit',
+    });
+
+    // .yarnrc with "strict-ssl false" required only to install yarn@berry behind corporate proxies with self-signed certificates
+    fs.promises.unlink(path.join(rootDir, '.yarnrc')).catch((error) => {
+      console.log(
+        chalk.yellow(
+          `Failed to remove .yarnrc file: ${error.message}, you may want to remove it manually`
+        )
+      );
     });
   }
 
