@@ -200,6 +200,8 @@ export type InputParameters = {
   mode?: 'development' | 'production';
   port?: number;
   host?: string;
+  httpsKey?: string;
+  httpsCert?: string;
   benchmark?: boolean;
   analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   staticPort?: number;

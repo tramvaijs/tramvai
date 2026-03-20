@@ -2,9 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 import chalk from 'chalk';
-import type { Certificate } from '../../types/base';
+import { createToken } from '@tinkoff/dippy';
+
 import { getHosts } from './getHosts';
-import { certificateDirectoryPath, certificateDirectory } from './common';
+import { certificateDirectoryPath, certificateDirectory, Certificate } from './common';
 import {
   createCertificatedHostsListFile,
   readCertificatedHostsListFile,
@@ -16,13 +17,17 @@ interface CreateSelfSignedCertificateOptions {
   certificatePath?: string;
 }
 
+export const SELF_SIGNED_CERTIFICATE_TOKEN = createToken<Certificate | null>(
+  'tramvai certificates token'
+);
+
 // eslint-disable-next-line max-statements
 export const createSelfSignedCertificate = (
   options: CreateSelfSignedCertificateOptions
 ): Certificate => {
   try {
     const { host } = options;
-    const hosts = getHosts(host === '0.0.0.0' ? null : host);
+    const hosts = getHosts(host === '0.0.0.0' ? undefined : host);
     const hostsFile = readCertificatedHostsListFile();
 
     const defaultKeyPath = path.resolve(certificateDirectoryPath, 'localhost-key.pem');
@@ -88,7 +93,7 @@ export const createSelfSignedCertificate = (
       keyPath,
       certificatePath,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error(
       chalk.red(
         `Error while generating the certificate. The mkcert tool may not be installed please check and install it if that is the case.`

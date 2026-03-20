@@ -194,13 +194,21 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'broken-ssr', 'index.ts'),
     },
-    ssr: {
-      name: 'ssr',
+    'app-ssr': {
+      name: 'app-ssr',
       type: 'application',
       hotRefresh: {
         enabled: false,
       },
       entryFile: path.join(fixturesFolder, 'application', 'ssr', 'index.ts'),
+    },
+    'app-https': {
+      name: 'app-https',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'https', 'index.tsx'),
     },
     'app-jsx': {
       name: 'app-jsx',
@@ -1047,7 +1055,7 @@ export default createPapiMethod({
         test.describe('server', () => {
           test.use({
             inputParameters: {
-              name: 'ssr',
+              name: 'app-ssr',
               host: '0.0.0.0',
               rootDir: testSuiteFolder,
               buildType: 'server',
@@ -2735,6 +2743,46 @@ export default Cmp;`,
             test.expect(platformJs).toContain(`#value`);
             test.expect(tramvaiJs).toContain(`#tramvaiValue`);
             test.expect(platformJs).not.toContain(`#focused`);
+          });
+        });
+
+        test.describe('https', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-https',
+              rootDir: testSuiteFolder,
+              https: true,
+              httpsCert: path.resolve(__dirname, 'certs', 'localhost.pem.tmp'),
+              httpsKey: path.resolve(__dirname, 'certs', 'localhost-key.pem.tmp'),
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should correctly serve assets on https protocol', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const platformJsResponse = await fetch(
+              `https://localhost:${devServer.staticPort}/dist/client/platform.js`
+            );
+            const runtimeJsResponse = await fetch(
+              `https://localhost:${devServer.staticPort}/dist/client/runtime.js`
+            );
+
+            test.expect(platformJsResponse.status).toBe(200);
+            test.expect(runtimeJsResponse.status).toBe(200);
+          });
+
+          test('should correctly load page on https protocol', async ({ page, devServer }) => {
+            await devServer.buildPromise;
+
+            await page.goto(`https://localhost:${devServer.port}`);
+
+            test.expect(await page.locator('#container').textContent()).toEqual('hello world');
           });
         });
       });

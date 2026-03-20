@@ -7,6 +7,7 @@ import type {
   DEV_SERVER_TOKEN,
 } from '@tramvai/api/lib/tokens';
 import { BuildStats } from '@tramvai/api/lib/builder/dev-server';
+import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
 import { logger } from '@tramvai/api/lib/services/logger';
 import type { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/lib/config';
 import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
@@ -28,12 +29,14 @@ export function createDevServer({
   portManager,
   config,
   tracer,
+  selfSignedCertificate,
   closeHandlers,
 }: {
   inputParameters: ExtractDependencyType<typeof INPUT_PARAMETERS_TOKEN>;
   portManager: ExtractDependencyType<typeof PORT_MANAGER_TOKEN>;
   config: ExtractDependencyType<typeof CONFIG_SERVICE_TOKEN>;
   tracer: ExtractDependencyType<typeof TRACER_TOKEN>;
+  selfSignedCertificate: ExtractDependencyType<typeof SELF_SIGNED_CERTIFICATE_TOKEN>;
   closeHandlers: ExtractDependencyType<typeof DEV_SERVER_CLOSE_HANDLER_TOKEN>;
 }): DevServerApi {
   return {
@@ -61,6 +64,7 @@ export function createDevServer({
       const compilationWatcher = new CompilationWatcher();
       const proxy = createProxy({
         port: portManager.port!,
+        selfSignedCertificate,
         staticPort: portManager.staticPort!,
         hostname: config.host,
         serverBuildPort,
