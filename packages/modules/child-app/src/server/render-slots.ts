@@ -130,7 +130,6 @@ export const registerChildAppRenderSlots =
     preloadedConfigs.forEach((config) => {
       const stats = 'getStats' in loader ? loader.getStats(config) : undefined;
       const di = diManager.getChildDi(config);
-      const loadableAssets = di?.get(CHILD_APP_INTERNAL_CHUNK_EXTRACTOR)?.getMainAssets();
 
       addChunk(config.client.entry, true);
 
@@ -138,15 +137,30 @@ export const registerChildAppRenderSlots =
         addChunk(config.css.entry);
       }
 
-      loadableAssets
-        ?.map((asset: any) => resolve(config.client.baseUrl, asset.filename))
-        .filter((file: string) => {
-          // filter entry js and css chunks
-          return config.client.entry !== file && config.css?.entry !== file;
-        })
-        .forEach((file: string) => {
-          addChunk(file);
+      // chunkExtractor.getMainAssets() can throw an error if loadable stats is not available
+      try {
+        const loadableAssets = di?.get(CHILD_APP_INTERNAL_CHUNK_EXTRACTOR)?.getMainAssets();
+
+        loadableAssets
+          ?.map((asset: any) => resolve(config.client.baseUrl, asset.filename))
+          .filter((file: string) => {
+            // filter entry js and css chunks
+            return config.client.entry !== file && config.css?.entry !== file;
+          })
+          .forEach((file: string) => {
+            addChunk(file);
+          });
+      } catch (error: any) {
+        log[config.client.statsLoadable ? 'warn' : 'info']({
+          event: 'loadable-assets-failed',
+          error,
+          childApp: {
+            name: config.name,
+            version: config.version,
+            tag: config.tag,
+          },
         });
+      }
 
       if (stats && stats.federatedModules) {
         for (const federatedModule of stats.federatedModules) {
