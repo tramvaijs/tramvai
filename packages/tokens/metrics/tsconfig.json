@@ -9,9 +9,5 @@
     "rootDir": "./src",
     "strict": true
   },
-  "references": [
-    {
-      "path": "../../libs/dippy"
-    }
-  ]
+  "references": []
 }

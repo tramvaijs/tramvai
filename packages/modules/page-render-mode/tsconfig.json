@@ -12,9 +12,6 @@
   },
   "references": [
     {
-      "path": "../../libs/dippy"
-    },
-    {
       "path": "../../tramvai/core"
     },
     {

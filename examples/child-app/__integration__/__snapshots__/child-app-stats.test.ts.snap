@@ -47,9 +47,9 @@ exports[`latest stats generation test stats should build stats.json 1`] = `
       ]
     },
     {
-      "id": "libs_dippy_lib_di_js",
+      "id": "node_modules_tinkoff_dippy_lib_di_js",
       "files": [
-        "libs_dippy_lib_di_js_client.chunk.js"
+        "node_modules_tinkoff_dippy_lib_di_js_client.chunk.js"
       ]
     },
     {

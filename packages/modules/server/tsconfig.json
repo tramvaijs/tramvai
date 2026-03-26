@@ -50,9 +50,6 @@
             "path": "../../libs/errors"
         },
         {
-            "path": "../../libs/dippy"
-        },
-        {
             "path": "../../cli"
         },
         {

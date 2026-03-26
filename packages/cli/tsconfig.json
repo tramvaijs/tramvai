@@ -24,9 +24,6 @@
             "path": "../libs/minicss"
         },
         {
-            "path": "../libs/dippy"
-        },
-        {
             "path": "../../tools/check-versions"
         },
         {

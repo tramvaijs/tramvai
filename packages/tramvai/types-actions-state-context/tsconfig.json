@@ -10,8 +10,5 @@
         "strict": true
     },
     "references": [
-        {
-            "path": "../../libs/dippy"
-        }
     ]
 }

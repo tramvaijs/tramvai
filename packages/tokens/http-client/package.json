@@ -23,7 +23,7 @@
     "@tramvai/tinkoff-request-http-client-adapter": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.11.11",
     "tslib": "^2.4.0"
   },
   "license": "Apache-2.0"

@@ -12,9 +12,6 @@
     "references": [
         {
             "path": "../core"
-        },
-        {
-            "path": "../../libs/dippy"
         }
     ]
 }

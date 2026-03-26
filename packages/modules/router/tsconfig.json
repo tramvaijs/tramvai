@@ -38,9 +38,6 @@
             "path": "../../tokens/common"
         },
         {
-            "path": "../../libs/dippy"
-        },
-        {
             "path": "../../tokens/router"
         },
         {
