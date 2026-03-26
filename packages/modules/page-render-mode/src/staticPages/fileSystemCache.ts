@@ -74,7 +74,7 @@ export class FileSystemCache {
     metrics: CacheMetrics;
     logger: Logger;
   }) {
-    this.directory = directory;
+    this.directory = path.isAbsolute(directory) ? directory : path.join(process.cwd(), directory);
     this.maxSize = maxSize;
     this.ttl = ttl;
     this.allowStale = allowStale;
@@ -95,6 +95,9 @@ export class FileSystemCache {
     });
 
     try {
+      // fill zero values for metrics
+      this.updateMetrics();
+
       await this.scanDirectory();
 
       this.log.info({
@@ -105,20 +108,21 @@ export class FileSystemCache {
 
       this.updateMetrics();
     } catch (error) {
-      if (process.env.NODE_ENV === 'development' && (error as any)?.code === 'ENOENT') {
-        // in development mode, static directory path includes unique build id and can be missing on first run, so just create it
+      if ((error as any)?.code === 'ENOENT') {
+        // static directory path can be missing on first run, so always create it
         await fs.mkdir(this.directory, { recursive: true });
-      } else {
-        this.log.warn({
-          event: 'init-error',
-          message:
-            (error as any)?.code === 'ENOENT'
-              ? `"${this.directory}" directory is not found. To effectively use file system cache, run "tramvai static {appName} --buildType=none" after application build,
-and copy "dist/static" folder into the Docker image, to ensure the pages cache is populated on the first run.`
-              : 'Failed to initialize file system cache',
-          error: error as Error,
-        });
       }
+
+      this.log.warn({
+        event: 'init-error',
+        message:
+          // static directory path includes unique build id in development mode, so warn only in production
+          (error as any)?.code === 'ENOENT' && process.env.NODE_ENV !== 'development'
+            ? `"${this.directory}" directory is not found. To effectively use file system cache, run "tramvai static {appName} --buildType=none" after application build,
+and copy "dist/static" folder into the Docker image, to ensure the pages cache is populated on the first run.`
+            : 'Failed to initialize file system cache',
+        error: error as Error,
+      });
     }
   }
 
