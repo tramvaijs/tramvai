@@ -17,7 +17,7 @@
     "@rsdoctor/webpack-plugin": "^1.5.4",
     "@svgr/webpack": "^8.1.0",
     "@tinkoff/browserslist-config": "0.0.0-stub",
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.12.9",
     "@tinkoff/is-modern-lib": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.3",
     "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",

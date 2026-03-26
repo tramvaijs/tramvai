@@ -20,9 +20,6 @@
             "path": "../common"
         },
         {
-            "path": "../../libs/dippy"
-        },
-        {
             "path": "../../tramvai/state"
         },
         {

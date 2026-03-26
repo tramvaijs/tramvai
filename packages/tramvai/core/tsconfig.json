@@ -18,9 +18,6 @@
         },
         {
             "path": "../types-actions-state-context"
-        },
-        {
-            "path": "../../libs/dippy"
         }
     ]
 }

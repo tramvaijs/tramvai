@@ -31,7 +31,7 @@
     "user-agent-data-types": "^0.3.1"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.12.9",
     "@tinkoff/logger": "^0.10.516",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",

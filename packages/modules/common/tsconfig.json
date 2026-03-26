@@ -23,9 +23,6 @@
             "path": "../../libs/pubsub"
         },
         {
-            "path": "../../libs/dippy"
-        },
-        {
             "path": "../../libs/hooks"
         },
         {

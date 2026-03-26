@@ -20,9 +20,6 @@
             "path": "../../../packages/tramvai/papi"
         },
         {
-            "path": "../../../packages/libs/dippy"
-        },
-        {
             "path": "../../../packages/tokens/common"
         },
         {
