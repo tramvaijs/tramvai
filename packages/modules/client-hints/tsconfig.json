@@ -17,9 +17,6 @@
             "path": "../../libs/user-agent"
         },
         {
-            "path": "../../libs/dippy"
-        },
-        {
             "path": "../../tramvai/state"
         },
         {

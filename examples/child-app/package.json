@@ -15,7 +15,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.13.2",
     "@tinkoff/utils": "^2.2.1",
     "@tramvai/child-app-core": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",

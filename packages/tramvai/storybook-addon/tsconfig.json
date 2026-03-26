@@ -30,9 +30,6 @@
       "path": "../../tramvai/core"
     },
     {
-      "path": "../../libs/dippy"
-    },
-    {
       "path": "../../libs/router"
     },
     {

@@ -2840,7 +2840,7 @@ export default Cmp;`,
           test.expect(runtimeCode).toContain('register("react-dom", "19.0.1"');
           test.expect(runtimeCode).toContain('register("react/jsx-dev-runtime", "19.0.1"');
           test.expect(runtimeCode).toContain('register("react", "19.0.1"');
-          test.expect(runtimeCode).toContain('register("@tinkoff/dippy", "0.0.0-stub"');
+          test.expect(runtimeCode).toContain('register("@tinkoff/dippy", "0.13.2"');
         });
 
         test('client runtime shoud not contain unused shared module', async ({ devServer }) => {
@@ -2885,7 +2885,7 @@ export default Cmp;`,
           const mfServerShared = await page.evaluate(() => (window as any).serverShared);
           test.expect(mfServerShared.default).toEqual({
             '@tinkoff/dippy': {
-              '0.0.0-stub': {
+              '0.13.2': {
                 eager: true,
                 from: 'application:app-mf-host:0.0.0-stub',
                 loaded: 1,

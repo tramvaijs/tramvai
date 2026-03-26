@@ -22,7 +22,7 @@
     "@tramvai/safe-strings": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.13.2",
     "tslib": "^2.4.0"
   },
   "license": "Apache-2.0"

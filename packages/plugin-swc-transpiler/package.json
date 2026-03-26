@@ -13,7 +13,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.13.2",
     "@tinkoff/utils": "^2.1.3",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
     "find-cache-dir": "^3.3.2",

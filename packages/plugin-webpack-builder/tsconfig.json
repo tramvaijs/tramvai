@@ -18,9 +18,6 @@
     },
     "references": [
         {
-            "path": "../libs/dippy"
-        },
-        {
             "path": "../api"
         },
         {

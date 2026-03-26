@@ -24,7 +24,7 @@
     "@tinkoff/htmlpagebuilder": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.13.2",
     "react": ">=16.14.0",
     "tslib": "^2.4.0"
   },

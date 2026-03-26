@@ -17,9 +17,6 @@
             "path": "../../../tokens/common"
         },
         {
-            "path": "../../../libs/dippy"
-        },
-        {
             "path": "../../../libs/pubsub"
         },
         {

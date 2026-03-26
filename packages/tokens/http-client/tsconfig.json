@@ -11,9 +11,6 @@
   },
   "references": [
     {
-      "path": "../../../packages/libs/dippy"
-    },
-    {
       "path": "../../../packages/libs/http-client"
     },
     {
