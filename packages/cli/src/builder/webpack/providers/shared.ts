@@ -1,7 +1,8 @@
 import type { Provider } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
 import { EventEmitter } from 'events';
-import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-webpack-builder';
+import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-base-builder/lib/utils';
+
 import { CONFIG_MANAGER_TOKEN, WITH_BUILD_STATS_TOKEN } from '../../../di/tokens';
 import { closeWorkerPool, warmupWorkerPool } from '../../../library/webpack/utils/threadLoader';
 import {

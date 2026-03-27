@@ -138,6 +138,7 @@ fs.readdirSync('./in')
   });
 
 const resultFilename = './out/merged.cpuprofile';
+fs.mkdirSync('./out');
 fs.writeFileSync(resultFilename, JSON.stringify(profile), 'utf-8');
 console.log(
   `Saved ${resultFilename} with ${profile.samples.length} samples, ${profile.timeDeltas.length} deltas, ${profile.endTime - profile.startTime} time delta`

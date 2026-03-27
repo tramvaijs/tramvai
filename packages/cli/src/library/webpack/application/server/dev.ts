@@ -2,7 +2,7 @@ import path from 'path';
 import Config from 'webpack-chain';
 import WebpackBar from 'webpackbar';
 
-import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+import { FancyReporter, RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
@@ -13,7 +13,6 @@ import { commonApplicationDev } from '../dev';
 import configResolve from '../../blocks/configResolve';
 import type { UI_SHOW_PROGRESS_TOKEN } from '../../../../di/tokens';
 import sourcemaps from '../../blocks/sourcemaps';
-import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
 import { getApplicationUrl } from '../../../../utils/getApplicationUrl';
 
 export const webpackServerConfig = ({

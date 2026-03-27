@@ -1,6 +1,6 @@
 import type { Provider } from '@tinkoff/dippy';
 import { provide } from '@tinkoff/dippy';
-import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
 
 import { INIT_HANDLER_TOKEN, CLOSE_HANDLER_TOKEN } from '../../tokens';
 import { CONFIG_MANAGER_TOKEN, SERVER_TOKEN } from '../../../../di/tokens';

@@ -4,17 +4,11 @@ import crypto from 'crypto';
 
 import findCacheDir from 'find-cache-dir';
 import type { Configuration } from 'webpack';
-import { createToken } from '@tinkoff/dippy';
 
 import { ConfigService } from '@tramvai/api/lib/config';
 import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import { getPostcssConfigPath } from './styles';
 import { WebpackTranspilerInputParameters } from './transpiler';
-
-export const CACHE_ADDITIONAL_FLAGS_TOKEN = createToken<string[]>(
-  'tramvai webpack cache additional flags',
-  { multi: true }
-);
 
 const getConfigCacheNameAdditionalFlags = (
   configManager: ConfigService,

@@ -8,7 +8,7 @@ import {
   ModuleFederationFixRange,
   ModuleFederationFixRangeOptions,
   PatchAutoPublicPathPlugin,
-} from '@tramvai/plugin-webpack-builder';
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 import common from '../common/main';
 import type { ConfigManager } from '../../../config/configManager';

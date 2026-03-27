@@ -2,7 +2,7 @@ import { declareModule, provide } from '@tinkoff/dippy';
 import { defineTramvaiConfig } from '@tramvai/api/lib/config';
 import {
   DEFINE_PLUGIN_OPTIONS_TOKEN,
-  WEBPACK_EXTERNALS_TOKEN,
+  BUILD_EXTERNALS_TOKEN,
 } from '@tramvai/plugin-webpack-builder';
 import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-webpack-builder/lib/webpack/webpack-config';
 
@@ -16,7 +16,7 @@ const DefineOptionsPlugin = declareModule({
       },
     }),
     provide({
-      provide: WEBPACK_EXTERNALS_TOKEN,
+      provide: BUILD_EXTERNALS_TOKEN,
       useFactory: ({ buildTarget }) => {
         return ['@sotqa/mountebank-fork'];
       },

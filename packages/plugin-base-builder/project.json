@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/plugin-base-builder",
+  "root": "packages/plugin-base-builder",
+  "sourceRoot": "packages/plugin-base-builder/src",
+  "projectType": "library",
+  "targets": {}
+}

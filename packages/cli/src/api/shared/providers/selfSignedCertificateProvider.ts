@@ -3,7 +3,7 @@ import { provide } from '@tinkoff/dippy';
 import {
   SELF_SIGNED_CERTIFICATE_TOKEN,
   createSelfSignedCertificate,
-} from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+} from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
 
 import { COMMAND_PARAMETERS_TOKEN, CONFIG_MANAGER_TOKEN } from '../../../di/tokens';
 

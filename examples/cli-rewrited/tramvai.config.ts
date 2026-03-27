@@ -1,11 +1,12 @@
-import path from 'node:path';
-
 import { defineTramvaiConfig } from '@tramvai/api/lib/config';
 import { WebpackBuilderPlugin } from '@tramvai/plugin-webpack-builder';
+import { RspackBuilderPlugin } from '@tramvai/plugin-rspack-builder';
+import { SwcTranspilerPlugin } from '@tramvai/plugin-swc-transpiler';
 import { BabelTranspilerPlugin } from '@tramvai/plugin-babel-transpiler';
 import { PwaPlugin } from '@tramvai/plugin-webpack-pwa';
 
 export default defineTramvaiConfig({
+  // plugins: [RspackBuilderPlugin, SwcTranspilerPlugin],
   plugins: [WebpackBuilderPlugin, BabelTranspilerPlugin, PwaPlugin],
   projects: {
     'cli-rewrited': {

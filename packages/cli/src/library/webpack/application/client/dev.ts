@@ -9,7 +9,7 @@ import type { ForkTsCheckerWebpackPluginOptions } from 'fork-ts-checker-webpack-
 
 import isObject from '@tinkoff/utils/is/object';
 import isUndefined from '@tinkoff/utils/is/undefined';
-import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+import { FancyReporter, RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
 import type { ConfigManager } from '../../../../config/configManager';
@@ -18,7 +18,6 @@ import commonDev from '../../common/dev';
 import { commonApplicationDev } from '../dev';
 import type { UI_SHOW_PROGRESS_TOKEN } from '../../../../di/tokens';
 import sourcemaps from '../../blocks/sourcemaps';
-import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
 import { extendEntry } from '../../utils/extendEntry';
 import { extractCssPluginFactory } from '../../blocks/extractCssPlugin';
 import { splitChunksConfig } from './prod/optimization/splitChunks';

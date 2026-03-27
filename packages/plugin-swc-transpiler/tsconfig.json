@@ -21,6 +21,9 @@
         },
         {
             "path": "../api"
+        },
+        {
+            "path": "../plugin-rspack-builder"
         }
     ]
 }

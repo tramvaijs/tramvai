@@ -3,7 +3,7 @@ import { createToken } from '@tinkoff/dippy';
 
 export type BuildStats = {
   maxMemoryRss?: number;
-  buildTime: number;
+  buildTime?: number;
 };
 
 export type DevServer = {
@@ -12,6 +12,7 @@ export type DevServer = {
   getStats(): {
     client: BuildStats;
     server: BuildStats;
+    maxMemoryRss?: number;
   };
   buildPromise: Promise<void>;
   port: number;

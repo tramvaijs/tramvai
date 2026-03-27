@@ -1,7 +1,7 @@
 import path from 'path';
 import type Config from 'webpack-chain';
 
-import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+import { RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 

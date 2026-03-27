@@ -2,6 +2,8 @@ import inspector from 'node:inspector';
 import { Worker } from 'node:worker_threads';
 import { ConfigService } from '@tramvai/api/lib/config';
 import { logger } from '@tramvai/api/lib/services/logger';
+import { filterWorkerStderr } from '@tramvai/plugin-base-builder/lib/utils';
+
 import {
   EXIT,
   INVALIDATE,
@@ -12,7 +14,6 @@ import {
   WebpackWorkerOutgoingEventsPayload,
 } from '../workers/webpack.events';
 import { ProgressBar } from '../utils/progress-bar';
-import { filterWorkerStderr } from '../utils/filter';
 
 export class WebpackWorkerBridge {
   #worker: Worker | null = null;

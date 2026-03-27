@@ -1,7 +1,7 @@
 import path from 'node:path';
 import type { TransformOptions } from '@babel/core';
 import { WebpackTranspilerInputParameters } from '@tramvai/plugin-webpack-builder';
-import { hasJsxRuntime } from '@tramvai/api/lib/utils/react';
+import { hasJsxRuntime } from '@tramvai/plugin-base-builder/lib/utils';
 import { getReactCompilerPlugin } from './plugins/react-compiler';
 
 const envConfig: Record<string, any> = {

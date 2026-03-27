@@ -1,32 +1,11 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { Container, createToken, optional } from '@tinkoff/dippy';
-import { CONFIG_SERVICE_TOKEN, extensions } from '@tramvai/api/lib/config';
-import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
 import type webpack from 'webpack';
+import { Container, optional } from '@tinkoff/dippy';
+import { TsconfigPathsPlugin } from 'tsconfig-paths-webpack-plugin';
 
-export { extensions as defaultExtensions };
-
-/**
- * @description Webpack [resolve.extensions](https://webpack.js.org/configuration/resolve/#resolveextensions)
- */
-export const RESOLVE_EXTENSIONS_TOKEN = createToken<string[]>('tramvai webpack resolve extensions');
-
-/**
- * @description Webpack [resolve.alias](https://webpack.js.org/configuration/resolve/#resolvealias)
- */
-export const RESOLVE_ALIAS_TOKEN = createToken<Record<string, string | false | string[]>>(
-  'tramvai webpack resolve alias',
-  { multi: true }
-);
-
-/**
- * @description Webpack [resolve.alias](https://webpack.js.org/configuration/resolve/#resolvefallback)
- */
-export const RESOLVE_FALLBACK_TOKEN = createToken<Record<string, string | false | string[]>>(
-  'tramvai webpack resolve fallback',
-  { multi: true }
-);
+import { CONFIG_SERVICE_TOKEN, extensions } from '@tramvai/api/lib/config';
+import { RESOLVE_EXTENSIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 
 export const createResolveOptions = async ({
   di,

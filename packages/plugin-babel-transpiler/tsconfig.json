@@ -21,6 +21,12 @@
         },
         {
             "path": "../plugin-webpack-builder"
+        },
+        {
+            "path": "../plugin-rspack-builder"
+        },
+        {
+            "path": "../plugin-base-builder"
         }
     ]
 }

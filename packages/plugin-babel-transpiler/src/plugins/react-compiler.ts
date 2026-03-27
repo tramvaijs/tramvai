@@ -1,5 +1,5 @@
 import { ReactCompilerOptions } from '@tramvai/api/lib/config';
-import { resolveReactVersion } from '@tramvai/api/lib/utils/react';
+import { resolveReactVersion } from '@tramvai/plugin-base-builder/lib/utils/react';
 
 type ReactCompilerTarget = '17' | '18' | '19';
 

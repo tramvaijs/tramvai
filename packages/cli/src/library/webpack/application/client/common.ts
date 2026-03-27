@@ -1,13 +1,14 @@
 import path from 'path';
 import fs from 'fs';
 import type Config from 'webpack-chain';
+import { Compilation } from 'webpack';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import {
   AssetsIntegritiesPlugin,
   PolyfillConditionPlugin,
-  PurifyStatsPlugin,
-} from '@tramvai/plugin-webpack-builder';
+  getPurifyStatsPlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
@@ -147,6 +148,7 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
       .end();
   }
 
+  const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
   config
     .plugin('assets-purify-plugin')
     .use(PurifyStatsPlugin, [{ fileName: statsFileName, target: 'application' }])

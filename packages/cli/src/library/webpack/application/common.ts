@@ -6,7 +6,7 @@ import {
   ModuleFederationFixRangeOptions,
   ModuleFederationIgnoreEntries,
   ModuleFederationIgnoreEntriesOptions,
-} from '@tramvai/plugin-webpack-builder';
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 import { getSharedModules } from '../child-app/moduleFederationShared';
 import type { ModuleFederationPluginOptions } from '../types/webpack';

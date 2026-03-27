@@ -7,16 +7,19 @@ import type {
   DEV_SERVER_TOKEN,
 } from '@tramvai/api/lib/tokens';
 import { BuildStats } from '@tramvai/api/lib/builder/dev-server';
-import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/api/lib/utils/selfSignedCertificate/createSelfSignedCertificate';
+import { SELF_SIGNED_CERTIFICATE_TOKEN } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
 import { logger } from '@tramvai/api/lib/services/logger';
 import type { CONFIG_SERVICE_TOKEN, INPUT_PARAMETERS_TOKEN } from '@tramvai/api/lib/config';
-import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
+import {
+  resolvePublicPathDirectory,
+  CompilationWatcher,
+} from '@tramvai/plugin-base-builder/lib/utils';
+import { ServerRunnerWorkerBridge } from '@tramvai/plugin-base-builder/lib/server-runner/worker-bridge';
+import { createProxy } from '@tramvai/plugin-base-builder/lib/server-runner/proxy';
+
 import { BUILD_DONE, BUILD_FAILED, WATCH_RUN } from '../workers/webpack.events';
 import { WebpackWorkerBridge } from './webpack-worker-bridge';
-import { ServerRunnerWorkerBridge } from './server-runner-worker-bridge';
-import { createProxy } from './proxy';
 import { ProgressBar } from '../utils/progress-bar';
-import { CompilationWatcher } from '../utils/compilation-watcher';
 
 type DevServerApi = ExtractTokenType<typeof DEV_SERVER_TOKEN>;
 
@@ -90,7 +93,9 @@ export function createDevServer({
       });
 
       const webpackWorkerPath = path.resolve(__dirname, '..', 'workers', 'webpack.js');
-      const serverRunnerWorkerPath = path.resolve(__dirname, '..', 'workers', 'server-runner.js');
+      const serverRunnerWorkerPath = require.resolve(
+        '@tramvai/plugin-base-builder/lib/server-runner/server-runner.js'
+      );
       const serverPublicPath = resolvePublicPathDirectory(config.outputServer);
       const progressBar = new ProgressBar();
       let serverStats: BuildStats | undefined;

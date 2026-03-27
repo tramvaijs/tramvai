@@ -4,7 +4,7 @@ import path from 'path';
 
 import isObject from '@tinkoff/utils/is/object';
 import isUndefined from '@tinkoff/utils/is/undefined';
-import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+import { RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 // eslint-disable-next-line no-restricted-imports
 import type { ForkTsCheckerWebpackPluginOptions } from 'fork-ts-checker-webpack-plugin/lib/plugin-options';

@@ -1,16 +1,11 @@
 import type webpack from 'webpack';
 import { createToken } from '@tinkoff/dippy';
 import type { Container } from '@tinkoff/dippy';
+import type { BuildType, BuildTarget, BuildMode } from '@tramvai/plugin-base-builder/lib/types';
 
 export type WebpackConfigurationFactory = (options: {
   di: Container;
 }) => Promise<webpack.Configuration>;
-
-export type BuildType = 'application' | 'child-app';
-
-export type BuildTarget = 'client' | 'server';
-
-export type BuildMode = 'development' | 'production';
 
 /**
  * @description Build type defines Tramvai type of the build - regular application or Child App

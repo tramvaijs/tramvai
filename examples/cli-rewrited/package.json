@@ -17,6 +17,8 @@
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/plugin-babel-transpiler": "0.0.0-stub",
+    "@tramvai/plugin-rspack-builder": "0.0.0-stub",
+    "@tramvai/plugin-swc-transpiler": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
     "@tramvai/plugin-webpack-pwa": "0.0.0-stub",
     "@tramvai/test-integration": "0.0.0-stub",
