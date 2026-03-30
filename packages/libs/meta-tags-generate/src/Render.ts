@@ -1,7 +1,8 @@
 import reduceObj from '@tinkoff/utils/object/reduce';
-import type { Meta } from './Meta';
+
 import { META_DATA_ATTR } from './constants';
-import type { TagRecord } from './Meta.h';
+import type { Meta } from './Meta';
+import type { TagRecord, TagPlacement } from './Meta.h';
 
 const formatAttr = reduceObj((acc, value, key) => `${acc} ${key}="${value}"`, '');
 
@@ -22,7 +23,9 @@ export class Render {
     this.meta = meta;
   }
 
-  render(): string {
-    return this.meta.dataCollection().map(htmlConverter).join('\n');
+  render(options?: { placement?: TagPlacement }): string {
+    const { placement = 'head' } = options ?? {};
+
+    return this.meta.dataCollection(placement).map(htmlConverter).join('\n');
   }
 }

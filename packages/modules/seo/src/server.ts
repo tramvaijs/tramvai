@@ -1,18 +1,16 @@
+import { Meta, Render } from '@tinkoff/meta-tags-generate';
+import flatten from '@tinkoff/utils/array/flatten';
+import isArray from '@tinkoff/utils/is/array';
 import { Module } from '@tramvai/core';
 import { CONTEXT_TOKEN } from '@tramvai/module-common';
-import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
-import flatten from '@tinkoff/utils/array/flatten';
-import path from '@tinkoff/utils/object/path';
-import { Meta, Render } from '@tinkoff/meta-tags-generate';
-import isArray from '@tinkoff/utils/is/array';
-import isEmpty from '@tinkoff/utils/is/empty';
+
+import { converters } from './converters/converters';
+import { sharedProviders } from './shared';
+import { setServerMetaWalkState } from './store/metaStore';
 import { META_WALK_TOKEN, META_UPDATER_TOKEN, META_DEFAULT_TOKEN } from './tokens';
 import { transformValue } from './transformValue';
-import { sharedProviders } from './shared';
-import { converters } from './converters/converters';
 import type { MetaRouteConfig, SeoModuleOptions, PageSeoProperty } from './types';
-import { setServerMetaWalkState } from './store/metaStore';
 
 export * from './constants';
 export * from './tokens';
@@ -45,40 +43,32 @@ declare module '@tinkoff/router' {
         // We should do this before rendering because rendering resets the state of MetaWalk
         context.dispatch(setServerMetaWalkState(metaWalk.getSerializableState()));
 
-        const result = new Render(meta).render();
+        const renderer = new Render(meta);
+        const head = renderer.render({ placement: 'head' });
+        const body = renderer.render({ placement: 'body' });
 
-        return {
-          slot: ResourceSlot.HEAD_META,
-          type: ResourceType.asIs,
-          payload: result,
-        };
+        return [
+          {
+            slot: ResourceSlot.HEAD_META,
+            type: ResourceType.asIs,
+            payload: head,
+          },
+          ...(body !== ''
+            ? [
+                {
+                  slot: ResourceSlot.BODY_TAIL_ANALYTICS,
+                  type: ResourceType.asIs,
+                  payload: body,
+                },
+              ]
+            : []),
+        ];
       },
       multi: true,
       deps: {
+        context: CONTEXT_TOKEN,
         metaWalk: META_WALK_TOKEN,
         metaUpdaters: { token: META_UPDATER_TOKEN, optional: true },
-        context: CONTEXT_TOKEN,
-      },
-    },
-    {
-      // вставка ld json
-      provide: RENDER_SLOTS,
-      multi: true,
-      useFactory: ({ pageService }) => {
-        const jsonLd = path(['seo', 'structuredData', 'jsonLd'], pageService.getMeta());
-
-        if (isEmpty(jsonLd)) {
-          return {};
-        }
-
-        return {
-          slot: ResourceSlot.BODY_TAIL_ANALYTICS,
-          type: ResourceType.asIs,
-          payload: `<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`,
-        };
-      },
-      deps: {
-        pageService: PAGE_SERVICE_TOKEN,
       },
     },
   ],

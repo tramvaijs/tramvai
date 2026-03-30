@@ -1,11 +1,11 @@
+import { Meta, Update } from '@tinkoff/meta-tags-generate';
 import flatten from '@tinkoff/utils/array/flatten';
 import { DI_TOKEN, provide } from '@tramvai/core';
-import { MetaWalk } from '@tinkoff/meta-tags-generate';
-import { Meta, Update } from '@tinkoff/meta-tags-generate';
+
 import { META_PRIORITY_APP } from './constants';
+import { converters } from './converters/converters';
 import { META_UPDATER_TOKEN, APPLY_META_TOKEN, META_WALK_TOKEN } from './tokens';
 import { transformValue } from './transformValue';
-import { converters } from './converters/converters';
 import type { ApplyMeta } from './types';
 
 /** Provider for applying meta tags */
@@ -29,7 +29,9 @@ export const ApplyMetaProvider = provide({
         converters,
       });
 
-      new Update(meta).update();
+      const updater = new Update(meta);
+      updater.update({ placement: 'head' });
+      updater.update({ placement: 'body' });
     };
   },
   deps: {

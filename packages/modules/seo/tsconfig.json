@@ -39,6 +39,9 @@
         },
         {
             "path": "../../tramvai/react"
+        },
+        {
+            "path": "../../libs/safe-strings"
         }
     ]
 }

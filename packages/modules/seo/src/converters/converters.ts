@@ -1,5 +1,5 @@
 import type { Converter } from '@tinkoff/meta-tags-generate';
-import { metaInnerHtml, metaName, metaProperty, metaLink } from './metaType';
+import { metaInnerHtml, metaName, metaProperty, metaLink, metaScript } from './metaType';
 
 const robotsNoIndex = [metaName('robots', 'noindex, follow'), metaName('robots', 'noarchive')];
 const robotsNoFollow = [metaName('robots', 'index, nofollow'), metaName('robots', 'noarchive')];
@@ -30,6 +30,7 @@ export const converters: Record<string, Converter> = {
   keywords: metaName('keywords'),
   canonical: metaLink('canonical'),
   viewport: metaName('viewport'),
+  jsonLd: metaScript('application/ld+json'),
   ogTitle: metaProperty('og:title'),
   ogDescription: metaProperty('og:description'),
   ogSiteName: metaProperty('og:site_name'),

@@ -3,10 +3,17 @@
  */
 
 import { Module, provide } from '@tramvai/core';
-import { META_UPDATER_TOKEN } from '../../tokens';
-import { META_DEFAULT_TOKEN } from '../../tokens';
-import { testMetaUpdater } from './metaUpdater';
+
 import { META_PRIORITY_APP } from '../../constants';
+import { META_DEFAULT_TOKEN, META_UPDATER_TOKEN } from '../../tokens';
+
+import {
+  jsonLdMock,
+  stringifiedJsonLdMock,
+  stringifiedUpdatedJsonLdMock,
+  updatedJsonLdMock,
+} from './constants';
+import { testMetaUpdater } from './metaUpdater';
 
 describe('testMetaUpdater', () => {
   it('should allow to test metaUpdater', async () => {
@@ -16,6 +23,7 @@ describe('testMetaUpdater', () => {
     >((walker) => {
       walker.updateMeta(META_PRIORITY_APP, {
         title: 'test title',
+        jsonLd: jsonLdMock,
       });
     });
     @Module({
@@ -32,27 +40,40 @@ describe('testMetaUpdater', () => {
       modules: [CustomModule],
     });
 
-    const { render, metaWalk } = renderMeta();
+    const TEST_TITLE = 'test title';
 
-    expect(metaWalk.get('title')).toEqual({ priority: 20, value: 'test title' });
-    expect(render).toMatch('<title data-meta-dynamic="true">test title</title>');
+    const { head, body, metaWalk } = renderMeta();
+
+    expect(metaWalk.get('title')).toEqual({ priority: 20, value: TEST_TITLE });
+    expect(metaWalk.get('jsonLd')).toEqual({ priority: 20, value: jsonLdMock });
+
+    expect(head).toMatch(`<title data-meta-dynamic="true">${TEST_TITLE}</title>`);
+    expect(body).toMatch(
+      `<script type="application/ld+json" data-meta-dynamic="true">${stringifiedJsonLdMock}</script>`
+    );
   });
 
   it('should allow to specify default meta', async () => {
+    const TEST_DEFAULT_TITLE = 'test default title';
+
     const { renderMeta } = testMetaUpdater({
       providers: [
         provide({
           provide: META_DEFAULT_TOKEN,
           useValue: {
-            title: 'default title',
+            title: TEST_DEFAULT_TITLE,
+            jsonLd: jsonLdMock,
           },
         }),
       ],
     });
 
-    const { render } = renderMeta();
+    const { head, body } = renderMeta();
 
-    expect(render).toMatch('<title data-meta-dynamic="true">default title</title>');
+    expect(head).toMatch(`<title data-meta-dynamic="true">${TEST_DEFAULT_TITLE}</title>`);
+    expect(body).toMatch(
+      `<script type="application/ld+json" data-meta-dynamic="true">${stringifiedJsonLdMock}</script>`
+    );
   });
 
   it('metaObj passed - should update meta tags from metaObj', async () => {
@@ -65,14 +86,21 @@ describe('testMetaUpdater', () => {
 
     metaWalk.updateMeta(META_PRIORITY_APP, {
       title: TEST_DEFAULT_TITLE,
+      jsonLd: jsonLdMock,
     });
 
-    applyMeta({ metaObj: { title: TEST_APPLIED_TITLE } });
+    applyMeta({ metaObj: { title: TEST_APPLIED_TITLE, jsonLd: updatedJsonLdMock } });
 
     expect(document.title).toBe(TEST_APPLIED_TITLE);
+    expect(document.body.lastElementChild?.textContent).toBe(stringifiedUpdatedJsonLdMock);
+
     expect(metaWalk.get('title')).toMatchObject({
       priority: META_PRIORITY_APP,
       value: TEST_APPLIED_TITLE,
+    });
+    expect(metaWalk.get('jsonLd')).toMatchObject({
+      priority: META_PRIORITY_APP,
+      value: updatedJsonLdMock,
     });
   });
 
@@ -85,11 +113,18 @@ describe('testMetaUpdater', () => {
 
     metaWalk.updateMeta(META_PRIORITY_APP, {
       title: TEST_DEFAULT_TITLE,
+      jsonLd: jsonLdMock,
     });
 
     applyMeta();
 
     expect(document.title).toBe(TEST_DEFAULT_TITLE);
-    expect(metaWalk.get('title')).toEqual({ priority: 20, value: 'test default title' });
+    expect(document.body.lastElementChild?.textContent).toBe(stringifiedJsonLdMock);
+
+    expect(metaWalk.get('title')).toEqual({ priority: 20, value: TEST_DEFAULT_TITLE });
+    expect(metaWalk.get('jsonLd')).toMatchObject({
+      priority: META_PRIORITY_APP,
+      value: jsonLdMock,
+    });
   });
 });
