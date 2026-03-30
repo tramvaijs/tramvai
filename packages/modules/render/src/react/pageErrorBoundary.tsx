@@ -3,8 +3,8 @@ import type { ComponentType, PropsWithChildren } from 'react';
 import {
   useDi,
   UniversalErrorBoundary,
-  ERROR_BOUNDARY_TOKEN,
   ERROR_BOUNDARY_FALLBACK_COMPONENT_TOKEN,
+  ERROR_BOUNDARY_TOKEN,
 } from '@tramvai/react';
 import { useUrl } from '@tramvai/module-router';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';

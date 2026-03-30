@@ -20,9 +20,6 @@
             "path": "../../tramvai/state"
         },
         {
-            "path": "../../libs/user-agent"
-        },
-        {
             "path": "../common"
         },
         {

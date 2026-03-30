@@ -1,9 +1,10 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable max-classes-per-file */
 import { COMMAND_LINE_RUNNER_TOKEN } from '@tramvai/core';
-import { commandLineListTokens } from '@tramvai/tokens-core';
+import { commandLineListTokens, TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/tokens-core';
 import type { ModuleType } from '@tinkoff/dippy';
 import { INVALID_MODULE_ERROR, Module } from '@tinkoff/dippy';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import { createApp } from './createApp';
 import { createBundle } from './bundles/createBundle';
 
@@ -47,6 +48,10 @@ describe('createApp', () => {
       name: 'testApp',
       modules: [ModuleLevel1 as ModuleType],
       providers: [
+        {
+          provide: TAPABLE_HOOK_FACTORY_TOKEN,
+          useClass: TapableHooks,
+        },
         {
           provide: COMMAND_LINE_RUNNER_TOKEN,
           useClass: class CommandLine {
@@ -122,6 +127,10 @@ describe('createApp', () => {
       modules: [Module1 as ModuleType],
       providers: [
         {
+          provide: TAPABLE_HOOK_FACTORY_TOKEN,
+          useClass: TapableHooks,
+        },
+        {
           provide: COMMAND_LINE_RUNNER_TOKEN,
           useClass: class CommandLine {
             run() {
@@ -161,6 +170,10 @@ describe('createApp', () => {
           modules,
           name: 'testApp',
           providers: [
+            {
+              provide: TAPABLE_HOOK_FACTORY_TOKEN,
+              useClass: TapableHooks,
+            },
             {
               provide: COMMAND_LINE_RUNNER_TOKEN,
               useValue: {
@@ -202,6 +215,10 @@ describe('createApp', () => {
       name: 'testApp',
       modules: [createModule(), createModule()],
       providers: [
+        {
+          provide: TAPABLE_HOOK_FACTORY_TOKEN,
+          useClass: TapableHooks,
+        },
         {
           provide: COMMAND_LINE_RUNNER_TOKEN,
           useClass: class CommandLine {
@@ -246,6 +263,10 @@ describe('createApp', () => {
       modules: [Module1],
       name: 'testApp',
       providers: [
+        {
+          provide: TAPABLE_HOOK_FACTORY_TOKEN,
+          useClass: TapableHooks,
+        },
         {
           provide: 'dependencyApp',
           useValue: dependencyAppMock,
@@ -308,6 +329,10 @@ describe('createApp', () => {
       name: 'testApp',
       providers: [
         {
+          provide: TAPABLE_HOOK_FACTORY_TOKEN,
+          useClass: TapableHooks,
+        },
+        {
           provide: COMMAND_LINE_RUNNER_TOKEN,
           useValue: {
             run: () => Promise.resolve(),
@@ -369,6 +394,10 @@ describe('createApp', () => {
       modules: [ModuleLevel1],
       name: 'testApp',
       providers: [
+        {
+          provide: TAPABLE_HOOK_FACTORY_TOKEN,
+          useClass: TapableHooks,
+        },
         {
           provide: COMMAND_LINE_RUNNER_TOKEN,
           useValue: {

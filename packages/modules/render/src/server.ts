@@ -1,4 +1,10 @@
-import { Module, commandLineListTokens, DI_TOKEN, provide } from '@tramvai/core';
+import {
+  Module,
+  commandLineListTokens,
+  DI_TOKEN,
+  provide,
+  TAPABLE_HOOK_FACTORY_TOKEN,
+} from '@tramvai/core';
 import {
   LOGGER_TOKEN,
   REQUEST_MANAGER_TOKEN,
@@ -8,7 +14,7 @@ import {
   DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
-import { ClientHintsModule, USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
+import { ClientHintsModule } from '@tramvai/module-client-hints';
 import {
   RESOURCES_REGISTRY,
   RENDER_SLOTS,
@@ -28,10 +34,8 @@ import {
   INLINE_WEBPACK_RUNTIME,
 } from '@tramvai/tokens-render';
 import { Scope, optional } from '@tinkoff/dippy';
-import { satisfies } from '@tinkoff/user-agent';
 import { isRedirectFoundError } from '@tinkoff/errors';
 import { PageErrorStore, setPageErrorEvent, deserializeError } from '@tramvai/module-router';
-import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
 import {
   SERVER_RESPONSE_STREAM,
   SERVER_RESPONSE_TASK_MANAGER,

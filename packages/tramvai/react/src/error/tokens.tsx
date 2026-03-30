@@ -2,8 +2,12 @@ import type React from 'react';
 import { createToken } from '@tinkoff/dippy';
 import type { UniversalErrorBoundaryFallbackProps } from './UniversalErrorBoundary';
 
+export type ErrorSeverity = 'critical' | 'error';
 type ErrorBoundaryHandler = (error: Error, errorInfo: React.ErrorInfo) => void;
 
+/**
+ * @deprecated subsribe to `TRAMVAI_HOOKS_TOKEN['react:error']` hook instead, looking for the `page-error-boundary` event
+ */
 export const ERROR_BOUNDARY_TOKEN = createToken<ErrorBoundaryHandler>(
   'reactErrorBoundaryHandlers',
   {

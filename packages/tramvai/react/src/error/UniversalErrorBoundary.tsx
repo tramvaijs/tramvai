@@ -63,9 +63,11 @@ export class UniversalErrorBoundary extends Component<Props, State> {
     const { errorHandlers } = this.props;
 
     if (errorHandlers) {
-      errorHandlers.forEach((handler) => {
-        handler(error, errorInfo);
-      });
+      if (errorHandlers) {
+        errorHandlers.forEach((handler) => {
+          handler(error, errorInfo);
+        });
+      }
     }
   }
 

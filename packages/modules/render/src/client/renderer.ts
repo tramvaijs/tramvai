@@ -28,7 +28,7 @@ const ExecuteRenderCallback: FC<{ callback: () => void; children?: React.ReactNo
   return children as any;
 };
 
-const renderer: Renderer = ({ element, container, callback, log, renderMode }) => {
+const renderer: Renderer = ({ hooks, element, container, callback, renderMode }) => {
   // in case of react 19 we should always use hydrateRoot
   if (process.env.__TRAMVAI_CONCURRENT_FEATURES && typeof hydrateRoot === 'function') {
     const wrappedElement = createElement(ExecuteRenderCallback, { callback }, element);
@@ -41,8 +41,7 @@ const renderer: Renderer = ({ element, container, callback, log, renderMode }) =
 
       const [{ error, errorInfo }, ...otherErrors] = Array.from(allErrors.values());
       allErrors = new Map();
-
-      log.error({
+      hooks['react:error'].call({
         event: 'hydrate:recover-after-error',
         error,
         errorInfo,
@@ -54,7 +53,7 @@ const renderer: Renderer = ({ element, container, callback, log, renderMode }) =
       startTransition(() => {
         hydrateRoot(container(), wrappedElement, {
           onUncaughtError: (error, errorInfo) => {
-            log.error({
+            hooks['react:error'].call({
               event: 'hydrate:on-uncaught-error',
               error,
               errorInfo: {
@@ -63,7 +62,7 @@ const renderer: Renderer = ({ element, container, callback, log, renderMode }) =
             });
           },
           onCaughtError: (error, errorInfo) => {
-            log.error({
+            hooks['react:error'].call({
               event: 'hydrate:on-caught-error',
               error,
               errorInfo: {
