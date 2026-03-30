@@ -101,7 +101,7 @@ export function patchRules(customPolyfillsPaths: string[], rules: Rules) {
   });
 }
 
-function getImports(filePath: string, projectRootPath: string) {
+export function getImports(filePath: string, projectRootPath: string) {
   const packageJSONPath = path.join(projectRootPath, 'package.json');
   const packageJSONHash = getFileContentHash(packageJSONPath);
 
