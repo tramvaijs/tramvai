@@ -267,7 +267,16 @@ export class PreloadManager implements ChildAppPreloadManager {
       );
     });
 
-    await Promise.allSettled(promises);
+    const childAppInitResult = await Promise.allSettled(promises);
+    const errors = childAppInitResult
+      .map((promise) => (promise.status === 'rejected' ? promise.reason : undefined))
+      .filter(Boolean);
+
+    if (errors.length === 1) {
+      throw errors[0];
+    } else if (errors.length > 1) {
+      throw new AggregateError(errors);
+    }
   }
 
   pageRender(): void {

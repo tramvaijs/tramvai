@@ -92,11 +92,18 @@ export const browserProviders: Provider[] = [
 
         return preloader.runPreloaded().catch((error) => {
           const log = logger('child-app:run-preloaded');
-
-          log.error({
+          const errorForLog: { event: string; error: Error; otherErrors?: Error[] } = {
             event: 'client-failed',
             error,
-          });
+          };
+
+          // TODO: TCORE-5465
+          if (error instanceof AggregateError) {
+            [errorForLog.error] = error.errors;
+            errorForLog.otherErrors = error.errors.slice(1);
+          }
+
+          log.error(errorForLog);
         });
       };
     },
