@@ -1,4 +1,13 @@
-import { Module, commandLineListTokens, DI_TOKEN, provide, optional } from '@tramvai/core';
+import {
+  Module,
+  commandLineListTokens,
+  DI_TOKEN,
+  provide,
+  optional,
+  TAPABLE_HOOK_FACTORY_TOKEN,
+  Scope,
+  TRAMVAI_HOOKS_TOKEN,
+} from '@tramvai/core';
 import { LOGGER_TOKEN, CONTEXT_TOKEN, STORE_TOKEN } from '@tramvai/tokens-common';
 import {
   EXTEND_RENDER,
@@ -11,7 +20,7 @@ import {
   DEFAULT_ERROR_BOUNDARY_COMPONENT,
 } from '@tramvai/tokens-render';
 import { PageErrorStore, setPageErrorEvent, beforeResolveHooksToken } from '@tramvai/module-router';
-import { COOKIE_MANAGER_TOKEN } from '@tramvai/module-common';
+import { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
 import { rendering as renderInBrowser } from './client';
 import type { RenderModuleConfig } from './shared/types';
 import { LayoutModule } from './shared/LayoutModule';
@@ -68,6 +77,7 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
         };
       },
       deps: {
+        hooks: TRAMVAI_HOOKS_TOKEN,
         logger: LOGGER_TOKEN,
         customRender: { token: CUSTOM_RENDER, optional: true },
         extendRender: { token: EXTEND_RENDER, optional: true },
@@ -79,6 +89,21 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
         defaultErrorBoundary: optional(DEFAULT_ERROR_BOUNDARY_COMPONENT),
       },
       multi: true,
+    }),
+    provide({
+      provide: ERROR_BOUNDARY_TOKEN,
+      useFactory: ({ hooks }) => {
+        return (error, errorInfo) => {
+          hooks['react:error'].call({
+            event: 'page-error-boundary',
+            error,
+            errorInfo,
+          });
+        };
+      },
+      deps: {
+        hooks: TRAMVAI_HOOKS_TOKEN,
+      },
     }),
     provide({
       provide: RENDERER_CALLBACK,

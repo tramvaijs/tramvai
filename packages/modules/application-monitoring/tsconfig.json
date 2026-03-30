@@ -4,14 +4,19 @@
         "./src"
     ],
     "compilerOptions": {
-        "declarationDir": "./lib",
         "outDir": "./lib",
-        "rootDir": "./src",
-        "strict": true
+        "declarationDir": "./lib",
+        "rootDir": "./src"
     },
     "references": [
         {
-            "path": "../../libs/pageBuilder"
+            "path": "../../tramvai/core"
+        },
+        {
+            "path": "../../tokens/render"
+        },
+        {
+            "path": "../common"
         },
         {
             "path": "../../tramvai/react"

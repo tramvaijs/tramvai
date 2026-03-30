@@ -1,0 +1,35 @@
+{
+  "name": "@tramvai/module-application-monitoring",
+  "version": "0.0.0-stub",
+  "description": "Модуль сбора и отправки событий мониторинга состояния приложения",
+  "browser": "lib/browser.js",
+  "main": "lib/server.js",
+  "module": "lib/server.es.js",
+  "typings": "lib/server.d.ts",
+  "files": [
+    "lib"
+  ],
+  "sideEffects": false,
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
+  },
+  "scripts": {
+    "build": "tramvai-build --forPublish --preserveModules",
+    "watch": "tsc -w"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub"
+  },
+  "peerDependencies": {
+    "@tinkoff/dippy": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "tslib": "^2.4.0"
+  }
+}

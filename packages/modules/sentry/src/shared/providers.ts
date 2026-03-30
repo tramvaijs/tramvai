@@ -4,7 +4,7 @@ import isObject from '@tinkoff/utils/is/object';
 import isPromise from '@tinkoff/utils/is/promise';
 
 import type { Provider } from '@tramvai/core';
-import { commandLineListTokens } from '@tramvai/core';
+import { commandLineListTokens, TRAMVAI_HOOKS_TOKEN } from '@tramvai/core';
 import { ENV_MANAGER_TOKEN } from '@tramvai/module-common';
 import { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
 import type { Options } from '@sentry/types';
@@ -26,12 +26,14 @@ export const sharedProviders: Provider[] = [
       envManager,
       sentryDsn,
       filterErrors,
+      hooks,
     }: {
       sentry: typeof SENTRY_TOKEN;
       multiOptions: typeof SENTRY_OPTIONS_TOKEN;
       envManager: typeof ENV_MANAGER_TOKEN;
       sentryDsn: typeof SENTRY_DSN_TOKEN;
       filterErrors?: Array<typeof SENTRY_FILTER_ERRORS>;
+      hooks: typeof TRAMVAI_HOOKS_TOKEN;
     }) => {
       const getOptions = (SentrySdk) => {
         const defaultOptions: Options = {
@@ -81,30 +83,24 @@ export const sharedProviders: Provider[] = [
       };
 
       return function initSentry() {
+        hooks['react:error'].tap('react:error-sentry', (_, { error, errorInfo }) => {
+          sentry.withScope((scope) => {
+            if (errorInfo) {
+              scope.setExtras(errorInfo);
+            }
+            sentry.captureException(error);
+          });
+        });
         sentry.init(getOptions);
       };
     },
     deps: {
+      hooks: TRAMVAI_HOOKS_TOKEN,
       sentry: SENTRY_TOKEN,
       multiOptions: { token: SENTRY_OPTIONS_TOKEN, optional: true },
       envManager: ENV_MANAGER_TOKEN,
       sentryDsn: SENTRY_DSN_TOKEN,
       filterErrors: { token: SENTRY_FILTER_ERRORS, optional: true },
-    },
-  },
-  {
-    provide: ERROR_BOUNDARY_TOKEN,
-    multi: true,
-    useFactory: ({ sentry }: { sentry: typeof SENTRY_TOKEN }) => {
-      return function captureErrorBoundary(error, errorInfo) {
-        sentry.withScope((scope) => {
-          scope.setExtras(errorInfo);
-          sentry.captureException(error);
-        });
-      };
-    },
-    deps: {
-      sentry: SENTRY_TOKEN,
     },
   },
 ];

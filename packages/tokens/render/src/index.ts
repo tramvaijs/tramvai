@@ -6,6 +6,7 @@ import type { JSX } from 'react';
 import * as ResourceSlot from './slots';
 
 /**
+ * @deprecated use `TRAMVAI_HOOKS_TOKEN['react:render']` and `TRAMVAI_HOOKS_TOKEN['react:error']` instead
  * @description
  * Token adding resources to specific render slots.
  * Used only on server and it is equivalent to usage of RESOURCES_REGISTRY.

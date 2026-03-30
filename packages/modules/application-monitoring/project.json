@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-application-monitoring",
+  "sourceRoot": "packages/modules/application-monitoring/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/application-monitoring/package.json",
+        "packages/modules/application-monitoring/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

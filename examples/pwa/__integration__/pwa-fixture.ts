@@ -2,7 +2,11 @@ import type { TestFixture, BrowserContext, Page, Response } from '@playwright/te
 import type { CreateApp } from '@tramvai/internal-test-utils/fixtures/create-app';
 
 export class PwaComponentObject {
-  constructor(private page: Page, private context: BrowserContext, private app: CreateApp.App) {}
+  constructor(
+    private page: Page,
+    private context: BrowserContext,
+    private app: CreateApp.App
+  ) {}
 
   async getSWUrl(): Promise<string> {
     await this.waitForSWRegistration();

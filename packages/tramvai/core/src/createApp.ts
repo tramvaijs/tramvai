@@ -12,14 +12,18 @@ import {
   MODULE_PARAMETERS,
   Scope,
   walkOfModules,
+  provide,
+  optional,
 } from '@tinkoff/dippy';
-import type { Bundle } from '@tramvai/tokens-core';
+import type { Bundle, TramvaiHooks } from '@tramvai/tokens-core';
 import {
   ACTIONS_LIST_TOKEN,
   BUNDLE_LIST_TOKEN,
   MODULES_LIST_TOKEN,
   APP_INFO_TOKEN,
   COMMAND_LINE_RUNNER_TOKEN,
+  TRAMVAI_HOOKS_TOKEN,
+  TAPABLE_HOOK_FACTORY_TOKEN,
 } from '@tramvai/tokens-core';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 
@@ -65,6 +69,36 @@ function appProviders(
       scope: Scope.SINGLETON,
       useValue: modules,
     },
+    provide({
+      provide: TRAMVAI_HOOKS_TOKEN,
+      useFactory: ({ tapableHookFactory }) => {
+        return {
+          'app:initialized': tapableHookFactory.createSync<{}>('app:initialized'),
+          'app:initialize-failed': tapableHookFactory.createSync<{ error: Error }>(
+            'app:initialize-failed'
+          ),
+          'app:rendered': tapableHookFactory.createSync<{}>('app:rendered'),
+          'app:render-failed': tapableHookFactory.createSync<{ error: Error }>('app:render-failed'),
+          'react:render': tapableHookFactory.createSync<{}>('react:render'),
+          'react:error': tapableHookFactory.createSync<{
+            event: string;
+            error: Error;
+            errorInfo?: {
+              componentStack?: string;
+            };
+            otherErrors?: {
+              error: Error;
+              errorInfo?: {
+                componentStack: string;
+              };
+            }[];
+          }>('react:error'),
+        };
+      },
+      deps: {
+        tapableHookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
+      },
+    }),
   ];
 }
 
@@ -194,13 +228,18 @@ export function createApp(options: AppOptions) {
     throw error;
   }
 
+  const hooks = app.di.get(TRAMVAI_HOOKS_TOKEN);
+
   return app
     .initialization(typeof window === 'undefined' ? 'server' : 'client')
-    .then(() => app)
+    .then(() => {
+      hooks['app:initialized'].call({});
+
+      return app;
+    })
     .catch((error: any) => {
       if (error instanceof Error) {
-        // eslint-disable-next-line no-param-reassign
-        (error as any).appCreationError = true;
+        hooks['app:initialize-failed'].call({ error });
       }
       throw error;
     });

@@ -7,6 +7,7 @@ import type {
 } from '@tramvai/tokens-render';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { createElement } from 'react';
+import { TRAMVAI_HOOKS_TOKEN } from '@tramvai/core';
 import { renderer } from './renderer';
 import RootClientComponent, { createRootElement } from './RootClientComponent';
 
@@ -20,6 +21,7 @@ export function rendering({
   rendererCallback,
   renderMode,
   defaultErrorBoundary,
+  hooks,
 }: {
   logger: any;
   consumerContext: any;
@@ -30,6 +32,7 @@ export function rendering({
   rendererCallback?: ExtractDependencyType<typeof RENDERER_CALLBACK>;
   renderMode?: ExtractDependencyType<typeof REACT_SERVER_RENDER_MODE>;
   defaultErrorBoundary?: ExtractDependencyType<typeof DEFAULT_ERROR_BOUNDARY_COMPONENT>;
+  hooks: ExtractDependencyType<typeof TRAMVAI_HOOKS_TOKEN>;
 }) {
   const log = logger('module-render');
 
@@ -63,15 +66,27 @@ export function rendering({
       log.debug('App rendering');
       document.querySelector('html').classList.remove('no-js');
       executeRendererCallbacks();
+      hooks['react:render'].call({});
       resolve();
     };
-    const params = { element: renderResult, container, callback, log, renderMode };
+    const params = {
+      element: renderResult,
+      container,
+      callback,
+      log,
+      renderMode,
+      hooks,
+    };
 
     try {
       renderer(params);
-    } catch (e) {
-      executeRendererCallbacks(e);
-      reject(e);
+    } catch (error) {
+      executeRendererCallbacks(error);
+      hooks['react:error'].call({
+        event: 'hydrate:failed',
+        error,
+      });
+      reject(error);
     }
   });
 }
