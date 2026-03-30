@@ -4,6 +4,10 @@ import {
   WEBPACK_TRANSPILER_TOKEN,
   WebpackTranspilerInputParameters,
 } from '@tramvai/plugin-webpack-builder';
+import {
+  RSPACK_TRANSPILER_TOKEN,
+  RspackTranspilerInputParameters,
+} from '@tramvai/plugin-rspack-builder';
 import { configFactory } from './config-factory';
 
 export const BabelTranspilerPlugin = declareModule({
@@ -27,6 +31,22 @@ export const BabelTranspilerPlugin = declareModule({
           // can't find a big difference on a small project with one thread-loader worker
           // TODO: maybe just a config parameter?
           warmupThreadLoader: process.env.TRAMVAI_THREAD_LOADER_WARMUP_DISABLED !== 'true',
+        };
+      },
+      deps: {
+        config: CONFIG_SERVICE_TOKEN,
+      },
+    }),
+    provide({
+      provide: RSPACK_TRANSPILER_TOKEN,
+      useFactory: ({ config }) => {
+        return {
+          loader: 'babel-loader',
+          configFactory: (parameters: RspackTranspilerInputParameters) => {
+            return configFactory(parameters);
+          },
+          useThreadLoader: false,
+          warmupThreadLoader: false,
         };
       },
       deps: {

@@ -9,11 +9,8 @@ import {
   CONFIG_SERVICE_TOKEN,
   Extension,
 } from '@tramvai/api/lib/config';
-import {
-  DEFINE_PLUGIN_OPTIONS_TOKEN,
-  WEBPACK_PLUGINS_TOKEN,
-  BUILD_TARGET_TOKEN,
-} from '@tramvai/plugin-webpack-builder';
+import { WEBPACK_PLUGINS_TOKEN, BUILD_TARGET_TOKEN } from '@tramvai/plugin-webpack-builder';
+import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 import { resolveAbsolutePathForFile } from '@tramvai/api/lib/utils/path';
 import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 

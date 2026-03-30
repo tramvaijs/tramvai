@@ -1,5 +1,3 @@
-import path from 'node:path';
-
 import { createToken } from '@tinkoff/dippy';
 import type { Container } from '@tinkoff/dippy';
 import {

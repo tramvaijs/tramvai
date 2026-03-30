@@ -14,45 +14,54 @@ import {
 } from '@tramvai/api/lib/utils/path';
 import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
 
-import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
-import { resolvePublicPathDirectory } from './utils/publicPath';
-import { resolveUrl } from '../utils/url';
+import {
+  ignoreWarnings,
+  resolvePublicPathDirectory,
+  resolveUrl,
+  getApplicationUrl,
+} from '@tramvai/plugin-base-builder/lib/utils';
+import {
+  getAnalyzeRsdoctorOptions,
+  getBenchmarkRsdoctorOptions,
+} from '@tramvai/plugin-base-builder/lib/shared/rsdoctor';
+import { DEBUG_STATS_OPTIONS } from '@tramvai/plugin-base-builder/lib/shared/stats';
+import { normalizeBrowserslistConfig } from '@tramvai/plugin-base-builder/lib/shared/browserslist';
+import { configToEnv } from '@tramvai/plugin-base-builder/lib/shared/config-to-env';
+import { getSharedModules } from '@tramvai/plugin-base-builder/lib/shared/shared-modules';
+import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
+import { CACHE_ADDITIONAL_FLAGS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/cache';
+import { createSnapshot } from '@tramvai/plugin-base-builder/lib/shared/snapshot';
+import {
+  RESOLVE_ALIAS_TOKEN,
+  RESOLVE_EXTENSIONS_TOKEN,
+  RESOLVE_FALLBACK_TOKEN,
+  defaultExtensions,
+} from '@tramvai/plugin-base-builder/lib/shared/resolve';
+import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';
+import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
+import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
+import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
+import {
+  RuntimePathPlugin,
+  ModuleFederationIgnoreEntries,
+  ModuleFederationFixRange,
+  VirtualProtocolPlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
+
 import {
   WEBPACK_TRANSPILER_TOKEN,
   createTranspilerRules,
   resolveWebpackTranspilerParameters,
 } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
-import { configToEnv } from './shared/config-to-env';
-import { WEBPACK_DEBUG_STATS_OPTIONS } from './shared/stats';
 import { WebpackConfigurationFactory } from './webpack-config';
-import { DEFINE_PLUGIN_OPTIONS_TOKEN } from './shared/define';
 import { createStylesConfiguration } from './shared/styles';
-import {
-  RESOLVE_EXTENSIONS_TOKEN,
-  RESOLVE_FALLBACK_TOKEN,
-  RESOLVE_ALIAS_TOKEN,
-  defaultExtensions,
-  createResolveOptions,
-} from './shared/resolve';
-import { normalizeBrowserslistConfig } from './shared/browserslist';
+import { createResolveOptions } from './shared/resolve';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
-import { createSnapshot } from './shared/snapshot';
 import { createAssetsRules } from './shared/assets';
-import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { createServerInlineRules } from './shared/server-inline';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
-import { createOptimizeOptions } from './shared/optimization';
-import { PROVIDE_TOKEN } from './shared/provide';
-import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
-import { ignoreWarnings } from './utils/warningsFilter';
-import { createSourceMaps } from './shared/sourcemaps';
-import { getSharedModules } from './shared/shared-modules';
-import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
-import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
-import { getAnalyzeRsdoctorOptions, getBenchmarkRsdoctorOptions } from './shared/rsdoctor';
-import { RuntimePathPlugin } from './plugins/RuntimePathPlugin';
-import { getApplicationUrl } from './utils/getApplicationUrl';
+import { createCacheConfig } from './shared/cache';
 
 const mainFields = ['module', 'main'];
 
@@ -88,7 +97,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
-  const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
+  const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
   const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
@@ -148,7 +157,7 @@ export default appConfig;`;
 
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
-  const sourceMapsConfiguration = createSourceMaps({ config, target: 'server' });
+  const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'server' });
 
   const resolveOptions = await createResolveOptions({ di, mainFields });
 
@@ -157,7 +166,7 @@ export default appConfig;`;
     target: normalizedBrowserslistConfig.node
       ? `browserslist:${normalizedBrowserslistConfig.node}`
       : 'node',
-    // context: config.rootDir,
+    context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?
       server: resolveAbsolutePathForFile({
@@ -235,14 +244,14 @@ export default appConfig;`;
         }),
     optimization: {
       emitOnErrors: false,
-      ...createOptimizeOptions({ config, target: 'server' }),
+      ...createOptimizeOptions<'webpack'>({ config, target: 'server' }),
     },
     // TODO: check is it configuration optimal?
     stats: {
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
       warningsCount: false,
-      ...(verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+      ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?
@@ -288,7 +297,7 @@ export default appConfig;`;
         ...createAssetsRules({ di }),
         {
           test: /[\\/]api[\\/]lib[\\/]virtual[\\/]file-system-pages.js$/,
-          loader: path.resolve(__dirname, './loaders/file-system-pages'),
+          loader: require.resolve('@tramvai/plugin-base-builder/lib/loaders/file-system-pages'),
           enforce: 'pre',
           options: {
             fileSystemPages: config.fileSystemPages!,
@@ -299,7 +308,7 @@ export default appConfig;`;
         },
         {
           test: /[\\/]api[\\/]lib[\\/]virtual[\\/]file-system-papi.js$/,
-          loader: path.resolve(__dirname, './loaders/file-system-papi'),
+          loader: require.resolve('@tramvai/plugin-base-builder/lib/loaders/file-system-papi'),
           enforce: 'pre',
           options: {
             fileSystemPapiDir: config.fileSystemPapiDir!,

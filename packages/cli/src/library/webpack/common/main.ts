@@ -3,7 +3,7 @@ import type Config from 'webpack-chain';
 import path from 'path';
 import { existsSync } from 'fs-extra';
 import findCacheDir from 'find-cache-dir';
-import { getBenchmarkRsdoctorOptions } from '@tramvai/plugin-webpack-builder';
+import { getBenchmarkRsdoctorOptions } from '@tramvai/plugin-base-builder/lib/shared/rsdoctor';
 import { ignoreWarnings } from '../utils/warningsFilter';
 import resolve from '../blocks/resolve';
 import ignoreLocales from '../blocks/ignoreLocales';

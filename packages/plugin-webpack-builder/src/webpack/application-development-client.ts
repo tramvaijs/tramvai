@@ -1,5 +1,4 @@
 /* eslint-disable max-statements, complexity */
-import path from 'node:path';
 import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
@@ -7,6 +6,7 @@ import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
+import { Compilation } from 'webpack';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { optional } from '@tinkoff/dippy';
@@ -19,52 +19,63 @@ import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
 
 import {
-  WEBPACK_DEBUG_STATS_OPTIONS,
-  WEBPACK_DEBUG_STATS_FIELDS,
+  ignoreWarnings,
+  resolvePublicPathDirectory,
+  resolveUrl,
+} from '@tramvai/plugin-base-builder/lib/utils';
+import {
+  getAnalyzeRsdoctorOptions,
+  getBenchmarkRsdoctorOptions,
+} from '@tramvai/plugin-base-builder/lib/shared/rsdoctor';
+import {
+  DEBUG_STATS_OPTIONS,
+  DEBUG_STATS_FIELDS,
   DEV_STATS_OPTIONS,
   DEV_STATS_FIELDS,
   STATS_FILE_NAME,
-} from './shared/stats';
-import { resolvePublicPathDirectory } from './utils/publicPath';
-import { resolveUrl } from '../utils/url';
+} from '@tramvai/plugin-base-builder/lib/shared/stats';
+import { normalizeBrowserslistConfig } from '@tramvai/plugin-base-builder/lib/shared/browserslist';
+import { configToEnv } from '@tramvai/plugin-base-builder/lib/shared/config-to-env';
+import { getSharedModules } from '@tramvai/plugin-base-builder/lib/shared/shared-modules';
+import { createSnapshot } from '@tramvai/plugin-base-builder/lib/shared/snapshot';
+import { CACHE_ADDITIONAL_FLAGS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/cache';
+import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
+import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';
+import { createSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
+import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
+import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
+import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
+import {
+  RESOLVE_ALIAS_TOKEN,
+  RESOLVE_EXTENSIONS_TOKEN,
+  RESOLVE_FALLBACK_TOKEN,
+  defaultExtensions,
+} from '@tramvai/plugin-base-builder/lib/shared/resolve';
+import {
+  ModuleFederationFixRange,
+  ModuleFederationIgnoreEntries,
+  RuntimePathPlugin,
+  PolyfillConditionPlugin,
+  AssetsIntegritiesPlugin,
+  getPurifyStatsPlugin,
+  VirtualProtocolPlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
+
 import {
   WEBPACK_TRANSPILER_TOKEN,
   createTranspilerRules,
   resolveWebpackTranspilerParameters,
 } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
-import { VirtualProtocolPlugin } from './plugins/virtual-protocol-plugin';
-import { configToEnv } from './shared/config-to-env';
-import { WebpackConfigurationFactory } from './webpack-config';
-import { DEFINE_PLUGIN_OPTIONS_TOKEN } from './shared/define';
 import { createStylesConfiguration } from './shared/styles';
-import {
-  RESOLVE_EXTENSIONS_TOKEN,
-  RESOLVE_FALLBACK_TOKEN,
-  RESOLVE_ALIAS_TOKEN,
-  defaultExtensions,
-  createResolveOptions,
-} from './shared/resolve';
-import { createSnapshot } from './shared/snapshot';
-import { createSplitChunksOptions } from './shared/split-chunks';
-import { WorkerProgressPlugin } from './plugins/progress-plugin';
-import { PolyfillConditionPlugin } from './plugins/polyfill-condition-plugin';
+import { createResolveOptions } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
-import { WEBPACK_EXTERNALS_TOKEN } from './shared/externals';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
-import { createOptimizeOptions } from './shared/optimization';
-import { AssetsIntegritiesPlugin } from './plugins/AssetsIntegritiesPlugin';
-import { PurifyStatsPlugin } from './plugins/PurifyStatsPlugin';
-import { PROVIDE_TOKEN } from './shared/provide';
-import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
-import { normalizeBrowserslistConfig } from './shared/browserslist';
-import { ignoreWarnings } from './utils/warningsFilter';
-import { createSourceMaps } from './shared/sourcemaps';
-import { ModuleFederationFixRange } from './plugins/ModuleFederationFixRange';
-import { ModuleFederationIgnoreEntries } from './plugins/ModuleFederationIgnoreEntries';
-import { getSharedModules } from './shared/shared-modules';
-import { getAnalyzeRsdoctorOptions, getBenchmarkRsdoctorOptions } from './shared/rsdoctor';
-import { RuntimePathPlugin } from './plugins/RuntimePathPlugin';
+
+import { WorkerProgressPlugin } from './plugins/progress-plugin';
+import { createCacheConfig } from './shared/cache';
+
+import { WebpackConfigurationFactory } from './webpack-config';
 
 const mainFields = ['browser', 'module', 'main'];
 
@@ -91,6 +102,8 @@ stderrWithWarningFilters.on('error', (error: Error) =>
   console.error('[infrastructureLogging] stream error', error)
 );
 
+const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
+
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
 }): Promise<Configuration> => {
@@ -110,7 +123,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
-  const externals = di.get(optional(WEBPACK_EXTERNALS_TOKEN)) ?? ([] as string[]);
+  const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
   const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
@@ -179,7 +192,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
-  const sourceMapsConfiguration = createSourceMaps({ config, target: 'client' });
+  const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'client' });
 
   const resolveOptions = await createResolveOptions({ di, mainFields });
 
@@ -190,7 +203,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         // https://github.com/webpack/webpack/blob/914db1f7ca1ff6ed4eba015b6765add9afac35e3/lib/config/browserslistTargetHandler.js#L212
         `browserslist:${normalizedBrowserslistConfig.defaults.filter((query) => !query.includes('UCAndroid'))}`
       : 'web',
-    // context: config.rootDir,
+    context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?
       platform: {
@@ -281,14 +294,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     optimization: {
       emitOnErrors: false,
       ...createSplitChunksOptions({ config }),
-      ...createOptimizeOptions({ config, target: 'client' }),
+      ...createOptimizeOptions<'webpack'>({ config, target: 'client' }),
     },
     // TODO: check is it configuration optimal?
     stats: {
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
       warningsCount: false,
-      ...(verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+      ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?
@@ -327,7 +340,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         {
           // test: /[\\/]cli[\\/]lib[\\/]external[\\/]pages.js$/,
           test: /[\\/]api[\\/]lib[\\/]virtual[\\/]file-system-pages.js$/,
-          loader: path.resolve(__dirname, './loaders/file-system-pages'),
+          loader: require.resolve('@tramvai/plugin-base-builder/lib/loaders/file-system-pages'),
           enforce: 'pre',
           options: {
             fileSystemPages: config.fileSystemPages!,
@@ -340,7 +353,9 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           ? [
               {
                 test: new RegExp(virtualRootErrorBoundary),
-                loader: path.resolve(__dirname, './loaders/root-error-boundary'),
+                loader: require.resolve(
+                  '@tramvai/plugin-base-builder/lib/loaders/root-error-boundary'
+                ),
                 enforce: 'pre' as const,
                 options: {
                   path: config.fileSystemPages!.rootErrorBoundaryPath,
@@ -369,9 +384,9 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         filename: STATS_FILE_NAME,
         stats: {
           ...DEV_STATS_OPTIONS,
-          ...(verboseLogging ? WEBPACK_DEBUG_STATS_OPTIONS : {}),
+          ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
         },
-        fields: [...DEV_STATS_FIELDS, ...(verboseLogging ? WEBPACK_DEBUG_STATS_FIELDS : [])],
+        fields: [...DEV_STATS_FIELDS, ...(verboseLogging ? DEBUG_STATS_FIELDS : [])],
       }) as any as WebpackPluginInstance,
       new webpack.container.ModuleFederationPlugin({
         name: 'host',

@@ -1,0 +1,48 @@
+{
+  "name": "@tramvai/plugin-rspack-builder",
+  "version": "0.0.0-stub",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "files": [
+    "src",
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@module-federation/node": "^0.15.1",
+    "@rsdoctor/rspack-plugin": "^1.5.2",
+    "@rspack/core": "^1.7.5",
+    "@rspack/dev-server": "^1.2.1",
+    "@rspack/plugin-react-refresh": "^1.6.0",
+    "@svgr/webpack": "^8.1.0",
+    "@tinkoff/browserslist-config": "0.0.0-stub",
+    "@tinkoff/dippy": "^0.13.2",
+    "@tinkoff/is-modern-lib": "0.0.0-stub",
+    "@tinkoff/utils": "^2.1.3",
+    "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",
+    "@tramvai/plugin-base-builder": "0.0.0-stub",
+    "autoprefixer": "^10.4.8",
+    "browserslist": "^4.21.3",
+    "file-loader": "^6.2.0",
+    "find-cache-dir": "^3.3.2",
+    "lightningcss-loader": "^3.0.0",
+    "postcss-modules-values-replace": "^4.0.0",
+    "resolve": "^1.22.4",
+    "spark-md5": "^3.0.2",
+    "svgo": "^3.0.2",
+    "webpack-stats-plugin": "^1.1.3",
+    "webpackbar": "^7.0.0"
+  },
+  "devDependencies": {
+    "@tramvai/api": "0.0.0-stub",
+    "@types/resolve": "^1.20.2",
+    "@types/spark-md5": "^3.0.5",
+    "@types/webpack-stats-plugin": "^0.3.2"
+  },
+  "peerDependencies": {
+    "@tramvai/api": "0.0.0-stub"
+  }
+}

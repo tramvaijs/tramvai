@@ -1,7 +1,7 @@
 import Config from 'webpack-chain';
 import TerserPlugin from 'terser-webpack-plugin';
 
-import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+import { RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';

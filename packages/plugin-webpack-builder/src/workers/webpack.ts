@@ -1,5 +1,5 @@
-import '../utils/inspector';
-import '@tramvai/api/lib/utils/cpu-profile';
+import '@tramvai/plugin-base-builder/lib/utils/inspector';
+import '@tramvai/plugin-base-builder/lib/utils/cpu-profile';
 import { parentPort, workerData } from 'node:worker_threads';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
@@ -14,7 +14,12 @@ import {
 import { initContainer, isValidModule, optional, provide } from '@tinkoff/dippy';
 import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
 import { logger } from '@tramvai/api/lib/services/logger';
-import { resolvePublicPathDirectory } from '../webpack/utils/publicPath';
+import {
+  calculateBuildTime,
+  maxMemoryRss,
+  resolvePublicPathDirectory,
+} from '@tramvai/plugin-base-builder/lib/utils';
+
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
 import { BUILD_MODE_TOKEN, BUILD_TYPE_TOKEN, WEBPACK_TRANSPILER_TOKEN } from '../index';
@@ -31,8 +36,6 @@ import {
   WebpackWorkerOutgoingEventsPayload,
 } from './webpack.events';
 import { BUILD_TARGET_TOKEN } from '../webpack/webpack-config';
-import { calculateBuildTime } from '../utils/calculateBuildTime';
-import { maxMemoryRss } from '../utils/maxMemoryRss';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top

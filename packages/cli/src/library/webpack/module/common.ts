@@ -2,7 +2,7 @@ import type Config from 'webpack-chain';
 import webpack from 'webpack';
 import path from 'path';
 
-import { RuntimePathPlugin } from '@tramvai/plugin-webpack-builder';
+import { RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import externals from './externals';
 import common from '../common/main';

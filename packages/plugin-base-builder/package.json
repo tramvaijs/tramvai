@@ -1,0 +1,44 @@
+{
+  "name": "@tramvai/plugin-base-builder",
+  "version": "0.0.0-stub",
+  "types": "./lib/index.d.ts",
+  "main": "./lib/index.js",
+  "files": [
+    "src",
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@rsdoctor/webpack-plugin": "^1.5.4",
+    "@tinkoff/dippy": "^0.13.2",
+    "@tinkoff/utils": "^2.1.1",
+    "@tramvai/api": "0.0.0-stub",
+    "ansi-escapes": "^4.3.2",
+    "browserslist": "^4.28.1",
+    "chalk": "^4.1.2",
+    "core-js-compat": "3.43.0",
+    "figures": "^3.2.0",
+    "file-loader": "^6.2.0",
+    "find-cache-dir": "^3.3.2",
+    "http-proxy": "^1.18.1",
+    "image-minimizer-webpack-plugin": "^4.1.3",
+    "image-size": "^1.0.2",
+    "loader-utils": "^3.2.1",
+    "resolve": "^1.22.4",
+    "semver": "^7.3.2",
+    "sharp": "0.34.3",
+    "svgo": "^3.0.2",
+    "text-table": "^0.2.0",
+    "wrap-ansi": "^7.0.0"
+  },
+  "devDependencies": {
+    "@module-federation/node": "^0.15.1",
+    "@rspack/core": "^1.7.5",
+    "@types/http-proxy": "^1.17.9",
+    "@types/resolve": "^1.20.2",
+    "webpack": "5.101.1"
+  }
+}

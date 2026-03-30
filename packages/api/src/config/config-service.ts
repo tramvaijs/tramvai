@@ -269,6 +269,11 @@ export type InputParameters = {
    * @default false
    */
   disableServerRunnerWaiting?: boolean;
+  /**
+   * Disable websocket server and additional entry, used for test purposes
+   * @default false
+   */
+  disableWebSocketServer?: boolean;
 };
 
 export type Project = ApplicationProject | ChildAppProject;
@@ -858,6 +863,14 @@ export class ConfigService {
   get disableServerRunnerWaiting() {
     if (this.#project.type === 'application') {
       return this.#parameters.disableServerRunnerWaiting ?? false;
+    }
+
+    return false;
+  }
+
+  get disableWebSocketServer() {
+    if (this.#project.type === 'application') {
+      return this.#parameters.disableWebSocketServer ?? false;
     }
 
     return false;

@@ -1,0 +1,33 @@
+{
+    "extends": "../../tsconfig.lib.json",
+    "include": [
+        "./src"
+    ],
+    "compilerOptions": {
+        "module": "CommonJS",
+        "moduleResolution": "nodenext",
+        "declarationDir": "./lib",
+        "outDir": "./lib",
+        "rootDir": "./src",
+        "strict": true,
+        "types": [
+            "node",
+            "jest",
+            "webpack"
+        ]
+    },
+    "references": [
+        {
+            "path": "../api"
+        },
+        {
+            "path": "../libs/webpack-dedupe-plugin"
+        },
+        {
+            "path": "../libs/is-modern-lib"
+        },
+        {
+            "path": "../plugin-base-builder"
+        }
+    ]
+}

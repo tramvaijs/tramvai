@@ -1,6 +1,7 @@
 import { Configuration, InputParameters } from '@tramvai/api/lib/config';
 import { BuildStats } from '@tramvai/api/lib/builder/dev-server';
-import { BuildTarget, BuildType } from '../webpack/webpack-config';
+import type { BuildTarget, BuildType } from '@tramvai/plugin-base-builder/lib/types';
+
 import { ProgressState } from '../utils/progress-bar/types';
 
 export const DEV_SERVER_STARTED = 'dev-server-started';

@@ -1,4 +1,3 @@
-import path from 'node:path';
 import type { Container } from '@tinkoff/dippy';
 import type webpack from 'webpack';
 import type { Config } from 'postcss-load-config';

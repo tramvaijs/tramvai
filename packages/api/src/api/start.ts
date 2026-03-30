@@ -1,4 +1,4 @@
-import { provide, isValidModule } from '@tinkoff/dippy';
+import { provide, isValidModule, initContainer } from '@tinkoff/dippy';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -61,7 +61,7 @@ export async function start(
     return plugin;
   });
 
-  const tramvai = new Tramvai({
+  const di = initContainer({
     modules: plugins,
     providers: [
       provide({
@@ -88,6 +88,7 @@ export async function start(
       }),
     ],
   });
+  const tramvai = new Tramvai(di);
 
   const devServer = tramvai.resolve(DEV_SERVER_TOKEN);
   const configExtensions = tramvai.resolve(CONFIGURATION_EXTENSION_TOKEN);

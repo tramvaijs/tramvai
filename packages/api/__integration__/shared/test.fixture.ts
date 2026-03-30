@@ -36,17 +36,16 @@ export const test = base.extend<TestFixture, WorkerFixture>({
   },
   spawnDevServer: async ({ inputParameters, extraConfiguration }, use) => {
     const code = `
-  async function main() {
+async function main() {
   const { start } = require('@tramvai/api/lib/api/start');
-
   const devServer = await start(${JSON.stringify(inputParameters)}, ${JSON.stringify(extraConfiguration)});
-  
+
   await devServer.buildPromise;
-
   await devServer.close();
-  }
+  process.exit(0);
+}
 
-  main()
+main()
   `;
 
     const logs: string[] = [];

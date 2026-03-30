@@ -1,7 +1,8 @@
 import type Config from 'webpack-chain';
+import { Compilation } from 'webpack';
 import { ChunkCorrelationPlugin } from '@module-federation/node';
 import LoadablePlugin from '@loadable/webpack-plugin';
-import { PurifyStatsPlugin } from '@tramvai/plugin-webpack-builder';
+import { getPurifyStatsPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 
@@ -54,6 +55,8 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
       chunkLoadingGlobal: toIdentifier(`__LOADABLE_LOADED_CHUNKS__child_app_${name}_${version}__`),
     },
   ]);
+
+  const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
 
   config
     .plugin('assets-purify-plugin')

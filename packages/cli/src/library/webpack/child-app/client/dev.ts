@@ -2,13 +2,14 @@ import Config from 'webpack-chain';
 import WebpackBar from 'webpackbar';
 import webpack from 'webpack';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import { FancyReporter } from '@tramvai/plugin-base-builder/lib/plugins';
+
 import type { ConfigManager } from '../../../../config/configManager';
 import common from './common';
 import commonDev from '../../common/dev';
 import type { UI_SHOW_PROGRESS_TOKEN } from '../../../../di/tokens';
 import { extendEntry } from '../../utils/extendEntry';
 import type { ChildAppConfigEntry } from '../../../../typings/configEntry/child-app';
-import FancyReporter from '../../plugins/WebpackBar/reporters/fancy';
 import sourcemaps from '../../blocks/sourcemaps';
 
 export const webpackClientConfig = ({

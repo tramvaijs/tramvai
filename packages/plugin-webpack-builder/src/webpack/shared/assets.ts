@@ -1,31 +1,12 @@
-import path from 'node:path';
-
 import SparkMD5 from 'spark-md5';
 import type webpack from 'webpack';
-import type { Config as SvgoConfig } from 'svgo';
 
 import { Container, optional } from '@tinkoff/dippy';
-import { CONFIG_SERVICE_TOKEN, ConfigService } from '@tramvai/api/lib/config';
+import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
+import { getSvgoOptions } from '@tramvai/plugin-base-builder/lib/shared/assets';
 
 import { BUILD_TARGET_TOKEN } from '../webpack-config';
 import { WEBPACK_TRANSPILER_TOKEN, resolveWebpackTranspilerParameters } from './transpiler';
-
-export const getSvgoOptions = (config: ConfigService): SvgoConfig & { configFile?: boolean } => {
-  return {
-    configFile: false,
-    plugins: config.svgo?.plugins ?? [
-      {
-        name: 'preset-default',
-        params: {
-          overrides: {
-            cleanupIds: false,
-            collapseGroups: false,
-          },
-        },
-      },
-    ],
-  };
-};
 
 export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRule[] => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
@@ -88,7 +69,7 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
 
   rules.push({
     test: /\.(png|jpe?g|gif|webp)$/,
-    loader: path.resolve(__dirname, '../loaders/image-loader'),
+    loader: require.resolve('@tramvai/plugin-base-builder/lib/loaders/image-loader'),
   });
 
   rules.push({

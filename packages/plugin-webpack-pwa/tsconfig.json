@@ -24,6 +24,9 @@
         },
         {
             "path": "../tramvai/core"
+        },
+        {
+            "path": "../plugin-base-builder"
         }
     ]
 }

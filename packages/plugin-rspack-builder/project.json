@@ -1,0 +1,7 @@
+{
+  "name": "@tramvai/plugin-rspack-builder",
+  "root": "packages/plugin-rspack-builder",
+  "sourceRoot": "packages/plugin-rspack-builder/src",
+  "projectType": "library",
+  "targets": {}
+}

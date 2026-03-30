@@ -36,6 +36,8 @@
     "@babel/types": "^7.28.5",
     "@tinkoff/babel-plugin-lodash": "^0.1.0",
     "@tinkoff/dippy": "^0.12.9",
+    "@tramvai/plugin-base-builder": "0.0.0-stub",
+    "@tramvai/plugin-rspack-builder": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
     "babel-plugin-dynamic-import-node": "^2.3.3",
     "babel-plugin-polyfill-corejs3": "^0.11.1",
