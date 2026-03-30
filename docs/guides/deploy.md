@@ -36,7 +36,7 @@ COPY package.json /app/
 ENV NODE_ENV='production'
 
 EXPOSE 3000
-CMD [ "node", "--max-http-header-size=80000", "/app/server.js" ]
+CMD node --max-http-header-size=80000 /app/server.js
 ```
 
 - `FROM` - you can put a 16+ version of the node, preferably an alpine version to reduce the size
@@ -74,7 +74,7 @@ In general, everything is the same as in a regular deployment, but you need to a
 Dockerfile example
 
 ```dockerfile
-FROM node:18-buster-slim
+FROM node:24-buster-slim
 WORKDIR /app
 COPY dist/server /app/
 COPY package.json /app/
@@ -82,7 +82,7 @@ COPY dist/client /app/public/statics
 ENV NODE_ENV='production'
 
 EXPOSE 3000
-CMD [ "node", "--max-http-header-size=80000", "/app/server.js" ]
+CMD node --max-http-header-size=80000 /app/server.js
 ```
 
 When starting the application, you must pass `ASSETS_PREFIX=/statics/`. When the application starts, the server for serving statistics will rise and all files inside the /public/ directory will be available. Thus, the client will be able to receive data on the url /statics/payment.js

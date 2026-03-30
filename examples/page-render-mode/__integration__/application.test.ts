@@ -370,6 +370,17 @@ describe('page-render-mode', () => {
       });
     });
 
+    describe('unknown pages', () => {
+      it('cache is not used for unknown urls', async () => {
+        const res1 = await fetch(`${app.serverUrl}/unknown/page/`);
+        await sleep(150);
+        const res2 = await fetch(`${app.serverUrl}/unknown/page/`);
+
+        expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
+        expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
+      });
+    });
+
     describe('5xx errors', () => {
       it('Fetched cache disabled', async () => {
         const res1 = await fetch(`${app.serverUrl}/static-error/`, {

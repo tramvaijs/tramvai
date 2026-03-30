@@ -3,6 +3,7 @@ import { createToken, Scope } from '@tinkoff/dippy';
 import type { TramvaiRenderMode } from '@tramvai/tokens-render';
 import type { Cache, ResponseManager } from '@tramvai/tokens-common';
 import type { commandLineListTokens } from '@tramvai/tokens-core';
+import { RouteTree } from '@tinkoff/router';
 import { StaticPagesService } from './staticPages/staticPagesService';
 
 export const PAGE_RENDER_FALLBACK_COMPONENT_PREFIX = createToken<string>(
@@ -132,3 +133,7 @@ export const STATIC_PAGES_CACHE_CONTROL_HEADER_TOKEN = createToken<
 });
 
 export const STATIC_PAGES_SERVICE = createToken<StaticPagesService>('static pages service');
+
+export const STATIC_PAGES_ROUTE_TREE = createToken<RouteTree>('static pages route tree', {
+  scope: Scope.SINGLETON,
+});

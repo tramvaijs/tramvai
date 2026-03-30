@@ -82,8 +82,40 @@ For application users it means:
    ENV NODE_ENV='production'
 
    EXPOSE 3000
-   CMD [ "node", "--max-http-header-size=80000", "/app/server.js" ]
+   CMD node --max-http-header-size=80000 /app/server.js
    ```
+
+:::info
+
+If the application is used in a Kubernetes environment, and `readOnlyRootFilesystem: true` option is used with a read-only file system, you need to add volume mount for `dist` directory, for example:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  #...
+spec:
+  # ...
+  template:
+    spec:
+      securityContext:
+        # ...
+      containers:
+        - name: ...
+          image: ...
+          securityContext:
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            # Mount /dist as writable ephemeral storage
+            - name: dist-volume
+              mountPath: /app/dist
+      volumes:
+        # Define the emptyDir volume
+        - name: dist-volume
+          emptyDir: {}
+```
+
+:::
 
 After that, all application pages will be served from cache, and will be revalidated in runtime with the default ttl of 5 minutes.
 

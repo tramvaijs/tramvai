@@ -110,7 +110,14 @@ export class FileSystemCache {
     } catch (error) {
       if ((error as any)?.code === 'ENOENT') {
         // static directory path can be missing on first run, so always create it
-        await fs.mkdir(this.directory, { recursive: true });
+        await fs.mkdir(this.directory, { recursive: true }).catch((mkdirError) => {
+          this.log.warn({
+            event: 'mkdir-error',
+            message: `Failed to create static cache directory ${this.directory}, maybe read-only file system is used.
+In k8s environment, it means that "readOnlyRootFilesystem" option is enabled for deployment, to fix this issue, add 'dist' directory as a emptyDir volume mount.`,
+            error: mkdirError as Error,
+          });
+        });
       }
 
       this.log.warn({
@@ -377,7 +384,7 @@ and copy "dist/static" folder into the Docker image, to ensure the pages cache i
       });
     } catch (error) {
       if (process.env.NODE_ENV !== 'development') {
-        this.log.warn({
+        this.log.info({
           event: 'meta-read-error',
           error: error as Error,
         });

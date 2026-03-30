@@ -109,6 +109,7 @@ export class StaticPagesService {
     this.cacheControlFactory = cacheControlFactory;
   }
 
+  // eslint-disable-next-line max-statements
   async respond(onSuccess: () => void) {
     if (!this.hasCache()) {
       this.log.debug({
@@ -248,6 +249,18 @@ export class StaticPagesService {
         if (!this.cache5xxResponse() && response.status >= 500) {
           this.log.debug({
             event: 'cache-set-5xx',
+            cacheKey: this.cacheKey,
+          });
+          return;
+        }
+        // for 4xx responses we want to cache only HTML pages
+        if (
+          response.status >= 400 &&
+          response.status < 500 &&
+          !response.headers['content-type']?.includes('text/html')
+        ) {
+          this.log.debug({
+            event: 'cache-set-4xx',
             cacheKey: this.cacheKey,
           });
           return;

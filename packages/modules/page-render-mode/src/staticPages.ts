@@ -1,3 +1,4 @@
+import flatten from '@tinkoff/utils/array/flatten';
 import { commandLineListTokens, DI_TOKEN, optional, provide, Scope } from '@tramvai/core';
 import {
   CREATE_CACHE_TOKEN,
@@ -12,10 +13,12 @@ import {
   PAGE_REGISTRY_TOKEN,
   PAGE_SERVICE_TOKEN,
   ROUTER_TOKEN,
+  ROUTES_TOKEN,
 } from '@tramvai/tokens-router';
 import { SERVER_MODULE_PAPI_PRIVATE_ROUTE } from '@tramvai/tokens-server';
 import { METRICS_MODULE_TOKEN } from '@tramvai/tokens-metrics';
 import { createPapiMethod } from '@tramvai/papi';
+import { isWildcard, Route, RouteTree } from '@tinkoff/router';
 import { StopCommandLineRunnerError } from './error';
 import {
   PAGE_RENDER_DEFAULT_MODE,
@@ -31,6 +34,7 @@ import {
   STATIC_PAGES_FS_CACHE_OPTIONS_TOKEN,
   STATIC_PAGES_CACHE_CONTROL_HEADER_TOKEN,
   STATIC_PAGES_SERVICE,
+  STATIC_PAGES_ROUTE_TREE,
 } from './tokens';
 import { getPageRenderMode } from './utils/getPageRenderMode';
 import { getCacheKey } from './utils/cacheKey';
@@ -204,10 +208,11 @@ export const staticPagesProviders = [
   provide({
     provide: STATIC_PAGES_RESOLVE_PAGE_RENDER_MODE,
     useFactory: ({ requestManager, pageService, router, defaultRenderMode, fileSystemCache }) => {
-      return () =>
+      return (route) =>
         getPageRenderMode({
           pageService,
           router,
+          route,
           requestManager,
           defaultRenderMode,
           fileSystemCache,
@@ -286,13 +291,15 @@ export const staticPagesProviders = [
             resolvePageRenderMode,
             router,
             pageRegistry,
+            routeTree,
           }) => {
             const log = logger('static-pages');
 
+            // eslint-disable-next-line max-statements
             return async function staticPagesFromCache() {
               const isPrerenderRequest = !!requestManager.getHeader('x-tramvai-prerender');
               const { pathname } = requestManager.getParsedUrl();
-              const route = router?.getCurrentRoute() ?? router?.resolve(pathname);
+              let route = router?.getCurrentRoute() ?? router?.resolve(pathname);
 
               // prefetch route only for `tramvai static` because it can be async and slow in runtime
               if (isPrerenderRequest) {
@@ -306,14 +313,29 @@ export const staticPagesProviders = [
                   `Should prefetch page component to determine if page is static: ${pathname}`
                 );
                 await pageRegistry?.resolve(route).catch((error) => {
-                  if (!route.redirect) {
+                  if (!route!.redirect) {
                     log.info(`${pathname} page component for prefetch failed: ${error.message}`);
                   }
                 });
               }
 
-              const isStatic = resolvePageRenderMode() === 'static';
+              // dynamic route will be resolved after prefetch
+              if (isPrerenderRequest && !route) {
+                route = router?.getCurrentRoute() ?? router?.resolve(pathname);
+              }
+
+              const isStatic = resolvePageRenderMode(route) === 'static';
               const shouldUseCache = staticPagesService.shouldUseCache();
+              // we can't use cache for wildcard routes,
+              // because wildcard routes can match any possible urls
+              const isWildcardRoute = route
+                ? isWildcard(route.path)
+                : routeTree.getWildcard(pathname);
+              // routes can be resolved in runtime with ROUTE_RESOLVE_TOKEN,
+              // but this routes exists only in Request scope, so we use STATIC_PAGES_ROUTE_TREE
+              // to save minimal info about resolved routes between requests, because
+              // we want to be sure that we use cache and revalidation only for resolved routes
+              const isUnknownRoute = !route && !routeTree.getRoute(pathname);
 
               if (isStatic) {
                 responseManager.setHeader('X-Tramvai-Static-Page-Key', staticPagesKey());
@@ -325,18 +347,24 @@ export const staticPagesProviders = [
                   responseManager.setHeader('X-Tramvai-Static-Page-Route', JSON.stringify(route));
                 }
 
-                if (shouldUseCache) {
-                  log.debug(`Should use static pages cache: ${pathname}`);
+                if (shouldUseCache && !isWildcardRoute && !isUnknownRoute) {
+                  log.info(`Should use static pages cache: ${pathname}`);
 
                   await staticPagesService.respond(() => {
-                    log.debug(`Successful static page response from cache: ${pathname}`);
+                    log.info(`Successful static page response from cache: ${pathname}`);
 
                     staticPagesCacheMetrics.hit.inc();
 
                     throw new StopCommandLineRunnerError();
                   });
                 } else {
-                  log.debug(`Static pages cache is not used for this request: ${pathname}`);
+                  let msg = `Static pages cache is not used for this request: ${pathname}`;
+                  if (shouldUseCache && isWildcardRoute) {
+                    msg += `, because wildcard route was resolved`;
+                  } else if (shouldUseCache && isUnknownRoute) {
+                    msg += `, because route for this url was never resolved`;
+                  }
+                  log.info(msg);
                 }
               }
             };
@@ -352,6 +380,7 @@ export const staticPagesProviders = [
             resolvePageRenderMode: STATIC_PAGES_RESOLVE_PAGE_RENDER_MODE,
             router: optional(ROUTER_TOKEN),
             pageRegistry: optional(PAGE_REGISTRY_TOKEN),
+            routeTree: STATIC_PAGES_ROUTE_TREE,
           },
         });
       };
@@ -430,6 +459,41 @@ export const staticPagesProviders = [
       fsCache: STATIC_PAGES_FS_CACHE_TOKEN,
       fsCacheEnabled: STATIC_PAGES_FS_CACHE_ENABLED,
       logger: LOGGER_TOKEN,
+    },
+  }),
+  provide({
+    provide: STATIC_PAGES_ROUTE_TREE,
+    scope: Scope.SINGLETON,
+    useFactory: ({ di }) => {
+      const staticRoutes = di.get(optional(ROUTES_TOKEN)) ?? [];
+
+      return new RouteTree(
+        flatten<Route>(staticRoutes).map((route) => ({ name: route.name, path: route.path }))
+      );
+    },
+    deps: {
+      di: DI_TOKEN,
+    },
+  }),
+  provide({
+    provide: commandLineListTokens.clear,
+    useFactory: ({ router, routeTree }) => {
+      return () => {
+        const currentUrl = router.getCurrentUrl();
+        const currentRoute = router.getCurrentRoute();
+
+        // save dynamically resolved route in route tree to use it in next requests before route resolving
+        if (currentRoute && currentUrl && !routeTree.getRoute(currentUrl.pathname)) {
+          routeTree.addRoute({
+            name: currentRoute.name,
+            path: currentRoute.path,
+          });
+        }
+      };
+    },
+    deps: {
+      router: ROUTER_TOKEN,
+      routeTree: STATIC_PAGES_ROUTE_TREE,
     },
   }),
 ];

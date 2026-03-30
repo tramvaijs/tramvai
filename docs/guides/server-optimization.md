@@ -101,7 +101,7 @@ If you are deploying to environment with VPA, you should reference to `requests.
 
 ```Dockerfile title="Dockerfile"
 // highlight-next-line
-CMD [ "node" , "--max-old-space-size=$((MEMORY_LIMIT_BYTES * 75 / 100))", "main.js" ]
+CMD node --max-old-space-size=$((MEMORY_LIMIT_BYTES * 75 / 100)) /app/server.js
 ```
 
 Worth noting that if your runtime image does not have shell (bash, sh) you should write custom wrapper in appropriate language (e.g. Node.js) to perform computations:
@@ -175,7 +175,7 @@ ENV NODE_ENV='production'
 
 EXPOSE 3000
 // highlight-next-line
-CMD [ "node", "--max-semi-space-size=64", "/app/server.js" ]
+CMD node --max-semi-space-size=64 /app/server.js
 ```
 
 More information:

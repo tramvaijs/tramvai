@@ -254,7 +254,7 @@ Example CI setup for SSG with file-system cache for `static` mode:
    ENV NODE_ENV='production'
 
    EXPOSE 3000
-   CMD [ "node", "--max-http-header-size=80000", "/app/server.js" ]
+   CMD node --max-http-header-size=80000 /app/server.js
    ```
 
 ## How-to

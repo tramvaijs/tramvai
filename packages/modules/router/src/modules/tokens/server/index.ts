@@ -103,7 +103,7 @@ export const serverTokens: Provider[] = [
 
             routes.push(
               ...deduplicateArray(
-                paths.map(prop('path')).filter((path) => !DYNAMIC_PAGE_REGEX.test(path))
+                paths.map(prop('path')).filter((path: string) => !path.match(DYNAMIC_PAGE_REGEX))
               ).sort()
             );
           }
