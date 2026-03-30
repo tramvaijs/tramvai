@@ -21,9 +21,14 @@ export const resolveLazyComponent = async (
       component = mod.default || mod;
     }
 
-    // manually hoist static properties from preloaded component to loadable wrapper,
-    // this open access to current page component static properties outside before rendering
-    hoistNonReactStatics(componentOrLoader, component);
+    if (!(componentOrLoader as any).__tramvai_lazy_loaded) {
+      // small performance optimization to avoid hoisting the same static properties on every load (which already cached by loadable)
+      (componentOrLoader as any).__tramvai_lazy_loaded = true;
+
+      // manually hoist static properties from preloaded component to loadable wrapper,
+      // this open access to current page component static properties outside before rendering
+      hoistNonReactStatics(componentOrLoader, component);
+    }
 
     return component;
   }

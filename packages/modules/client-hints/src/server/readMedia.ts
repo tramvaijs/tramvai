@@ -39,7 +39,8 @@ export const readMediaCommand = ({
   cookieManager: typeof COOKIE_MANAGER_TOKEN;
 }) => {
   return function readMedia() {
-    const mediaInfo: MediaInfo = safeParseJSON(cookieManager.get(COOKIE_NAME_MEDIA_INFO) ?? '');
+    const rawValue = cookieManager.get(COOKIE_NAME_MEDIA_INFO);
+    const mediaInfo: MediaInfo | null = rawValue ? safeParseJSON(rawValue) : null;
 
     if (mediaInfo) {
       return context.dispatch(

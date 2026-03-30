@@ -120,16 +120,18 @@ In k8s environment, it means that "readOnlyRootFilesystem" option is enabled for
         });
       }
 
-      this.log.warn({
-        event: 'init-error',
-        message:
-          // static directory path includes unique build id in development mode, so warn only in production
-          (error as any)?.code === 'ENOENT' && process.env.NODE_ENV !== 'development'
-            ? `"${this.directory}" directory is not found. To effectively use file system cache, run "tramvai static {appName} --buildType=none" after application build,
+      // static directory path includes unique build id in development mode, so warn only in production
+      if (process.env.NODE_ENV !== 'development') {
+        this.log.warn({
+          event: 'init-error',
+          message:
+            (error as any)?.code === 'ENOENT'
+              ? `"${this.directory}" directory is not found. To effectively use file system cache, run "tramvai static {appName} --buildType=none" after application build,
 and copy "dist/static" folder into the Docker image, to ensure the pages cache is populated on the first run.`
-            : 'Failed to initialize file system cache',
-        error: error as Error,
-      });
+              : 'Failed to initialize file system cache',
+          error: error as Error,
+        });
+      }
     }
   }
 

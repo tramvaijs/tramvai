@@ -49,6 +49,12 @@ import {
   STATIC_PAGES_RESOLVE_PAGE_RENDER_MODE,
 } from './private-tokens';
 
+// small performance optimization to prevent stack trace generation for static StopCommandLineRunnerError
+const { stackTraceLimit } = Error;
+Error.stackTraceLimit = 0;
+const STOP_COMMAND_LINE_ERROR = new StopCommandLineRunnerError();
+Error.stackTraceLimit = stackTraceLimit;
+
 export const staticPagesProviders = [
   provide({
     provide: STATIC_PAGES_CACHE_METRICS_TOKEN,
@@ -355,7 +361,7 @@ export const staticPagesProviders = [
 
                     staticPagesCacheMetrics.hit.inc();
 
-                    throw new StopCommandLineRunnerError();
+                    throw STOP_COMMAND_LINE_ERROR;
                   });
                 } else {
                   let msg = `Static pages cache is not used for this request: ${pathname}`;
