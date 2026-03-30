@@ -1,7 +1,8 @@
 import eachObj from '@tinkoff/utils/object/each';
-import type { Meta } from './Meta';
+
 import { META_DATA_ATTR } from './constants';
-import type { PatchMeta, TagRecord } from './Meta.h';
+import type { Meta } from './Meta';
+import type { PatchMeta, TagRecord, TagPlacement } from './Meta.h';
 
 const create = ({ tag, attributes, innerHtml }: TagRecord) => {
   const newElement = document.createElement(tag);
@@ -32,7 +33,7 @@ export class Update {
    * все теги meta с name="robots".Это сделано для того, чтобы не допустить дублирования таких тегов.
    * Остальные метатеги в head обновляются точечно.
    */
-  private patchMeta({ head, addTags, removeTagsArray }: PatchMeta) {
+  private patchHeadMeta({ head, addTags, removeTagsArray }: PatchMeta) {
     let shouldRemoveRobotsMeta = false;
 
     addTags.forEach((newTag) => {
@@ -85,28 +86,59 @@ export class Update {
   }
 
   /**
-   * Обновляет метатеги в head
-   * @param {boolean} shouldPatchMeta - если true, то метатеги будут обновлены точчечно, иначе все метатеги будут удалены и добавлены заново
+   * Обновляет метатеги в указанном месте (head или body)
+   * @param {Object} options - Опции для обновления метатегов
+   * @param {TagPlacement} [options.placement='head'] - Место, где будут обновлены метатеги (head или body)
+   * @param {boolean} [options.shouldPatchHeadMeta=false] - если true, то метатеги внутри head будут обновлены точчечно, иначе все метатеги будут удалены и добавлены заново
    */
-  update(shouldPatchMeta: boolean = false) {
-    const head = document.head || document.querySelector('head');
-    const addTags = this.meta.dataCollection().map(create);
-    const removeTags = head.querySelectorAll(`[${META_DATA_ATTR}]`);
+  update(options?: { placement?: TagPlacement; shouldPatchHeadMeta?: boolean }) {
+    const { placement = 'head', shouldPatchHeadMeta = false } = options ?? {};
+
+    const placementElement = document[placement] || document.querySelector(placement);
+    const isHeadPlacementElement = placementElement instanceof HTMLHeadElement;
 
     const fragment = document.createDocumentFragment();
+    const addTags = this.meta.dataCollection(placement).map(create);
+
+    const removeTags = placementElement.querySelectorAll(`[${META_DATA_ATTR}]`);
 
     // Преобразуем NodeList в массив для удобства работы
     const removeTagsArray = Array.from(removeTags);
 
-    if (shouldPatchMeta) {
-      this.patchMeta({ head, addTags, removeTagsArray });
+    if (shouldPatchHeadMeta && isHeadPlacementElement) {
+      this.patchHeadMeta({ head: placementElement, addTags, removeTagsArray });
     } else {
       // Удаляем все существующие метатеги
-      removeTagsArray.forEach((tag) => head.removeChild(tag));
+      removeTagsArray.forEach((tag) => placementElement.removeChild(tag));
     }
 
     addTags.forEach((tag) => fragment.appendChild(tag));
 
-    head.insertBefore(fragment, head.firstChild);
+    if (isHeadPlacementElement) {
+      placementElement.insertBefore(fragment, placementElement.firstChild);
+    } else {
+      const { childNodes } = placementElement;
+      let bodyTailAnalyticsStart: ChildNode | null = null;
+
+      const BODY_TAIL_ANALYTICS_START_PLACEMENT = 'START OF SLOT body:tail:analytics';
+
+      for (let i = 0; i < childNodes.length; i++) {
+        const child = childNodes[i];
+        if (
+          child.nodeType === Node.COMMENT_NODE &&
+          child.textContent?.trim() === BODY_TAIL_ANALYTICS_START_PLACEMENT
+        ) {
+          bodyTailAnalyticsStart = child;
+          break;
+        }
+      }
+
+      if (bodyTailAnalyticsStart) {
+        placementElement.insertBefore(fragment, bodyTailAnalyticsStart.nextSibling);
+        return;
+      }
+
+      placementElement.appendChild(fragment);
+    }
   }
 }

@@ -1,12 +1,14 @@
+import React from 'react';
 import { createApp, createBundle, declareAction, provide } from '@tramvai/core';
+import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
 import { SeoModule, META_WALK_TOKEN, META_DEFAULT_TOKEN } from '@tramvai/module-seo';
 import { PAGE_SERVICE_TOKEN, ROUTES_TOKEN } from '@tramvai/tokens-router';
-import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
-import React from 'react';
-import { jsonLd } from './data/jsonLd';
-import { Button } from './Button';
+
 import { APPLY_META_TOKEN } from '../src/tokens';
+
 import { ApplyMetaRobotsButton } from './ApplyMetaRobotsButton';
+import { Button } from './Button';
+import { jsonLd, updatedJsonLd } from './data/jsonLd';
 
 const metaSpecial = (context, meta) => {
   meta.updateMeta(10, {
@@ -26,6 +28,7 @@ const dynamicAction = declareAction({
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',
       robots: 'skip',
+      jsonLd: updatedJsonLd,
     });
   },
   deps: {
@@ -76,6 +79,7 @@ const dynamicClientAction = declareAction({
     this.deps.meta.updateMeta(20, {
       title: 'WoW, such dynamic!',
       robots: 'skip',
+      jsonLd: updatedJsonLd,
     });
   },
   deps: {
@@ -93,6 +97,7 @@ const dynamicServerAction = declareAction({
     this.deps.meta.updateMeta(10, {
       title: 'Hello, this is Tramvai!',
       robots: 'all',
+      jsonLd,
     });
   },
   deps: {
@@ -210,6 +215,9 @@ createApp({
                   robots: 'none',
                   title: 'common seo',
                   viewport: 'test seo',
+                },
+                structuredData: {
+                  jsonLd,
                 },
               },
             },
@@ -335,6 +343,9 @@ createApp({
                   robots: 'none',
                   title: 'common seo',
                   viewport: 'test viewport seo',
+                },
+                structuredData: {
+                  jsonLd,
                 },
               },
             },

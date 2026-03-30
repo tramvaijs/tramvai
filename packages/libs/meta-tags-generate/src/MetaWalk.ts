@@ -1,7 +1,9 @@
+import isEmpty from '@tinkoff/utils/is/empty';
 import eachObj from '@tinkoff/utils/object/each';
-import type { SerializableMetaWalkState, TagRecord } from './Meta.h';
 
-export type WalkItem = { value: string | TagRecord | null; priority: number };
+import type { JsonLdValue, MetaObj, OptionalTagValue, SerializableMetaWalkState } from './Meta.h';
+
+export type WalkItem = { value: JsonLdValue | OptionalTagValue; priority: number };
 
 export class MetaWalk {
   state: Map<string, WalkItem>;
@@ -22,12 +24,13 @@ export class MetaWalk {
     }
   }
 
-  updateMeta(priority: number, metaObj: Record<string, string | TagRecord | null>) {
+  updateMeta<const M extends MetaObj<M>>(priority: number, metaObj: M) {
     eachObj((value, name) => {
-      if (!value && value !== null) {
+      if (value !== null && (!value || isEmpty(value))) {
         return;
       }
-      this.updateStateByPriority(name, { value, priority });
+
+      this.updateStateByPriority(name as string, { value, priority });
     }, metaObj);
 
     return this;

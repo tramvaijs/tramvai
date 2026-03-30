@@ -5,7 +5,9 @@ import { provide } from '@tramvai/core';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { COMBINE_REDUCERS, CONTEXT_TOKEN } from '@tramvai/module-common';
 import { MetaWalk } from '@tinkoff/meta-tags-generate';
+import isEmpty from '@tinkoff/utils/is/empty';
 import type { PageComponent } from '@tramvai/react';
+
 import { metaDefaultPack, defaultPack } from './metaDefaultPack';
 import { META_PRIORITY_ROUTE } from './constants';
 import { META_DEFAULT_TOKEN, META_WALK_TOKEN, META_UPDATER_TOKEN } from './tokens';
@@ -60,11 +62,13 @@ export const sharedProviders: Provider[] = [
         const seo = mergeDeep({}, routeSeo, pageComponentSeo);
 
         const shareSchema = seo.shareSchema || {};
+        const { jsonLd } = seo.structuredData || {};
 
         const metaTags = {
           ...seo.metaTags, // Базовые теги
           ...convertWithPrefix('twitter', shareSchema.twitterCard), // преобразование тегов с twitterCard
           ...convertWithPrefix('og', shareSchema.openGraph), // преобразование тегов с opengraph
+          jsonLd: !isEmpty(jsonLd) ? jsonLd : undefined, // jsonLd
         };
 
         walker.updateMeta(META_PRIORITY_ROUTE, metaTags);

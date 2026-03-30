@@ -1,4 +1,5 @@
-import type { MetaWalk, TagRecord } from '@tinkoff/meta-tags-generate';
+import type { JsonLdValue, MetaObj } from '@tinkoff/meta-tags-generate';
+
 import type { META_UPDATER_TOKEN, META_DEFAULT_TOKEN } from './tokens';
 
 export type SeoModuleOptions =
@@ -16,7 +17,7 @@ export type MetaRouteConfig = {
       twitterCard?: Record<string, string>;
     };
     structuredData?: {
-      jsonLd?: Record<string, any>;
+      jsonLd?: JsonLdValue;
       microdata?: Record<string, any>;
     };
   };
@@ -25,8 +26,4 @@ export type MetaRouteConfig = {
 
 export type PageSeoProperty = MetaRouteConfig['seo'];
 
-export type ApplyMeta = ({
-  metaObj,
-}?: {
-  metaObj?: Record<string, string | TagRecord | null>;
-}) => void;
+export type ApplyMeta = <const M extends MetaObj<M>>({ metaObj }?: { metaObj?: M }) => void;

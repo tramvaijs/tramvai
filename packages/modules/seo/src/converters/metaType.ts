@@ -19,3 +19,8 @@ export const metaLink = curryN(
   2,
   (rel: string, href: string): TagRecord => href && { tag: 'link', attributes: { rel, href } }
 );
+export const metaScript = curryN(
+  2,
+  (type: string, innerHtml: string): TagRecord =>
+    innerHtml && { tag: 'script', attributes: { type }, innerHtml }
+);

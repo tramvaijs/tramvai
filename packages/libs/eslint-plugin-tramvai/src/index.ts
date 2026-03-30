@@ -11,6 +11,7 @@ import {
   getUsedPolyfillsPathsFromLibrary,
   getUsedPolyfillsPathsFromProject,
   getLibraryEslintConfig,
+  getImports,
 } from './utils';
 import { disabledRules } from './rulesMap';
 
@@ -20,8 +21,6 @@ const defaultEslintPluginEsXRules = getRules({ query: defaultBrowserslistConfig 
 disabledRules.forEach((ruleName) => {
   defaultEslintPluginEsXRules[ruleName] = 0;
 });
-
-const defaultCompatConfig = getCompatConfig(defaultEslintPluginEsXRules);
 
 function getCompatConfig(
   rules: Rules,
@@ -123,11 +122,21 @@ function getCustomEslintPlugin(rootOrLibrary: string, projectRoot?: string) {
   };
 }
 
+function getDefaultTramvaiEslintPlugin() {
+  const compatRules = getRules({
+    query: defaultBrowserslistConfig,
+  });
+  const customPolyfillsPaths = getImports(require.resolve('@tinkoff/pack-polyfills'), __dirname);
+  patchRules(customPolyfillsPaths, compatRules);
+
+  return getCompatConfig(compatRules);
+}
+
 module.exports = {
   getCustomEslintPlugin,
   rules: pluginCustomRules,
   configs: {
-    compat: defaultCompatConfig,
+    compat: getDefaultTramvaiEslintPlugin(),
     recommended: recommendedConfig,
   },
 };

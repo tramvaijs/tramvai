@@ -1,10 +1,20 @@
 import identity from '@tinkoff/utils/function/identity';
 import isArray from '@tinkoff/utils/is/array';
 import has from '@tinkoff/utils/object/has';
-import { MetaWalk } from './MetaWalk';
-import type { TagRecord, ListSources, TransformValue, Converter } from './Meta.h';
 
-const defaultConverter = (value: TagRecord | string): TagRecord | null =>
+import { MetaWalk } from './MetaWalk';
+import type {
+  TagRecord,
+  ListSources,
+  TransformValue,
+  Converter,
+  TagValue,
+  TagPlacement,
+  JsonLdValue,
+} from './Meta.h';
+import { getTagPlacement } from './utils/getTagPlacement';
+
+const defaultConverter = (value: JsonLdValue | TagValue): TagRecord | null =>
   has('tag', value) ? (value as TagRecord) : null;
 
 export class Meta {
@@ -34,8 +44,8 @@ export class Meta {
     this.metaWalk = metaWalk ?? new MetaWalk();
   }
 
-  dataCollection(...args: any[]) {
-    this.listSources.map((fn) => fn(this.metaWalk, ...args));
+  dataCollection(placement?: TagPlacement) {
+    this.listSources.map((fn) => fn(this.metaWalk));
 
     let result: TagRecord[] = [];
 
@@ -50,6 +60,10 @@ export class Meta {
         }
       }
     });
+
+    if (placement) {
+      return result.filter((tag) => getTagPlacement(tag) === placement);
+    }
 
     return result;
   }
