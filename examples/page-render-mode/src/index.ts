@@ -114,8 +114,8 @@ createApp({
         ttl: 5 * 60 * 1000,
         maxSize: 100,
         allowStale: true,
-        // if `User-Agent` and host headers is used for cache key, they should be included in allowedHeaders, to include that headers in background cache revalidation request
-        allowedHeaders: ['User-Agent', 'X-Original-Host', 'Host'],
+        // if `User-Agent` is used for cache key, it should be included in allowedHeaders, to include that header in background cache revalidation request
+        allowedHeaders: ['User-Agent'],
       },
     }),
     provide({

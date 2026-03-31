@@ -23,7 +23,7 @@ Tramvai application's health and performance monitoring. It monitors critical li
 
 | `unhandled-error` | Unhandled promise rejection | Global unhandledrejection event |
 
-:::warning
+:::info
 
 When a `react:error` occurs, an `app:render-failed` event is also emitted automatically. If you subscribe to both hooks, be aware that you may receive duplicate notifications for the same error.
 
@@ -68,33 +68,25 @@ Key Events Sent Through Inline Reporters:
 - **App Start Failed** (`app-start-failed`): Tracks initialization errors.
 - **Unhandled Errors** (`unhandled-error`): Tracks unhandled errors or promise rejections.
 
-The module requires an inline reporter factory to send events to your monitoring service. To do this provide `INLINE_REPORTER_FACTORY_SCRIPT_TOKEN` using inline script or object
+The module requires an inline reporter factory to send events to your monitoring service. To do this provide `INLINE_REPORTER_FACTORY_SCRIPT_TOKEN` using inline script
 
-```typescript
-import { provide } from '@tramvai/core';
-import { INLINE_REPORTER_FACTORY_SCRIPT_TOKEN } from '@tramvai/module-application-monitoring';
-
-const providers = [
-  provide({
-    provide: INLINE_REPORTER_FACTORY_SCRIPT_TOKEN,
-    useValue: (parameters) => {
-      return {
-        send(eventName, payload) {
-          fetch('/api/monitoring', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              event: eventName,
-              ...parameters,
-              ...payload,
-              timestamp: Date.now(),
-            }),
-          });
-        },
-      };
+```typescript title="inlineReporter.inline.ts"
+export function inlineReporterFactoryScript() {
+  return {
+    send(eventName, payload) {
+      fetch('/api/monitoring', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event: eventName,
+          ...parameters,
+          ...payload,
+          timestamp: Date.now(),
+        }),
+      });
     },
-  }),
-];
+  };
+}
 ```
 
 ```typescript

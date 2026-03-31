@@ -319,6 +319,14 @@ const provider = [
 ];
 ```
 
+:::warning
+
+By default, `Host` and `X-Original-Host` headers are included in allowed headers list.
+
+For multi-domain applications, especially when domains have different content, make sure to include `requestManager.getHost()` header in cache key generation logic with `STATIC_PAGES_KEY_TOKEN`.
+
+:::
+
 The cache key is combined with the pathname to create the full cache key. For example, internal cache keys will look like this:
 
 - Desktop: `/about/` (key is empty string)

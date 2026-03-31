@@ -34,7 +34,15 @@ type Cache5xxResponse = ExtractDependencyType<typeof STATIC_PAGES_CACHE_5xx_RESP
 type CacheControlFactory = ExtractDependencyType<typeof STATIC_PAGES_CACHE_CONTROL_HEADER_TOKEN>;
 
 // `Location` is required for 3xx responses
-const DEFAULT_HEADERS_WHITELIST = ['Location', 'Content-Type', 'Content-Length', 'X-App-Id'];
+// `X-Original-Host` and `Host` are required for RequestManager and Router
+const DEFAULT_HEADERS_WHITELIST = [
+  'Location',
+  'Content-Type',
+  'Content-Length',
+  'X-App-Id',
+  'X-Original-Host',
+  'Host',
+];
 
 export class StaticPagesService {
   readonly key: string;
