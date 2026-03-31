@@ -69,7 +69,9 @@ export class RequestManager implements Interface {
 
   getHost(): string {
     if (typeof window === 'undefined') {
-      return (this.getHeader('x-original-host') || this.getHeader('host')) as string;
+      return (this.getHeader('x-original-host') ||
+        this.getHeader('x-forwarded-host') ||
+        this.getHeader('host')) as string;
     }
 
     return window.location.host;

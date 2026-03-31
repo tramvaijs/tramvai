@@ -46,6 +46,7 @@ export class BackgroundFetchService {
       return;
     }
 
+    // TODO: support --https
     const revalidateUrl = format({
       hostname: this.hostname,
       port: this.port,

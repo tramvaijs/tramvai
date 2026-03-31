@@ -42,6 +42,8 @@ const DEFAULT_HEADERS_WHITELIST = [
   'X-App-Id',
   'X-Original-Host',
   'Host',
+  'X-Forwarded-Host',
+  'X-Forwarded-Proto',
 ];
 
 export class StaticPagesService {
