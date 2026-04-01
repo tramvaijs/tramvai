@@ -234,7 +234,9 @@ export class StaticPagesService {
     }
 
     const incomingHeaders = this.requestManager.getHeaders();
+    const incomingQuery = this.requestManager.getParsedUrl().query;
     const revalidateHeaders: Record<string, string | string[] | undefined> = {};
+    const revalidateQuery: Record<string, string | string[]> = {};
 
     this.options.allowedHeaders.concat(DEFAULT_HEADERS_WHITELIST).forEach((header) => {
       const lowercaseHeader = header.toLowerCase();
@@ -246,11 +248,18 @@ export class StaticPagesService {
       }
     });
 
+    this.options.allowedQuery.forEach((query) => {
+      if (incomingQuery[query]) {
+        revalidateQuery[query] = incomingQuery[query];
+      }
+    });
+
     await this.backgroundFetchService
       .revalidate({
         cacheKey: this.cacheKey,
         pathname: this.pathname,
         headers: revalidateHeaders,
+        query: revalidateQuery,
       })
       .then((response) => {
         if (!response) {

@@ -88,6 +88,85 @@ test.describe('tramvai/page-render-mode', async () => {
 
     test.expect(res.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
     test.expect(res.headers.get('x-tramvai-static-page-cache-source')).toBe('fs');
+    test.expect(res.headers.get('x-tramvai-static-page-key')).toBe('query');
+  });
+
+  test('Query-based FS cache hit promotes to memory cache after revalidation', async ({
+    appServer,
+  }) => {
+    // First request with allowed query params - should come from FS cache
+    const res1 = await fetch(
+      `http://localhost:${appServer.port}/?utm_source=prerender&utm_medium=example`
+    );
+    test.expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res1.headers.get('x-tramvai-static-page-cache-source')).toBe('fs');
+    test.expect(res1.headers.get('x-tramvai-static-page-key')).toBe('query');
+
+    // Wait for background revalidation (which must forward query params via allowedQuery)
+    await sleep(100);
+
+    // Same request again - should come from memory (revalidation succeeded with query params)
+    const res2 = await fetch(
+      `http://localhost:${appServer.port}/?utm_source=prerender&utm_medium=example`
+    );
+    test.expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res2.headers.get('x-tramvai-static-page-cache-source')).toBe('memory');
+    test.expect(res2.headers.get('x-tramvai-static-page-key')).toBe('query');
+  });
+
+  test('PAPI revalidate with query-based key clears only that variation', async ({ appServer }) => {
+    // Fill cache for both desktop and query-based keys
+    const res1 = await fetch(`http://localhost:${appServer.port}/`, {
+      headers: { 'User-Agent': desktopUA },
+    });
+    const res2 = await fetch(
+      `http://localhost:${appServer.port}/?utm_source=prerender&utm_medium=example`
+    );
+
+    test.expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res1.headers.get('x-tramvai-static-page-key')).toBe('desktop');
+    test.expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res2.headers.get('x-tramvai-static-page-key')).toBe('query');
+
+    // Revalidate only query key
+    await fetch(`http://localhost:${appServer.port}/prerender/private/papi/revalidate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pathname: '/', key: 'query' }),
+    });
+
+    await sleep(100);
+
+    // Desktop should still be cached
+    const res3 = await fetch(`http://localhost:${appServer.port}/`, {
+      headers: { 'User-Agent': desktopUA },
+    });
+    // Query-based should be cleared
+    const res4 = await fetch(
+      `http://localhost:${appServer.port}/?utm_source=prerender&utm_medium=example`
+    );
+
+    test.expect(res3.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res3.headers.get('x-tramvai-static-page-key')).toBe('desktop');
+    test.expect(res4.headers.get('x-tramvai-static-page-from-cache')).toBe(null);
+  });
+
+  test('Non-allowed query params do not affect cache key', async ({ appServer }) => {
+    // First request without query params - populates memory cache from FS
+    const res1 = await fetch(`http://localhost:${appServer.port}/`, {
+      headers: { 'User-Agent': desktopUA },
+    });
+    test.expect(res1.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res1.headers.get('x-tramvai-static-page-cache-source')).toBe('fs');
+    test.expect(res1.headers.get('x-tramvai-static-page-key')).toBe('desktop');
+
+    // Request with non-allowed query param - should hit same memory cache entry
+    const res2 = await fetch(`http://localhost:${appServer.port}/?unrelated=foo`, {
+      headers: { 'User-Agent': desktopUA },
+    });
+    test.expect(res2.headers.get('x-tramvai-static-page-from-cache')).toBe('true');
+    test.expect(res2.headers.get('x-tramvai-static-page-cache-source')).toBe('memory');
+    test.expect(res2.headers.get('x-tramvai-static-page-key')).toBe('desktop');
   });
 
   test('FS cache hit promotes entry to memory cache for key variations', async ({ appServer }) => {

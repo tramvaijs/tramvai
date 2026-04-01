@@ -37,10 +37,12 @@ export class BackgroundFetchService {
     cacheKey,
     pathname,
     headers,
+    query,
   }: {
     cacheKey: string;
     pathname: string;
     headers: Record<string, string | string[] | undefined>;
+    query?: Record<string, string | string[]>;
   }) {
     if (this.requests.has(cacheKey)) {
       return;
@@ -51,6 +53,7 @@ export class BackgroundFetchService {
       hostname: this.hostname,
       port: this.port,
       path: pathname,
+      query,
     });
 
     this.requests.add(cacheKey);
@@ -65,6 +68,7 @@ export class BackgroundFetchService {
       headers: {
         ...headers,
         'X-Tramvai-Static-Page-Revalidate': 'true',
+        'X-Tramvai-Service-Name': 'BACKGROUND_STATIC_PAGE_REVALIDATE',
       },
       signal: AbortSignal.timeout(10000),
       // we need to save raw redirect response status code and headers

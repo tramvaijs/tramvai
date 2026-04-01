@@ -116,6 +116,7 @@ createApp({
         allowStale: true,
         // if `User-Agent` is used for cache key, it should be included in allowedHeaders, to include that header in background cache revalidation request
         allowedHeaders: ['User-Agent'],
+        allowedQuery: [],
       },
     }),
     provide({

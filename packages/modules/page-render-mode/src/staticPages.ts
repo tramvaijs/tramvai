@@ -89,11 +89,14 @@ export const staticPagesProviders = [
   provide({
     provide: STATIC_PAGES_OPTIONS_TOKEN,
     useValue: {
-      // @TODO: unique ttl per pages
+      // @TODO: unique cache parameters per pages
       ttl: 5 * 60 * 1000,
       maxSize: 100,
       allowStale: true,
+      // @TODO: unique headers per pages
       allowedHeaders: [],
+      // @TODO: unique query per pages
+      allowedQuery: [],
     },
   }),
   provide({

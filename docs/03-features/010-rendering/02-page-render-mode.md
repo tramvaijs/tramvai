@@ -291,19 +291,26 @@ By default, the cache is segmented by page path and device type (mobile/desktop)
 ```ts
 import { STATIC_PAGES_KEY_TOKEN } from '@tramvai/module-page-render-mode';
 import { USER_AGENT_TOKEN } from '@tramvai/module-client-hints';
+import { REQUEST_MANAGER_TOKEN } from '@tramvai/tokens-common';
 
 const provider = [
   provide({
     provide: STATIC_PAGES_KEY_TOKEN,
-    useFactory: ({ userAgent }) => {
+    useFactory: ({ userAgent, requestManager }) => {
       return () => {
-        // Custom logic for cache key
-        // Return empty string for desktop, 'mobile' for mobile devices
-        return userAgent.device.type === 'mobile' ? 'mobile' : '';
+        const query = requestManager.getParsedUrl().query;
+
+        const key = [userAgent.device.type ?? 'desktop', query.tenant ?? 'default'];
+
+        // Custom logic for cache key, example values:
+        // - 'mobile,tenant1' for mobile device with tenant1 query parameter
+        // - 'desktop,default' for desktop device without tenant query parameter
+        return key.join(',');
       };
     },
     deps: {
       userAgent: USER_AGENT_TOKEN,
+      requestManager: REQUEST_MANAGER_TOKEN,
     },
   }),
   provide({
@@ -314,6 +321,8 @@ const provider = [
       allowStale: true,
       // if `User-Agent` header is used for cache key, it should be included in allowedHeaders, to include that header in background cache revalidation request
       allowedHeaders: ['User-Agent'],
+      // if `tenant` query parameter is used for cache key, it should be included in allowedQuery, to include that parameter in background cache revalidation request
+      allowedQuery: ['tenant'],
     },
   }),
 ];

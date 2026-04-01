@@ -52,10 +52,19 @@ export interface StaticPagesOptions {
   allowStale: boolean;
   /**
    * Whitelist of headers, that are allowed to be passed from client request to backround cache revalidation request,
-   * and allowed to be cached and returned with the cached response
+   * and allowed to be cached and returned with the cached response.
+   * Some headers are required and can't be removed from this list:
+   * ['Location', 'Content-Type', 'Content-Length', 'X-App-Id', 'X-Original-Host', 'Host', 'X-Forwarded-Host', 'X-Forwarded-Proto']
    * @default []
    */
   allowedHeaders: string[];
+
+  /**
+   * Whitelist of query parameters, that are allowed to be passed from client request to backround cache revalidation request,
+   * and allowed to be cached and returned with the cached response
+   * @default []
+   */
+  allowedQuery: string[];
 }
 
 export const STATIC_PAGES_CACHE_TOKEN =

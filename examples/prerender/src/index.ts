@@ -173,8 +173,8 @@ createApp({
               ttl: 5 * 60 * 1000,
               maxSize: 100,
               allowStale: true,
-              // if `User-Agent` header is used for cache key, it should be included in allowedHeaders, to include that header in background cache revalidation request
               allowedHeaders: ['User-Agent'],
+              allowedQuery: ['utm_source', 'utm_medium'],
             },
           }),
         ]
