@@ -21,7 +21,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/dippy": "^0.12.9",
+    "@tinkoff/dippy": ">=0.12.9 <2",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-core": "0.0.0-stub",

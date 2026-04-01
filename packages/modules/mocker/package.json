@@ -23,7 +23,7 @@
     "tslib": "^2.4.0"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "^0.12.9",
+    "@tinkoff/dippy": ">=0.12.9 <2",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/papi": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",

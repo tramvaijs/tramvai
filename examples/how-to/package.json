@@ -2,7 +2,7 @@
   "name": "@tinkoff-test-app/tramvai-how-to",
   "version": "0.0.0-stub",
   "dependencies": {
-    "@tinkoff/dippy": "^0.12.9",
+    "@tinkoff/dippy": ">=0.12.9 <2",
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.1",
     "@tramvai/core": "0.0.0-stub",
