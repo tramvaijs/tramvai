@@ -26,7 +26,7 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": ">=4.0.0 <6.0.0",
-    "@tinkoff/dippy": "^0.11.11",
+    "@tinkoff/dippy": ">=0.11.11 <2",
     "@tinkoff/utils": "^2.1.2",
     "react": ">=16.14.0",
     "tslib": "^2.4.0"

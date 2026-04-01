@@ -6,10 +6,12 @@ title: Contracts
 ## Explanation
 
 Microfrontends and Host applications can have a different set of relations, and most of them can be defined in two ways:
+
 - Microfront requires dependency from Host
 - Host requires dependency from Microfront
 
 In Child Apps world, there is a few different types of dependencies, which can be required in microfrontend:
+
 - [providers from host DI container](03-features/015-child-app/013-workflow.md#dependency-injection)
 - [state from host application](03-features/015-child-app/05-state-management.md#how-to-subscribe-to-root-app-store)
 - [shared libraries](03-features/015-child-app/014-module-federation.md)
@@ -25,6 +27,7 @@ Host state subscription is a special case of working with Root DI container.
 By default, Child App has **full access** to Root application DI container, as described in [this schema](03-features/015-child-app/013-workflow.md#dependency-injection).
 
 This behavior allows to write less and ship faster, but also it is unsafe and can lead to bugs in producion environment:
+
 - Child App and Host application has different release cycles
 - Dependencies interfaces can be changed without backward compatibility
 - Dependencies can be not provided or removed
@@ -36,6 +39,7 @@ Contracts mechanism was created to address these issues.
 With Contracts, access to Root DI container is **strictly limited** at Host application level. Only few core `tramvai` dependencies are available out of the box, and we can guarantee this dependencies compatibility between different Child App and Host application `tramvai` versions because of our matrix of integration tests.
 
 Contracts are composed of several elements:
+
 - specific Child Apps DI acces mode
 - list of providers, which are passed from Root DI to Child App
 - list of providers, which are required in Child App
@@ -48,13 +52,14 @@ In a nutshell, contract is a usual `tramvai` [provider](concepts/provider.md), w
 
 ## Usage
 
-Contracts already integrated in `@tramvai/module-child-app` module, no extra dependencies needed. 
+Contracts already integrated in `@tramvai/module-child-app` module, no extra dependencies needed.
 
 ### Restricting access to DI container
 
 For ability to incremental migration, there is a two access modes to Root DI from Child App:
+
 - `whitelist` - full access to Root DI only for specified Child Apps
-- `blacklist` - full access to Root DI  for all Child Apps except specified
+- `blacklist` - full access to Root DI for all Child Apps except specified
 
 For example, if you want to migrate `header` Child App to Contracts mechanism, provide this `CHILD_APP_ROOT_DI_ACCESS_MODE_TOKEN` token in Host application:
 
@@ -222,6 +227,7 @@ declare module '@tramvai/module-child-app' {
 TL;DR - provide Contracts as separate npm packages (one package for one or multiple Child Apps), update this packages as infrequently as you can.
 
 Delivering Contracts as npm packages provides the following benefits:
+
 - versioning out of the box
 - reusability between microfrontends and host applications
 
@@ -230,7 +236,6 @@ Tramvai tokens chosen for Contracts declaration because of ability to provide st
 So the contracts for Child Apps are set of Tramvai tokens wrapped in npm package. `@tramvai/build` can be used to build these packages.
 
 For example:
-
 
 <Tabs>
   <TabItem value="json" label="package.json" default>
@@ -246,7 +251,7 @@ For example:
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/dippy": "^0.9.0"
+    "@tinkoff/dippy": ">=0.11.11 <2"
   },
   "peerDependencies": {
     "@tramvai/module-child-app": ">=3.0.0"

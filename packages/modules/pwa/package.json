@@ -29,7 +29,7 @@
     "workbox-window": "^6.6.1"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "^0.11.11",
+    "@tinkoff/dippy": ">=0.11.11 <2",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "tslib": "^2.4.0"

@@ -22,7 +22,7 @@
     "@sentry/types": "^6.17.2"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "^0.11.11",
+    "@tinkoff/dippy": ">=0.11.11 <2",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub",
