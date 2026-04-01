@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@rsdoctor/webpack-plugin": "^1.5.4",
-    "@tinkoff/dippy": "^0.13.2",
+    "@tinkoff/dippy": ">=0.13.2 <2",
     "@tinkoff/utils": "^2.1.1",
     "@tramvai/api": "0.0.0-stub",
     "ansi-escapes": "^4.3.2",

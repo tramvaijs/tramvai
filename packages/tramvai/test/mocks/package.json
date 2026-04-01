@@ -29,7 +29,7 @@
     "@tramvai/tokens-core": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": "^0.13.2",
+    "@tinkoff/dippy": ">=0.13.2 <2",
     "@tinkoff/utils": "^2.1.2",
     "tslib": "^2.4.0"
   },
