@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
+    {{#if isJest}}
+    "types": ["jest"],
+    {{/if}}
     "target": "esnext",
     "module": "esnext",
     "lib": ["es2015", "es2016", "es2017", "es2018", "dom"],
@@ -14,8 +17,7 @@
     "noUnusedParameters": false,
     "noEmitOnError": true,
     "importHelpers": true,
-    "skipLibCheck": true,
-    "baseUrl": "src"
+    "skipLibCheck": true
   }{{#if isJest}},
   "ts-node": {
     "transpileOnly": true,
