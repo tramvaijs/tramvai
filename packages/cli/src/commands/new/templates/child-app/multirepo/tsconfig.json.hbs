@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
+    {{#if isJest}}
+    "types": ["jest"],
+    {{/if}}
+    "moduleResolution": "bundler",
     "target": "esnext",
     "module": "esnext",
     "lib": ["es2015", "es2016", "es2017", "es2018", "dom"],
@@ -15,15 +18,14 @@
     "noEmitOnError": true,
     "importHelpers": true,
     "skipLibCheck": true,
-    "baseUrl": "src",
     "paths": {
-      "~shared/*": ["shared/*"],
-      "~entities/*": ["entities/*"],
-      "~features/*": ["features/*"],
-      "~widgets/*": ["widgets/*"],
-      "~pages/*": ["pages/*"],
-      "~processes/*": ["processes/*"],
-      "~app/*": ["app/*"]
+      "~shared/*": ["./src/shared/*"],
+      "~entities/*": ["./src/entities/*"],
+      "~features/*": ["./src/features/*"],
+      "~widgets/*": ["./src/widgets/*"],
+      "~pages/*": ["./src/pages/*"],
+      "~processes/*": ["./src/processes/*"],
+      "~app/*": ["./src/app/*"]
     }
   }{{#if isJest}},
   "ts-node": {

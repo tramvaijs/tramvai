@@ -3,7 +3,7 @@ import { test } from '@playwright/test';
 
 interface ConstructorPayload {
   page: Page;
-  baseURL: string;
+  baseURL: string | undefined;
 }
 
 export const PAGES = {
@@ -13,7 +13,7 @@ export const PAGES = {
 export class ApplicationComponentObject {
   private page: Page;
 
-  private baseURL: string;
+  private baseURL: string | undefined;
 
   constructor(payload: ConstructorPayload) {
     this.page = payload.page;
