@@ -11,8 +11,7 @@ Levels and identifiers of displayed loggers are specified separately for server 
 
 ### Displaying logs on the server
 
-The server log settings are set in the `LOG_LEVEL` and `LOG_ENABLE` environment variables, if needed, you can change these settings in runtime, through the papi method `/{appName}/private/papi/logger` with additional query parameters.
-You can read more about the available parameters in the documentation [@tramvai/module-log](references/modules/log.md)
+The server log settings are set in the `LOG_LEVEL` and `LOG_ENABLE` environment variables, if needed, you can change these settings in runtime, through the papi method `/{appName}/private/papi/logger` with additional query parameters. You can read more about the available parameters in the documentation [@tramvai/module-log](references/modules/log.md)
 
 ```bash
 LOG_ENABLE='router' // displays all logs for the logger with the ID `router`
@@ -20,11 +19,16 @@ LOG_ENABLE='router' // displays all logs for the logger with the ID `router`
 
 ### Displaying logs on the browser
 
-Client logs settings are controlled by methods of the `@tinkoff/logger` library.
-These settings are stored in the localStorage, so to display all client logs with new settings, you must additionally reload the page, or clear the localStorage.
+Client logs settings are controlled by methods of the `@tinkoff/logger` library. These settings are stored in the localStorage, so to display all client logs with new settings, you must additionally reload the page, or clear the localStorage.
 
 ```tsx
 import logger from '@tinkoff/logger';
 
 logger.enable('router'); // displays all logs for the logger with the ID `router`
 ```
+
+### Finding Token Implementations
+
+When searching for functionality bound to a token, confusion may arise because IDE navigation often leads to the token definition rather than the `provide` usage.
+
+**Recommendation:** If you need to find the implementation, search for the line `provide: <TOKEN>` instead of just the token name. Typically, there is only one such occurrence in the project (excluding test files, which can be filtered by path).
