@@ -7,6 +7,7 @@ import { isSameSiteNoneCompatible } from './isSameSiteNoneCompatible';
 import { mergeExtensions } from './utils/merge-extensions';
 import { getBrowserEngine } from './utils/get-browser-engine';
 import { getMobileOs } from './utils/get-mobile-os';
+import { normalizeOSVersion } from './utils/normalizeOSVersion';
 
 const toLowerName = compose(toLower, propOr('name', ''));
 
@@ -18,7 +19,7 @@ export const parseUserAgentHeader = (
     ...mergeExtensions(extensions || []),
   }).getResult();
 
-  const { browser, os, engine } = result;
+  const { browser, engine, os } = result;
 
   const browserName = toLowerName(browser);
   const engineName = toLowerName(engine);
@@ -29,6 +30,7 @@ export const parseUserAgentHeader = (
 
   return {
     ...result,
+    os: normalizeOSVersion({ os, browser }),
     mobileOS: getMobileOs(os.name),
     sameSiteNoneCompatible: isSameSiteNoneCompatible(result),
     browser: {

@@ -3,6 +3,200 @@ import { UAParserExtensionsTypes } from '../lib';
 import { parseUserAgentHeader } from './userAgent';
 
 describe('modern browsers', () => {
+  describe('mobile safari with iOS >= 26 and iOS <= 18', () => {
+    it('mobile safari iOS >= 26 (UA frozen at 18.x, should normalize to 26.x)', () => {
+      const ua =
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.3 Mobile/15E148 Safari/604.1';
+
+      const result = parseUserAgentHeader(ua);
+
+      expect(result.os.name).toBe('iOS');
+      expect(result.os.version).toBe('26.3');
+      expect(result).toMatchInlineSnapshot(`
+      {
+        "browser": {
+          "browserEngine": "safari",
+          "major": "26",
+          "name": "mobile safari",
+          "version": "26.3",
+        },
+        "cpu": {
+          "architecture": undefined,
+        },
+        "device": {
+          "model": "iPhone",
+          "type": "mobile",
+          "vendor": "Apple",
+        },
+        "engine": {
+          "name": "WebKit",
+          "version": "605.1.15",
+        },
+        "mobileOS": "ios",
+        "os": {
+          "name": "iOS",
+          "version": "26.3",
+        },
+        "sameSiteNoneCompatible": true,
+      }
+    `);
+    });
+
+    it('mobile safari iOS <= 18 (should keep original UA version)', () => {
+      const ua =
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1';
+
+      const result = parseUserAgentHeader(ua);
+
+      expect(result.os.name).toBe('iOS');
+      expect(result.os.version).toBe('18.6');
+      expect(result).toMatchInlineSnapshot(`
+    {
+      "browser": {
+        "browserEngine": "safari",
+        "major": "18",
+        "name": "mobile safari",
+        "version": "18.6",
+      },
+      "cpu": {
+        "architecture": undefined,
+      },
+      "device": {
+        "model": "iPhone",
+        "type": "mobile",
+        "vendor": "Apple",
+      },
+      "engine": {
+        "name": "WebKit",
+        "version": "605.1.15",
+      },
+      "mobileOS": "ios",
+      "os": {
+        "name": "iOS",
+        "version": "18.6",
+      },
+      "sameSiteNoneCompatible": true,
+    }
+  `);
+    });
+
+    it('should not normalize non-Safari browsers on iOS (e.g. Chrome)', () => {
+      const ua =
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 26_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/117.0.5938.108 Mobile/15E148 Safari/604.1';
+
+      const result = parseUserAgentHeader(ua);
+
+      expect(result.os.name).toBe('iOS');
+      expect(result.os.version).toBe('26.4');
+
+      expect(result).toMatchInlineSnapshot(`
+    {
+      "browser": {
+        "browserEngine": "safari",
+        "major": "117",
+        "name": "chrome",
+        "version": "117.0.5938.108",
+      },
+      "cpu": {
+        "architecture": undefined,
+      },
+      "device": {
+        "model": "iPhone",
+        "type": "mobile",
+        "vendor": "Apple",
+      },
+      "engine": {
+        "name": "WebKit",
+        "version": "605.1.15",
+      },
+      "mobileOS": "ios",
+      "os": {
+        "name": "iOS",
+        "version": "26.4",
+      },
+      "sameSiteNoneCompatible": true,
+    }
+  `);
+    });
+
+    it('should not normalize non-Safari browsers on iOS (e.g. Firefox)', () => {
+      const ua =
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) FxiOS/149.2 Mobile/15E148 Safari/604.1';
+
+      const result = parseUserAgentHeader(ua);
+
+      expect(result.os.name).toBe('iOS');
+      expect(result.os.version).toBe('18.7');
+
+      expect(result).toMatchInlineSnapshot(`
+    {
+      "browser": {
+        "browserEngine": "safari",
+        "major": undefined,
+        "name": "firefox focus",
+        "version": undefined,
+      },
+      "cpu": {
+        "architecture": undefined,
+      },
+      "device": {
+        "model": "iPhone",
+        "type": "mobile",
+        "vendor": "Apple",
+      },
+      "engine": {
+        "name": "WebKit",
+        "version": "605.1.15",
+      },
+      "mobileOS": "ios",
+      "os": {
+        "name": "iOS",
+        "version": "18.7",
+      },
+      "sameSiteNoneCompatible": true,
+    }
+  `);
+    });
+
+    it('should not override if Safari version is missing', () => {
+      const ua =
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Safari/604.1';
+
+      const result = parseUserAgentHeader(ua);
+
+      expect(result.os.version).toBe('18.7');
+
+      expect(result).toMatchInlineSnapshot(`
+    {
+      "browser": {
+        "browserEngine": "safari",
+        "major": undefined,
+        "name": "safari",
+        "version": undefined,
+      },
+      "cpu": {
+        "architecture": undefined,
+      },
+      "device": {
+        "model": "iPhone",
+        "type": "mobile",
+        "vendor": "Apple",
+      },
+      "engine": {
+        "name": "WebKit",
+        "version": "605.1.15",
+      },
+      "mobileOS": "ios",
+      "os": {
+        "name": "iOS",
+        "version": "18.7",
+      },
+      "sameSiteNoneCompatible": true,
+    }
+  `);
+    });
+  });
+
   it('desktop chrome', () => {
     const ua =
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.61 Safari/537.36';
