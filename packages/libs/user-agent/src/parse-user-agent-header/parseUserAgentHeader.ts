@@ -6,6 +6,7 @@ import { getMobileOs } from '../utils/getMobileOs';
 import { toLowerName } from './utils/toLowerName';
 import { DeviceType } from '../constants';
 import { mergeExtensions } from './utils/mergeExtensions';
+import { normalizeOSVersion } from './utils/normalizeOSVersion';
 
 export const parseUserAgentHeader = (
   userAgent: string,
@@ -15,7 +16,7 @@ export const parseUserAgentHeader = (
     ...mergeExtensions(extensions || []),
   }).getResult();
 
-  const { browser, os, engine } = result;
+  const { browser, engine, os } = result;
 
   const browserName = toLowerName(browser);
   const engineName = toLowerName(engine);
@@ -26,6 +27,7 @@ export const parseUserAgentHeader = (
 
   return {
     ...result,
+    os: normalizeOSVersion({ os, browser }),
     mobileOS: getMobileOs(os.name),
     sameSiteNoneCompatible: isSameSiteNoneCompatible(result),
     browser: {
