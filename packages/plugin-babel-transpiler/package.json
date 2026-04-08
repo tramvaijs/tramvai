@@ -35,7 +35,7 @@
     "@babel/traverse": "^7.28.5",
     "@babel/types": "^7.28.5",
     "@tinkoff/babel-plugin-lodash": "^0.1.0",
-    "@tinkoff/dippy": ">=0.13.2 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "@tramvai/plugin-base-builder": "0.0.0-stub",
     "@tramvai/plugin-rspack-builder": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",

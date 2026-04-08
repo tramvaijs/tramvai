@@ -27,7 +27,7 @@
     "supertest": "^7.1.4"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": ">=0.13.2 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "tslib": "^2.4.0"
   },
   "license": "Apache-2.0",

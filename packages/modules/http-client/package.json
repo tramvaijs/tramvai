@@ -44,7 +44,7 @@
     "@tramvai/build": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": ">=0.13.2 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub",

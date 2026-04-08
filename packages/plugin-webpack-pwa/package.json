@@ -23,7 +23,7 @@
     "sharp": "0.34.3"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": ">=0.13.2 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/plugin-base-builder": "0.0.0-stub",

@@ -17,7 +17,7 @@
     "watch": "tsc -w"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": ">=0.13.2 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-router": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",

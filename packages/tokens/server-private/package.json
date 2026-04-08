@@ -22,7 +22,7 @@
   },
   "peerDependencies": {
     "@fastify/cookie": "^11.0.2",
-    "@tinkoff/dippy": ">=0.13.2 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "fastify": "^5.6.2",
     "tslib": "^2.4.0"
   },
