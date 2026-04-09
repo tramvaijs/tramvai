@@ -251,7 +251,7 @@ For example:
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@tinkoff/dippy": ">=0.11.11 <2"
+    "@tinkoff/dippy": "^1.0.0"
   },
   "peerDependencies": {
     "@tramvai/module-child-app": ">=3.0.0"
