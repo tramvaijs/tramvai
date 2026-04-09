@@ -38,7 +38,7 @@
     "@tramvai/tokens-server": "0.0.0-stub"
   },
   "peerDependencies": {
-    "@tinkoff/dippy": ">=0.12.9 <2",
+    "@tinkoff/dippy": "^1.0.0",
     "@tinkoff/utils": "^2.1.2",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
