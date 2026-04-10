@@ -7,14 +7,15 @@ import {
   isOneOf,
   startsWith,
   endsWith,
+  isArrayUrl,
 } from './validators';
 
 describe('validators', () => {
   it('isUrl', () => {
     expect(isUrl('https://google.com')).toEqual(false);
     expect(isUrl('/foo/bar')).toEqual(false);
-    expect(isUrl('file://google.com')).toEqual('Invalid protocol file:');
-    expect(isUrl('not valid url')).toEqual('URL is not valid');
+    expect(isUrl('file://google.com')).toEqual('Invalid protocol file://google.com/');
+    expect(isUrl('not valid url')).toEqual('URL not valid url is not valid');
   });
   it('isNumber', () => {
     expect(isNumber('5')).toEqual(true);
@@ -40,6 +41,21 @@ describe('validators', () => {
     expect(endsWith('somepostfix')('value_and_somepostfix')).toEqual(true);
     expect(endsWith('xxx')('yxx')).toEqual('value should ends with xxx');
   });
+  it('isArrayUrl', () => {
+    expect(isArrayUrl('https://google.com')).toEqual(true);
+    expect(isArrayUrl('/foo/bar')).toEqual(true);
+    expect(isArrayUrl('file://google.com')).toEqual('Invalid protocol file://google.com/');
+    expect(isArrayUrl('not valid url')).toEqual('URL not valid url is not valid');
+    expect(isArrayUrl('https://google.com,https://yandex.ru')).toEqual(true);
+    expect(isArrayUrl('https://google.com, https://yandex.ru')).toEqual(true);
+    expect(isArrayUrl('/foo/bar,/bar/baz')).toEqual(true);
+    expect(isArrayUrl('file://google.com,file://yandex.ru')).toEqual(
+      `Invalid protocol file://google.com/
+Invalid protocol file://yandex.ru/`
+    );
+    expect(isArrayUrl('not valid url, other not valid')).toEqual(`URL not valid url is not valid
+URL other not valid is not valid`);
+  });
 });
 
 describe('combine validators', () => {
@@ -49,9 +65,11 @@ describe('combine validators', () => {
     expect(combineValidators([isUrl, endsWith('/')])('https://google.com')).toEqual(
       'value should ends with /'
     );
-    expect(combineValidators([isUrl, endsWith('/')])('google.com/')).toEqual('URL is not valid');
+    expect(combineValidators([isUrl, endsWith('/')])('google.com/')).toEqual(
+      'URL google.com/ is not valid'
+    );
     expect(combineValidators([isUrl, endsWith('/')])('asdjhpasojdh')).toEqual(
-      'URL is not valid; value should ends with /'
+      'URL asdjhpasojdh is not valid; value should ends with /'
     );
   });
 });

@@ -16,13 +16,13 @@ export const parseUserAgentHeader = (
     ...mergeExtensions(extensions || []),
   }).getResult();
 
-  const { browser, engine, os } = result;
+  const { browser, engine, os, device } = result;
 
   const browserName = toLowerName(browser);
   const engineName = toLowerName(engine);
 
   if (browserName === 'opera mobi') {
-    result.device.type = DeviceType.mobile;
+    device.type = DeviceType.mobile;
   }
 
   return {
@@ -34,6 +34,10 @@ export const parseUserAgentHeader = (
       ...browser,
       browserEngine: getBrowserEngine(browserName, engineName),
       name: browserName,
+    },
+    device: {
+      ...device,
+      type: device.type || DeviceType.desktop,
     },
   };
 };

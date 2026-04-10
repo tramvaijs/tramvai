@@ -213,7 +213,7 @@ describe('modern browsers', () => {
         },
         "device": {
           "model": "Macintosh",
-          "type": undefined,
+          "type": "desktop",
           "vendor": "Apple",
         },
         "engine": {
@@ -279,7 +279,7 @@ describe('modern browsers', () => {
         },
         "device": {
           "model": "Macintosh",
-          "type": undefined,
+          "type": "desktop",
           "vendor": "Apple",
         },
         "engine": {
@@ -314,7 +314,7 @@ describe('supported browsers', () => {
         },
         "device": {
           "model": "Macintosh",
-          "type": undefined,
+          "type": "desktop",
           "vendor": "Apple",
         },
         "engine": {
@@ -380,7 +380,7 @@ describe('supported browsers', () => {
         },
         "device": {
           "model": "Macintosh",
-          "type": undefined,
+          "type": "desktop",
           "vendor": "Apple",
         },
         "engine": {

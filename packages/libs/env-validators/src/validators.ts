@@ -7,6 +7,7 @@ export const isUrl: Validator = (value: string) => {
   if (!value) {
     return 'value should not be empty';
   }
+
   let url;
 
   try {
@@ -16,12 +17,29 @@ export const isUrl: Validator = (value: string) => {
       url = new URL(value);
     }
   } catch (_) {
-    return 'URL is not valid';
+    return `URL ${value} is not valid`;
   }
 
-  return (
-    url.protocol !== 'http:' && url.protocol !== 'https:' && `Invalid protocol ${url.protocol}`
-  );
+  return url.protocol !== 'http:' && url.protocol !== 'https:' && `Invalid protocol ${url}`;
+};
+
+export const isArrayUrl: Validator = (value: string) => {
+  if (!value) {
+    return 'value should not be empty';
+  }
+
+  const rawUrls = value.split(',').map((url) => url.trim());
+  const errors: string[] = [];
+
+  rawUrls.forEach((rawUrl) => {
+    const isUrlValid = isUrl(rawUrl);
+
+    if (typeof isUrlValid === 'string') {
+      errors.push(isUrlValid);
+    }
+  });
+
+  return errors.length === 0 ? true : errors.join('\n');
 };
 
 export const isNumber: Validator = (value: string) => {

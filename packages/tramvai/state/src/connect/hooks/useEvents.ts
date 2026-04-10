@@ -10,8 +10,10 @@ type ConvertEventToDispatch<Ev extends EventCreatorN<any>> = Ev extends (
   ? (...args: T) => P
   : never;
 
-export function useEvents<Ev extends EventCreatorN<any>>(event: Ev): ConvertEventToDispatch<Ev>;
-export function useEvents<Ev extends Readonly<EventCreatorN<any>[]>>(
+export function useEvents<const Ev extends EventCreatorN<any>>(
+  event: Ev
+): ConvertEventToDispatch<Ev>;
+export function useEvents<const Ev extends Readonly<EventCreatorN<any>[]>>(
   events: Ev
 ): {
   [key in keyof Ev]: ConvertEventToDispatch<Ev[key]>;
