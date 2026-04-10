@@ -1,4 +1,4 @@
-import type { UserAgent } from '@tinkoff/user-agent';
+import type { UAParserExtensionsTypes, UserAgent } from '@tinkoff/user-agent';
 import { parseClientHintsUserAgentData, parse } from '@tinkoff/user-agent';
 
 const getFromUserAgentData = (): UserAgent | null => {
@@ -23,8 +23,8 @@ const getFromUserAgentData = (): UserAgent | null => {
   }
 };
 
-export function loadUserAgent(): UserAgent {
+export function loadUserAgent(extensions?: UAParserExtensionsTypes[] | null): UserAgent {
   const fromUserAgentData = getFromUserAgentData();
 
-  return fromUserAgentData ?? parse(navigator.userAgent);
+  return fromUserAgentData ?? parse(navigator.userAgent, extensions);
 }

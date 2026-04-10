@@ -4,7 +4,7 @@ import { STORE_TOKEN, ENV_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import { browserProviders } from '../../shared/providers.browser';
 import { setUserAgent, UserAgentStore } from '../../shared/stores/userAgent';
 import { loadUserAgent } from '../../browser/loadUserAgent';
-import { USER_AGENT_TOKEN } from '../../tokens';
+import { USER_AGENT_PARSER_EXTENSIONS_TOKEN, USER_AGENT_TOKEN } from '../../tokens';
 
 declare global {
   interface Window {
@@ -18,9 +18,9 @@ export const ClientHintsCSRModule = /* @__PURE__ */ declareModule({
     ...browserProviders,
     provide({
       provide: USER_AGENT_TOKEN,
-      useFactory: ({ store, envManager }) => {
+      useFactory: ({ store, envManager, extensions }) => {
         if (envManager.get('TRAMVAI_FORCE_CLIENT_SIDE_RENDERING') === 'true') {
-          const userAgent = loadUserAgent();
+          const userAgent = loadUserAgent(extensions);
 
           store.dispatch(setUserAgent(userAgent));
 
@@ -32,6 +32,7 @@ export const ClientHintsCSRModule = /* @__PURE__ */ declareModule({
       deps: {
         store: STORE_TOKEN,
         envManager: ENV_MANAGER_TOKEN,
+        extensions: { token: USER_AGENT_PARSER_EXTENSIONS_TOKEN, optional: true },
       },
     }),
   ],
