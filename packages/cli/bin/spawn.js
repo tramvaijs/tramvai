@@ -26,9 +26,19 @@ module.exports = function spawn(executePath) {
       .concat(nodeArgs)
       .concat(require.resolve(executePath))
       .concat(args.slice(paramsIndex > 0 ? paramsIndex : 0)),
-    // this is the first place where we can pass env which will be used by webpack
-    // about watchpack issue - https://github.com/webpack/watchpack/issues/222, https://github.com/vercel/next.js/pull/51826
-    { stdio: 'inherit', env: { ...process.env, WATCHPACK_WATCHER_LIMIT: '20' }, signal }
+    {
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        // this is the first place where we can pass env which will be used by webpack
+        // about watchpack issue - https://github.com/webpack/watchpack/issues/222, https://github.com/vercel/next.js/pull/51826
+        WATCHPACK_WATCHER_LIMIT: '20',
+        // https://nodejs.org/learn/http/enterprise-network-configuration
+        // allow use of certificate authorities from system store
+        NODE_USE_SYSTEM_CA: '1',
+      },
+      signal,
+    }
   );
 
   cliInstance.on('error', async (err) => {

@@ -31,13 +31,13 @@ type StoreType<S = any, N extends string = string> =
 
 const schedule = /* #__PURE__*/ scheduling();
 
-export function useSelector<T, S extends string>(
+export function useSelector<T, const S extends string>(
   storesOrStore: S,
   selector: (state: { [key in S]: any }) => T,
   equalityFn?: typeof shallowEqual
 ): T;
 
-export function useSelector<T, S extends OptionalStoreType>(
+export function useSelector<T, const S extends OptionalStoreType>(
   storesOrStore: S,
   selector: (
     state: S['store'] extends Reducer<any>
@@ -49,19 +49,19 @@ export function useSelector<T, S extends OptionalStoreType>(
   equalityFn?: typeof shallowEqual
 ): T;
 
-export function useSelector<T, R extends Reducer<any>>(
+export function useSelector<T, const R extends Reducer<any>>(
   storesOrStore: R,
   selector: (state: { [key in R['storeName']]: InferStoreStateFromReducer<R> }) => T,
   equalityFn?: typeof shallowEqual
 ): T;
 
-export function useSelector<T, R extends BaseStoreConstructor<any>>(
+export function useSelector<T, const R extends BaseStoreConstructor<any>>(
   storesOrStore: R,
   selector: (state: { [key in R['storeName']]: InferStoreStateFromLegacyStore<R> }) => T,
   equalityFn?: typeof shallowEqual
 ): T;
 
-export function useSelector<T, S extends ReadonlyArray<unknown>>(
+export function useSelector<T, const S extends ReadonlyArray<unknown>>(
   storesOrStore: S,
   selector: (state: {
     [Key in Indices<S> as InferStoreNameFromUnknownStore<S[Key]>]: InferStoreStateFromUnknownStore<
@@ -71,13 +71,13 @@ export function useSelector<T, S extends ReadonlyArray<unknown>>(
   equalityFn?: typeof shallowEqual
 ): T;
 
-export function useSelector<T, S>(
+export function useSelector<T, const S>(
   storesOrStore: S,
   selector: (state: Record<string, any>) => T,
   equalityFn?: typeof shallowEqual
 ): T;
 
-export function useSelector<T, S extends StoreType | StoreType[]>(
+export function useSelector<T, const S extends StoreType | StoreType[]>(
   storesOrStore: S,
   selector: Selector<T>,
   equalityFn = shallowEqual

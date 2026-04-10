@@ -566,9 +566,9 @@ To get data from a store, you can use a store name, a reference to a store, or a
 - `{ store: storeObject, optional: true }`
 - `{ store: 'storeName', optional: true }`
 
-You can pass an array of keys, then for correct type inference it is better to use `as const`:
+You can pass an array of keys:
 
-- `useSelector(['fooStoreName', barStoreObject] as const, ({ foo, bar }) => null)`;
+- `useSelector(['fooStoreName', barStoreObject], ({ foo, bar }) => null)`;
 
 ```tsx
 import { useSelector } from '@tramvai/state';
@@ -626,8 +626,6 @@ Allows to execute tramvai [actions](concepts/action.md) in React components
 
 - `actions` - one or an array of tramvai actions
 
-> If you pass an array to `useActions`, for typing you need to specify `as const` - `useActions([] as const)`
-
 #### Usage
 
 ```tsx
@@ -638,11 +636,7 @@ export const Component = () => {
   // if you pass one action, the payload type for loadUser is automatically deduced
   const loadUser = useActions(loadUserAction);
 
-  // if you pass a list of actions, `as const` is required for correct type inference
-  const [getInformation, setInformation] = useActions([
-    getInformationAction,
-    setInformationAction,
-  ] as const);
+  const [getInformation, setInformation] = useActions([getInformationAction, setInformationAction]);
 
   return (
     <div>

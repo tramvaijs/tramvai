@@ -153,6 +153,43 @@ describe('useSelector type infer', () => {
     };
   });
 
+  it('infer right result type from array of optional stores argument', () => {
+    const store1 = createReducer('test1', { id: 1 });
+    const store2 = createReducer('test2', { id: '2' });
+    const result1 = useSelector(
+      [{ store: store1, optional: true }],
+      (something) => something.test1.id
+    );
+    const result2 = useSelector(
+      [{ store: store2, optional: true }],
+      (something) => something.test2.id
+    );
+    const result3 = useSelector(
+      [{ store: store1, optional: true }],
+      (something) => something.test1.id
+    );
+    const result4 = useSelector(
+      [{ store: store2, optional: true }],
+      (something) => something.test2.id
+    );
+
+    const isNumber1: IsNumber<typeof result1> = 1;
+    // @ts-expect-error
+    const isAny1: IsAny<typeof result1> = 1;
+
+    const isString2: IsString<typeof result2> = 1;
+    // @ts-expect-error
+    const isAny2: IsAny<typeof result2> = 1;
+
+    const isNumber3: IsNumber<typeof result3> = 1;
+    // @ts-expect-error
+    const isAny3: IsAny<typeof result3> = 1;
+
+    const isString4: IsString<typeof result4> = 1;
+    // @ts-expect-error
+    const isAny4: IsAny<typeof result4> = 1;
+  });
+
   it('infer right result type from array of optional stores argument, only with const', () => {
     const store1 = createReducer('test1', { id: 1 });
     const store2 = createReducer('test2', { id: '2' });
@@ -174,9 +211,11 @@ describe('useSelector type infer', () => {
     );
 
     const isNumber1: IsNumber<typeof result1> = 1;
+    // @ts-expect-error
     const isAny1: IsAny<typeof result1> = 1;
 
     const isString2: IsString<typeof result2> = 1;
+    // @ts-expect-error
     const isAny2: IsAny<typeof result2> = 1;
 
     const isNumber3: IsNumber<typeof result3> = 1;
@@ -274,11 +313,12 @@ describe('useSelector type infer', () => {
     };
   });
 
-  it('infer right store name from single optional store name argument, if name is const', () => {
+  it('infer right store name from single optional store name argument', () => {
     const Component = () => {
       const store = createReducer('test', { id: 1 });
       const result1 = useSelector(
         { store: 'test', optional: true },
+        // @ts-expect-error
         (something) => something.WRONG.id
       );
       const result2 = useSelector(
@@ -303,10 +343,14 @@ describe('useSelector type infer', () => {
     };
   });
 
-  it('infer right store name from array of stores names argument, if array is const', () => {
+  it('infer right store name from array of stores names argument', () => {
     const Component = () => {
       const store = createReducer('test', { id: 1 });
-      const result1 = useSelector(['test'], (something) => something.WRONG.id);
+      const result1 = useSelector(
+        ['test'],
+        // @ts-expect-error
+        (something) => something.WRONG.id
+      );
       // @ts-expect-error
       const result2 = useSelector(['test'] as const, (something) => something.WRONG.id);
 
@@ -314,10 +358,14 @@ describe('useSelector type infer', () => {
     };
   });
 
-  it('infer right store name from array of optional stores argument, only with const', () => {
+  it('infer right store name from array of optional stores argument', () => {
     const Component = () => {
       const store = createReducer('test', { id: 1 });
-      const result1 = useSelector([{ store, optional: true }], (something) => something.WRONG.id);
+      const result1 = useSelector(
+        [{ store, optional: true }],
+        // @ts-expect-error
+        (something) => something.WRONG.id
+      );
       const result2 = useSelector(
         [{ store, optional: true }] as const,
         // @ts-expect-error
@@ -384,8 +432,10 @@ describe('useSelector type infer', () => {
     const isNumber11: IsNumber<(typeof result1)[1]> = 1;
     const isAny11: IsAny<(typeof result1)[1]> = 1;
     const isString12: IsString<(typeof result1)[2]> = 1;
+    // @ts-expect-error
     const isAny12: IsAny<(typeof result1)[2]> = 1;
     const isBoolean13: IsBoolean<(typeof result1)[3]> = 1;
+    // @ts-expect-error
     const isAny13: IsAny<(typeof result1)[3]> = 1;
     const isArray14: IsArray<(typeof result1)[4]> = 1;
     const isAny14: IsAny<(typeof result1)[4]> = 1;
