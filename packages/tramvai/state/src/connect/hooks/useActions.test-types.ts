@@ -30,11 +30,11 @@ describe('useActions.test-types', () => {
 
       const [hookAction1, hookAction2] = useActions([action1, action2]);
 
-      expectTypeOf(hookAction1).returns.resolves.toBeAny();
-      expectTypeOf(hookAction1).parameters.items.toBeAny();
+      expectTypeOf(hookAction1).returns.resolves.toEqualTypeOf<number>();
+      expectTypeOf(hookAction1).parameters.items.toEqualTypeOf<string>();
 
-      expectTypeOf(hookAction2).returns.resolves.toBeAny();
-      expectTypeOf(hookAction2).parameters.items.toBeAny();
+      expectTypeOf(hookAction2).returns.resolves.toEqualTypeOf<void>();
+      expectTypeOf(hookAction2).parameters.items.toEqualTypeOf<{ a: number }>();
     });
 
     it('multiple actions as const', async () => {
@@ -85,12 +85,12 @@ describe('useActions.test-types', () => {
 
       const [hookAction1, hookAction2] = useActions([action1, action2]);
 
-      expectTypeOf(hookAction1).returns.resolves.toBeAny();
-      expectTypeOf(hookAction1).parameter(0).toBeAny();
+      expectTypeOf(hookAction1).returns.resolves.toEqualTypeOf<number>();
+      expectTypeOf(hookAction1).parameter(0).toEqualTypeOf<string | undefined>();
       expectTypeOf(hookAction1).parameter(1).toBeUndefined();
 
-      expectTypeOf(hookAction2).returns.resolves.toBeAny();
-      expectTypeOf(hookAction2).parameter(0).toBeAny();
+      expectTypeOf(hookAction2).returns.resolves.toEqualTypeOf<void>();
+      expectTypeOf(hookAction2).parameter(0).toEqualTypeOf<{ a: number } | undefined>();
       expectTypeOf(hookAction2).parameter(1).toBeUndefined();
     });
 

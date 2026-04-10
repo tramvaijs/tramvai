@@ -75,7 +75,7 @@ describe('single event', () => {
 });
 
 describe('multiple events', () => {
-  it('different events', () => {
+  it('different events as const', () => {
     const event1 = createEvent('test-1');
     const event2 = createEvent('test-2', (a: number) => true);
     const event3 = createEvent('test-3', (a: string, b: boolean) => a);
@@ -85,6 +85,26 @@ describe('multiple events', () => {
       event2,
       event3,
     ] as const);
+
+    dispatchEvent1();
+    // @ts-expect-error
+    dispatchEvent1('test');
+
+    // @ts-expect-error
+    dispatchEvent2();
+    dispatchEvent2(3);
+
+    // @ts-expect-error
+    dispatchEvent3();
+    dispatchEvent3('test', true);
+  });
+
+  it('different events', () => {
+    const event1 = createEvent('test-1');
+    const event2 = createEvent('test-2', (a: number) => true);
+    const event3 = createEvent('test-3', (a: string, b: boolean) => a);
+
+    const [dispatchEvent1, dispatchEvent2, dispatchEvent3] = useEvents([event1, event2, event3]);
 
     dispatchEvent1();
     // @ts-expect-error
