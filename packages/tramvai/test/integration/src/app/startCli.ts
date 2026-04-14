@@ -24,6 +24,73 @@ export interface StartCliOptions extends Omit<StartOptions, 'config' | 'target'>
   logger?: Pick<typeof console, 'log' | 'error'>;
 }
 
+export const startChildApp = async (
+  targetOrConfig: StartOptions['target'] | StartOptions['config'],
+  { enableRebuild = false, env, logger = console, ...cliOptions }: StartCliOptions = {}
+) => {
+  const stdout = new Writable({
+    write(chunk, _encoding, callback) {
+      logger.log(`[@tramvai/cli child app] log:`, chunk.toString());
+
+      callback();
+    },
+  });
+  const stderr = new Writable({
+    write(chunk, _encoding, callback) {
+      logger.error(`[@tramvai/cli child app] error:`, chunk.toString());
+
+      callback();
+    },
+  });
+
+  const cliResult = await start({
+    stdout,
+    stderr,
+    noClientRebuild: !enableRebuild,
+    noServerRebuild: !enableRebuild,
+    // build cache made tests unstable in CI, because of cache writing process are async,
+    // and there is no way to wait this process (`idleTimeoutForInitialStore: 0` helps sometimes, but no guarantees)
+    fileCache: !ciInfo.isCi,
+    // faster builds with debug flag, sm still will be disabled by default
+    sourceMap: cliOptions.sourceMap ?? false,
+    ...(typeof targetOrConfig === 'string'
+      ? { target: targetOrConfig }
+      : {
+          config: mergeDeep(
+            {
+              // disable hot-refresh that may break checks for full page load because of never-ending request
+              hotRefresh: { enabled: false },
+              // faster builds
+              sourceMap: false,
+              // faster builds
+              experiments: {
+                transpilation: {
+                  loader: 'swc',
+                  include: [
+                    '@tinkoff/request',
+                    '@tramvai/module-dev-tools',
+                    '@tramvai-tinkoff/module-push-web',
+                  ],
+                },
+              },
+            },
+            targetOrConfig
+          ),
+        }),
+    env,
+    ...cliOptions,
+  });
+
+  const staticUrl = getStaticUrl(cliResult);
+
+  return {
+    ...cliResult,
+    staticUrl,
+    stdout,
+    stderr,
+  };
+};
+
 export const startCli = async (
   targetOrConfig: StartOptions['target'] | StartOptions['config'],
   { enableRebuild = false, env, logger = console, ...cliOptions }: StartCliOptions = {}
@@ -139,4 +206,6 @@ export const startCli = async (
     mocker,
   };
 };
+
 export type StartCliResult = PromiseType<ReturnType<typeof startCli>>;
+export type StartChildAppResult = PromiseType<ReturnType<typeof startChildApp>>;
