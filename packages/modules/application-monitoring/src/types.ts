@@ -12,7 +12,7 @@ export interface TramvaiInlineReporter {
 
 export interface InlineReporterParameters {
   appName: string;
-  appVersion: string | undefined;
-  appRelease: string | undefined;
+  appVersion?: string;
+  appRelease?: string;
   [x: string]: any;
 }
