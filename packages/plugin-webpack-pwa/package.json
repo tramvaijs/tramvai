@@ -13,12 +13,14 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@aaroon/workbox-rspack-plugin": "^0.3.3",
     "workbox-webpack-plugin": "^6.6.1"
   },
   "devDependencies": {
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/plugin-base-builder": "0.0.0-stub",
+    "@tramvai/plugin-rspack-builder": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
     "sharp": "0.34.3"
   },
@@ -27,6 +29,7 @@
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/plugin-base-builder": "0.0.0-stub",
+    "@tramvai/plugin-rspack-builder": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
     "sharp": "0.34.3",
     "tslib": "^2.4.0"

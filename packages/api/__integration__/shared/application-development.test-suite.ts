@@ -1083,109 +1083,107 @@ export default createPapiMethod({
         });
       });
 
-      if (builder !== 'rspack') {
-        test.describe('pwa', () => {
-          test.describe('default settings', () => {
-            test.use({
-              inputParameters: {
-                name: 'app-pwa',
-                rootDir: testSuiteFolder,
-                disableServerRunnerWaiting: true,
-                buildType: 'client',
-                fileCache: false,
-                noRebuild: true,
-              },
-              extraConfiguration: {
-                plugins,
-                projects,
-              },
-            });
-
-            test('service worker', async ({ devServer }) => {
-              await devServer.buildPromise;
-
-              const swResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/client/sw.js`
-              );
-
-              test.expect(swResponse.status).toBe(200);
-            });
+      test.describe('pwa', () => {
+        test.describe('default settings', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-pwa',
+              rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
+              buildType: 'client',
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
           });
 
-          test.describe('custom settings', () => {
-            test.use({
-              inputParameters: {
-                name: 'custom-pwa',
-                rootDir: testSuiteFolder,
-                disableServerRunnerWaiting: true,
-                buildType: 'client',
-                fileCache: false,
-                noRebuild: true,
-              },
-              extraConfiguration: {
-                plugins,
-                projects,
-              },
-            });
+          test('service worker', async ({ devServer }) => {
+            await devServer.buildPromise;
 
-            test('service worker with custom path and include', async ({ devServer }) => {
-              await devServer.buildPromise;
+            const swResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/sw.js`
+            );
 
-              const statsJson = await (
-                await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
-              ).json();
-
-              const chunks = ['react'].map((chunkname) => {
-                return statsJson.assetsByChunkName[chunkname][0];
-              });
-
-              const swResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/client/custom-sw.js`
-              );
-
-              test.expect(swResponse.status).toBe(200);
-              const swContent = await swResponse.text();
-
-              chunks.forEach((chunkname) => {
-                test.expect(swContent.includes(chunkname)).toBe(true);
-              });
-            });
-
-            test('webmanifest', async ({ devServer }) => {
-              await devServer.buildPromise;
-
-              const webmanifestResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/client/manifest.webmanifest`
-              );
-              const webmanifestContent = await webmanifestResponse.json();
-
-              test.expect(webmanifestResponse.status).toBe(200);
-
-              test.expect(webmanifestContent.theme_color).toBe('#ffdd2d');
-              test.expect(webmanifestContent.name).toBe('my manifest');
-              test.expect(webmanifestContent.short_name).toBe('also my manifest but short');
-              test.expect(webmanifestContent.scope).toBe('/scope/');
-            });
-
-            test('Should generate icons', async ({ devServer }) => {
-              await devServer.buildPromise;
-
-              const webmanifestResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/client/manifest.webmanifest`
-              );
-              const webmanifestContent = await webmanifestResponse.json();
-
-              test.expect(webmanifestContent.icons.length).toBe(2);
-
-              for (const { src } of webmanifestContent.icons) {
-                const iconSrc = src.replace('4000', devServer.staticPort);
-                const iconResponse = await fetch(iconSrc);
-                test.expect(iconResponse.status).toBe(200);
-              }
-            });
+            test.expect(swResponse.status).toBe(200);
           });
         });
-      }
+
+        test.describe('custom settings', () => {
+          test.use({
+            inputParameters: {
+              name: 'custom-pwa',
+              rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
+              buildType: 'client',
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('service worker with custom path and include', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            const chunks = ['react'].map((chunkname) => {
+              return statsJson.assetsByChunkName[chunkname][0];
+            });
+
+            const swResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/custom-sw.js`
+            );
+
+            test.expect(swResponse.status).toBe(200);
+            const swContent = await swResponse.text();
+
+            chunks.forEach((chunkname) => {
+              test.expect(swContent.includes(chunkname)).toBe(true);
+            });
+          });
+
+          test('webmanifest', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            test.expect(webmanifestResponse.status).toBe(200);
+
+            test.expect(webmanifestContent.theme_color).toBe('#ffdd2d');
+            test.expect(webmanifestContent.name).toBe('my manifest');
+            test.expect(webmanifestContent.short_name).toBe('also my manifest but short');
+            test.expect(webmanifestContent.scope).toBe('/scope/');
+          });
+
+          test('Should generate icons', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            test.expect(webmanifestContent.icons.length).toBe(2);
+
+            for (const { src } of webmanifestContent.icons) {
+              const iconSrc = src.replace('4000', devServer.staticPort);
+              const iconResponse = await fetch(iconSrc);
+              test.expect(iconResponse.status).toBe(200);
+            }
+          });
+        });
+      });
 
       // MARK: BROWSER
       test.describe('browser', () => {

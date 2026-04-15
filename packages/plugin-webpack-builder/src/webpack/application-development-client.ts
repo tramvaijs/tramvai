@@ -75,7 +75,7 @@ import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createCacheConfig } from './shared/cache';
 
-import { WebpackConfigurationFactory } from './webpack-config';
+import { WebpackConfigurationFactory } from './types/webpack';
 
 const mainFields = ['browser', 'module', 'main'];
 

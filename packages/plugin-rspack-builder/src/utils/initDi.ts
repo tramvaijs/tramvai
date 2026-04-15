@@ -9,7 +9,11 @@ import {
 } from '@tramvai/api/lib/config';
 import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
 import { BuildTarget, BuildType } from '@tramvai/plugin-base-builder/lib/types';
-import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN, BUILD_TYPE_TOKEN } from '../rspack/rspack-config';
+import {
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+  BUILD_TYPE_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
 import { RSPACK_TRANSPILER_TOKEN } from '../rspack/shared/transpiler';
 
 export async function initDi(

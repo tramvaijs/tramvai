@@ -6,11 +6,15 @@ import {
   TranspilationOptions,
 } from '@tramvai/api/lib/config';
 import envTargets, { modern } from '@tinkoff/browserslist-config';
+import {
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
 import type webpack from 'webpack';
 import browserslist from 'browserslist';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
+
 import { WorkerPoolConfig } from './thread-loader';
-import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from '../webpack-config';
 
 export type WebpackTranspilerInputParameters = {
   // TODO: rename to "mode"

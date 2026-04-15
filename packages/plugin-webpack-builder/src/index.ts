@@ -22,7 +22,11 @@ import {
 
 import { createDevServer } from './dev-server/dev-server';
 
-export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from './webpack/webpack-config';
+export {
+  BUILD_TYPE_TOKEN,
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
 export {
   WEBPACK_TRANSPILER_TOKEN,
   WebpackTranspiler,

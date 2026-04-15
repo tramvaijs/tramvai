@@ -22,7 +22,12 @@ import {
 
 import { createDevServer } from './dev-server/dev-server';
 
-export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN } from './rspack/rspack-config';
+export {
+  BUILD_TYPE_TOKEN,
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
+export { RSPACK_PLUGINS_TOKEN } from './rspack/shared/plugins';
 export {
   RSPACK_TRANSPILER_TOKEN,
   RspackTranspiler,

@@ -7,7 +7,7 @@ import autoprefixer from 'autoprefixer';
 import { safeRequire } from '@tramvai/api/lib/utils/require';
 import { CONFIG_SERVICE_TOKEN, ConfigService } from '@tramvai/api/lib/config';
 import { resolveAbsolutePathForFile } from '@tramvai/api/lib/utils/path';
-import { BUILD_TARGET_TOKEN } from '../webpack-config';
+import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 
 const mediaVars = {
   PHONE: 599,

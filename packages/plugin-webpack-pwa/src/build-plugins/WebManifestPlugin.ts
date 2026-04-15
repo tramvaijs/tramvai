@@ -32,9 +32,9 @@ export class WebManifestPlugin implements webpack.WebpackPluginInstance {
             const assets = Object.keys(compilationAssets);
 
             assets.forEach((asset) => {
-              const assetInfo = compilation.assetsInfo.get(asset);
+              const assetInfo = compilation.getAsset(asset);
               // asset info `_pwaIconSize` added in PwaIconsPlugin
-              const size = assetInfo?._pwaIconSize;
+              const size = assetInfo?.info?._pwaIconSize;
 
               if (size) {
                 if (!content.icons) {

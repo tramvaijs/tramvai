@@ -54,7 +54,6 @@ import {
   resolveWebpackTranspilerParameters,
 } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
-import { WebpackConfigurationFactory } from './webpack-config';
 import { createStylesConfiguration } from './shared/styles';
 import { createResolveOptions } from './shared/resolve';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
@@ -62,6 +61,7 @@ import { createAssetsRules } from './shared/assets';
 import { createServerInlineRules } from './shared/server-inline';
 import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createCacheConfig } from './shared/cache';
+import { WebpackConfigurationFactory } from './types/webpack';
 
 const mainFields = ['module', 'main'];
 

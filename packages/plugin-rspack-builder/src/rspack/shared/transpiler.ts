@@ -9,7 +9,7 @@ import envTargets from '@tinkoff/browserslist-config';
 import type { RuleSetRule } from '@rspack/core';
 import browserslist from 'browserslist';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
-import { BUILD_MODE_TOKEN } from '../rspack-config';
+import { BUILD_MODE_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 
 export type RspackTranspilerInputParameters = {
   // TODO: rename to "mode"

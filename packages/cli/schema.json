@@ -1373,26 +1373,23 @@
                               "dotAll": {
                                 "type": "boolean"
                               },
-                              "hasIndices": {
-                                "type": "boolean"
-                              },
-                              "__@match@10568": {
+                              "__@match@10295": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@10570": {
+                              "__@replace@10297": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@10573": {
+                              "__@search@10300": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@10575": {
+                              "__@split@10302": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@10577": {
+                              "__@matchAll@10304": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -2247,26 +2244,23 @@
                                 "dotAll": {
                                   "type": "boolean"
                                 },
-                                "hasIndices": {
-                                  "type": "boolean"
-                                },
-                                "__@match@10568": {
+                                "__@match@10295": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@10570": {
+                                "__@replace@10297": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@10573": {
+                                "__@search@10300": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@10575": {
+                                "__@split@10302": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@10577": {
+                                "__@matchAll@10304": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -3121,26 +3115,23 @@
                                   "dotAll": {
                                     "type": "boolean"
                                   },
-                                  "hasIndices": {
-                                    "type": "boolean"
-                                  },
-                                  "__@match@10568": {
+                                  "__@match@10295": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@10570": {
+                                  "__@replace@10297": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@10573": {
+                                  "__@search@10300": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@10575": {
+                                  "__@split@10302": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@10577": {
+                                  "__@matchAll@10304": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }

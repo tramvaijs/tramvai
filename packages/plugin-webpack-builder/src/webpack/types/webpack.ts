@@ -1,5 +1,7 @@
 import type { container, Configuration } from 'webpack';
+import type webpack from 'webpack';
 import type { UniversalFederationPlugin } from '@module-federation/node';
+import type { Container } from '@tinkoff/dippy';
 
 export type ModuleFederationPluginOptions = ConstructorParameters<
   typeof container.ModuleFederationPlugin
@@ -15,3 +17,7 @@ export type ModuleFederationSharedObject = Record<
 >;
 
 export type SplitChunksOptions = Required<Required<Configuration>['optimization']>['splitChunks'];
+
+export type WebpackConfigurationFactory = (options: {
+  di: Container;
+}) => Promise<webpack.Configuration>;

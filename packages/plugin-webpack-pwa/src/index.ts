@@ -1,15 +1,19 @@
 /* eslint-disable max-statements */
 import fs from 'node:fs';
 import path from 'node:path';
-import { InjectManifest } from 'workbox-webpack-plugin';
-import { declareModule, provide } from '@tinkoff/dippy';
+import { InjectManifest as WebpackInjectManifestPlugin } from 'workbox-webpack-plugin';
+// @ts-expect-error
+import { InjectManifest as RspackInfectManifestPlugin } from '@aaroon/workbox-rspack-plugin';
+import { createToken, declareModule, provide } from '@tinkoff/dippy';
 
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
   Extension,
 } from '@tramvai/api/lib/config';
-import { WEBPACK_PLUGINS_TOKEN, BUILD_TARGET_TOKEN } from '@tramvai/plugin-webpack-builder';
+import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-webpack-builder';
+import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-rspack-builder';
+import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 import { resolveAbsolutePathForFile } from '@tramvai/api/lib/utils/path';
 import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
@@ -21,6 +25,8 @@ import { getWorkboxOptions } from './utils';
 
 export * from './types';
 export { PwaIconsPlugin, WebManifestPlugin, getWorkboxOptions };
+
+const CREATE_PWA_PLUGINS_TOKEN = createToken('create pwa plugins token');
 
 const PWAConfigExtension = {
   pwa: ({ project, parameters }: Parameters<Extension<any>>[0]): PWAConfig | undefined => {
@@ -81,7 +87,7 @@ export const PwaPlugin = declareModule({
     }),
     provide({
       provide: DEFINE_PLUGIN_OPTIONS_TOKEN,
-      useFactory: ({ config, target }) => {
+      useFactory: ({ config, buildTarget }) => {
         const { assetsPrefix, extensions, rootDir, sourceDir } = config;
         const pwa = extensions.pwa();
 
@@ -103,7 +109,7 @@ export const PwaPlugin = declareModule({
           'process.env.TRAMVAI_PWA_META': `'${JSON.stringify(pwa?.meta ?? {})}'`,
         };
 
-        if (target === 'client') {
+        if (buildTarget === 'client') {
           defines['process.env.ASSETS_PREFIX'] = JSON.stringify(assetsPrefix);
         }
 
@@ -111,89 +117,111 @@ export const PwaPlugin = declareModule({
       },
       deps: {
         config: CONFIG_SERVICE_TOKEN,
-        target: BUILD_TARGET_TOKEN,
+        buildTarget: BUILD_TARGET_TOKEN,
+      },
+    }),
+    provide({
+      provide: RSPACK_PLUGINS_TOKEN,
+      useFactory: ({ createPlugins }) =>
+        createPlugins({ InjectManifestPlugin: RspackInfectManifestPlugin }),
+      deps: {
+        createPlugins: CREATE_PWA_PLUGINS_TOKEN,
       },
     }),
     provide({
       provide: WEBPACK_PLUGINS_TOKEN,
+      useFactory: ({ createPlugins }) =>
+        createPlugins({ InjectManifestPlugin: WebpackInjectManifestPlugin }),
+      deps: {
+        createPlugins: CREATE_PWA_PLUGINS_TOKEN,
+      },
+    }),
+    provide({
+      provide: CREATE_PWA_PLUGINS_TOKEN,
       useFactory: ({ config, target }) => {
-        if (target === 'server') {
-          return [];
-        }
+        return ({
+          InjectManifestPlugin,
+        }: {
+          InjectManifestPlugin: typeof WebpackInjectManifestPlugin;
+        }) => {
+          if (target === 'server') {
+            return [];
+          }
 
-        const { extensions, rootDir, sourceDir, outputClient, mode, assetsPrefix } = config;
+          const { extensions, rootDir, sourceDir, outputClient, mode, assetsPrefix } = config;
 
-        const pwa = extensions.pwa();
-        if (!pwa) {
-          return [];
-        }
+          const pwa = extensions.pwa();
+          if (!pwa) {
+            return [];
+          }
 
-        if (
-          !safeRequireResolve('@tramvai/module-progressive-web-app', true) &&
-          (pwa.workbox?.enabled || pwa.webmanifest?.enabled)
-        ) {
-          throw Error('PWA functional requires @tramvai/module-progressive-web-app installed');
-        }
+          if (
+            !safeRequireResolve('@tramvai/module-progressive-web-app', true) &&
+            (pwa.workbox?.enabled || pwa.webmanifest?.enabled)
+          ) {
+            throw Error('PWA functional requires @tramvai/module-progressive-web-app installed');
+          }
 
-        const plugins = [];
+          const plugins = [];
 
-        if (pwa.workbox?.enabled && pwa.sw?.src && pwa.sw?.dest) {
-          const swSrc = resolveAbsolutePathForFile({ file: pwa.sw?.src, rootDir, sourceDir });
-          const swDest = path.join(rootDir, outputClient, pwa.sw?.dest);
+          if (pwa.workbox?.enabled && pwa.sw?.src && pwa.sw?.dest) {
+            const swSrc = resolveAbsolutePathForFile({ file: pwa.sw?.src, rootDir, sourceDir });
+            const swDest = path.join(rootDir, outputClient, pwa.sw?.dest);
 
-          if (!fs.existsSync(swSrc)) {
-            throw Error(
-              `PWA workbox enabled but Service Worker source file not found by path ${swSrc}`
+            if (!fs.existsSync(swSrc)) {
+              throw Error(
+                `PWA workbox enabled but Service Worker source file not found by path ${swSrc}`
+              );
+            }
+
+            // @todo: static HTML caching ??? full offline mode for tramvai static ???
+            const workboxPlugin = new InjectManifestPlugin(
+              getWorkboxOptions({
+                swSrc,
+                swDest,
+                workbox: pwa.workbox,
+                mode,
+                scope: pwa.sw.scope!,
+                assetsPrefix: assetsPrefix!,
+              })
             );
+
+            // https://github.com/GoogleChrome/workbox/issues/1790#issuecomment-1241356293
+            if (mode === 'development') {
+              Object.defineProperty(workboxPlugin, 'alreadyCalled', {
+                get() {
+                  return false;
+                },
+                set() {},
+              });
+            }
+
+            plugins.push(workboxPlugin);
           }
 
-          // @todo: static HTML caching ??? full offline mode for tramvai static ???
-          const workboxPlugin = new InjectManifest(
-            getWorkboxOptions({
-              swSrc,
-              swDest,
-              workbox: pwa.workbox,
-              mode,
-              scope: pwa.sw.scope!,
+          if (pwa.webmanifest?.enabled) {
+            const webmanifestPlugin = new WebManifestPlugin({
+              manifest: pwa.webmanifest,
+              icon: pwa.icon!,
               assetsPrefix: assetsPrefix!,
-            })
-          );
-
-          // https://github.com/GoogleChrome/workbox/issues/1790#issuecomment-1241356293
-          if (mode === 'development') {
-            Object.defineProperty(workboxPlugin, 'alreadyCalled', {
-              get() {
-                return false;
-              },
-              set() {},
             });
+
+            plugins.push(webmanifestPlugin);
           }
 
-          plugins.push(workboxPlugin);
-        }
+          if (pwa.icon?.src) {
+            const iconSrc = path.join(sourceDir, pwa.icon.src);
+            const pwaIconsPlugin = new PwaIconsPlugin({
+              ...pwa.icon,
+              src: iconSrc,
+              mode,
+            });
 
-        if (pwa.webmanifest?.enabled) {
-          const webmanifestPlugin = new WebManifestPlugin({
-            manifest: pwa.webmanifest,
-            icon: pwa.icon!,
-            assetsPrefix: assetsPrefix!,
-          });
+            plugins.push(pwaIconsPlugin);
+          }
 
-          plugins.push(webmanifestPlugin);
-        }
-
-        if (pwa.icon?.src) {
-          const iconSrc = path.join(sourceDir, pwa.icon.src);
-          const pwaIconsPlugin = new PwaIconsPlugin({
-            ...pwa.icon,
-            src: iconSrc,
-            mode,
-          });
-
-          plugins.push(pwaIconsPlugin);
-        }
-
-        return plugins;
+          return plugins;
+        };
       },
       deps: {
         config: CONFIG_SERVICE_TOKEN,

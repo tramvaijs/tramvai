@@ -4,7 +4,7 @@ import {
   DEFINE_PLUGIN_OPTIONS_TOKEN,
   BUILD_EXTERNALS_TOKEN,
 } from '@tramvai/plugin-webpack-builder';
-import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-webpack-builder/lib/webpack/webpack-config';
+import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-webpack-builder';
 
 const DefineOptionsPlugin = declareModule({
   name: 'DefineOptionsPlugin',

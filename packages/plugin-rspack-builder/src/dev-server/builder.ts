@@ -9,12 +9,7 @@ import {
 } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 
-import {
-  CONFIGURATION_EXTENSION_TOKEN,
-  CONFIG_SERVICE_TOKEN,
-  InputParameters,
-} from '@tramvai/api/lib/config';
-import { optional, provide } from '@tinkoff/dippy';
+import { CONFIG_SERVICE_TOKEN, InputParameters } from '@tramvai/api/lib/config';
 import type { ExtractDependencyType, DI_TOKEN } from '@tinkoff/dippy';
 import { logger } from '@tramvai/api/lib/services/logger';
 import { TRACER_TOKEN } from '@tramvai/api/lib/tokens';
@@ -23,8 +18,6 @@ import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-base-builder/l
 
 import { rspackConfig as rspackApplicationDevelopmentServerConfig } from '../rspack/application-development-server';
 import { rspackConfig as rspackApplicationDevelopmentClientConfig } from '../rspack/application-development-client';
-import { RSPACK_TRANSPILER_TOKEN } from '../rspack/shared/transpiler';
-import { BUILD_MODE_TOKEN, BUILD_TYPE_TOKEN } from '../rspack/rspack-config';
 
 export async function runBuild(
   config: ExtractDependencyType<typeof CONFIG_SERVICE_TOKEN>,
@@ -119,7 +112,11 @@ export async function runBuild(
     onBuildEnd();
 
     if (stats.hasErrors()) {
-      const { errors } = stats.toJson({ all: false, errors: true, errorDetails: true });
+      const { errors } = stats.toJson({
+        all: false,
+        errors: true,
+        errorDetails: true,
+      });
       onFailedBuild(errors);
     } else {
       onSuccessBuild();

@@ -1,5 +1,7 @@
-import type { container, Configuration } from '@rspack/core';
+import type { container, Configuration as RspackConfiguration, RspackOptions } from '@rspack/core';
 import type { UniversalFederationPlugin } from '@module-federation/node';
+
+import { Configuration, InputParameters } from '@tramvai/api/lib/config';
 
 export type ModuleFederationPluginOptions = ConstructorParameters<
   typeof container.ModuleFederationPlugin
@@ -14,4 +16,11 @@ export type ModuleFederationSharedObject = Record<
   Exclude<Exclude<Required<ModuleFederationPluginOptions>['shared'], any[]>[string], string>
 >;
 
-export type SplitChunksOptions = Required<Required<Configuration>['optimization']>['splitChunks'];
+export type SplitChunksOptions = Required<
+  Required<RspackConfiguration>['optimization']
+>['splitChunks'];
+
+export type RspackConfigurationFactory = (
+  inputParameters: InputParameters,
+  extraConfiguration: Partial<Configuration>
+) => Promise<RspackOptions>;

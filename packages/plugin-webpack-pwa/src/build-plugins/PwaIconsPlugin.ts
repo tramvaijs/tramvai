@@ -1,8 +1,16 @@
+import fs from 'node:fs/promises';
+import { createHash } from 'crypto';
+
 import type webpack from 'webpack';
 import type Sharp from 'sharp';
 import { PwaIconOptions } from '../types';
 
 const pluginName = 'PwaIconsPlugin';
+
+async function createFileHash(filePath: string) {
+  const content = await fs.readFile(filePath);
+  return createHash('md5').update(content).digest('hex');
+}
 
 export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
   private hash: string | undefined;
@@ -37,11 +45,7 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
           try {
             const sharp: typeof Sharp = require('sharp');
             // check icon source file updates
-            const nextHash = await new Promise<string>((resolve) => {
-              compilation.fileSystemInfo.getFileHash(src, (_, hash) => {
-                resolve(hash!);
-              });
-            });
+            const nextHash = await createFileHash(src);
 
             if (!this.hash) {
               this.hash = nextHash;

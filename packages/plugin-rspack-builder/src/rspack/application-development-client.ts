@@ -71,7 +71,7 @@ import { createStylesConfiguration } from './shared/styles';
 import { RSPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 
-import { RspackConfigurationFactory } from './rspack-config';
+import { RspackConfigurationFactory } from './types/rspack';
 import { initDi } from '../utils/initDi';
 
 const mainFields = ['browser', 'module', 'main'];

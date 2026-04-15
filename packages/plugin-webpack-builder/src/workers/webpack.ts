@@ -19,6 +19,7 @@ import {
   maxMemoryRss,
   resolvePublicPathDirectory,
 } from '@tramvai/plugin-base-builder/lib/utils';
+import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
@@ -35,7 +36,6 @@ import {
   WebpackWorkerIncomingEventsPayload,
   WebpackWorkerOutgoingEventsPayload,
 } from './webpack.events';
-import { BUILD_TARGET_TOKEN } from '../webpack/webpack-config';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
