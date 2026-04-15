@@ -25,9 +25,6 @@ export const sharedProviders = [
         });
         tramvaiHooks['app:rendered'].tap('application-health', () => {
           log.info({ event: 'app:rendered' });
-          if (!applicationRenderFinished) {
-            applicationRenderFinished = true;
-          }
         });
         tramvaiHooks['react:render'].tap('application-health', () => {
           log.info({ event: 'react:render' });
@@ -38,7 +35,7 @@ export const sharedProviders = [
         });
 
         tramvaiHooks['app:render-failed'].tap('application-health', (_, { error }) => {
-          log.error({ event: 'app:initialized', error });
+          log.error({ event: 'app:render-failed', error });
         });
         tramvaiHooks['react:error'].tap(
           'application-health',
