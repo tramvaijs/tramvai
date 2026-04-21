@@ -62,6 +62,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Response: ok
         Error: Failed Fast Deferred
         Error: Failed Deferred
+        XSS safe: </script><script>alert("xss")</script>
         Error: Deferred Action Abort
         this Footer in render-to-stream"
       `);
