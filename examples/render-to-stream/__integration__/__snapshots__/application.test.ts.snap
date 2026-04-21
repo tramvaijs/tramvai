@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`render-to-stream client hydration deferred page 1`] = `
+"Tramvai 🥳
+Main
+Second
+Deferred
+Deferred State
+Non-deferred
+Deferred Foo
+Deferred Bar
+Deferred Baz
+Deferred Page
+Response: ok
+Response: ok
+Error: Failed Fast Deferred
+Error: Failed Deferred
+XSS safe: </script><script>alert("xss")</script>
+Error: Deferred Action Abort
+this Footer in render-to-stream"
+`;
+
 exports[`render-to-stream server-side rendering deferred page 1`] = `
 "
       
@@ -33,6 +53,11 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
       
       
       Loading long error...
+      
+      
+        XSS safe:
+        &lt;/script&gt;&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;
+      
       
       Loading aborted error...
       

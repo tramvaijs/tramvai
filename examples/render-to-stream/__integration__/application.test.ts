@@ -94,6 +94,33 @@ describe('render-to-stream', () => {
           done();
         });
     });
+
+    // eslint-disable-next-line jest/no-done-callback
+    it('deferred page escapes dangerous sequences in inline scripts (XSS prevention)', (done) => {
+      const stream = new WritableBuffer();
+
+      app
+        .request('/deferred/')
+        .expect(200)
+        .pipe(stream)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .on('finish', (error: any) => {
+          if (error) {
+            return done(error);
+          }
+
+          const html = stream.getChunks().join('');
+
+          // The xssDeferred action returns { data: '</script><script>alert("xss")</script>' }
+          // Verify that the dangerous </script> sequence is escaped with \u003C
+          expect(html).toContain('xssDeferred');
+          expect(html).toContain('\\u003C/script>\\u003Cscript>alert(\\"xss\\")\\u003C/script>');
+          // Verify that the raw dangerous payload is NOT present in any inline script
+          expect(html).not.toContain('</script><script>alert("xss")</script>');
+
+          done();
+        });
+    });
   });
 
   describe('server-side rendering', () => {
@@ -149,25 +176,9 @@ describe('render-to-stream', () => {
 
       const { page } = await getPageWrapper(`${app.serverUrl}/deferred/`);
 
-      expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
-        .toMatchInlineSnapshot(`
-        "Tramvai 🥳
-        Main
-        Second
-        Deferred
-        Deferred State
-        Non-deferred
-        Deferred Foo
-        Deferred Bar
-        Deferred Baz
-        Deferred Page
-        Response: ok
-        Response: ok
-        Error: Failed Fast Deferred
-        Error: Failed Deferred
-        Error: Deferred Action Abort
-        this Footer in render-to-stream"
-      `);
+      expect(
+        await page.$eval('.application', (node) => (node as HTMLElement).innerText)
+      ).toMatchSnapshot();
 
       await browser.close();
     });
