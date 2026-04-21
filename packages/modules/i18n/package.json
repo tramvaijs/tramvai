@@ -29,7 +29,7 @@
   },
   "peerDependencies": {
     "@tinkoff/dippy": "^1.0.0",
-    "@tinkoff/logger": "^0.10.507",
+    "@tinkoff/logger": "^0.10.518",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",
