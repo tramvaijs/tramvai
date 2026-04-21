@@ -3232,7 +3232,7 @@ export default Cmp;`,
               test
                 .expect(runtimeCode)
                 .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [2,0,10,516]'
+                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [2,0,10,518]'
                 );
             });
 
@@ -3249,7 +3249,7 @@ export default Cmp;`,
               test
                 .expect(serverCode)
                 .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [2,0,10,516]'
+                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [2,0,10,518]'
                 );
             });
 
