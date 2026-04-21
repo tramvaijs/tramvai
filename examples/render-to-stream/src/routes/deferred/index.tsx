@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment, react/no-unstable-nested-components */
 import { declareAction } from '@tramvai/core';
 import { Await } from '@tramvai/module-common';
 import type { PageComponent } from '@tramvai/react';
@@ -34,6 +35,13 @@ const failedDeferredAction = declareAction({
   async fn() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     throw new Error('Failed Deferred');
+  },
+  deferred: true,
+});
+const xssDeferredAction = declareAction({
+  name: 'xssDeferred',
+  async fn() {
+    return { data: '</script><script>alert("xss")</script>' };
   },
   deferred: true,
 });
@@ -87,6 +95,13 @@ export const DeferredPage: PageComponent = () => {
           }}
         </Await>
       </Suspense>
+      <Suspense fallback={<div>Loading xss...</div>}>
+        <Await action={xssDeferredAction}>
+          {(data) => {
+            return <div>XSS safe: {data.data}</div>;
+          }}
+        </Await>
+      </Suspense>
       <Suspense fallback={<div>Loading aborted error...</div>}>
         <Await
           action={abortedDeferredAction}
@@ -108,6 +123,7 @@ DeferredPage.actions = [
   fastDeferredAction,
   failedFastDeferredAction,
   failedDeferredAction,
+  xssDeferredAction,
   abortedDeferredAction,
 ];
 
