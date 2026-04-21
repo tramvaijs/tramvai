@@ -757,6 +757,28 @@ describe('router/browser-spa', () => {
         expect(mockAfterNavigateHook).not.toHaveBeenCalled();
       });
 
+      it('cancel navigation if method called in guard without argument', async () => {
+        const gurad = jest.fn().mockImplementationOnce(async (navigation) => {
+          router.cancel();
+        });
+        const mockBeforeNavigateHook = jest.fn();
+        const mockChangeHook = jest.fn();
+        const mockAfterNavigateHook = jest.fn();
+
+        router.registerGuard(gurad);
+        router.registerHook('beforeNavigate', mockBeforeNavigateHook);
+        router.registerSyncHook('change', mockChangeHook);
+        router.registerHook('afterNavigate', mockAfterNavigateHook);
+
+        await router.navigate('/child1/');
+
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
+        expect(router.isNavigating()).toBe(false);
+        expect(mockBeforeNavigateHook).not.toHaveBeenCalled();
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterNavigateHook).not.toHaveBeenCalled();
+      });
+
       it('dont cancel navigation if method called in change hook', async () => {
         const mockChangeHook = jest.fn();
         const mockAfterNavigateHook = jest.fn();
@@ -777,6 +799,27 @@ describe('router/browser-spa', () => {
       it('cancel navigation if method called in beforeUpdateCurrent hook', async () => {
         const hook = jest.fn().mockImplementationOnce(async (navigation) => {
           router.cancel(navigation);
+        });
+
+        const mockChangeHook = jest.fn();
+        const mockAfterUpdateHook = jest.fn();
+
+        router.registerHook('beforeUpdateCurrent', hook);
+        router.registerSyncHook('change', mockChangeHook);
+        router.registerHook('afterUpdateCurrent', mockAfterUpdateHook);
+
+        await router.updateCurrentRoute({ query: { foo: 'bar' } });
+
+        expect(router.getCurrentRoute()).toMatchObject({ name: 'root', path: '/' });
+        expect(router.getCurrentUrl()).toMatchObject({ query: {} });
+        expect(router.isNavigating()).toBe(false);
+        expect(mockChangeHook).not.toHaveBeenCalled();
+        expect(mockAfterUpdateHook).not.toHaveBeenCalled();
+      });
+
+      it('cancel navigation if method called in beforeUpdateCurrent hook without argument', async () => {
+        const hook = jest.fn().mockImplementationOnce(async (navigation) => {
+          router.cancel();
         });
 
         const mockChangeHook = jest.fn();

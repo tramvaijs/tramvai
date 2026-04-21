@@ -326,6 +326,8 @@ export class Router extends ClientRouter {
   }
 
   cancel(navigation?: Navigation) {
+    let result: Navigation | void;
+
     logger.debug({
       event: 'cancel',
       navigation: navigation ?? this.currentNavigation,
@@ -333,12 +335,17 @@ export class Router extends ClientRouter {
 
     if (navigation) {
       navigation.skipped = true;
+      result = navigation;
     }
 
-    if (!navigation || navigation === this.currentNavigation) {
+    if (this.currentNavigation && (!navigation || navigation === this.currentNavigation)) {
+      result = this.currentNavigation;
+
       this.currentNavigation.skipped = true;
       this.currentNavigation = null;
     }
+
+    return result;
   }
 
   private async _flatten(nav: Navigation) {
