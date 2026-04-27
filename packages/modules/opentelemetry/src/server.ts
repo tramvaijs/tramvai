@@ -154,8 +154,7 @@ export * from './tokens';
         provider: OPENTELEMETRY_PROVIDER_TOKEN,
       },
     }),
-    // todo open telemetry debug flag or wrap ConsoleSpanExporter in logger
-    ...(process.env.NODE_ENV === 'development'
+    ...(process.env.TRAMVAI_OPENTELEMETRY_DEBUG === 'true'
       ? [
           provide({
             provide: OPENTELEMETRY_PROVIDER_SPAN_PROCESSOR_TOKEN,

@@ -12,6 +12,7 @@ Tramvai provides a deep integration with [OpenTelemetry](https://opentelemetry.i
 :::warning
 
 Browser OpenTelemetry SDK is not supported yet, because of it limitations:
+
 - experimental status
 - requires `zone.js` dependency
 - minimum 30+ kb gzip to bundle size and some performance overhead
@@ -214,6 +215,10 @@ In a browser context, `spanId` and `traceId` properties is not added to client l
 
 ## Debug and testing
 
-By default, in `development` mode [ConsoleSpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.ConsoleSpanExporter.html) is used, which prints all spans to the console.
+In `development` mode you can enable [ConsoleSpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.ConsoleSpanExporter.html), which prints all spans to the console, if `TRAMVAI_OPENTELEMETRY_DEBUG` environment variable is set to `true`:
+
+```sh
+TRAMVAI_OPENTELEMETRY_DEBUG=true npx tramvai start {appName}
+```
 
 For testing purposes, you can use [InMemorySpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk_trace_base.InMemorySpanExporter.html).
