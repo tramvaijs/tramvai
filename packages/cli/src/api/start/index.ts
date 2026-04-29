@@ -27,8 +27,7 @@ export type Params = WithConfig<{
   analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   benchmark?: boolean;
   withBuildStats?: boolean;
-  // @todo: not working?
-  env?: Record<string, string>;
+  env?: Record<string, string | null>;
   onlyBundles?: string[];
   strictErrorHandle?: boolean;
   fileCache?: boolean;
