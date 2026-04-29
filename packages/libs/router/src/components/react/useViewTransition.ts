@@ -35,8 +35,8 @@ export const useViewTransition = (
       // We are handling forward and back navigations for the same route here
       isTransitioning: [currentPath, nextPath].includes(path),
       types: viewTransition.types,
-      isForward: viewTransition.types.includes(NAVIGATION_TYPE.FORWARD),
-      isBack: viewTransition.types.includes(NAVIGATION_TYPE.BACK),
+      isForward: viewTransition.types?.includes(NAVIGATION_TYPE.FORWARD),
+      isBack: viewTransition.types?.includes(NAVIGATION_TYPE.BACK),
     };
   }
 

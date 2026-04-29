@@ -102,6 +102,21 @@ export abstract class AbstractRouter {
       NavigationRoute | undefined
     >;
     'router:resolve-url': SyncTapableHookInstance<NavigateOptions, Url>;
+    'router:resolve-view-transition': SyncTapableHookInstance<
+      {
+        navigation: Navigation;
+        from: string;
+        to: string;
+        previousViewTransition: {
+          viewTransition: boolean;
+          viewTransitionTypes?: string[];
+        };
+      },
+      {
+        viewTransition?: boolean;
+        viewTransitionTypes?: string[];
+      } | null
+    >;
   };
 
   public readonly navigateHook: AsyncTapableHookInstance<{
@@ -229,6 +244,9 @@ export abstract class AbstractRouter {
     this.internalHooks = {
       'router:resolve-route': this.hooksFactory.createSync('router:resolve-route'),
       'router:resolve-url': this.hooksFactory.createSync('router:resolve-url'),
+      'router:resolve-view-transition': this.hooksFactory.createSync(
+        'router:resolve-view-transition'
+      ),
     };
 
     this.internalHooks['router:resolve-route'].tap('router', (_, args) => {
@@ -236,6 +254,9 @@ export abstract class AbstractRouter {
     });
     this.internalHooks['router:resolve-url'].tap('router', (_, navigation) => {
       return this._resolveUrl(navigation);
+    });
+    this.internalHooks['router:resolve-view-transition'].tap('router', (_, params) => {
+      return this._resolveViewTransition(params);
     });
 
     this.plugins.forEach((plugin) => {
@@ -266,6 +287,27 @@ export abstract class AbstractRouter {
   getCurrentUrl() {
     // same as getCurrentRoute
     return this.currentNavigation?.url ?? this.lastNavigation?.url;
+  }
+
+  getCurrentViewTransition() {
+    const currentNavigation = this.currentNavigation ?? this.lastNavigation;
+
+    if (!currentNavigation || !('viewTransition' in currentNavigation)) {
+      return null;
+    }
+
+    const viewTransition: {
+      viewTransition: boolean;
+      viewTransitionTypes?: string[];
+    } = {
+      viewTransition: currentNavigation.viewTransition,
+    };
+
+    if ('viewTransitionTypes' in currentNavigation) {
+      viewTransition.viewTransitionTypes = currentNavigation.viewTransitionTypes;
+    }
+
+    return viewTransition;
   }
 
   getLastRoute() {
@@ -722,5 +764,17 @@ export abstract class AbstractRouter {
       params: { ...route.params, ...params },
       navigateState,
     };
+  }
+
+  protected _resolveViewTransition(params: {
+    navigation: Navigation;
+    from: string;
+    to: string;
+    previousViewTransition: {
+      viewTransition: boolean;
+      viewTransitionTypes?: string[];
+    };
+  }) {
+    return null;
   }
 }

@@ -6,7 +6,7 @@ import { RouteTree } from '../tree/tree';
 import { NAVIGATION_TYPE } from './constants';
 
 const DELAY_CHECK_INTERVAL = 50;
-const APPLIED_VIEW_TRANSITIONS_KEY = '_t_view_transitions';
+const APPLIED_VIEW_TRANSITIONS_KEY = '_t_view_transitions_v2';
 
 type NavigationTypeKeys = keyof typeof NAVIGATION_TYPE;
 type NavigationType = (typeof NAVIGATION_TYPE)[NavigationTypeKeys];
@@ -18,7 +18,13 @@ export class Router extends ClientRouter {
   protected delayedReject: (error: Error) => void;
 
   // Store applied view transitions, so we can apply them on back navigations
-  private appliedViewTransitions: Map<number, string>;
+  private appliedViewTransitions: Map<
+    number,
+    {
+      path: string;
+      viewTransitionTypes?: string[];
+    }
+  >;
 
   constructor(options: Options) {
     super(options);
@@ -51,6 +57,7 @@ export class Router extends ClientRouter {
     }
   }
 
+  // eslint-disable-next-line max-statements
   protected async run(navigation: Navigation) {
     // if navigation was cancelled before, do not run it
     if (navigation.skipped) {
@@ -68,20 +75,51 @@ export class Router extends ClientRouter {
         : navigation.to?.actualPath) ?? '';
     const from = navigation.from?.actualPath ?? '';
 
-    if (this.viewTransitionsEnabled && to !== from && !navigation.hasUAVisualTransition) {
-      navigation.viewTransition = this.shouldApplyViewTransition(navigation, to);
-      const hasNavigationType =
-        !!navigation.viewTransitionTypes &&
-        navigation.viewTransitionTypes.some((type) =>
-          Object.values(NAVIGATION_TYPE).includes(type as NavigationType)
-        );
-      // add a navigation type only if it has not been provided
-      if (navigation.viewTransition && !hasNavigationType) {
-        const navigationType = this.getNavigationType(navigation);
-        // add a navigation type to transition types
-        navigation.viewTransitionTypes = navigation.viewTransitionTypes
-          ? [...(navigation.viewTransitionTypes ?? []), navigationType]
-          : [navigationType];
+    if (this.viewTransitionsEnabled) {
+      const prevTransitionByIndex = this.getPrevTransition(navigation, to);
+      const previousViewTransition = prevTransitionByIndex
+        ? {
+            viewTransition: true,
+            viewTransitionTypes:
+              prevTransitionByIndex && prevTransitionByIndex?.viewTransitionTypes,
+          }
+        : {
+            viewTransition: false,
+          };
+
+      const viewTransition = this.internalHooks['router:resolve-view-transition'].call({
+        navigation,
+        from,
+        to,
+        previousViewTransition,
+      });
+
+      logger.debug({
+        event: 'view-transition.resolved',
+        navigation,
+        viewTransition,
+        previousViewTransition,
+      });
+
+      if (viewTransition) {
+        navigation.viewTransition = viewTransition.viewTransition;
+        navigation.viewTransitionTypes = viewTransition.viewTransitionTypes;
+      }
+
+      const historyState = this.history.getCurrentState();
+
+      // sync applied view transitions
+      if (!navigation.history && historyState) {
+        if (navigation.viewTransition) {
+          // add transition except history navigations with VT enabled
+          this.appliedViewTransitions.set(historyState.index, {
+            path: from,
+            viewTransitionTypes: navigation.viewTransitionTypes,
+          });
+          // if we have forward navigation without VT enabled and stored val for this index
+        } else if (this.appliedViewTransitions.has(historyState.index)) {
+          this.appliedViewTransitions.delete(historyState.index);
+        }
       }
     }
 
@@ -244,48 +282,88 @@ export class Router extends ClientRouter {
   }
 
   private shouldApplyViewTransition(navigation: Navigation, to: string) {
-    const from = navigation.from?.actualPath ?? '';
-
     const historyState = this.history.getCurrentState();
+
     if (!historyState) {
+      logger.debug({
+        event: 'view-transition.not-applied',
+        message:
+          'View Transition not applied because there is no history state, probably it is the first navigation in app',
+        navigation,
+      });
       return false;
     }
-    const historyIndex = historyState.index;
-    const prevTransitionFrom = this.getPrevTransition(navigation);
+
+    const prevTransitionByIndex = this.getPrevTransition(navigation, to);
 
     // handle back navigation when prev navigation was with VT enabled
-    if (navigation.history && prevTransitionFrom === to) {
+    if (navigation.history && navigation.isBack && !!prevTransitionByIndex) {
+      logger.debug({
+        event: 'view-transition.should-apply',
+        message:
+          'View Transition should be applied for browser back navigation with VT enabled on previous navigation',
+        navigation,
+      });
       return true;
     }
 
     if (navigation.viewTransition) {
-      // add transition except history navigations with VT enabled
-      !navigation.history && this.appliedViewTransitions.set(historyIndex, from);
+      logger.debug({
+        event: 'view-transition.should-apply',
+        message: 'View Transition should be applied because it is present on navigation parameters',
+        navigation,
+      });
       return true;
     }
 
     // handle forward navigation
     if (navigation.history && !navigation.isBack) {
       // returns true if prev navigation was with VT enabled
-      return !!prevTransitionFrom;
+      const result = !!prevTransitionByIndex;
+
+      if (result) {
+        logger.debug({
+          event: 'view-transition.should-apply',
+          message:
+            'View Transition should be applied for browser forward navigation because previous navigation was with VT enabled',
+          navigation,
+        });
+      } else {
+        logger.debug({
+          event: 'view-transition.not-applied',
+          message:
+            'View Transition not applied for browser forward navigation because previous navigation was without VT',
+          navigation,
+        });
+      }
+
+      return result;
     }
 
-    // if we have forward navigation without VT enabled and stored val for this index
-    if (!navigation.history && this.appliedViewTransitions.has(historyIndex)) {
-      this.appliedViewTransitions.delete(historyIndex);
-    }
+    logger.debug({
+      event: 'view-transition.not-applied',
+      navigation,
+    });
 
     return false;
   }
 
-  private getPrevTransition(navigation: Navigation) {
+  private getPrevTransition(navigation: Navigation, target: string) {
     const historyState = this.history.getCurrentState();
     if (!historyState) {
       return false;
     }
+    const isBrowserBackNavigation = navigation.history && navigation.isBack;
     const historyIndex = historyState.index;
-    const index = navigation.history && navigation.isBack ? historyIndex : historyIndex - 1;
-    return this.appliedViewTransitions.get(index);
+    const index = isBrowserBackNavigation ? historyIndex : historyIndex - 1;
+    const result = this.appliedViewTransitions.get(index);
+
+    if (result) {
+      // can't be sure, but this check looks like replace state protection,
+      // when we save a different route on the same index
+      return result && result.path === target ? result : false;
+    }
+    return false;
   }
 
   private restoreAppliedViewTransitions() {
@@ -298,7 +376,7 @@ export class Router extends ClientRouter {
         this.appliedViewTransitions = new Map(
           Object.entries(parsedValue).map(([key, value]) => [
             Number.parseInt(key, 10),
-            value as string,
+            value as { path: string },
           ])
         );
 
@@ -365,5 +443,59 @@ export class Router extends ClientRouter {
 
       return this._flatten(delayedNavigation);
     }
+  }
+
+  _resolveViewTransition({
+    navigation,
+    from,
+    to,
+  }: {
+    navigation: Navigation;
+    from: string;
+    to: string;
+  }) {
+    if (!this.viewTransitionsEnabled) {
+      return null;
+    }
+    if (to === from) {
+      logger.debug({
+        event: 'view-transition.disabled',
+        message: 'View Transition is disabled for same route navigation',
+        navigation,
+      });
+      return null;
+    }
+    if (navigation.hasUAVisualTransition) {
+      logger.debug({
+        event: 'view-transition.disabled',
+        message: 'View Transition is disabled because another View Transition is already running',
+        navigation,
+      });
+      return null;
+    }
+
+    const result: {
+      viewTransition?: boolean;
+      viewTransitionTypes?: string[];
+    } = {};
+
+    result.viewTransition = this.shouldApplyViewTransition(navigation, to);
+
+    const hasNavigationType =
+      !!navigation.viewTransitionTypes &&
+      navigation.viewTransitionTypes.some((type) =>
+        Object.values(NAVIGATION_TYPE).includes(type as NavigationType)
+      );
+
+    // add a navigation type only if it has not been provided
+    if (result.viewTransition && !hasNavigationType) {
+      const navigationType = this.getNavigationType(navigation);
+      // add a navigation type to transition types
+      result.viewTransitionTypes = navigation.viewTransitionTypes
+        ? [...(navigation.viewTransitionTypes ?? []), navigationType]
+        : [navigationType];
+    }
+
+    return result;
   }
 }

@@ -41,7 +41,6 @@ const generatePreviousNavigateState = (
     if (previousRoute) {
       state.previousRoute = previousRoute;
     }
-
     if (previousUrl) {
       state.previousUrl = previousUrl;
     }
@@ -52,7 +51,6 @@ const generatePreviousNavigateState = (
   if (navigation.from) {
     state.previousRoute = navigation.from;
   }
-
   if (navigation.fromUrl) {
     state.previousUrl = navigation.fromUrl;
   }
@@ -143,7 +141,7 @@ export class ClientHistory extends History {
             navigateState = state.navigateState;
 
             if (key !== prevKey) {
-              navigateState = 'navigate';
+              navigationType = 'navigate';
             } else {
               if (this.backNavigationWithinRouteType === BackNavigationType.PREFER_UPDATE) {
                 if (type === 'updateCurrentRoute' || prevType === 'updateCurrentRoute') {
