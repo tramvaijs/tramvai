@@ -60,6 +60,7 @@ Do not confuse with [Router Hooks](03-features/07-routing/05-hooks-and-guards.md
 :::
 
 Router provides a set of tapable hooks which can be useful for monitoring:
+
 - `Router.hooks.beforeResolve`
 - `Router.hooks.beforeNavigate`
 - `Router.hooks.afterNavigate`
@@ -74,6 +75,9 @@ Router provides a set of tapable hooks which can be useful for monitoring:
 - `Router.redirectHook`
 - `Router.notfoundHook`
 - `Router.blockHook`
+- `Router.internalHooks.router:resolve-route`
+- `Router.internalHooks.router:resolve-url`
+- `Router.internalHooks.router:resolve-view-transition`
 
 ### Navigation hooks
 
@@ -96,7 +100,7 @@ Visualized route update hooks flow:
 First, you need to create a Router Plugin and provide it with `ROUTER_PLUGIN` token:
 
 ```ts
-import { COMMAND_LINE_RUNNROUTER_PLUGINER_PLUGIN } from '@tramvai/tokens-router';
+import { ROUTER_PLUGIN } from '@tramvai/tokens-router';
 
 const provider = provide({
   provide: ROUTER_PLUGIN,
@@ -113,7 +117,7 @@ Method `apply` will be called right in the end of Router initialization.
 Then, you can use hooks, for example to monitor navigation execution:
 
 ```ts
-import { COMMAND_LINE_RUNNROUTER_PLUGINER_PLUGIN } from '@tramvai/tokens-router';
+import { ROUTER_PLUGIN } from '@tramvai/tokens-router';
 
 const provider = provide({
   provide: ROUTER_PLUGIN,

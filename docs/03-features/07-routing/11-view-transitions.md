@@ -216,6 +216,8 @@ We recommend to see at this [article](https://developer.chrome.com/docs/web-plat
 
 You can assign one or more types to an active view transition. For example, when transitioning to a higher page in a pagination sequence use the forwards type and when going to a lower page use the backwards type.
 
+By default, Tramvai automatically adds `tramvai_vt_forward` or `tramvai_vt_back` type to the transition, depending on the navigation direction. For programmatic navigations, you can specify types via `viewTransitionTypes` parameter (it will be merged with the default one):
+
 ```tsx
 import { useViewTransition, Link } from '@tinkoff/router';
 
@@ -286,6 +288,77 @@ For View transition types functionality:
 
 But it is safe to use it anywhere, no polyfill required.
 
+## How-to
+
+### How-to customize view transition for browser back/forward buttons
+
+By default, for browser back/forward navigations, Tramvai enables view transition, if previous navigation had view transition enabled. But if you want to disable or overwrite it for browser back/forward navigations, you can use router hook `router:resolve-view-transition`:
+
+```ts
+import { ROUTER_PLUGIN } from '@tramvai/tokens-router';
+
+const providers = provide({
+  provide: ROUTER_PLUGIN,
+  useFactory: ({}) => {
+    return {
+      apply(router) {
+        router.internalHooks['router:resolve-view-transition'].tap(
+          'supreme',
+          ({}, params, viewTransition) => {
+            const { navigation, previousViewTransition } = params;
+            const currentViewTransition = router.getCurrentViewTransition();
+
+            // current navigation view transition state and types (how we want to get to the next page)
+            navigation.viewTransition;
+            navigation.viewTransitionTypes;
+
+            // last navigation view transition state and types (how we get to current page)
+            currentViewTransition.viewTransition;
+            currentViewTransition.viewTransitionTypes;
+
+            // for browser back/forward navigations, previous page view transition state and types (how we get to previous page in the past)
+            previousViewTransition.viewTransition;
+            previousViewTransition.viewTransitionTypes;
+
+            // disable view transition for all browser back navigations,
+            // navigation.history is `true` for browser back/forward buttons navigations (or swipes)
+            if (navigation.history && navigation.isBack) {
+              return {
+                viewTransition: false,
+              };
+            }
+
+            // default resolved view transition state
+            return viewTransition;
+          }
+        );
+      },
+    };
+  },
+  deps: {},
+});
+```
+
 ## Explanation
+
+### View transition for browser back/forward buttons
+
+When a user presses the browser's back or forward button (or uses swipe gestures), Tramvai needs to decide whether a view transition should be applied, because there is no explicit `viewTransition: true` parameter — unlike programmatic navigations via `Link` or `useNavigate`.
+
+The router saves applied transitions in `sessionStorage` by navigation index (you can find current index in `window.history.state`) to remember which navigations had view transitions enabled. Here is the algorithm used for resolving view transition state for browser back/forward navigations:
+
+1. **No history state** — if there is no history state (e.g. first navigation in the app), view transition is **not applied**.
+
+2. **Browser back navigation** — the router looks up the stored view transition entry at the **current** history index. If the entry exists and its stored path matches the current navigation target, view transition **is applied**. This means: if you navigated forward to a page with `viewTransition: true`, pressing back will also use a view transition.
+
+3. **Explicit `viewTransition` on navigation** — if the navigation already has `viewTransition: true` (e.g. passed via `router.navigate({ url, viewTransition: true })`), view transition **is applied**. The router also saves the current path and transition types into the map at the current history index, so future back navigations to this page will also use view transitions. History-triggered navigations (back/forward) do not save to the map to avoid corrupting the stored state.
+
+4. **Browser forward navigation** — the router looks up the stored view transition entry at `historyIndex - 1`. If the entry exists and its stored path matches the navigation target, view transition **is applied**. This means: if you navigated forward with view transition, then navigated back from this page, pressing forward will replay the view transition.
+
+5. **Programmatic forward navigation without `viewTransition`** — if there is a stored entry at the current history index (from a previous navigation that had view transition), the entry is **removed** to keep the map clean. View transition is **not applied**.
+
+In all cases, the router also automatically adds a navigation type (`tramvai_vt_forward` or `tramvai_vt_back`) to the `viewTransitionTypes` array, unless one was already provided.
+
+### Diagram
 
 Here you can see a diagram explains how does the react provider work: ![Diagram](/img/router/view-transitions.svg)

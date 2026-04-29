@@ -2174,5 +2174,191 @@ describe('router/browser-spa', () => {
         })
       );
     });
+
+    it('should not enable view transition when hasUAVisualTransition is true', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({
+        url: '/child1/',
+        viewTransition: true,
+        hasUAVisualTransition: true,
+      });
+
+      expect(mockChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
+        })
+      );
+      expect(mockChange).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          viewTransition: true,
+        })
+      );
+    });
+
+    it('should expose getCurrentViewTransition with current navigation state', async () => {
+      expect(router.getCurrentViewTransition()).toBeNull();
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+
+      const vt = router.getCurrentViewTransition();
+
+      expect(vt).toEqual({
+        viewTransition: true,
+        viewTransitionTypes: ['tramvai_vt_forward'],
+      });
+    });
+
+    it('should return null from getCurrentViewTransition when no view transition was used', async () => {
+      await router.navigate({ url: '/child1/' });
+
+      const vt = router.getCurrentViewTransition();
+
+      expect(vt).toEqual({
+        viewTransition: false,
+      });
+    });
+
+    it('should allow router:resolve-view-transition hook to add custom types', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      router.internalHooks['router:resolve-view-transition'].tap(
+        'my-plugin',
+        // eslint-disable-next-line no-empty-pattern
+        ({}, _params, viewTransition) => {
+          return {
+            ...viewTransition,
+            viewTransitionTypes: [...(viewTransition?.viewTransitionTypes ?? []), 'custom-type'],
+          };
+        }
+      );
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+
+      expect(mockChange).toHaveBeenCalledWith(
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
+          viewTransition: true,
+          viewTransitionTypes: ['tramvai_vt_forward', 'custom-type'],
+        })
+      );
+    });
+
+    it('should allow router:resolve-view-transition hook to conditionally disable back navigation view transition', async () => {
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      router.internalHooks['router:resolve-view-transition'].tap(
+        'my-plugin',
+        // eslint-disable-next-line no-empty-pattern
+        ({}, params, viewTransition) => {
+          const { navigation } = params;
+
+          // disable view transition for back navigations
+          if (navigation.history && navigation.isBack) {
+            return {
+              viewTransition: false,
+            };
+          }
+
+          return viewTransition;
+        }
+      );
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+      await router.back();
+
+      expect(mockChange).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/child1/' }),
+          viewTransition: true,
+        })
+      );
+      expect(mockChange).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          to: expect.objectContaining({ actualPath: '/' }),
+          viewTransition: false,
+        })
+      );
+    });
+
+    it('should provide previousViewTransition in router:resolve-view-transition hook', async () => {
+      const hookSpy = jest.fn();
+
+      router.internalHooks['router:resolve-view-transition'].tap(
+        'my-plugin',
+        // eslint-disable-next-line no-empty-pattern
+        ({}, params, viewTransition) => {
+          hookSpy(params.previousViewTransition);
+          return viewTransition;
+        }
+      );
+
+      // Navigate without explicit types
+      await router.navigate({ url: '/child1/', viewTransition: true });
+      await router.back();
+
+      expect(hookSpy).toHaveBeenNthCalledWith(1, { viewTransition: false });
+      expect(hookSpy).toHaveBeenNthCalledWith(2, {
+        viewTransition: true,
+        viewTransitionTypes: ['tramvai_vt_forward'],
+      });
+
+      // Navigate forward again, then with explicit custom types to child2
+      await router.forward();
+      await router.navigate({
+        url: '/child2/',
+        viewTransition: true,
+        viewTransitionTypes: ['custom-slide'],
+      });
+      await router.back();
+
+      // Back navigation: previous VT exists with explicit types preserved
+      expect(hookSpy).toHaveBeenLastCalledWith({
+        viewTransition: true,
+        viewTransitionTypes: ['custom-slide', 'tramvai_vt_forward'],
+      });
+    });
+
+    it('should not apply view transition when viewTransitions are disabled', async () => {
+      router?.unsubscribe();
+
+      router = new Router({
+        routes,
+        enableViewTransitions: false,
+      });
+
+      mockPush.mockClear();
+      mockReplace.mockClear();
+      window.history.replaceState({}, '', '/');
+      window.location.href = 'http://localhost/';
+
+      await router.rehydrate({
+        type: 'navigate',
+        to: { name: 'root', path: '/', actualPath: '/', params: {} },
+        url: parse('http://localhost/'),
+      });
+
+      await router.start();
+
+      const mockChange = jest.fn();
+
+      router.registerSyncHook('change', mockChange);
+
+      await router.navigate({ url: '/child1/', viewTransition: true });
+
+      expect(mockChange).toHaveBeenCalledWith(
+        expect.not.objectContaining({
+          viewTransition: true,
+        })
+      );
+    });
   });
 });
