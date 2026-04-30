@@ -115,7 +115,13 @@ it('test', async () => {
 
 ### Router
 
-Creates mock instance for `@tinkoff/router`
+Creates mock instance for `@tinkoff/router` with full history support.
+
+**Features:**
+
+- Full history stack with `back()`, `forward()`, `go()` navigation
+- Proper redirect handling (redirect is part of single navigation)
+- Query and hash change support
 
 ```ts
 import { createMockRouter } from '@tramvai/test-mocks';
@@ -133,6 +139,29 @@ describe('test', () => {
 
     expect(router.getCurrentRoute()).toMatchObject({ path: '/page/test/' });
     expect(router.getCurrentUrl()).toMatchObject({ path: '/page/test/' });
+  });
+
+  it('should support history navigation', async () => {
+    const router = createMockRouter();
+
+    await router.navigate('/page1');
+    await router.navigate('/page2');
+
+    await router.back();
+    expect(router.getCurrentRoute()).toMatchObject({ path: '/page1' });
+
+    await router.forward();
+    expect(router.getCurrentRoute()).toMatchObject({ path: '/page2' });
+  });
+
+  it('should handle static redirect configuration', async () => {
+    const router = createMockRouter({
+      currentRoute: { name: 'redirected', path: '/new-page', redirect: '/new-page' } as any,
+    });
+
+    await router.navigate('/old-page');
+
+    expect(router.getCurrentRoute()).toMatchObject({ path: '/new-page' });
   });
 });
 ```
