@@ -1,5 +1,5 @@
-import { createApp, provide } from '@tramvai/core';
-import type { ActionCondition } from '@tramvai/module-common';
+import { createApp, provide, Scope } from '@tramvai/core';
+import type { ActionCondition, LoggerFactory } from '@tramvai/module-common';
 import {
   ACTION_CONDITIONALS,
   COMBINE_REDUCERS,
@@ -9,6 +9,7 @@ import {
   ENV_USED_TOKEN,
   STORE_TOKEN,
 } from '@tramvai/module-common';
+import { RemoteReporter } from '@tinkoff/logger';
 import type { REACT_SERVER_RENDER_MODE } from '@tramvai/module-render';
 import { RenderModule } from '@tramvai/module-render';
 import { PAGE_SERVICE_TOKEN, ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
@@ -52,6 +53,13 @@ const {
   CHILD_APP_PRELOAD_MANAGER_PLUGIN,
   CHILD_APP_CONFIG_RESOLUTION_PLUGIN,
 } = require('@tramvai/module-child-app');
+const { LOGGER_REMOTE_REPORTER, LOGGER_INIT_HOOK } = require('@tramvai/module-common');
+
+declare global {
+  interface Window {
+    events: any[];
+  }
+}
 
 declare module '@tramvai/module-child-app' {
   export interface TypedContractsProvided {
@@ -86,6 +94,7 @@ createApp({
     monitoring: () => import(/* webpackChunkName: "monitoring" */ './bundles/monitoring'),
     redirect: () => import(/* webpackChunkName: "redirect" */ './bundles/redirect'),
     'not-found': () => import(/* webpackChunkName: "not-found" */ './bundles/not-found'),
+    logging: () => import(/* webpackChunkName: "logging" */ './bundles/logging'),
   },
   modules: [
     CommonModule,
@@ -99,6 +108,54 @@ createApp({
     MockerModule,
   ],
   providers: [
+    ...(LOGGER_INIT_HOOK
+      ? [
+          provide({
+            multi: true,
+            scope: Scope.SINGLETON,
+            provide: LOGGER_INIT_HOOK,
+            useFactory: () => {
+              return (loggerInstance: LoggerFactory) => {
+                loggerInstance.addExtension({
+                  extend(logObj) {
+                    return {
+                      ...logObj,
+                      from: 'root-app',
+                    };
+                  },
+                });
+              };
+            },
+          }),
+        ]
+      : []),
+
+    ...(LOGGER_REMOTE_REPORTER
+      ? [
+          provide({
+            provide: LOGGER_REMOTE_REPORTER,
+            useFactory: () => {
+              return new RemoteReporter({
+                requestCount: Infinity,
+                emitLevels: { error: true, fatal: true, info: true },
+                makeRequest(logObj) {
+                  if (typeof window !== 'undefined') {
+                    if (Array.isArray(window.events)) {
+                      window.events.push(logObj);
+                    } else {
+                      window.events = [logObj];
+                    }
+                  }
+                  return Promise.resolve();
+                },
+              });
+            },
+            scope: Scope.SINGLETON,
+            deps: {},
+          }),
+        ]
+      : []),
+
     provide({
       provide: ENV_USED_TOKEN,
       multi: true,
@@ -425,6 +482,15 @@ createApp({
         },
         {
           name: 'redirect',
+          byTag: {
+            latest: {
+              version: '0.0.0-stub',
+              withoutCss: true,
+            },
+          },
+        },
+        {
+          name: 'logging',
           byTag: {
             latest: {
               version: '0.0.0-stub',

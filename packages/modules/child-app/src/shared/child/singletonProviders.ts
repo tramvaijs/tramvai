@@ -1,6 +1,8 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import type { Container } from '@tinkoff/dippy';
 import type { Provider } from '@tramvai/core';
+import noop from '@tinkoff/utils/function/noop';
+
 import {
   APP_INFO_TOKEN,
   COMMAND_LINE_RUNNER_PLUGIN,
@@ -26,8 +28,10 @@ import {
   PUBSUB_TOKEN,
   PUBSUB_FACTORY_TOKEN,
   ACTION_EXECUTION_HOOKS_TOKEN,
+  LOGGER_INIT_HOOK,
 } from '@tramvai/tokens-common';
 import { RENDER_SLOTS } from '@tramvai/tokens-render';
+import { loggerFactoryFromInstance } from '@tinkoff/logger';
 import {
   CHILD_APP_ACTIONS_REGISTRY_TOKEN,
   CHILD_APP_INTERNAL_ACTION_TOKEN,
@@ -37,6 +41,7 @@ import {
   CHILD_APP_PAGE_COMPONENTS_TOKEN,
   CHILD_APP_PAGE_SERVICE_TOKEN,
   CHILD_APP_INTERNAL_ROOT_DI_BORROW_TOKEN,
+  ChildAppFinalConfig,
 } from '@tramvai/tokens-child-app';
 import {
   LINK_PREFETCH_MANAGER_TOKEN,
@@ -50,15 +55,38 @@ import { extractorProviders } from './extractorProviders';
 import type { LoadableStats } from '../webpack/moduleFederation';
 import { ChildAppPageService } from '../pageService';
 
-export const getChildProviders = (appDi: Container, loadableStats: LoadableStats): Provider[] => {
+export const getChildProviders = (
+  appDi: Container,
+  loadableStats: LoadableStats,
+  config: ChildAppFinalConfig
+): Provider[] => {
   const logger = appDi.get(LOGGER_TOKEN);
 
   return [
     provide({
+      provide: LOGGER_INIT_HOOK,
+      multi: true,
+      useValue: noop,
+    }),
+    provide({
       provide: LOGGER_TOKEN,
-      useValue: Object.assign((opts: any) => {
-        return logger('child-app').child(opts);
-      }, logger),
+      useFactory: ({ loggerInitHooks }) => {
+        const child = logger({
+          name: 'child-app',
+          key: `child-app-${config.name}-${config.version}`,
+        });
+        const factory = loggerFactoryFromInstance(child);
+        if (loggerInitHooks) {
+          for (const hookFn of loggerInitHooks) {
+            hookFn(factory);
+          }
+        }
+
+        return factory;
+      },
+      deps: {
+        loggerInitHooks: LOGGER_INIT_HOOK,
+      },
     }),
     provide({
       provide: RENDER_SLOTS,

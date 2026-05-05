@@ -223,3 +223,43 @@ To extend the behavior of child-apps throughout their lifecycle:
 3. Register your plugin under the appropriate token with `multi: true`
 
 ---
+
+### Configuring Child App logger
+
+Register a `LOGGER_INIT_HOOK` provider inside the Child App's `providers` array. The hook receives the Child App's logger factory and runs once at Child App initialization, before any logs are produced.
+
+```ts
+import { provide, Scope } from '@tramvai/core';
+import { createChildApp } from '@tramvai/child-app-core';
+import { LOGGER_INIT_HOOK, type LoggerFactory } from '@tramvai/module-common';
+import { Cmp } from './component';
+
+// eslint-disable-next-line import/no-default-export
+export default createChildApp({
+  name: 'base',
+  render: Cmp,
+  modules: [],
+  providers: [
+    provide({
+      provide: LOGGER_INIT_HOOK,
+      multi: true,
+      scope: Scope.SINGLETON,
+      useFactory: () => {
+        return (loggerInstance: LoggerFactory) => {
+          loggerInstance.addExtension({
+            extend(logObj) {
+              return {
+                ...logObj,
+                customField: 'customField',
+              };
+            },
+          });
+          return loggerInstance;
+        };
+      },
+    }),
+  ],
+});
+```
+
+Every log produced by this Child App will then include `customField: 'customField'`. The hook runs only against this Child App's logger — Root App logs and other Child Apps are unaffected.

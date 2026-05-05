@@ -526,6 +526,26 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
     });
   }
 
+  if (rootAppVersion === 'latest') {
+    describe('custom logs from each child app', () => {
+      it('should have custom fields that was created by separate child app loggers', async () => {
+        const { serverUrl } = rootApp;
+        const { page } = await getPageWrapper('/logging/');
+        await page.goto(`${serverUrl}/logging`);
+        const events = await page.evaluate(() => {
+          return window.events;
+        });
+        events.forEach((event) => {
+          if (event.customField) {
+            // message contain child-app name and customField should contain child app name
+            // eslint-disable-next-line jest/no-conditional-expect
+            expect(event.message).toEqual(event.customField);
+          }
+        });
+      });
+    });
+  }
+
   describe('react-query', () => {
     it('should work with react-query', async () => {
       const { request } = rootApp;

@@ -11,6 +11,13 @@ export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
     },
   },
   {
+    name: 'logging',
+    path: '/logging',
+    config: {
+      bundle: 'logging',
+    },
+  },
+  {
     name: 'base',
     path: '/base',
     config: {
