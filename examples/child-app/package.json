@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@tinkoff/dippy": "^1.0.0",
+    "@tinkoff/logger": "^0.10.158",
     "@tinkoff/utils": "^2.2.1",
     "@tramvai/child-app-core": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",

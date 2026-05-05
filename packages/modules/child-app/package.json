@@ -32,6 +32,7 @@
     "@loadable/server": "^5.15.0",
     "@tinkoff/env-validators": "0.0.0-stub",
     "@tinkoff/errors": "0.0.0-stub",
+    "@tinkoff/logger": "^0.10.518",
     "@tinkoff/module-loader-client": "0.0.0-stub",
     "@tinkoff/module-loader-server": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",

@@ -136,7 +136,7 @@ export class SingletonDiManager implements ChildAppDiManager {
       'getLoadableStats' in this.loader ? (this.loader as any).getLoadableStats(config) : undefined;
 
     // add providers on the Singleton Level to make it possible to reuse providers from the root-app Container
-    const childProviders = getChildProviders(this.appDi, statsLoadable);
+    const childProviders = getChildProviders(this.appDi, statsLoadable, config);
 
     childProviders.forEach((provider) => {
       di.register(provider);
