@@ -16,14 +16,18 @@
     "build": "tramvai-build --forPublish --preserveModules",
     "watch": "tsc -w"
   },
+  "dependencies": {
+    "tslib": "^2.4.0"
+  },
   "peerDependencies": {
     "@tinkoff/dippy": "^1.0.0",
+    "@tinkoff/react-hooks": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-router": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
-    "react": ">=16.14.0",
-    "tslib": "^2.4.0"
+    "react": ">=16.14.0"
   },
   "module": "lib/index.es.js",
   "license": "Apache-2.0"
