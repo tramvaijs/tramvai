@@ -21,6 +21,12 @@
         },
         {
             "path": "../../tramvai/react"
+        },
+        {
+            "path": "../../tokens/common"
+        },
+        {
+            "path": "../../libs/react-hooks"
         }
     ]
 }

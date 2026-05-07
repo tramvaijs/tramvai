@@ -30,6 +30,8 @@ createApp({
 
 `behavior: smooth` is not supported by every browser (e.g. doesn't work in Safari). In this case you can use polyfill `smoothscroll-polyfill` that you should add to your app.
 
+Browser scroll restoration is disabled when autoscroll is enabled (`window.history.scrollRestoration = 'manual'`).
+
 ## How to
 
 ### Disable autoscroll for page
@@ -94,6 +96,31 @@ const providers = [
   provide({
     provide: AUTOSCROLL_SCROLL_TOP_TOKEN,
     useValue: -1, // default is 0
+  }),
+];
+```
+
+#### Local
+
+You can also provide a function that will return scroll top value, for example if you save page scroll position in sessionStorage and then want to restore it:
+
+```tsx
+import { AUTOSCROLL_SCROLL_TOP_TOKEN } from '@tramvai/module-autoscroll';
+import { provide } from '@tramvai/core';
+
+const providers = [
+  // ...,
+  provide({
+    provide: AUTOSCROLL_SCROLL_TOP_TOKEN,
+    useValue: () => {
+      try {
+        const savedScrollTop = JSON.parse(sessionStorage.get('scrollTop'));
+        // for example, if you save scroll position by navigation index
+        return savedScrollTop[history.state.index] ?? 0;
+      } catch (e) {
+        return 0;
+      }
+    },
   }),
 ];
 ```

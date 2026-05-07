@@ -1,28 +1,21 @@
-import { useEffect, useRef } from 'react';
-import { useRoute, useUrl } from '@tramvai/module-router';
+import { memo, useMemo, useRef } from 'react';
+import { useRoute, useUrl, useViewTransition } from '@tramvai/module-router';
 import { optional } from '@tinkoff/dippy';
 import { useDi } from '@tramvai/react';
+import { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { useIsomorphicLayoutEffect } from '@tinkoff/react-hooks';
 import { AUTOSCROLL_BEHAVIOR_MODE_TOKEN, AUTOSCROLL_SCROLL_TOP_TOKEN } from '../tokens';
 
 const DEFAULT_AUTOSCROLL_BEHAVIOR = 'smooth';
 const DEFAULT_AUTOSCROLL_SCROLL_TOP = 0;
 
 const scrollToTop = (behavior: ScrollBehavior, top: number) => {
-  // В некоторых браузерах не поддерживается scrollTo с одним параметром
+  // cross-browser `window.scrollTo` parameters
   try {
     window.scrollTo({ top, left: 0, behavior });
   } catch (error) {
     window.scrollTo(0, top);
   }
-};
-
-const isAutoScrollEnabled = (
-  route: ReturnType<typeof useRoute>,
-  prevRoute: ReturnType<typeof useRoute>
-) => {
-  const isDisabled =
-    route.navigateState?.disableAutoscroll || prevRoute.navigateState?.disableAutoscroll;
-  return !isDisabled;
 };
 
 const scrollToAnchor = (anchor: string, behavior: ScrollBehavior): boolean => {
@@ -37,50 +30,66 @@ const scrollToAnchor = (anchor: string, behavior: ScrollBehavior): boolean => {
   }
 };
 
-function usePreviousValue<T>(value: T): T {
-  const prevValueRef = useRef<T>(value);
-
-  /** Сохраняем предыдущее значение */
-  useEffect(() => {
-    prevValueRef.current = value;
-  }, [value]);
-
-  return prevValueRef.current;
-}
-
-// Поведение с подскроллом похоже на
-// https://reacttraining.com/react-router/web/guides/scroll-restoration/scroll-to-top
-
-export function Autoscroll() {
-  const globalScrollBehavior =
-    useDi(optional(AUTOSCROLL_BEHAVIOR_MODE_TOKEN)) || DEFAULT_AUTOSCROLL_BEHAVIOR;
-  const scrollTop = useDi(optional(AUTOSCROLL_SCROLL_TOP_TOKEN)) ?? DEFAULT_AUTOSCROLL_SCROLL_TOP;
+// @reference https://reacttraining.com/react-router/web/guides/scroll-restoration/scroll-to-top
+export const Autoscroll = memo(() => {
   const route = useRoute();
-  const prevRoute = usePreviousValue(route);
   const url = useUrl();
-  const routeRef = useRef(url);
-  const shouldScroll = useRef(!!routeRef.current.hash && isAutoScrollEnabled(route, prevRoute));
+  const { isTransitioning } = useViewTransition(url.pathname);
+  const scrollBehaviorFactory =
+    useDi(optional(AUTOSCROLL_BEHAVIOR_MODE_TOKEN)) ?? DEFAULT_AUTOSCROLL_BEHAVIOR;
+  const scrollTopFactory =
+    useDi(optional(AUTOSCROLL_SCROLL_TOP_TOKEN)) ?? DEFAULT_AUTOSCROLL_SCROLL_TOP;
+  const logger = useDi(LOGGER_TOKEN);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const log = useMemo(() => logger('autoscroll'), []);
+  const previousUrl = useRef(url);
+  const shouldScroll = useRef(false);
 
-  // Так как отрисовка нужного нам элемента происходит после обновления route, при первом срабатывании эффекта мы обновляем shouldScroll, а при втором скроллим
-  useEffect(() => {
-    if (url.pathname !== routeRef.current.pathname || url.hash !== routeRef.current.hash) {
-      routeRef.current = url;
-      shouldScroll.current = isAutoScrollEnabled(route, prevRoute);
+  useIsomorphicLayoutEffect(() => {
+    if (url.pathname !== previousUrl.current.pathname || url.hash !== previousUrl.current.hash) {
+      shouldScroll.current = true;
     }
-
+    // skip unnecessary checks, if url has not changed and shouldScroll.current set to false - we don't need to scroll
     if (!shouldScroll.current) {
       return;
     }
-
-    const scrollBehavior = route?.navigateState?.autoscrollBehavior || globalScrollBehavior;
-
-    if (!url.hash) {
-      scrollToTop(scrollBehavior, scrollTop);
-      shouldScroll.current = false;
-    } else {
-      shouldScroll.current = !scrollToAnchor(url.hash, scrollBehavior);
+    // when VT is enabled, we will have a two re-renderw with `isTransitioning: true` (with current and next url),
+    // and only after that `isTransitioning` will be false and url will be updated to the next one.
+    if (isTransitioning) {
+      return;
     }
-  });
+    // disable autoscroll for current page if `disableAutoscroll` is set in route history state
+    if (route.navigateState?.disableAutoscroll) {
+      previousUrl.current = url;
+      shouldScroll.current = false;
+      log.debug('Skipping autoscroll because "disableAutoscroll" is set in route history state');
+      return;
+    }
+
+    previousUrl.current = url;
+    shouldScroll.current = false;
+
+    const scrollBehavior =
+      route.navigateState?.autoscrollBehavior ??
+      (typeof scrollBehaviorFactory === 'function'
+        ? scrollBehaviorFactory()
+        : scrollBehaviorFactory);
+    const scrollTop =
+      typeof scrollTopFactory === 'function' ? scrollTopFactory() : scrollTopFactory;
+
+    function scroll() {
+      if (!url.hash) {
+        log.debug(`Scrolling to top ${scrollTop}px with behavior: ${scrollBehavior}`);
+        scrollToTop(scrollBehavior, scrollTop);
+      } else {
+        log.debug(`Scrolling to anchor ${url.hash} with behavior: ${scrollBehavior}`);
+        scrollToAnchor(url.hash, scrollBehavior);
+      }
+    }
+
+    scroll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route, url, isTransitioning]);
 
   return null;
-}
+});
