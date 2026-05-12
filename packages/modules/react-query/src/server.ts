@@ -1,5 +1,6 @@
-import { Module, provide } from '@tramvai/core';
+import { commandLineListTokens, Module, provide } from '@tramvai/core';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
+import { commandLineListTokens as childAppCommandLineListTokens } from '@tramvai/tokens-child-app';
 import { dehydrate as queryDehydrate } from '@tanstack/react-query';
 import { safeStringify } from '@tramvai/safe-strings';
 import {
@@ -39,6 +40,29 @@ export * from '@tramvai/tokens-react-query';
       deps: {
         state: QUERY_CLIENT_DEHYDRATED_STATE_TOKEN,
         propKey: QUERY_DEHYDRATE_STATE_NAME_TOKEN,
+      },
+    }),
+    provide({
+      provide: commandLineListTokens.clear,
+      useFactory: ({ queryClient }) => {
+        return function clearQueryClient() {
+          return queryClient.clear();
+        };
+      },
+      deps: {
+        queryClient: QUERY_CLIENT_TOKEN,
+      },
+    }),
+    // this module is used directly in child app, so we need to provide clear command for child app as well
+    provide({
+      provide: childAppCommandLineListTokens.clear,
+      useFactory: ({ queryClient }) => {
+        return function clearQueryClient() {
+          return queryClient.clear();
+        };
+      },
+      deps: {
+        queryClient: QUERY_CLIENT_TOKEN,
       },
     }),
   ],
