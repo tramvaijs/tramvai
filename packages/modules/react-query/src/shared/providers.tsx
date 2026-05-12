@@ -60,6 +60,11 @@ export const sharedQueryProviders: Provider[] = [
         refetchOnMount: false,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
+        // prevent calls for gc clear timeouts, because it lead to memory leaks in long-running applications,
+        // when old microfrontends versions can't be unloaded from memory because of setTimeout references
+        gcTime: typeof window === 'undefined' ? Infinity : 5 * 60 * 1000,
+        // @ts-expect-error - backward compatibility with react-query v4
+        cacheTime: typeof window === 'undefined' ? Infinity : 5 * 60 * 1000,
       },
     },
   }),

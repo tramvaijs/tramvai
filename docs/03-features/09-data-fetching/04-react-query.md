@@ -89,7 +89,15 @@ import { QUERY_CLIENT_DEFAULT_OPTIONS_TOKEN } from '@tramvai/tokens-react-query'
 
 const provider = provide({
   provide: QUERY_CLIENT_DEFAULT_OPTIONS_TOKEN,
-  useValue: {},
+  // tramvai defaults
+  useValue: {
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    // prevent calls for gc clear timeouts, because it lead to memory leaks in long-running applications,
+    // when old microfrontends versions can't be unloaded from memory because of setTimeout references
+    gcTime: typeof window === 'undefined' ? Infinity : 5 * 60 * 1000,
+  },
 });
 ```
 
@@ -648,8 +656,7 @@ As a parameter `key` you can use:
 
 :::note
 
-If you pass parameter `key` as a function, you should pass `actionNamePostfix` to avoid duplicates in the server-client cache
-Also, `this` will be undefined for arrow functions.
+If you pass parameter `key` as a function, you should pass `actionNamePostfix` to avoid duplicates in the server-client cache Also, `this` will be undefined for arrow functions.
 
 :::
 

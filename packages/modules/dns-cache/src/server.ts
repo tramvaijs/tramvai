@@ -11,16 +11,10 @@ import {
   DEFAULT_HTTP_CLIENT_INTERCEPTORS,
   HTTP_CLIENT_AGENT_INTERCEPTORS,
 } from '@tramvai/tokens-http-client';
-import {
-  CREATE_CACHE_TOKEN,
-  Cache,
-  ENV_MANAGER_TOKEN,
-  ENV_USED_TOKEN,
-} from '@tramvai/tokens-common';
+import { CREATE_CACHE_TOKEN, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
 
 type UndiciDnsCacheStorage = Required<Interceptors.DNSInterceptorOpts>['storage'];
 
-const DNS_LOOKUP_LRU_CACHE_TOKEN = createToken<Cache<any>>('dnsLookupLruCache');
 const DNS_CACHEABLE_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsCacheableLookupCache');
 const DNS_UNDICI_LOOKUP_CACHE_TOKEN = createToken<UndiciDnsCacheStorage>('dnsUndiciLookupCache');
 
@@ -120,7 +114,7 @@ export const TramvaiDnsCacheModule = declareModule({
     }),
     provide({
       provide: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
-      useFactory: ({ envManager, cache }) => {
+      useFactory: ({ envManager, cache, cacheHttp }) => {
         const dnsLookupEnabled = envManager.get('DNS_LOOKUP_CACHE_ENABLE') === 'true';
 
         return (req, next) => {
@@ -132,8 +126,11 @@ export const TramvaiDnsCacheModule = declareModule({
 
               if (!isExpectedError) {
                 if (req.baseUrl) {
+                  const key = new URL(req.baseUrl).hostname;
+
                   // clear DNS lookup cache for all unexpected HTTP errors
-                  cache.delete(new URL(req.baseUrl).hostname);
+                  cache.delete(key);
+                  cacheHttp.delete(key);
                 }
               }
               throw e;
@@ -144,29 +141,19 @@ export const TramvaiDnsCacheModule = declareModule({
       },
       deps: {
         envManager: ENV_MANAGER_TOKEN,
-        cache: DNS_LOOKUP_LRU_CACHE_TOKEN,
-      },
-    }),
-    provide({
-      provide: DNS_LOOKUP_LRU_CACHE_TOKEN,
-      scope: Scope.SINGLETON,
-      useFactory: ({ createCache, envManager }) => {
-        const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
-        const dnsTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
-
-        const cache = createCache('memory', { name: 'dns-lookup', max, ttl: dnsTTL });
-
-        return cache;
-      },
-      deps: {
-        createCache: CREATE_CACHE_TOKEN,
-        envManager: ENV_MANAGER_TOKEN,
+        cache: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
+        cacheHttp: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
       },
     }),
     provide({
       provide: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ cache }) => {
+      useFactory: ({ envManager, createCache }) => {
+        const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
+        const dnsTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+
+        const cache = createCache('memory', { name: 'dns-lookup-http', max, ttl: dnsTTL });
+
         const adapter: CacheInstance = {
           set: (hostname: string, entries: any[], ttl: number): any => {
             return cache.set(hostname, entries, { ttl });
@@ -185,13 +172,19 @@ export const TramvaiDnsCacheModule = declareModule({
         return adapter;
       },
       deps: {
-        cache: DNS_LOOKUP_LRU_CACHE_TOKEN,
+        createCache: CREATE_CACHE_TOKEN,
+        envManager: ENV_MANAGER_TOKEN,
       },
     }),
     provide({
       provide: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ cache }) => {
+      useFactory: ({ envManager, createCache }) => {
+        const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
+        const dnsTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+
+        const cache = createCache('memory', { name: 'dns-lookup', max, ttl: dnsTTL });
+
         const adapter: UndiciDnsCacheStorage = {
           set: (hostname: string, records: any, opts: { ttl: number }): void => {
             cache.set(hostname, records, opts);
@@ -213,7 +206,8 @@ export const TramvaiDnsCacheModule = declareModule({
         return adapter;
       },
       deps: {
-        cache: DNS_LOOKUP_LRU_CACHE_TOKEN,
+        createCache: CREATE_CACHE_TOKEN,
+        envManager: ENV_MANAGER_TOKEN,
       },
     }),
     provide({
