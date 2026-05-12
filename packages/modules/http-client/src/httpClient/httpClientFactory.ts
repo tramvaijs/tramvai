@@ -111,9 +111,13 @@ export const httpClientFactory = ({
         defaultOptions ? mergeOptions(defaultOptions, interceptors) : interceptors
       ),
       options
-    ) as TinkoffRequestOptions & { name: string };
+    ) as TinkoffRequestOptions & { name: string; baseUrlEnv?: string };
 
     adapterOptions.headers = {
+      // prevent CORS error when trying to set custom header in browser
+      ...(options.baseUrlEnv && typeof window === 'undefined'
+        ? { 'x-tramvai-service-name': options.baseUrlEnv }
+        : {}),
       ...transformUserAgent({ appInfo, envManager }),
       ...adapterOptions.headers,
     };
@@ -129,6 +133,10 @@ export const httpClientFactory = ({
     // environment variable in priority over disableCircuitBreaker
     if (forceDisabledCircuitBreaker === 'true') {
       adapterOptions.enableCircuitBreaker = !forceDisabledCircuitBreaker;
+    }
+
+    if (options.baseUrlEnv && typeof adapterOptions.baseUrl !== 'string') {
+      adapterOptions.baseUrl = envManager.get(options.baseUrlEnv);
     }
 
     // cache @tinkoff/request instance for performance reason

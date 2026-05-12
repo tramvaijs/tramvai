@@ -8,6 +8,7 @@ title: HTTP Client
 The [@tramvai/module-http-client](references/modules/http-client.md) module adds functionality to the application related to API requests. Available providers allow you to create new services to work with any API and create more specific services with preset settings for specific APIs.
 
 [@tinkoff/request](https://tinkoff.github.io/tinkoff-request/) library is used under the hood, and provides a lot of important functionality:
+
 - [logging](https://tinkoff.github.io/tinkoff-request/docs/plugins/log.html)
 - [caching](https://tinkoff.github.io/tinkoff-request/docs/plugins/cache-memory.html)
 - [requests deduplication](https://tinkoff.github.io/tinkoff-request/docs/plugins/cache-deduplicate.html)
@@ -24,7 +25,6 @@ HTTP client - implementation of the `HttpClient` interface, created via the `HTT
 The API service inherits from the `ApiService` class, which is exported from `@tramvai/http-client`. The API service takes an HTTP client in its constructor and uses it for requests. The API service implements all methods for requests from the `HttpClient` interface, but allows you to modify them. For example, you can replace the implementation of the `request` method by adding an error message to the `catch` request via an HTTP client - this logic will automatically work for all other methods - `get`, `put`, `post`, `delete`. In the API service, you can add custom methods for requests to certain API endpoints, and specify only the necessary parameters in them, and type responses.
 
 Additional reasons to create API services - if you need to use several different HTTP clients to work with a specific API, or you need the ability to add a convenient abstraction on top of the basic methods for sending requests.
-
 
 ## Usage
 
@@ -90,7 +90,10 @@ const provider = provide({
   }) => {
     return factory({
       name: 'whatever-api',
-      baseUrl: envManager.get('WHATEVER_API'),
+      baseUrlEnv: 'WHATEVER_API',
+      // alternative, you can get the baseUrl from envManager and pass it directly,
+      // but in this case, server metrics for outgoing requests can show wrong `service` label
+      // baseUrl: envManager.get('WHATEVER_API'),
     });
   },
   deps: {
@@ -150,7 +153,7 @@ const provider = provide({
   }) => {
     return factory({
       name: 'whatever-api',
-      baseUrl: envManager.get('WHATEVER_API'),
+      baseUrlEnv: 'WHATEVER_API',
       interceptors: [
         (req, next) => {
           return next({
@@ -200,17 +203,17 @@ const action = declareAction({
   name: 'my-action',
   async fn(file: File) {
     const data = await this.deps.myApi.post(
-        '/example/uploadFile',
-        {},
-        // add requestType: 'form' and put your files in the attaches array
-        // Note that there's no need to append files to the FormData, it will be done internally
-        { requestType: 'form', attaches: [file] }
-      );
+      '/example/uploadFile',
+      {},
+      // add requestType: 'form' and put your files in the attaches array
+      // Note that there's no need to append files to the FormData, it will be done internally
+      { requestType: 'form', attaches: [file] }
+    );
 
     return data.payload;
   },
   deps: {
-    myApi: 'WHATEVER_API_SERVICE'
+    myApi: 'WHATEVER_API_SERVICE',
   },
 });
 ```
@@ -226,13 +229,14 @@ To disable caching for all HTTP clients, pass the env variable `HTTP_CLIENT_CACH
 Interceptor example:
 
 ```ts
-const interceptor = (req, next) => next({
-  ...req,
-  headers: {
-    ...req.headers,
-    'X-custom-header': 'intercepted',
-  },
-});
+const interceptor = (req, next) =>
+  next({
+    ...req,
+    headers: {
+      ...req.headers,
+      'X-custom-header': 'intercepted',
+    },
+  });
 ```
 
 ### How to modify response?
@@ -241,11 +245,10 @@ Interceptor example:
 
 ```ts
 const interceptor = (req, next) => {
-  return next(req)
-    .then((res) => ({
-      ...res,
-      payload: `${res.payload}-intercepted`,
-    }));
+  return next(req).then((res) => ({
+    ...res,
+    payload: `${res.payload}-intercepted`,
+  }));
 };
 ```
 
@@ -413,7 +416,9 @@ type HttpClientRequest = {
   url?: string;
   // url of the request, not to be used simultaneously with `url`
   path?: string;
-  // base url, which is added to all queries before the `path` value
+  // resolve base url from this env variable, will be added to all queries before the `path` value
+  baseUrlEnv?: string;
+  // base url, alternative for `baseUrlEnv`, will be added to all queries before the `path` value
   baseUrl?: string;
   // basic HTTP methods are supported - GET, POST, PUT, DELETE
   method?: HttpMethod;

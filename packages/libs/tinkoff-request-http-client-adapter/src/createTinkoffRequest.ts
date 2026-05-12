@@ -123,7 +123,8 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
         if (process.env.NODE_ENV === 'development') {
           if (!baseUrl && !path) {
             log?.error(
-              `запрос должен содержать url, или baseUrl с полным путем запроса, или baseUrl вместе с path!`
+              `Запрос должен содержать url, или baseUrl с полным путем запроса, или baseUrl вместе с path.
+Если вы передаете baseUrlEnv, значит указанная переменная окружения не задана или пуста.`
             );
           }
         }

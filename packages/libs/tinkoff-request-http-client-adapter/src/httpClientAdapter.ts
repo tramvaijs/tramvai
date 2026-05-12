@@ -27,7 +27,17 @@ export class HttpClientAdapter extends BaseHttpClient implements HttpClient {
   }
 
   request<R = any>(req: HttpClientRequest): Promise<HttpClientResponse<R>> {
-    // применяем дефолтные опции до вызова modifyRequest на объекте запроса
+    // prevent CORS error when trying to set custom header in browser
+    if (typeof window !== 'undefined') {
+      if (this.options.headers?.['x-tramvai-service-name']) {
+        delete this.options.headers['x-tramvai-service-name'];
+      }
+      if (req.headers?.['x-tramvai-service-name']) {
+        delete req.headers['x-tramvai-service-name'];
+      }
+    }
+
+    // apply default options before calling modifyRequest on the request object
     const optionsWithDefaults = mergeOptions(this.options, req);
 
     const { modifyRequest, modifyResponse, modifyError, interceptors, ...reqWithDefaults } =

@@ -3,22 +3,17 @@ id: create-http-client
 title: Create HTTP client
 ---
 
-So far we are developing a very boring application.
-To display information about pokemon in our `Pokedex`, we need to get data from the `pokeapi` API.
-In this lesson we will learn how to create API clients and work with the [Dependency Injection container](concepts/di.md).
+So far we are developing a very boring application. To display information about pokemon in our `Pokedex`, we need to get data from the `pokeapi` API. In this lesson we will learn how to create API clients and work with the [Dependency Injection container](concepts/di.md).
 
 :::info
 
-Inversion of Control, and Dependency Injection (DI) are hard enough concepts to understand if you're dealing with them for the first time.
-But using DI makes our applications incredibly flexible, extensible and modular.
-The DI in `tramvai` is inspired by the dependency injection system in [Angular](https://angular.io/guide/dependency-injection).
+Inversion of Control, and Dependency Injection (DI) are hard enough concepts to understand if you're dealing with them for the first time. But using DI makes our applications incredibly flexible, extensible and modular. The DI in `tramvai` is inspired by the dependency injection system in [Angular](https://angular.io/guide/dependency-injection).
 
 :::
 
 Module [@tramvai/module-http-client](references/modules/http-client.md) provides a factory for creating HTTP clients.
 
-Important point! `tramvai` is built on the principle of [dependenciy injection](concepts/di.md), so the library does not export the factory directly, but adds it to the DI container of the application by a special [token](concepts/provider.md#tokens) as a key.
-The DI allows you to construct the application from modules as if they were separate LEGO blocks. 
+Important point! `tramvai` is built on the principle of [dependenciy injection](concepts/di.md), so the library does not export the factory directly, but adds it to the DI container of the application by a special [token](concepts/provider.md#tokens) as a key. The DI allows you to construct the application from modules as if they were separate LEGO blocks.
 
 :hourglass: Install the library `@tramvai/module-http-client`:
 
@@ -40,7 +35,7 @@ createApp({
   ],
   providers: [...providers],
   actions: [...actions],
-  bundles: {...bundles},
+  bundles: { ...bundles },
 });
 ```
 
@@ -83,13 +78,12 @@ import { ENV_USED_TOKEN } from '@tramvai/module-common';
       ],
     }),
     // highlight-end
-  ]
+  ],
 })
 export class PokeApiModule {}
 ```
 
-In `value` property we immediately added a default value.
-This value can be overridden in the `env.development.js` file when developing locally, or via environment variables when running the `tramvai` application on the server.
+In `value` property we immediately added a default value. This value can be overridden in the `env.development.js` file when developing locally, or via environment variables when running the `tramvai` application on the server.
 
 To add a new [provider](concepts/provider.md) to the DI, in this case a new HTTP client, you need two things:
 
@@ -105,9 +99,7 @@ import { ENV_USED_TOKEN } from '@tramvai/module-common';
 // highlight-start
 import { HttpClient } from '@tramvai/module-http-client';
 
-export const POKEAPI_HTTP_CLIENT = createToken<HttpClient>(
-  'pokeapi HTTP client'
-);
+export const POKEAPI_HTTP_CLIENT = createToken<HttpClient>('pokeapi HTTP client');
 // highlight-end
 
 @Module({
@@ -123,7 +115,7 @@ export const POKEAPI_HTTP_CLIENT = createToken<HttpClient>(
         },
       ],
     }),
-  ]
+  ],
 })
 export class PokeApiModule {}
 ```
@@ -151,8 +143,8 @@ export const POKEAPI_HTTP_CLIENT = createToken<HttpClient>('pokeapi HTTP client'
       useFactory: ({ factory, envManager }) => {
         return factory({
           name: 'pokeapi',
-          // используем базовый урл pokeapi из env переменной
-          baseUrl: envManager.get('POKEAPI_BASE_URL'),
+          // set base url for pokeapi client from env variable `POKEAPI_BASE_URL`
+          baseUrlEnv: 'POKEAPI_BASE_URL',
         });
       },
       // all dependencies from deps will be taken from DI and passed to useFactory
@@ -173,16 +165,14 @@ export const POKEAPI_HTTP_CLIENT = createToken<HttpClient>('pokeapi HTTP client'
         },
       ],
     }),
-  ]
+  ],
 })
 export class PokeApiModule {}
 ```
 
 :::tip
 
-A unique instance of `POKEAPI_HTTP_CLIENT` will be created for each user request to the application, allowing you to centralized add user data to the request parameters, for example you can take the `User-Agent` of the user and add it to the headers of all API requests.
-In doing so, all these `POKEAPI_HTTP_CLIENT` instances will have a shared in-memory cache.
-This cache can be disabled, for example for integration tests, with the env variable `HTTP_CLIENT_CACHE_DISABLED=true`.
+A unique instance of `POKEAPI_HTTP_CLIENT` will be created for each user request to the application, allowing you to centralized add user data to the request parameters, for example you can take the `User-Agent` of the user and add it to the headers of all API requests. In doing so, all these `POKEAPI_HTTP_CLIENT` instances will have a shared in-memory cache. This cache can be disabled, for example for integration tests, with the env variable `HTTP_CLIENT_CACHE_DISABLED=true`.
 
 :::
 
@@ -203,7 +193,7 @@ createApp({
   ],
   providers: [...providers],
   actions: [...actions],
-  bundles: {...bundles},
+  bundles: { ...bundles },
 });
 ```
 
