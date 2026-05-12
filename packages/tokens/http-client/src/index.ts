@@ -3,7 +3,10 @@ import type { Agent, Dispatcher } from 'undici';
 import type { BaseHttpClient, HttpClient, HttpClientInterceptor } from '@tramvai/http-client';
 import type { TinkoffRequestOptions } from '@tramvai/tinkoff-request-http-client-adapter';
 
-export type HttpClientFactoryOptions = TinkoffRequestOptions & { name: string };
+export type HttpClientFactoryOptions = TinkoffRequestOptions & {
+  name: string;
+  baseUrlEnv?: string;
+};
 
 /**
  * @description

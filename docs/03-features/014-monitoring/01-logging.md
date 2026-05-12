@@ -179,7 +179,7 @@ const provider = provide({
   useFactory: ({ factory, envManager }) => {
     return factory({
       name: 'my-api-name',
-      baseUrl: envManager.get('MY_API_URL'),
+      baseUrlEnv: 'MY_API_URL',
     });
   },
   deps: {
@@ -301,9 +301,10 @@ const provider = provide({
   useFactory: ({ loggerSharedContext, requestManager }) => {
     return function updateLoggerContext() {
       // depend of environment read UserAgent from request object or window.navigator
-      const userAgent = typeof window === 'undefined'
-        ? requestManager.getHeader('user-agent')
-        : window.navigator.userAgent;
+      const userAgent =
+        typeof window === 'undefined'
+          ? requestManager.getHeader('user-agent')
+          : window.navigator.userAgent;
 
       // `userAgent` property will be added to all logs, sended after `customerStart` stage
       loggerSharedContext.set('userAgent', userAgent);
@@ -311,7 +312,7 @@ const provider = provide({
   },
   deps: {
     loggerSharedContext: LOGGER_SHARED_CONTEXT,
-    requestManager: REQUEST_MANAGER_TOKEN, 
+    requestManager: REQUEST_MANAGER_TOKEN,
   },
 });
 ```
