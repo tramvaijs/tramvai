@@ -16,7 +16,7 @@
     "docker:build": "npm run docker:run ./scripts/build-wasm.sh"
   },
   "dependencies": {
-    "@swc/core": "1.15.7",
+    "@swc/core": "1.15.10",
     "@swc/helpers": "0.5.17",
     "swc-loader": "0.2.6"
   },

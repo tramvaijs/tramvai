@@ -592,6 +592,14 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         },
       },
     },
+    'app-lodash': {
+      name: 'app-lodash',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'lodash', 'index.ts'),
+    },
   };
 
   const [builder, transpiler] = key.split('-');
@@ -2817,6 +2825,41 @@ export default Cmp;`,
             await page.goto(`https://localhost:${devServer.port}`);
 
             test.expect(await page.locator('#container').textContent()).toEqual('hello world');
+          });
+        });
+
+        test.describe('lodash-transform-import', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-lodash',
+              rootDir: testSuiteFolder,
+              buildType: 'all',
+              disableServerRunnerWaiting: true,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('transpiler: should transform lodash imports', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            test.expect(platformJs).toContain(`../node_modules/lodash/assign.js`);
+            test.expect(platformJs).not.toContain(`../node_modules/lodash/debounce.js`);
+            test.expect(platformJs).not.toContain(`../node_modules/lodash/lodash.js`);
+            test.expect(serverJs).toContain(`../node_modules/lodash/assign.js`);
+            test.expect(serverJs).not.toContain(`../node_modules/lodash/debounce.js`);
+            test.expect(serverJs).not.toContain(`../node_modules/lodash/lodash.js`);
           });
         });
       });

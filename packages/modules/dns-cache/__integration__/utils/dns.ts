@@ -1,6 +1,12 @@
 /* eslint-disable no-param-reassign */
 import dns from 'dns';
 
+export const dnsLookupCalls: Record<string, number> = {};
+
+export const resetDnsLookupCalls = () => {
+  Object.keys(dnsLookupCalls).forEach((key) => delete dnsLookupCalls[key]);
+};
+
 export const mapHostsToLocalIP = (hosts: string[]) => {
   const originalLookup = dns.lookup as any;
 
@@ -12,7 +18,8 @@ export const mapHostsToLocalIP = (hosts: string[]) => {
     }
 
     if (hosts.includes(hostname)) {
-      // return IPv4 only to avoid IPv6 bracket issues in proxy CONNECT URLs
+      dnsLookupCalls[hostname] = (dnsLookupCalls[hostname] || 0) + 1;
+
       if (options && options.all) {
         callback(null, [{ address: '127.0.0.1', family: 4 }]);
       } else {

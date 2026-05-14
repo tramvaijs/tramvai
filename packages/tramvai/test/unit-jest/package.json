@@ -21,7 +21,7 @@
   "dependencies": {
     "@jest/types": "^29.6.3",
     "@swc-node/jest": "~1.9.1",
-    "@swc/core": "1.15.7",
+    "@swc/core": "1.15.10",
     "@swc/helpers": "0.5.17",
     "enhanced-resolve": "^5.18.4",
     "identity-obj-proxy": "^3.0.0",

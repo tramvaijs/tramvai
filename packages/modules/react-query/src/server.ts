@@ -44,6 +44,7 @@ export * from '@tramvai/tokens-react-query';
     }),
     provide({
       provide: commandLineListTokens.clear,
+      multi: true,
       useFactory: ({ queryClient }) => {
         return function clearQueryClient() {
           return queryClient.clear();
@@ -56,6 +57,7 @@ export * from '@tramvai/tokens-react-query';
     // this module is used directly in child app, so we need to provide clear command for child app as well
     provide({
       provide: childAppCommandLineListTokens.clear,
+      multi: true,
       useFactory: ({ queryClient }) => {
         return function clearQueryClient() {
           return queryClient.clear();

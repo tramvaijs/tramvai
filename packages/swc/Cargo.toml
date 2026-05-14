@@ -18,14 +18,14 @@ resolver = "2"
 
 [workspace.dependencies]
 swc_common = { version = "18.0.1" }
-swc_ecma_parser = { version = "30.0.0" }
+swc_ecma_parser = { version = "33.0.1" }
 if_chain = { version = "1.0.3" }
-swc_ecma_visit = { version = "19.0.0" }
+swc_ecma_visit = { version = "20.0.0" }
 log = { version = "0.4" }
 env_logger = { version = "0.11.8" }
 
 [workspace.dependencies.swc_core]
-version = "52.0.0"
+version = "55.0.2"
 features = [
   "ecma_plugin_transform",
   "ecma_utils",

@@ -6,6 +6,7 @@ import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
 import { getKeys } from '@tramvai/internal-test-utils/utils/keys';
 import { mapHostsToLocalIP } from './utils/dns';
 
+// proxy server resolves hostnames from CONNECT requests via dns.lookup
 mapHostsToLocalIP(['proxied.mylocalhost.com', 'non-proxied.mylocalhost.com']);
 
 export interface ApiServer {
@@ -20,8 +21,7 @@ export const apiServerFixture: [
 ] = [
   // eslint-disable-next-line no-empty-pattern
   async ({}, use) => {
-    // default port, used when our fake dns lookup will return 127.0.0.1 IP - we can't specify port there
-    const port = 443;
+    const port = await getPort();
     let urls: string[] = [];
 
     const server = https.createServer(await getKeys(), (req, res) => {

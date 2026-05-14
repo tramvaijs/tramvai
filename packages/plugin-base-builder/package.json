@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@module-federation/node": "^0.15.1",
-    "@rspack/core": "^1.7.5",
+    "@rspack/core": "1.7.5",
     "@types/http-proxy": "^1.17.9",
     "@types/resolve": "^1.20.2",
     "webpack": "5.101.1"

@@ -3,7 +3,17 @@ import { startCli } from '@tramvai/test-integration';
 import { resolve } from 'path';
 import detectPort from 'detect-port';
 
-const EXAMPLE_DIR = resolve(__dirname, '..', '..', '..', '..', '..', '..', 'examples', 'child-app');
+const EXAMPLE_DIR = resolve(
+  __dirname,
+  '..',
+  '..',
+  '..',
+  '..',
+  '..',
+  '..',
+  'examples',
+  'child-app'
+);
 
 export const startRootApp = ({
   define,
