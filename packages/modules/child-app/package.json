@@ -57,5 +57,15 @@
     "semver": "^7.3.8",
     "tslib": "^2.4.0"
   },
+  "devDependencies": {
+    "@tramvai/module-http-client": "0.0.0-stub",
+    "@tramvai/module-react-query": "0.0.0-stub",
+    "@tramvai/module-render": "0.0.0-stub",
+    "@tramvai/module-router": "0.0.0-stub",
+    "@tramvai/module-server": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/react-query": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub"
+  },
   "module": "lib/server.es.js"
 }

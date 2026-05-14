@@ -47,10 +47,9 @@ import {
 import { ChildDispatcherContext } from '@tramvai/state';
 import { getChildProviders as getChildEndProviders } from '../../server/child/singletonProviders';
 import { extractorProviders } from './extractorProviders';
-import type { LoadableStats } from '../webpack/moduleFederation';
 import { ChildAppPageService } from '../pageService';
 
-export const getChildProviders = (appDi: Container, loadableStats: LoadableStats): Provider[] => {
+export const getChildProviders = (appDi: Container): Provider[] => {
   const logger = appDi.get(LOGGER_TOKEN);
 
   return [
@@ -110,7 +109,7 @@ export const getChildProviders = (appDi: Container, loadableStats: LoadableStats
       ],
     }),
     ...getChildEndProviders(appDi),
-    ...extractorProviders(loadableStats),
+    ...extractorProviders(appDi),
     provide({
       provide: DISPATCHER_CONTEXT_TOKEN,
       scope: Scope.REQUEST,
