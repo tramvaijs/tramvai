@@ -3,22 +3,24 @@ import { test } from './test-fixture';
 /**
  * How this test works
  *
- * 1. Start https fake API server (`apiServerFixture`)
+ * 1. Start https fake API server (`apiServerFixture`) on a dynamic port
  * 2. Start http proxy server for CONNECT method (`proxyServerFixture`)
- * 3. Monkeypath `dns.lookup` in test and application processes to allows us made requests for fake domains - (`mapHostsToLocalIP`)
+ * 3. Monkeypatch `dns.lookup` in test and application processes to resolve fake domains to `127.0.0.1`
  * 4. Add HTTPS_PROXY and NO_PROXY envs
+ * 5. TramvaiDnsCacheModule is included to test coexistence with http-proxy-agent
+ *    (undici DNS interceptor is automatically excluded from EnvHttpProxyAgent due to incompatibility)
  *
  * On page load, for proxied response:
- * 1. We made request to fake API domain `proxied.mylocalhost.com`
- * 2. http-proxy-agent module create socket for HTTPS_PROXY and send CONNECT request with `proxied.mylocalhost.com:443` host
- * 3. Proxy server will get CONNECT, create socket for `127.0.0.1` IP resolved through our `dns.lookup` mock, and pipe all data there from incoming socket
+ * 1. We make request to fake API domain `proxied.mylocalhost.com:{port}`
+ * 2. EnvHttpProxyAgent checks hostname against NO_PROXY — not matched — routes through proxy
+ * 3. Proxy server gets CONNECT `proxied.mylocalhost.com:{port}`, resolves via dns.lookup mock, pipes to API server
  *
  * On page load, for non-proxied response:
- * 1. We made request to fake API domain `non-proxied.mylocalhost.com`
- * 2. Request will be sended to `127.0.0.1` IP resolved through our `dns.lookup` mock
+ * 1. We make request to fake API domain `non-proxied.mylocalhost.com:{port}`
+ * 2. EnvHttpProxyAgent checks hostname against NO_PROXY — matched — direct connection
+ * 3. Request resolved to `127.0.0.1` via dns.lookup mock, goes directly to API server
  */
-// TODO: for local testing, not working in CI because of "Error: listen EACCES: permission denied 0.0.0.0:443"
-test.describe.skip('packages/modules/http-proxy-agent', () => {
+test.describe('packages/modules/http-proxy-agent', () => {
   test.beforeEach(({ apiServer, proxyServer }) => {
     proxyServer.clearUrls();
     apiServer.clearUrls();
@@ -27,9 +29,11 @@ test.describe.skip('packages/modules/http-proxy-agent', () => {
   test('Check that HTTP_PROXY is work', async ({ app, I, apiServer, proxyServer }) => {
     await I.gotoPage(app.serverUrl, '?send-proxied-request');
 
+    const apiPort = apiServer.getPort();
+
     test
       .expect(proxyServer.getUrls())
-      .toEqual(['proxied.mylocalhost.com:443', 'proxied.mylocalhost.com:443']);
+      .toEqual([`proxied.mylocalhost.com:${apiPort}`, `proxied.mylocalhost.com:${apiPort}`]);
     test.expect(apiServer.getUrls()).toEqual(['/proxied/', '/proxied-fetch/']);
   });
 

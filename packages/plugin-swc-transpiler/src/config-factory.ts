@@ -136,6 +136,14 @@ Having swc config may conflict with @tramvai/cli configuration`
           isServer && [resolveTramvaiSwcPlugin('dynamic_import_to_require'), {}],
           tramvai && env === 'development' && [resolveTramvaiSwcPlugin('provider_stack'), {}],
           generateDataQaTag && [resolveTramvaiSwcPlugin('react_element_info_unique'), {}],
+          [
+            '@swc/plugin-transform-imports',
+            {
+              lodash: {
+                transform: 'lodash/{{member}}',
+              },
+            },
+          ],
         ].filter(Boolean) as Array<[string, Record<string, any>]>,
       },
     },

@@ -1,8 +1,11 @@
-// we need to monkeypath `dns.lookup` before `cacheable-lookup` will save original version in closure
+// monkeypatch dns.lookup before cacheable-lookup and undici dns interceptor capture it,
+// to resolve fake domains to 127.0.0.1 for both proxy tunnel and direct connections
 if (typeof window === 'undefined') {
   const { mapHostsToLocalIP } = require('./utils/dns');
 
-  mapHostsToLocalIP(['proxied.mylocalhost.com', 'non-proxied.mylocalhost.com']);
+  // include localhost to force IPv4-only resolution — prevents undici DNS interceptor
+  // from picking IPv6 (::1) which breaks the CONNECT tunnel URL parser
+  mapHostsToLocalIP(['proxied.mylocalhost.com', 'non-proxied.mylocalhost.com', 'localhost']);
 }
 
 /* eslint-disable no-param-reassign, import/first */
@@ -10,9 +13,9 @@ import { commandLineListTokens, createApp, provide } from '@tramvai/core';
 import { HttpClientModule, HTTP_CLIENT } from '@tramvai/module-http-client';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { HttpProxyAgentModule } from '@tramvai/module-http-proxy-agent';
+import { TramvaiDnsCacheModule } from '@tramvai/module-dns-cache';
 import { ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
-import { TramvaiDnsCacheModule } from '@tramvai/module-dns-cache';
 import { modules, bundles } from '@tramvai/internal-test-utils/shared/common';
 
 createApp({

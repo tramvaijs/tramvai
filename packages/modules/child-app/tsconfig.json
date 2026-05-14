@@ -60,6 +60,21 @@
         },
         {
             "path": "../router"
+        },
+        {
+            "path": "../http-client"
+        },
+        {
+            "path": "../react-query"
+        },
+        {
+            "path": "../render"
+        },
+        {
+            "path": "../server"
+        },
+        {
+            "path": "../../tramvai/react-query"
         }
     ]
 }

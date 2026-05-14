@@ -37,12 +37,43 @@ export const TramvaiDnsCacheModule = declareModule({
           };
         }
 
-        return interceptors.dns({
+        const dnsInterceptor = interceptors.dns({
           maxTTL,
           maxItems,
           // https://github.com/nodejs/undici/pull/4589
           storage,
+          // undici captures dns.lookup at import time via destructuring,
+          // so runtime patches to dns.lookup (e.g. from cacheable-lookup or test mocks) are invisible.
+          // Providing a custom lookup that reads dns.lookup from the module object at call time fixes this.
+          // https://github.com/nodejs/undici/blob/e1f9035d0fdc26db66d8501134ae15e5dab15488/lib/interceptor/dns.js#L241
+          lookup: (origin: URL, opts: any, cb: any) => {
+            dns.lookup(
+              origin.hostname,
+              {
+                all: true,
+                family: opts.dualStack === false ? opts.affinity : 0,
+                order: 'ipv4first',
+              },
+              (err: any, addresses: any) => {
+                if (err) {
+                  return cb(err);
+                }
+
+                const results = new Map();
+
+                for (const addr of addresses) {
+                  results.set(`${addr.address}:${addr.family}`, addr);
+                }
+
+                cb(null, results.values());
+              }
+            );
+          },
         });
+
+        (dnsInterceptor as any).__tramvai_dns_interceptor = true;
+
+        return dnsInterceptor;
       },
       deps: {
         envManager: ENV_MANAGER_TOKEN,
@@ -61,6 +92,11 @@ export const TramvaiDnsCacheModule = declareModule({
           const cacheable = new CacheableLookup({
             cache,
             maxTtl,
+            // cacheable-lookup captures dns.lookup at import time via destructuring,
+            // so runtime patches to dns.lookup are invisible.
+            // Passing dns.lookup from the module object at construction time fixes this.
+            // https://github.com/szmarczak/cacheable-lookup/blob/9e60c9f6e74a003692aec68f3ddad93afe613b8f/source/index.mjs#L6
+            lookup: dns.lookup,
           });
 
           const originalLookup = cacheable.lookup;

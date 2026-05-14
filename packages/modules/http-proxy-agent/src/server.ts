@@ -38,12 +38,29 @@ import { addProxyToHttpsAgent } from './add-proxy-to-https-agent/add-proxy-to-ht
             metricsConnectionCounter.inc({ host: new URL(connectParams.origin).host });
           });
 
+          // undici DNS interceptor is incompatible with EnvHttpProxyAgent —
+          // compose() runs interceptors before proxy routing, so DNS resolution
+          // replaces hostnames with IPs before NO_PROXY check, breaking hostname-based matching.
+          // Filter it out; DNS caching for http.Agent still works via cacheable-lookup.
+          const compatibleInterceptors = (interceptors ?? []).filter((interceptor) => {
+            if ((interceptor as any).__tramvai_dns_interceptor) {
+              logger.warn({
+                event: 'dns-interceptor-skipped',
+                message:
+                  'Undici DNS interceptor is incompatible with EnvHttpProxyAgent and was excluded. ' +
+                  'DNS caching for http.Agent requests still works via cacheable-lookup.',
+              });
+              return false;
+            }
+            return true;
+          });
+
           const agent = new EnvHttpProxyAgent({
             httpProxy: proxyEnv,
             httpsProxy: proxyEnv,
             noProxy: noProxyEnv,
             ...options,
-          }).compose(...(interceptors ?? []));
+          }).compose(...compatibleInterceptors);
 
           return {
             http: agent,
