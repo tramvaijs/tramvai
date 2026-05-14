@@ -144,6 +144,7 @@ export class PreloadManager implements ChildAppPreloadManager {
 
     if (this.map.has(key)) {
       await this.map.get(key);
+      return;
     }
 
     await this.hooks.preloadChildApp.callPromise({

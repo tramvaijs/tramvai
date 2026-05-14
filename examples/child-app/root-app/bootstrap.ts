@@ -11,7 +11,7 @@ import {
 } from '@tramvai/module-common';
 import { RemoteReporter } from '@tinkoff/logger';
 import type { REACT_SERVER_RENDER_MODE } from '@tramvai/module-render';
-import { RenderModule } from '@tramvai/module-render';
+import { RenderModule, RESOURCE_INLINE_OPTIONS } from '@tramvai/module-render';
 import { PAGE_SERVICE_TOKEN, ROUTES_TOKEN, SpaRouterModule } from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
 import {
@@ -221,6 +221,14 @@ createApp({
       }),
       deps: {
         context: CONTEXT_TOKEN,
+      },
+    }),
+    // resource inlining disabled for stable tests
+    provide({
+      provide: RESOURCE_INLINE_OPTIONS,
+      useValue: {
+        types: [],
+        threshold: 0,
       },
     }),
 

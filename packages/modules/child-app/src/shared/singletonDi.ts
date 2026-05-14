@@ -1,6 +1,6 @@
 import flatten from '@tinkoff/utils/array/flatten';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
-import { Container, Scope } from '@tinkoff/dippy';
+import { Container } from '@tinkoff/dippy';
 import { getModuleParameters, walkOfModules } from '@tramvai/core';
 import type {
   CHILD_APP_CONTRACT_MANAGER,
@@ -132,11 +132,8 @@ export class SingletonDiManager implements ChildAppDiManager {
       );
     }
 
-    const statsLoadable =
-      'getLoadableStats' in this.loader ? (this.loader as any).getLoadableStats(config) : undefined;
-
     // add providers on the Singleton Level to make it possible to reuse providers from the root-app Container
-    const childProviders = getChildProviders(this.appDi, statsLoadable, config);
+    const childProviders = getChildProviders(this.appDi, config);
 
     childProviders.forEach((provider) => {
       di.register(provider);
