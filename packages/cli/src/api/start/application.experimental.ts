@@ -192,6 +192,23 @@ function mapTramvaiJsonToNewTsConfig({ rootDir }: { rootDir: string }) {
         mappedProject.enableFillDeclareActionNamePlugin =
           applicationProject.experiments.enableFillDeclareActionNamePlugin;
       }
+      if (
+        applicationProject.experiments &&
+        'autoResolveSharedRequiredVersions' in applicationProject.experiments
+      ) {
+        if (!mappedProject.shared) {
+          mappedProject.shared = {};
+        }
+        mappedProject.shared.autoResolveSharedRequiredVersions =
+          applicationProject.experiments.autoResolveSharedRequiredVersions;
+      }
+      if ('flexibleTramvaiVersions' in applicationProject.shared) {
+        if (!mappedProject.shared) {
+          mappedProject.shared = {};
+        }
+        mappedProject.shared.autoResolveSharedRequiredVersions =
+          applicationProject.shared.flexibleTramvaiVersions;
+      }
       if (applicationProject.serverApiDir) {
         mappedProject.fileSystemPapiDir = path.resolve(applicationProject.serverApiDir);
       }

@@ -145,12 +145,6 @@ export type ApplicationExperiments = {
    */
   reactTransitions?: boolean;
   /**
-   * @title automatically resolve requiredVersion for shared dependencies
-   * @see https://webpack.js.org/plugins/module-federation-plugin/#requiredversion
-   * @default false
-   */
-  autoResolveSharedRequiredVersions?: boolean;
-  /**
    * @title Enable Lightningcss for css transpiling as Postcss alternative
    * @default false
    */
@@ -358,11 +352,11 @@ export interface BaseProject {
      */
     defaultTramvaiDependencies?: boolean;
     /**
-     * @title add caret range specifier for tramvai dependencies
-     * @description minimal versions are inferred from package.json
+     * @title automatically resolve requiredVersion for shared dependencies
+     * @see https://webpack.js.org/plugins/module-federation-plugin/#requiredversion
      * @default true
      */
-    flexibleTramvaiVersions?: boolean;
+    autoResolveSharedRequiredVersions?: boolean;
     /**
      * @title add chunks to preload as critical in-parallel with "platform.js"
      * @description this option is useful when you need to create async boundary for app dependencies.
@@ -789,7 +783,6 @@ export class ConfigService {
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
       lightningcss: experiments.lightningcss ?? false,
-      autoResolveSharedRequiredVersions: experiments.autoResolveSharedRequiredVersions ?? false,
     };
   }
 
@@ -901,8 +894,8 @@ export class ConfigService {
 
     return {
       defaultTramvaiDependencies: configShared?.defaultTramvaiDependencies,
-      flexibleTramvaiVersions: configShared?.flexibleTramvaiVersions ?? true,
       criticalChunks: configShared?.criticalChunks ?? [],
+      autoResolveSharedRequiredVersions: configShared?.autoResolveSharedRequiredVersions ?? true,
       deps: configShared?.deps ?? [],
     };
   }

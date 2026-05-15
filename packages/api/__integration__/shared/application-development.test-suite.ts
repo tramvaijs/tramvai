@@ -37,6 +37,18 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
+    'app-mf-host-broken': {
+      name: 'app-mf-host',
+      type: 'application',
+      shared: {
+        deps: ['@tinkoff/url'],
+        autoResolveSharedRequiredVersions: false,
+      },
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'mf-host-broken', 'index.tsx'),
+    },
     'app-mf-host-disabled-tramvai-dependencies': {
       name: 'app-mf-host-disabled-tramvai-dependencies',
       type: 'application',
@@ -54,22 +66,28 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
-    'app-mf-host-disabled-tramvai-flexible': {
-      name: 'app-mf-host-disabled-tramvai-flexible',
+    'app-mf-host-duplicate-tramvai-autoresolve': {
+      name: 'app-mf-host-duplicate-tramvai-autoresolve',
       type: 'application',
       shared: {
-        flexibleTramvaiVersions: false,
-        deps: ['@tinkoff/url'],
-      },
-      webpack: {
-        resolveAlias: {
-          '@tinkoff/url': './node_modules/@tinkoff/url/index.js',
-        },
+        deps: ['@tinkoff/url', '@tinkoff/logger', 'zod'],
       },
       hotRefresh: {
         enabled: false,
       },
-      entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
+      entryFile: path.join(fixturesFolder, 'application', 'mf-host-duplicates', 'index.tsx'),
+    },
+    'app-mf-host-duplicate-tramvai-autoresolve-disabled': {
+      name: 'app-mf-host-duplicate-tramvai-autoresolve-disabled',
+      type: 'application',
+      shared: {
+        deps: ['@tinkoff/url'],
+        autoResolveSharedRequiredVersions: false,
+      },
+      hotRefresh: {
+        enabled: false,
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'mf-host-duplicates', 'index.tsx'),
     },
     'app-mf-host-critical-chunks': {
       name: 'app-mf-host-critical-chunks',
@@ -113,6 +131,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       shared: {
         deps: ['@tinkoff/url', '@tinkoff/logger'],
+        autoResolveSharedRequiredVersions: false,
       },
       hotRefresh: {
         enabled: false,
@@ -122,17 +141,8 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-mf-host-auto-resolve-shared': {
       name: 'app-mf-host-auto-resolve-shared',
       type: 'application',
-      webpack: {
-        resolveAlias: {
-          '@tinkoff/url': './node_modules/@tinkoff/url/index.js',
-        },
-      },
       shared: {
-        deps: ['@tinkoff/url', '@tinkoff/logger'],
-        flexibleTramvaiVersions: false,
-      },
-      experiments: {
-        autoResolveSharedRequiredVersions: true,
+        deps: ['@tinkoff/url', '@tinkoff/logger', 'zod'],
       },
       hotRefresh: {
         enabled: false,
@@ -603,7 +613,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
   };
 
   const [builder, transpiler] = key.split('-');
-  const swcCachePath = path.resolve(__dirname, `../${builder}-${transpiler}/node_modules`);
 
   test.describe(`@tramvai/api @builder:${builder} @transpiler:${transpiler} @type:application @mode:development`, async () => {
     test.describe('api: application start', () => {
@@ -2978,211 +2987,151 @@ export default Cmp;`,
         });
       });
 
-      // TODO: support custom tramvai plugins for MF
-      if (builder !== 'rspack') {
-        test.describe('defaultTramvaiDependencies disabled option', () => {
-          test.use({
-            inputParameters: {
-              name: 'app-mf-host-disabled-tramvai-dependencies',
-              rootDir: testSuiteFolder,
-              fileCache: false,
-              noRebuild: true,
-            },
-            extraConfiguration: {
-              plugins,
-              projects,
-            },
-          });
-
-          test('should not use default tramvai dependencies in shared on client', async ({
-            devServer,
-          }) => {
-            await devServer.buildPromise;
-
-            const runtimeResponse = await fetch(
-              `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
-            );
-            const runtimeCode = await runtimeResponse.text();
-
-            test.expect(runtimeCode.includes('@tinkoff/dippy')).toBeFalsy();
-          });
-
-          test('should not use default tramvai dependencies in shared on server', async ({
-            devServer,
-            page,
-          }) => {
-            await devServer.buildPromise;
-            await page.goto(`http://localhost:${devServer.port}`);
-
-            const mfServerShared = await page.evaluate(() => (window as any).serverShared);
-
-            // no @tinkoff/dippy in shared deps
-            test.expect(mfServerShared.default).toEqual({
-              '@tinkoff/url': {
-                '1.3.0': {
-                  from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
-                  eager: true,
-                  loaded: 1,
-                },
-              },
-              'react/jsx-dev-runtime': {
-                '19.0.1': {
-                  eager: true,
-                  from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
-                  loaded: 1,
-                },
-              },
-            });
-          });
+      test.describe('defaultTramvaiDependencies disabled option', () => {
+        test.use({
+          inputParameters: {
+            name: 'app-mf-host-disabled-tramvai-dependencies',
+            rootDir: testSuiteFolder,
+            fileCache: false,
+            noRebuild: true,
+          },
+          extraConfiguration: {
+            plugins,
+            projects,
+          },
         });
 
-        test.describe('flexibleTramvaiVersions option', () => {
-          test.describe('enabled flexibleTramvaiVersions', () => {
-            test.use({
-              inputParameters: {
-                name: 'app-mf-host-disabled-tramvai-dependencies',
-                rootDir: testSuiteFolder,
-                fileCache: false,
-                noRebuild: true,
-              },
-              extraConfiguration: {
-                plugins,
-                projects,
-              },
-            });
+        test('should not use default tramvai dependencies in shared on client', async ({
+          devServer,
+        }) => {
+          await devServer.buildPromise;
 
-            test('should correctly flex version for tinkoff/url dep on client', async ({
-              devServer,
-              page,
-            }) => {
-              await devServer.buildPromise;
+          const runtimeResponse = await fetch(
+            `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
+          );
+          const runtimeCode = await runtimeResponse.text();
 
-              const runtimeResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
-              );
-              const runtimeCode = await runtimeResponse.text();
-
-              // [1,1,3,0] is encoded semver version, first 1 in array is flex version (^)
-              test
-                .expect(runtimeCode)
-                .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": () => (loadStrictVersion("default", "@tinkoff/url", true, [1,1,3,0]'
-                );
-            });
-
-            test('should correctly flex version for tinkoff/url dep on server', async ({
-              devServer,
-            }) => {
-              await devServer.buildPromise;
-
-              const serverCodeResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/server/server.js`
-              );
-              const serverCode = await serverCodeResponse.text();
-
-              // [1,1,3,0] is encoded semver version, first 1 in array is flex version (^)
-              test
-                .expect(serverCode)
-                .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": () => (loadStrictVersion("default", "@tinkoff/url", true, [1,1,3,0]'
-                );
-            });
-          });
-
-          test.describe('disabled flexibleTramvaiVersions', () => {
-            test.use({
-              inputParameters: {
-                name: 'app-mf-host-disabled-tramvai-flexible',
-                rootDir: testSuiteFolder,
-                fileCache: false,
-                noRebuild: true,
-              },
-              extraConfiguration: {
-                plugins,
-                projects,
-              },
-            });
-
-            test('should correctly not flex version for tinkoff/url dep on client', async ({
-              devServer,
-            }) => {
-              await devServer.buildPromise;
-
-              const runtimeResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
-              );
-              const runtimeCode = await runtimeResponse.text();
-
-              // // [4,1,3,0] is encoded semver version, first 4 in array is strict version
-              test
-                .expect(runtimeCode)
-                .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": () => (loadStrictVersion("default", "@tinkoff/url", true, [4,1,3,0]'
-                );
-            });
-
-            test('should correctly not flex version for tinkoff/url dep on server', async ({
-              devServer,
-            }) => {
-              await devServer.buildPromise;
-              const serverCodeResponse = await fetch(
-                `http://localhost:${devServer.staticPort}/dist/server/server.js`
-              );
-              const serverCode = await serverCodeResponse.text();
-
-              // // [4,1,3,0] is encoded semver version, first 4 in array is strict version
-              test
-                .expect(serverCode)
-                .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": () => (loadStrictVersion("default", "@tinkoff/url", true, [4,1,3,0]'
-                );
-            });
-          });
+          test.expect(runtimeCode.includes('@tinkoff/dippy')).toBeFalsy();
         });
 
-        test.describe('criticalChunks option', () => {
-          test.use({
-            inputParameters: {
-              name: 'app-mf-host-critical-chunks',
-              rootDir: testSuiteFolder,
-              fileCache: false,
-              noRebuild: true,
+        test('should not use default tramvai dependencies in shared on server', async ({
+          devServer,
+          page,
+        }) => {
+          await devServer.buildPromise;
+          await page.goto(`http://localhost:${devServer.port}`);
+
+          const mfServerShared = await page.evaluate(() => (window as any).serverShared);
+
+          // no @tinkoff/dippy in shared deps
+          test.expect(mfServerShared.default).toEqual({
+            '@tinkoff/url': {
+              '2.0.0': {
+                from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
+                eager: true,
+                loaded: 1,
+              },
             },
-            extraConfiguration: {
-              plugins,
-              projects,
+            'react/jsx-dev-runtime': {
+              '19.0.1': {
+                eager: true,
+                from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
+                loaded: 1,
+              },
             },
           });
+        });
+      });
 
-          test('should correctly add custom critical chunk', async ({ devServer, page }) => {
-            await devServer.buildPromise;
-            await page.goto(`http://localhost:${devServer.port}`);
+      test.describe('criticalChunks option', () => {
+        test.use({
+          inputParameters: {
+            name: 'app-mf-host-critical-chunks',
+            rootDir: testSuiteFolder,
+            fileCache: false,
+            noRebuild: true,
+          },
+          extraConfiguration: {
+            plugins,
+            projects,
+          },
+        });
 
-            const criticalChunksRaw = await page.evaluate(
-              () => (window as any).webpackChunkapplication_app_mf_host_critical_chunks_0_0_0_stub
-            );
-            const criticalChunks = criticalChunksRaw
-              .flat(Infinity)
-              .reduce((acc: Set<string>, item: Record<string, string> | string) => {
-                if (typeof item === 'object') {
-                  for (const key in item) {
-                    acc.add(key);
-                  }
-                } else {
-                  acc.add(item);
+        test('should correctly add custom critical chunk', async ({ devServer, page }) => {
+          await devServer.buildPromise;
+          await page.goto(`http://localhost:${devServer.port}`);
+
+          const criticalChunksRaw = await page.evaluate(
+            () => (window as any).webpackChunkapplication_app_mf_host_critical_chunks_0_0_0_stub
+          );
+          const criticalChunks = criticalChunksRaw
+            .flat(Infinity)
+            .reduce((acc: Set<string>, item: Record<string, string> | string) => {
+              if (typeof item === 'object') {
+                for (const key in item) {
+                  acc.add(key);
                 }
+              } else {
+                acc.add(item);
+              }
 
-                return acc;
-              }, new Set());
+              return acc;
+            }, new Set());
 
-            test.expect(criticalChunks.has('data')).toBeTruthy();
-          });
+          test.expect(criticalChunks.has('data')).toBeTruthy();
+        });
+      });
+
+      test.describe('deps option', () => {
+        test.use({
+          inputParameters: {
+            name: 'app-mf-host-deps',
+            rootDir: testSuiteFolder,
+            fileCache: false,
+            noRebuild: true,
+          },
+          extraConfiguration: {
+            plugins,
+            projects,
+          },
         });
 
-        test.describe('deps option', () => {
+        test('should correctly add custom deps on client', async ({ devServer, page }) => {
+          await devServer.buildPromise;
+
+          const runtimeResponse = await fetch(
+            `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
+          );
+          const runtimeCode = await runtimeResponse.text();
+
+          if (builder === 'webpack') {
+            test.expect(runtimeCode).toContain('register("external-library", "3.0.0"');
+          } else if (builder === 'rspack') {
+            test.expect(runtimeCode).toContain('{ name: "external-library", version: "3.0.0"');
+          }
+        });
+
+        test('should correctly add custom deps on server', async ({ devServer, page }) => {
+          await devServer.buildPromise;
+
+          const serverCodeResponse = await fetch(
+            `http://localhost:${devServer.staticPort}/dist/server/server.js`
+          );
+          const serverCode = await serverCodeResponse.text();
+
+          if (builder === 'webpack') {
+            test.expect(serverCode).toContain('register("external-library", "3.0.0"');
+          } else if (builder === 'rspack') {
+            test.expect(serverCode).toContain('{ name: "external-library", version: "3.0.0"');
+          }
+        });
+      });
+
+      test.describe('app-mf-host-auto-resolve-shared', () => {
+        test.describe('enabled with tramvai dependency', () => {
           test.use({
             inputParameters: {
-              name: 'app-mf-host-deps',
+              name: 'app-mf-host-auto-resolve-shared',
               rootDir: testSuiteFolder,
               fileCache: false,
               noRebuild: true,
@@ -3193,7 +3142,9 @@ export default Cmp;`,
             },
           });
 
-          test('should correctly add custom deps on client', async ({ devServer, page }) => {
+          test('should auto resolve requiredVersion for tinkoff/logger with ^ on client', async ({
+            devServer,
+          }) => {
             await devServer.buildPromise;
 
             const runtimeResponse = await fetch(
@@ -3201,10 +3152,24 @@ export default Cmp;`,
             );
             const runtimeCode = await runtimeResponse.text();
 
-            test.expect(runtimeCode).toContain('register("external-library", "3.0.0"');
+            if (builder === 'webpack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [1,1,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": { shareScope: "default", shareKey: "@tinkoff/logger", import: "@tinkoff/logger", requiredVersion: "^1.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
           });
 
-          test('should correctly add custom deps on server', async ({ devServer, page }) => {
+          test('should auto resolve requiredVersion for tinkoff/logger with ^ on server', async ({
+            devServer,
+          }) => {
             await devServer.buildPromise;
 
             const serverCodeResponse = await fetch(
@@ -3212,46 +3177,304 @@ export default Cmp;`,
             );
             const serverCode = await serverCodeResponse.text();
 
-            test.expect(serverCode).toContain('register("external-library", "3.0.0"');
+            if (builder === 'webpack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [1,1,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": { shareScope: "default", shareKey: "@tinkoff/logger", import: "@tinkoff/logger", requiredVersion: "^1.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+
+          test('should be no warnings in build logs about wrong package version', ({
+            spawnDevServer,
+          }) => {
+            const { logs } = spawnDevServer;
+
+            console.log(logs);
+
+            test
+              .expect(
+                logs.some((log) =>
+                  log.includes(
+                    'version specified and unable to automatically determine one. Unable to find'
+                  )
+                )
+              )
+              .toBeFalsy();
           });
         });
 
-        test.describe('app-mf-host-auto-resolve-shared', () => {
-          test.describe('disabled', async () => {
-            test.use({
-              inputParameters: {
-                name: 'app-mf-host-disabled-auto-resolve-shared',
-                rootDir: testSuiteFolder,
-                fileCache: false,
-                noRebuild: true,
-              },
-              extraConfiguration: {
-                plugins,
-                projects,
-              },
-            });
-
-            test('should generate warnings in build logs about wrong package version', async ({
-              spawnDevServer,
-            }) => {
-              const { logs } = spawnDevServer;
-
-              test
-                .expect(
-                  logs.some((log) =>
-                    log.includes(
-                      'version specified and unable to automatically determine one. Unable to find'
-                    )
-                  )
-                )
-                .toBeTruthy();
-            });
+        test.describe('enabled with external dependency', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-mf-host-auto-resolve-shared',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
           });
 
-          test.describe('enabled', () => {
+          test('should auto resolve requiredVersion for external dep on client', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const runtimeResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
+            );
+            const runtimeCode = await runtimeResponse.text();
+
+            if (builder === 'webpack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": () => (loadStrictVersion("default", "zod", true, [4,2,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": { shareScope: "default", shareKey: "zod", import: "zod", requiredVersion: "2.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+
+          test('should auto resolve requiredVersion for external dep on server', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverCodeResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/server/server.js`
+            );
+            const serverCode = await serverCodeResponse.text();
+
+            if (builder === 'webpack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": () => (loadStrictVersion("default", "zod", true, [4,2,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": { shareScope: "default", shareKey: "zod", import: "zod", requiredVersion: "2.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+
+          test('should be no warnings in build logs about wrong package version', ({
+            spawnDevServer,
+          }) => {
+            const { logs } = spawnDevServer;
+
+            test
+              .expect(
+                logs.some((log) =>
+                  log.includes(
+                    'version specified and unable to automatically determine one. Unable to find'
+                  )
+                )
+              )
+              .toBeFalsy();
+          });
+        });
+
+        test.describe('enabled with duplicate tramvai dependency', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-mf-host-duplicate-tramvai-autoresolve',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should auto resolve requiredVersion for tinkoff/url with ^ on client', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const runtimeResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
+            );
+            const runtimeCode = await runtimeResponse.text();
+
+            if (builder === 'webpack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": () => (loadStrictVersion("default", "@tinkoff/url", true, [1,2,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": { shareScope: "default", shareKey: "@tinkoff/url", import: "@tinkoff/url", requiredVersion: "^2.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+
+          test('should auto resolve requiredVersion for tinkoff/url with ^ on server', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverCodeResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/server/server.js`
+            );
+            const serverCode = await serverCodeResponse.text();
+
+            if (builder === 'webpack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": () => (loadStrictVersion("default", "@tinkoff/url", true, [1,2,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": { shareScope: "default", shareKey: "@tinkoff/url", import: "@tinkoff/url", requiredVersion: "^2.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+
+          test('should be no warnings in build logs about wrong package version', ({
+            spawnDevServer,
+          }) => {
+            const { logs } = spawnDevServer;
+
+            test
+              .expect(
+                logs.some((log) =>
+                  log.includes(
+                    'version specified and unable to automatically determine one. Unable to find'
+                  )
+                )
+              )
+              .toBeFalsy();
+          });
+        });
+
+        test.describe('enabled with duplicate external dependency', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-mf-host-duplicate-tramvai-autoresolve',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should auto resolve requiredVersion for external dep on client', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const runtimeResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/runtime.js`
+            );
+            const runtimeCode = await runtimeResponse.text();
+
+            if (builder === 'webpack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": () => (loadStrictVersion("default", "zod", true, [4,2,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(runtimeCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": { shareScope: "default", shareKey: "zod", import: "zod", requiredVersion: "2.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+
+          test('should auto resolve requiredVersion for external dep on server', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const serverCodeResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/server/server.js`
+            );
+            const serverCode = await serverCodeResponse.text();
+
+            if (builder === 'webpack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": () => (loadStrictVersion("default", "zod", true, [4,2,0,0]'
+                );
+            } else if (builder === 'rspack') {
+              test
+                .expect(serverCode)
+                .toContain(
+                  '"webpack/sharing/consume/default/zod/zod": { shareScope: "default", shareKey: "zod", import: "zod", requiredVersion: "2.0.0", strictVersion: true, singleton: false, eager: true'
+                );
+            }
+          });
+        });
+
+        test.describe('disabled', async () => {
+          test.use({
+            inputParameters: {
+              name: 'app-mf-host-broken',
+              rootDir: testSuiteFolder,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should generate warnings in build logs about wrong package version', async ({
+            spawnDevServer,
+          }) => {
+            const { logs } = spawnDevServer;
+
+            test
+              .expect(
+                logs.some((log) =>
+                  log.includes(
+                    'version specified and unable to automatically determine one. Unable to find'
+                  )
+                )
+              )
+              .toBeTruthy();
+          });
+        });
+
+        // Only in rspack we can test without FixRange plugin
+        if (builder === 'rspack') {
+          test.describe('disabled with duplicate dependencies', async () => {
             test.use({
               inputParameters: {
-                name: 'app-mf-host-auto-resolve-shared',
+                name: 'app-mf-host-duplicate-tramvai-autoresolve-disabled',
                 rootDir: testSuiteFolder,
                 fileCache: false,
                 noRebuild: true,
@@ -3262,9 +3485,7 @@ export default Cmp;`,
               },
             });
 
-            test('should use requiredVersion field for tinkoff/logger on client', async ({
-              devServer,
-            }) => {
+            test('should use strict version for tinkoff/url on client', async ({ devServer }) => {
               await devServer.buildPromise;
 
               const runtimeResponse = await fetch(
@@ -3275,13 +3496,11 @@ export default Cmp;`,
               test
                 .expect(runtimeCode)
                 .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [2,0,10,518]'
+                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": { shareScope: "default", shareKey: "@tinkoff/url", import: "@tinkoff/url", requiredVersion: "2.0.0", strictVersion: true, singleton: false, eager: true'
                 );
             });
 
-            test('should use requiredVersion field for tinkoff/logger on server', async ({
-              devServer,
-            }) => {
+            test('should use strict version for tinkoff/url on server', async ({ devServer }) => {
               await devServer.buildPromise;
 
               const serverCodeResponse = await fetch(
@@ -3292,28 +3511,12 @@ export default Cmp;`,
               test
                 .expect(serverCode)
                 .toContain(
-                  '"webpack/sharing/consume/default/@tinkoff/logger/@tinkoff/logger": () => (loadStrictVersion("default", "@tinkoff/logger", true, [2,0,10,518]'
+                  '"webpack/sharing/consume/default/@tinkoff/url/@tinkoff/url": { shareScope: "default", shareKey: "@tinkoff/url", import: "@tinkoff/url", requiredVersion: "2.0.0", strictVersion: true, singleton: false, eager: true'
                 );
             });
-
-            test('should be no warnings in build logs about wrong package version', ({
-              spawnDevServer,
-            }) => {
-              const { logs } = spawnDevServer;
-
-              test
-                .expect(
-                  logs.some((log) =>
-                    log.includes(
-                      'version specified and unable to automatically determine one. Unable to find'
-                    )
-                  )
-                )
-                .toBeFalsy();
-            });
           });
-        });
-      }
+        }
+      });
     });
 
     // test.describe('api: application build', () => {});

@@ -52,7 +52,6 @@ import {
   defaultExtensions,
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 import {
-  ModuleFederationFixRange,
   ModuleFederationIgnoreEntries,
   RuntimePathPlugin,
   PolyfillConditionPlugin,
@@ -401,9 +400,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           publicPath: 'window.ap',
         }),
       new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
-      new ModuleFederationFixRange({
-        flexibleTramvaiVersions: config.shared!.flexibleTramvaiVersions,
-      }),
       showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
       new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
       new webpack.ProvidePlugin({

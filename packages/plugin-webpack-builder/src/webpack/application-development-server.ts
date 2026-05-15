@@ -44,7 +44,6 @@ import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
 import {
   RuntimePathPlugin,
   ModuleFederationIgnoreEntries,
-  ModuleFederationFixRange,
   VirtualProtocolPlugin,
 } from '@tramvai/plugin-base-builder/lib/plugins';
 
@@ -342,9 +341,6 @@ export default appConfig;`;
         shared: getSharedModules(config),
       }),
       new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
-      new ModuleFederationFixRange({
-        flexibleTramvaiVersions: config.shared?.flexibleTramvaiVersions,
-      }),
       config.showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': false,

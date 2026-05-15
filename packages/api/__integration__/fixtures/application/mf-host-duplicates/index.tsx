@@ -1,19 +1,14 @@
 import { provide } from '@tinkoff/dippy';
 // @ts-ignore fake tinkoff/url library for flex tramvai test
-import { url } from '@tinkoff/url';
+import { zod } from 'zod';
 // @ts-ignore fake external library for custom shared deps test
 import { external } from 'external-library';
-import { zod } from 'zod';
 
-import { logger } from '@tinkoff/logger';
+import { url } from '@tinkoff/url';
 
 import { App } from './App';
 
-logger.addReporter({ log: () => {} });
-logger.info(url);
-logger.info(external);
-
-console.log(zod);
+console.log(url, external, zod);
 
 provide({
   provide: 'cool token',

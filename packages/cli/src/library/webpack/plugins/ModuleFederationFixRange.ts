@@ -4,7 +4,7 @@ import { WebpackError } from 'webpack';
 // @ts-ignore
 // eslint-disable-next-line no-restricted-imports
 import { parseRange, satisfy } from 'webpack/lib/util/semver';
-import { isDependantLib, isUnifiedVersion } from '../utils';
+import { isDependantLib, isUnifiedVersion } from '@tramvai/plugin-base-builder/lib/utils';
 
 const PLUGIN_NAME = 'ModuleFederationValidateDuplicates';
 
