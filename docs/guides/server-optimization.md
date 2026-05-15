@@ -36,11 +36,11 @@ This guide will contain a set of recommended optimizations to make your applicat
 
 ### K8s limits
 
-**TL;DR**: provide **1000m - 1150m** CPU limit/request, run Node.js with `--max-old-space-size=(0.75% * memory.limit)` parameter
+**TL;DR**: provide **1000m - 1150m** CPU limit/request, and if you have OOM errors, run Node.js with `--max-old-space-size=(0.70% * memory.limit)` parameter
 
 :::tip
 
-Starting from Node.js 24 you can use `--max-old-space-size-percentage=75`.
+Starting from Node.js 24 you can use `--max-old-space-size-percentage=70`.
 
 :::
 
@@ -53,9 +53,13 @@ Node.js is single-threaded, but can use multiple threads for Garbage Collector o
 
 There is a one disadvantage - with this CPU limits, if you maintain a sufficient number of instances with good latency and throughput, you may experience poor CPU utilization. Nevertheless, this represents a trade-off between effective CPU usage and low latency.
 
-With memory limits, to optimize memory optimization and prevent OOM failures, you need to pass [--max-old-space-size](https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-mib) parameter to Node.js options.
+With memory limits, to optimize memory optimization and prevent OOM failures, you may need to pass [--max-old-space-size](https://nodejs.org/api/cli.html#--max-old-space-sizesize-in-mib) parameter to Node.js options.
 
-As a start, you can calculate size by the following formula: `0.75 * memory.limit`, or 75% of current container memory limit. Then you can run benchmark and monitor application metrics for a long time, and try to find optimal value. This is recommendation from [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices/blob/master/sections/docker/memory-limit.md) guide.
+By default, Node.js will read cgroup `memory.max` and automatically size the heap accordingly.
+
+As a start, you can calculate size by the following formula: `0.70 * memory.limit`, or 60-75% of current container memory limit. Then you can run benchmark and monitor application metrics for a long time, and try to find optimal value. This is recommendation from [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices/blob/master/sections/docker/memory-limit.md) guide.
+
+75% of memory limit can be too much because some API's (`Buffer`, `Worker`) will allocate memory outside of V8 heap, and total RSS will be bigger than k8s memory limit.
 
 For setting this parameter you need to run `server.js` using the `node` command with the `--max-old-space-size` parameter. This command is typically located in the `Dockerfile`:
 
@@ -101,7 +105,7 @@ If you are deploying to environment with VPA, you should reference to `requests.
 
 ```Dockerfile title="Dockerfile"
 // highlight-next-line
-CMD node --max-old-space-size=$((MEMORY_LIMIT_BYTES * 75 / 100)) /app/server.js
+CMD node --max-old-space-size=$((MEMORY_LIMIT_BYTES * 70 / 100)) /app/server.js
 ```
 
 Worth noting that if your runtime image does not have shell (bash, sh) you should write custom wrapper in appropriate language (e.g. Node.js) to perform computations:
@@ -112,7 +116,7 @@ const process = require('node:process');
 
 const getMemoryLimit = () => {
   const DEFAULT_SIZE = 512;
-  const FRACTION = 0.75;
+  const FRACTION = 0.7;
 
   const parsed = Number.parseInt(process.env.MEMORY_LIMIT_BYTES, 10);
 
