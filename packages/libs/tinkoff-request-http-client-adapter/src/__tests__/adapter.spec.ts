@@ -372,6 +372,52 @@ describe('@tinkoff/request to HttpClient adapter', () => {
       await terminate();
     });
 
+    it('Deduplication should correctly work with retry', async () => {
+      const errorHandlerMock = jest.fn(async (req, res) => {
+        res.status(403).send('error');
+      });
+
+      const applyMockHandlers = (app: Express) => {
+        app.get('/first', errorHandlerMock);
+      };
+
+      const { port, terminate } = await startMockServer(applyMockHandlers);
+      const httpClient = createAdapter({
+        logger: loggerFactoryMock,
+        baseUrl: `http://localhost:${port}/`,
+        getCacheKey: (request) => String(request.url),
+        disableCache: true,
+        timeout: 4_000,
+        retryOptions: {
+          retry: 1,
+          retryDelay: 1_000,
+        },
+        interceptors: [
+          (request, next) => {
+            return next({
+              ...request,
+              deduplicateCache: true,
+            });
+          },
+        ],
+      });
+
+      let error;
+
+      try {
+        await httpClient.request({ path: 'first' });
+      } catch (e) {
+        error = e;
+      }
+
+      expect(error).toMatchObject({
+        status: 403,
+        body: 'error',
+      });
+
+      await terminate();
+    });
+
     it('cached requests include response status code', async () => {
       const STATUS = 204;
       const handler: Handler = jest.fn((_, res) => {
