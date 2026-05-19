@@ -43,8 +43,10 @@ exports[`seo ssr test common meta 1`] = `
           }
         };
       })([
+        { url: "\${STATIC_URL}/dist/client/runtime.js" },
         { url: "\${STATIC_URL}/dist/client/root.chunk.js" },
         { url: "\${STATIC_URL}/dist/client/react.js" },
+        { url: "\${STATIC_URL}/dist/client/tramvai.js" },
         { url: "\${STATIC_URL}/dist/client/platform.js" },
       ]);
     </script>
@@ -57,7 +59,12 @@ exports[`seo ssr test common meta 1`] = `
     
 
     
-
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -80,6 +87,12 @@ exports[`seo ssr test common meta 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
       charset="utf-8"
@@ -128,7 +141,12 @@ exports[`seo ssr test default meta pack 1`] = `
     
 
     
-
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -151,6 +169,12 @@ exports[`seo ssr test default meta pack 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
       charset="utf-8"
@@ -212,7 +236,12 @@ exports[`seo ssr test og meta 1`] = `
     
 
     
-
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -235,6 +264,12 @@ exports[`seo ssr test og meta 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
       charset="utf-8"
@@ -277,7 +312,12 @@ exports[`seo ssr test robots all meta 1`] = `
     
 
     
-
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -300,6 +340,12 @@ exports[`seo ssr test robots all meta 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
       charset="utf-8"
@@ -342,7 +388,12 @@ exports[`seo ssr test robots skip meta 1`] = `
     
 
     
-
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -365,6 +416,12 @@ exports[`seo ssr test robots skip meta 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
       charset="utf-8"
@@ -411,7 +468,12 @@ exports[`seo ssr test twitter meta 1`] = `
     
 
     
-
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/runtime.js"
+    ></script>
     
 
     
@@ -434,6 +496,12 @@ exports[`seo ssr test twitter meta 1`] = `
       crossorigin="anonymous"
       data-critical="true"
       src="\${STATIC_URL}/dist/client/react.js"
+    ></script>
+    <script defer="defer"
+      charset="utf-8"
+      crossorigin="anonymous"
+      data-critical="true"
+      src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
       charset="utf-8"

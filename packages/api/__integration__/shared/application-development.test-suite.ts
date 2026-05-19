@@ -486,6 +486,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       hotRefresh: {
         enabled: false,
       },
+      liveReload: true,
       entryFile: path.join(fixturesFolder, 'application', 'refresh-disabled', 'index.tsx'),
     },
     'app-provide': {
@@ -951,8 +952,7 @@ export default bar;`,
               await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
             ).text();
 
-            test.expect(serverJs).toContain('xmlns=');
-            test.expect(serverJs).toContain('<svg id=');
+            test.expect(serverJs).toContain('<svg xmlns=');
           });
         });
 
@@ -1385,8 +1385,8 @@ export default createPapiMethod({
                 swc: 'sha256-GNmALC0ldUkPTlGkvrhlir6ceAhXAUWWViZcSceP7hs=',
               },
               webpack: {
-                babel: 'sha256-l2lgOz7J7r4/Hqg1cogaNsMdiur7RNXVV8+/O4c6EWU=',
-                swc: 'sha256-0urdCyFSpBDhffRJVPsMpLpKPbJJ/+woh0zJ4/TcLF0=',
+                babel: 'sha256-+5PtjFPwPfz/xVMsQ953D6plfv4cuAKAhbpgtu1Uu3A=',
+                swc: 'sha256-7+VVUOoeRXkEj1oD9OK/joIbb6PkdcXzLNsLW2kGiik=',
               },
             };
 
@@ -1798,12 +1798,12 @@ export default bar;`,
               `http://localhost:${devServer.staticPort}/dist/server/platform.css`
             );
 
-            test.expect(platformJs).toContain('style-module__header_');
-            test.expect(platformCss).toContain('style-module__header_');
+            test.expect(platformJs).toContain('style--module__header_');
+            test.expect(platformCss).toContain('style--module__header_');
             test.expect(platformCss).toContain('color: red;');
             test.expect(platformCss).not.toContain('-webkit-user-select: none;');
             test.expect(platformCss).toContain('padding: 8px;');
-            test.expect(serverJs).toContain('style-module__header_');
+            test.expect(serverJs).toContain('style--module__header_');
             test.expect(serverCssResponse.status).toBe(404);
           });
         });
@@ -2138,8 +2138,6 @@ export default Cmp;`,
             const runtimeJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/runtime.js`)
             ).text();
-
-            console.log(runtimeJs);
 
             await page.goto(`http://localhost:${devServer.port}`);
 

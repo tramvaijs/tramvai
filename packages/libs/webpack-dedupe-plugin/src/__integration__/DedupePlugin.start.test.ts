@@ -9,6 +9,7 @@ jest.setTimeout(160000);
 const runStart = async (target: string) => {
   const cliResult = await start({
     target,
+    buildType: 'client',
     rootDir,
   });
   const staticUrl = getStaticUrl(cliResult);

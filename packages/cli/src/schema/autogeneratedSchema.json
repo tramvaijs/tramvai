@@ -1351,23 +1351,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@10295": {
+                        "__@match@10296": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10297": {
+                        "__@replace@10298": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10300": {
+                        "__@search@10301": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10302": {
+                        "__@split@10303": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10304": {
+                        "__@matchAll@10305": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -1499,6 +1499,11 @@
             }
           },
           "additionalProperties": false
+        },
+        "liveReload": {
+          "title": "Webpack live reload page after rebuild",
+          "default": true,
+          "type": "boolean"
         },
         "notifications": {
           "title": "Controls build notifications settings during development",
@@ -2213,23 +2218,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@10295": {
+                        "__@match@10296": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10297": {
+                        "__@replace@10298": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10300": {
+                        "__@search@10301": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10302": {
+                        "__@split@10303": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10304": {
+                        "__@matchAll@10305": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2361,6 +2366,11 @@
             }
           },
           "additionalProperties": false
+        },
+        "liveReload": {
+          "title": "Webpack live reload page after rebuild",
+          "default": true,
+          "type": "boolean"
         },
         "notifications": {
           "title": "Controls build notifications settings during development",
@@ -3075,23 +3085,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@10295": {
+                        "__@match@10296": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10297": {
+                        "__@replace@10298": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10300": {
+                        "__@search@10301": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10302": {
+                        "__@split@10303": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10304": {
+                        "__@matchAll@10305": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -3223,6 +3233,11 @@
             }
           },
           "additionalProperties": false
+        },
+        "liveReload": {
+          "title": "Webpack live reload page after rebuild",
+          "default": true,
+          "type": "boolean"
         },
         "notifications": {
           "title": "Controls build notifications settings during development",

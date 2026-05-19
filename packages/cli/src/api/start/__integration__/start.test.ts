@@ -86,8 +86,8 @@ describe('@tramvai/cli start command', () => {
         expect(appConfig).toMatchObject({
           port: serverPort,
           staticPort: staticServerPort,
-          type: 'application',
-          name: 'app',
+          projectType: 'application',
+          projectName: 'app',
         });
 
         const { body: browserslistConfig } = await request
@@ -155,6 +155,10 @@ describe('@tramvai/cli start command', () => {
         resolveSymlinks: false,
         config: {
           name: 'app',
+          liveReload: false,
+          hotRefresh: {
+            enabled: false,
+          },
           type: 'application',
           root,
           experiments: {
@@ -162,8 +166,6 @@ describe('@tramvai/cli start command', () => {
             transpilation: {
               loader: 'swc',
             },
-            // for threads "chdir" is used, cwd is changed and it can breaks some integration tests
-            serverRunner: 'process',
           },
         },
       });
@@ -191,8 +193,9 @@ describe('@tramvai/cli start command', () => {
       return close();
     });
 
+    // onlyBundles option is not supported in new tramvai cli
     // eslint-disable-next-line jest/expect-expect
-    it('should allow to exclude bundles from build', async () => {
+    it.skip('should allow to exclude bundles from build', async () => {
       let { server, close } = await start({
         rootDir: FIXTURES_DIR,
         target: 'app',
@@ -240,13 +243,12 @@ describe('@tramvai/cli start command', () => {
           port: getListeningPort(testServerStub),
           staticPort: getListeningPort(testStaticServerStub),
         })
-      ).rejects.toThrow('listen EADDRINUSE: address already in use');
-
-      return Promise.all([stopServer(testServerStub), stopServer(testStaticServerStub)]);
+      ).rejects.toThrow(/listen EADDRINUSE: address already in use/);
     });
   });
 
-  describe('module', () => {
+  // Module build is not supported in new tramvai cli
+  describe.skip('module', () => {
     // eslint-disable-next-line jest/expect-expect
     it('should start module by target', async () => {
       const { staticServer, close } = await start({
@@ -265,6 +267,7 @@ describe('@tramvai/cli start command', () => {
 
     it('should start module by specific config', async () => {
       const { staticServer, close } = await start({
+        // @ts-ignore
         config: {
           type: 'module',
           name: 'module',

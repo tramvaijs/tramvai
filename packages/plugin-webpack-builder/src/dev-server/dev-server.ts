@@ -61,15 +61,20 @@ export function createDevServer({
       ]);
 
       if (!inputParameters.staticPort) {
-        inputParameters.staticPort = portManager.staticPort!;
+        config.updateParam('staticPort', portManager.staticPort!);
+      }
+
+      if (!inputParameters.port) {
+        config.updateParam('port', portManager.port!);
       }
 
       const compilationWatcher = new CompilationWatcher();
       const proxy = createProxy({
-        port: portManager.port!,
-        selfSignedCertificate,
-        staticPort: portManager.staticPort!,
+        port: config.port!,
         hostname: config.host,
+        selfSignedCertificate,
+        staticPort: config.staticPort!,
+        staticHost: config.staticHost,
         serverBuildPort,
         browserBuildPort,
         serverRunnerPort,
@@ -108,8 +113,9 @@ export function createDevServer({
         config,
         workerPath: serverRunnerWorkerPath,
         workerData: {
+          cwd: config.rootDir,
           port: serverRunnerPort,
-          proxyPort: portManager.port!,
+          proxyPort: config.port!,
           disableServerRunnerWaiting,
         },
       });
@@ -121,7 +127,8 @@ export function createDevServer({
           type: config.projectType,
           target: 'server',
           port: serverBuildPort,
-          inputParameters,
+          // provide patched input parameters from config service
+          inputParameters: config.getParams(),
           extraConfiguration: config.extraConfiguration,
         },
       });
@@ -133,7 +140,8 @@ export function createDevServer({
           type: config.projectType,
           target: 'client',
           port: browserBuildPort,
-          inputParameters,
+          // provide patched input parameters from config service
+          inputParameters: config.getParams(),
           extraConfiguration: config.extraConfiguration,
         },
       });
@@ -316,11 +324,23 @@ export function createDevServer({
         });
       }
 
-      await proxy.listen();
+      try {
+        await proxy.listen();
+      } catch (err) {
+        await Promise.all([
+          proxy.close(),
+          serverRunnerWorker.destroy(),
+          serverWebpackWorker.destroy(),
+          clientWebpackWorker.destroy(),
+          ...closeHandlers.map((handler) => handler()),
+        ]);
+
+        throw err;
+      }
 
       return {
-        port: portManager.port!,
-        staticPort: portManager.staticPort!,
+        port: config.port!,
+        staticPort: config.staticPort!,
         server: proxy.server,
         staticServer: proxy.staticServer,
         getStats: () => ({

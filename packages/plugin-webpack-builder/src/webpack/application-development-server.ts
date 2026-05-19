@@ -1,5 +1,4 @@
 /* eslint-disable max-statements, complexity */
-import path from 'node:path';
 import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
@@ -7,6 +6,7 @@ import VirtualModulesPlugin from 'webpack-virtual-modules';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
+import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import { optional } from '@tinkoff/dippy';
 import {
   resolveAbsolutePathForFile,
@@ -92,10 +92,11 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 }): Promise<Configuration> => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
-  const { verboseLogging } = config;
+  const { verboseLogging, hotRefresh, noServerRebuild } = config;
+
+  const isHotEnabled = hotRefresh?.enabled && !noServerRebuild;
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
-  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
@@ -109,7 +110,13 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   Object.assign(alias, webpackConfigExtension.resolveAlias);
   Object.assign(provideList, webpackConfigExtension.provide);
 
-  const transpilerParameters = resolveWebpackTranspilerParameters({ di });
+  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  defineOptions.push(config.extensions.define());
+
+  const transpilerParameters = resolveWebpackTranspilerParameters({
+    di,
+    hot: isHotEnabled,
+  });
   const workerPoolConfig = createWorkerPoolConfig({ di });
 
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);

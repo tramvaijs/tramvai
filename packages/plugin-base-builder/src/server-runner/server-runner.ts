@@ -90,11 +90,20 @@ function monkeyPatchPort(actualPort: number) {
   };
 }
 
+const originalCwd = process.cwd;
+
+function monkeyPatchCWD(cwd: string) {
+  process.cwd = () => {
+    return cwd ?? originalCwd();
+  };
+}
+
 async function runServer() {
-  const { port, proxyPort, disableServerRunnerWaiting } = workerData;
+  const { port, proxyPort, disableServerRunnerWaiting, cwd } = workerData;
   process.env.PORT = String(proxyPort);
 
   monkeyPatchPort(port);
+  monkeyPatchCWD(cwd);
 
   initListenHandler((startedPort) => {
     if (Number(port) === startedPort) {

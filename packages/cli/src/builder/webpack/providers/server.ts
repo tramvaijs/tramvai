@@ -9,8 +9,7 @@ import type { ConfigGenerator } from '../types';
 
 const CONFIG_MAP: Record<Env, Record<ProjectType, () => ConfigGenerator>> = {
   development: {
-    application: () =>
-      require('../../../library/webpack/application/server/dev').webpackServerConfig,
+    application: () => ({}) as ConfigGenerator,
     module: () => require('../../../library/webpack/module/server/dev').webpackServerConfig,
     'child-app': () => require('../../../library/webpack/child-app/server/dev').webpackServerConfig,
     package: () => CONFIG_GENERATOR_STUB,

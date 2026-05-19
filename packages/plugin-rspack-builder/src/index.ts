@@ -14,13 +14,17 @@ import {
   runtimeChunkExtension,
   splitChunksConfigExtension,
   configExtension,
+  defineExtension,
 } from '@tramvai/plugin-base-builder';
 import {
   SELF_SIGNED_CERTIFICATE_TOKEN,
   createSelfSignedCertificate,
 } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
+import { showBanner } from '@tramvai/plugin-base-builder/lib/utils/banner';
+import { SHOW_BANNER_TOKEN } from '@tramvai/api/lib/services/banner';
 
 import { createDevServer } from './dev-server/dev-server';
+import { RSPACK_TRANSPILER_TOKEN } from './rspack/shared/transpiler';
 
 export {
   BUILD_TYPE_TOKEN,
@@ -61,6 +65,16 @@ export const RspackBuilderPlugin = declareModule({
       },
     }),
     provide({
+      provide: SHOW_BANNER_TOKEN,
+      useFactory: ({ config, transpiler }) => {
+        return () => showBanner(config, { transpiler });
+      },
+      deps: {
+        config: CONFIG_SERVICE_TOKEN,
+        transpiler: RSPACK_TRANSPILER_TOKEN,
+      },
+    }),
+    provide({
       provide: SELF_SIGNED_CERTIFICATE_TOKEN,
       useFactory: ({ configManager, parameters }) => {
         const { host } = configManager;
@@ -81,6 +95,10 @@ export const RspackBuilderPlugin = declareModule({
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,
       useValue: splitChunksConfigExtension,
+    }),
+    provide({
+      provide: CONFIGURATION_EXTENSION_TOKEN,
+      useValue: defineExtension,
     }),
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,

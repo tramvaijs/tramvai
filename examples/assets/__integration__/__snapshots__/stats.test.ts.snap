@@ -14,6 +14,9 @@ exports[`assets runtime chunk snapshot 1`] = `
     ],
     "react": [
       "react.js"
+    ],
+    "tramvai": [
+      "tramvai.js"
     ]
   },
   "namedChunkGroups": {
@@ -22,6 +25,7 @@ exports[`assets runtime chunk snapshot 1`] = `
       "chunks": [
         "runtime",
         "react",
+        "tramvai",
         "platform"
       ],
       "assets": [
@@ -30,6 +34,9 @@ exports[`assets runtime chunk snapshot 1`] = `
         },
         {
           "name": "react.js"
+        },
+        {
+          "name": "tramvai.js"
         },
         {
           "name": "platform.js"
@@ -62,6 +69,7 @@ exports[`assets runtime chunk snapshot 1`] = `
       "chunks": [
         "runtime",
         "react",
+        "tramvai",
         "platform"
       ],
       "assets": [
@@ -70,6 +78,9 @@ exports[`assets runtime chunk snapshot 1`] = `
         },
         {
           "name": "react.js"
+        },
+        {
+          "name": "tramvai.js"
         },
         {
           "name": "platform.js"
@@ -163,6 +174,28 @@ exports[`assets runtime chunk snapshot 1`] = `
       "hash": "0",
       "childrenByOrder": {},
       "id": "runtime"
+    },
+    {
+      "initial": true,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: tramvaiCacheGroup) (name: tramvai)",
+      "names": [
+        "tramvai"
+      ],
+      "idHints": [
+        "tramvaiCacheGroup"
+      ],
+      "runtime": [
+        "runtime"
+      ],
+      "files": [
+        "tramvai.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "0",
+      "childrenByOrder": {},
+      "id": "tramvai"
     }
   ]
 }"

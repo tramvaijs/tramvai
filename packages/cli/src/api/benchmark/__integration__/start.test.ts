@@ -29,9 +29,10 @@ describe('@tramvai/cli benchmark command', () => {
       expect(result).toMatchObject({
         clientBuildTime: expect.any(Number),
         serverBuildTime: expect.any(Number),
+        clientMaxMemoryRss: expect.any(Number),
+        serverMaxMemoryRss: expect.any(Number),
         clientCompilationStats: compilationStats,
         serverCompilationStats: compilationStats,
-        maxMemoryRss: expect.any(Number),
       });
     });
   });

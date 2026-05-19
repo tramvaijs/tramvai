@@ -3,6 +3,7 @@ import type webpack from 'webpack';
 import type { Config } from 'postcss-load-config';
 import ExtractCssPlugin from 'mini-css-extract-plugin';
 import autoprefixer from 'autoprefixer';
+import { createGenerator } from '@tinkoff/minicss-class-generator';
 // import imageSetPolyfill from 'postcss-image-set-polyfill';
 import { safeRequire } from '@tramvai/api/lib/utils/require';
 import { CONFIG_SERVICE_TOKEN, ConfigService } from '@tramvai/api/lib/config';
@@ -42,12 +43,25 @@ export const createStylesConfiguration = ({
 } => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
   const buildTarget = di.get(BUILD_TARGET_TOKEN);
+  const { mode } = config;
+
+  const cssLocalIdentName = config.postcss?.cssLocalIdentName;
 
   const cssModulesOptions: Record<string, any> = {
-    // TODO: localIdentName parameter
     localIdentName: '[name]__[local]_[minicss]',
-    // TODO: getLocalIdent
   };
+
+  if (typeof cssLocalIdentName === 'string') {
+    cssModulesOptions.localIdentName = cssLocalIdentName;
+  } else if (mode === 'development' && cssModulesOptions.development) {
+    cssModulesOptions.localIdentName = cssLocalIdentName?.development;
+  } else if (mode === 'production' && cssModulesOptions.production) {
+    cssModulesOptions.localIdentName = cssLocalIdentName?.production;
+  }
+
+  if (/\[minicss]/.test(cssModulesOptions.localIdentName)) {
+    cssModulesOptions.getLocalIdent = createGenerator();
+  }
 
   return {
     rules: [

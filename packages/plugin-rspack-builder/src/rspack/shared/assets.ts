@@ -41,6 +41,12 @@ export const createAssetsRules = ({
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
       type: 'asset/resource',
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       generator: {
         filename: (pathInfo: PathData) => {
           // hash computation exactly how it is working in react-ui-kit
@@ -56,6 +62,12 @@ export const createAssetsRules = ({
   } else {
     rules.push({
       test: /\.svg$/,
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       resourceQuery: { not: /react/ },
       type: 'asset/source',
     });

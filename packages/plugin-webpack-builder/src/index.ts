@@ -14,13 +14,17 @@ import {
   runtimeChunkExtension,
   splitChunksConfigExtension,
   configExtension,
+  defineExtension,
 } from '@tramvai/plugin-base-builder';
+import { SHOW_BANNER_TOKEN } from '@tramvai/api/lib/services/banner';
+import { showBanner } from '@tramvai/plugin-base-builder/lib/utils/banner';
 import {
   createSelfSignedCertificate,
   SELF_SIGNED_CERTIFICATE_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
 
 import { createDevServer } from './dev-server/dev-server';
+import { WEBPACK_TRANSPILER_TOKEN } from './webpack/shared/transpiler';
 
 export {
   BUILD_TYPE_TOKEN,
@@ -61,6 +65,16 @@ export const WebpackBuilderPlugin = declareModule({
       },
     }),
     provide({
+      provide: SHOW_BANNER_TOKEN,
+      useFactory: ({ config, transpiler }) => {
+        return () => showBanner(config, { transpiler });
+      },
+      deps: {
+        config: CONFIG_SERVICE_TOKEN,
+        transpiler: WEBPACK_TRANSPILER_TOKEN,
+      },
+    }),
+    provide({
       provide: SELF_SIGNED_CERTIFICATE_TOKEN,
       useFactory: ({ configManager, parameters }) => {
         const { host } = configManager;
@@ -81,6 +95,10 @@ export const WebpackBuilderPlugin = declareModule({
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,
       useValue: splitChunksConfigExtension,
+    }),
+    provide({
+      provide: CONFIGURATION_EXTENSION_TOKEN,
+      useValue: defineExtension,
     }),
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,

@@ -50,9 +50,7 @@
               "tramvai-workbox-window\\.([\\w\\d]+?\\.)?chunk.js$",
               "manifest\\.([\\w\\d]+?\\.)?webmanifest$"
             ],
-            "additionalManifestEntries": [
-              "/scope/"
-            ]
+            "additionalManifestEntries": ["/scope/"]
           },
           "webmanifest": {
             "enabled": true,
@@ -64,10 +62,7 @@
           "icon": {
             "src": "images/pwa-icon.png",
             "dest": "images",
-            "sizes": [
-              36,
-              512
-            ]
+            "sizes": [36, 512]
           },
           "meta": {
             "themeColor": "#ffdd2d",

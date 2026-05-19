@@ -100,6 +100,7 @@ it('should populate defaults for config', () => {
             },
           },
           "integrity": false,
+          "liveReload": true,
           "name": "test-app",
           "notifications": {},
           "output": {
@@ -170,6 +171,7 @@ it('should populate defaults for config', () => {
             },
           },
           "integrity": false,
+          "liveReload": true,
           "name": "test-child-app",
           "notifications": {},
           "output": "dist/child-app",
@@ -358,6 +360,7 @@ it('should populate defaults for overridable options', () => {
             },
           },
           "integrity": false,
+          "liveReload": true,
           "name": "test-app",
           "notifications": {},
           "output": {
@@ -443,6 +446,7 @@ it('should populate defaults for overridable options', () => {
             },
           },
           "integrity": false,
+          "liveReload": true,
           "name": "test-child-app",
           "notifications": {},
           "output": "dist/child-app",

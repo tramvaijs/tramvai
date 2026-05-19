@@ -4,10 +4,9 @@ import type { WorkerBridgeFactory } from '../base/types';
 import { TRACE_ARGV } from '../../../../../config/constants';
 import { getDebugArg } from '../../../../../config/utils';
 import { SERVER_CONFIG_MANAGER_TOKEN } from '../../../tokens';
-import { COMMAND_PARAMETERS_TOKEN, CONFIG_ROOT_DIR_TOKEN } from '../../../../../di/tokens';
+import { CONFIG_ROOT_DIR_TOKEN } from '../../../../../di/tokens';
 
 export const ThreadWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
-  const { env } = di.get(COMMAND_PARAMETERS_TOKEN);
   const configManager = di.get(SERVER_CONFIG_MANAGER_TOKEN);
   let firstWorker = true;
 
@@ -33,7 +32,7 @@ export const ThreadWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
         ),
         env: {
           ...process.env,
-          ...env,
+          ...configManager.appEnv,
           NODE_ENV: 'development',
           // port=0 позволяет запустить сервер на случайном доступном порту
           // https://nodejs.org/dist/latest-v15.x/docs/api/all.html#cluster_how_it_works
@@ -42,7 +41,7 @@ export const ThreadWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
           HOST: `${configManager.host}`,
           HOST_STATIC: `${configManager.staticHost}`,
           PORT_STATIC: `${configManager.staticPort}`,
-          TRAMVAI_CLI_WATCH_INITIAL_BUILD: firstWorker,
+          TRAMVAI_CLI_WATCH_INITIAL_BUILD: String(firstWorker),
         },
       });
 

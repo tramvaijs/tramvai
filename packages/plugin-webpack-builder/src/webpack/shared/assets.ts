@@ -34,6 +34,12 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
       type: 'asset/resource',
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       generator: {
         filename: (pathInfo: any) => {
           // hash computation exactly how it is working in react-ui-kit
@@ -46,6 +52,12 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
     rules.push({
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       type: 'asset/source',
     });
   }

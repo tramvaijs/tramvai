@@ -132,8 +132,8 @@ const formatStatsTables = (stats: Result, times: number | undefined = DEFAULT_TI
     clientBuildTime,
     clientCompilationStats,
     serverBuildTime,
-    serverCompilationStats,
     maxMemoryRss,
+    serverCompilationStats,
     clientMaxMemoryRss,
     serverMaxMemoryRss,
   } = stats;

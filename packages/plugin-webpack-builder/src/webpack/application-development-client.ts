@@ -1,5 +1,6 @@
 /* eslint-disable max-statements, complexity */
 import { Writable } from 'node:stream';
+
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
@@ -41,7 +42,6 @@ import { createSnapshot } from '@tramvai/plugin-base-builder/lib/shared/snapshot
 import { CACHE_ADDITIONAL_FLAGS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/cache';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';
-import { createSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
@@ -73,6 +73,7 @@ import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createCacheConfig } from './shared/cache';
+import { createSplitChunksOptions } from './shared/split-chunks';
 
 import { WebpackConfigurationFactory } from './types/webpack';
 
@@ -115,13 +116,17 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     rootDir,
     showProgress,
     hotRefresh,
+    noClientRebuild,
+    liveReload,
     integrity,
     projectType,
     verboseLogging,
   } = config;
 
+  const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
+  const isLiveReloadEnabled = liveReload && !noClientRebuild;
+
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
-  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
@@ -129,13 +134,19 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
   const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
-  const webpackConfigExtension = config.extensions.webpack();
 
+  const webpackConfigExtension = config.extensions.webpack();
   Object.assign(fallback, webpackConfigExtension.resolveFallback);
   Object.assign(alias, webpackConfigExtension.resolveAlias);
   Object.assign(provideList, webpackConfigExtension.provide);
 
-  const transpilerParameters = resolveWebpackTranspilerParameters({ di });
+  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  defineOptions.push(config.extensions.define());
+
+  const transpilerParameters = resolveWebpackTranspilerParameters({
+    di,
+    hot: Boolean(isHotEnabled),
+  });
   const workerPoolConfig = createWorkerPoolConfig({ di });
 
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
@@ -172,7 +183,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 
   const polyfillPath = safeRequireResolve(
     resolveAbsolutePathForFile({
-      file: polyfill ?? './src/polyfill',
+      file: polyfill ?? 'polyfill',
       sourceDir,
       rootDir,
     }),
@@ -180,7 +191,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   );
   const modernPolyfillPath = safeRequireResolve(
     resolveAbsolutePathForFile({
-      file: modernPolyfill ?? './src/modern.polyfill',
+      file: modernPolyfill ?? 'modern.polyfill',
       sourceDir,
       rootDir,
     }),
@@ -192,7 +203,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'client' });
-
   const resolveOptions = await createResolveOptions({ di, mainFields });
 
   return {
@@ -212,7 +222,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             sourceDir: config.sourceDir,
             rootDir: config.rootDir,
           }),
-          'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
+          (isLiveReloadEnabled || isHotEnabled) &&
+            'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
         ].filter(Boolean) as string[],
       },
       ...(polyfillPath
@@ -406,7 +417,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         process: 'process',
         ...provideList,
       }),
-      new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
@@ -437,7 +447,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             new AssetsIntegritiesPlugin({ fileName: STATS_FILE_NAME }),
           ]
         : []),
-      ...(hotRefresh?.enabled
+      (isLiveReloadEnabled || isHotEnabled) && new webpack.HotModuleReplacementPlugin(),
+      ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({
               ...hotRefresh.options,

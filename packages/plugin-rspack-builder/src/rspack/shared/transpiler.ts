@@ -49,6 +49,10 @@ export type RspackTranspilerInputParameters = {
 
 export type RspackTranspiler = {
   /**
+   * Name of loader for logging purpose
+   */
+  name: string;
+  /**
    * Name of rspack loader for processing JS and TS files
    */
   loader: string;
@@ -95,7 +99,7 @@ export const resolveRspackTranspilerParameters = (
     rootDir,
     //   enableFillActionNamePlugin,
     //   excludesPresetEnv,
-    //   experiments: { reactCompiler },
+    experiments: { reactCompiler },
   } = config;
   // const { env, modern } = configManager;
   const isServer = buildTarget === 'server';
@@ -120,7 +124,7 @@ export const resolveRspackTranspilerParameters = (
     modules: false,
     typescript: false,
     enableFillDeclareActionNamePlugin,
-    // reactCompiler,
+    reactCompiler: reactCompiler ?? false,
     // ...overrideOptions,
   };
 };
@@ -185,7 +189,12 @@ export const createTranspilerRules = ({
             : /node_modules/,
       // thread-loader trying to resolve virtual modules as real files and fail webpack build,
       // so we should ignore such modules in our filter
-      exclude: [/virtual:tramvai/],
+      exclude: defaultIncludeList,
+      // esm packages with invalid imports break build
+      // if package.json has type module import must contain extension
+      resolve: {
+        fullySpecified: false,
+      },
       use: [
         {
           loader: transpiler.loader,

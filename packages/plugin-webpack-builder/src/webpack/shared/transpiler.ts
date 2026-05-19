@@ -56,6 +56,10 @@ export type WebpackTranspilerInputParameters = {
 
 export type WebpackTranspiler = {
   /**
+   * Name of loader for logging purpose
+   */
+  name: string;
+  /**
    * Name of webpack loader for processing JS and TS files
    */
   loader: string;
@@ -85,10 +89,12 @@ export const resolveWebpackTranspilerParameters = (
     di,
     buildTarget = di.get(BUILD_TARGET_TOKEN),
     buildEnv = di.get(BUILD_MODE_TOKEN),
+    hot = false,
   }: {
     di: Container;
     buildTarget?: 'server' | 'client';
     buildEnv?: 'development' | 'production';
+    hot?: boolean;
   }
   // overrideOptions: Partial<WebpackTranspilerInputParameters> = {}
 ): WebpackTranspilerInputParameters => {
@@ -116,7 +122,7 @@ export const resolveWebpackTranspilerParameters = (
     tramvai: true,
     removeTypeofWindow: true,
     include: config.transpilation.include,
-    hot: !!config.hotRefresh?.enabled,
+    hot,
     // excludesPresetEnv,
     // enableFillActionNamePlugin,
     rootDir,
@@ -163,19 +169,29 @@ export const createTranspilerRules = ({
   const shouldSkipTranspile = include === 'none';
   const shouldTranspileManualList = Array.isArray(include);
   const shouldTranspileOnlyModern = include === 'only-modern';
-  const defaultIncludeList = [
+  const virtualList = [
     /[\\/]cli[\\/]lib[\\/]external[\\/]/,
     /[\\/]api[\\/]lib[\\/]virtual[\\/]/,
     /virtual:tramvai/,
   ];
   const manualIncludeList = Array.isArray(include)
-    ? include.map((dependencyPath) => new RegExp(dependencyPath)).concat(defaultIncludeList)
-    : defaultIncludeList;
+    ? include.map((dependencyPath) => new RegExp(dependencyPath))
+    : [];
 
   return [
     {
+      test: /\.js$/,
+      include: virtualList,
+      use: [
+        {
+          loader: transpiler.loader,
+          options: transpiler.configFactory(transpilerParameters),
+        },
+      ],
+    },
+    {
       test: /\.[cm]?js[x]?$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, ...virtualList],
       use: [
         transpiler.useThreadLoader && {
           loader: 'thread-loader',
@@ -198,7 +214,12 @@ export const createTranspilerRules = ({
             : /node_modules/,
       // thread-loader trying to resolve virtual modules as real files and fail webpack build,
       // so we should ignore such modules in our filter
-      exclude: [/virtual:tramvai/],
+      exclude: virtualList,
+      // esm packages with invalid imports break build
+      // if package.json has type module import must contain extension
+      resolve: {
+        fullySpecified: false,
+      },
       use: [
         transpiler.useThreadLoader && {
           loader: 'thread-loader',
@@ -212,7 +233,6 @@ export const createTranspilerRules = ({
     },
     {
       test: /\.ts[x]?$/,
-      // test: [/\.ts[x]?$/, /^virtual:/],
       exclude: /node_modules/,
       use: [
         transpiler.useThreadLoader && {

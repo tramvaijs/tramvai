@@ -7,7 +7,7 @@
 // TODO: it is profitable?
 // module.enableCompileCache(cacheDir);
 
-require('@tramvai/api/lib/utils/cpu-profile');
+require('@tramvai/plugin-base-builder/lib/utils/cpu-profile');
 const { tracer } = require('@tramvai/api/lib/services/tracer');
 
 tracer.init();

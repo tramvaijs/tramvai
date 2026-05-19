@@ -10,7 +10,7 @@ import {
 import { RspackDevServer } from '@rspack/dev-server';
 
 import { CONFIG_SERVICE_TOKEN, InputParameters } from '@tramvai/api/lib/config';
-import type { ExtractDependencyType, DI_TOKEN } from '@tinkoff/dippy';
+import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { logger } from '@tramvai/api/lib/services/logger';
 import { TRACER_TOKEN } from '@tramvai/api/lib/tokens';
 import { DevServer as TramvaiDevServer } from '@tramvai/api/src/builder/dev-server';
@@ -28,7 +28,6 @@ export async function runBuild(
     isInitialBuild,
     isServerBuildNeeded,
     isClientBuildNeeded,
-    inputParameters,
   }: {
     buildPort: number;
     devServerPort: number;
@@ -36,7 +35,6 @@ export async function runBuild(
     isServerBuildNeeded: boolean;
     isClientBuildNeeded: boolean;
     isInitialBuild: () => boolean;
-    inputParameters: InputParameters;
   },
   hooks: {
     onBuildEnd: Function;
@@ -46,16 +44,12 @@ export async function runBuild(
   }
 ): Promise<{ buildServer: RspackDevServer; getBuildStats: TramvaiDevServer['getStats'] }> {
   let rspackConfig: Configuration[];
-  const { extraConfiguration } = config;
-
   switch (`${config.projectType}`) {
     case 'application': {
       rspackConfig = await Promise.all(
         [
-          isClientBuildNeeded &&
-            rspackApplicationDevelopmentClientConfig(inputParameters, extraConfiguration),
-          isServerBuildNeeded &&
-            rspackApplicationDevelopmentServerConfig(inputParameters, extraConfiguration),
+          isClientBuildNeeded && rspackApplicationDevelopmentClientConfig(config),
+          isServerBuildNeeded && rspackApplicationDevelopmentServerConfig(config),
         ].filter(Boolean) as RspackOptions[]
       );
       break;

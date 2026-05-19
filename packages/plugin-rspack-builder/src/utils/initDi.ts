@@ -17,19 +17,9 @@ import {
 import { RSPACK_TRANSPILER_TOKEN } from '../rspack/shared/transpiler';
 
 export async function initDi(
-  inputParameters: InputParameters,
-  extraConfiguration: Partial<Configuration>,
+  config: ConfigService,
   { type, target }: { type: BuildType; target: BuildTarget }
 ) {
-  const config = new ConfigService(
-    {
-      mode: 'development',
-      ...inputParameters,
-    },
-    extraConfiguration
-  );
-  await config.initialize();
-
   const plugins: Array<ModuleType | ExtendedModule> = config.plugins.map((plugin) => {
     if (typeof plugin === 'string') {
       const possibleModule = require(plugin).default;
@@ -55,7 +45,7 @@ export async function initDi(
       }),
       provide({
         provide: INPUT_PARAMETERS_TOKEN,
-        useValue: inputParameters,
+        useValue: config.getParams(),
       }),
       provide({
         provide: BUILD_TYPE_TOKEN,

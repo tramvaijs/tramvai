@@ -17,6 +17,7 @@ export const BabelTranspilerPlugin = declareModule({
       provide: WEBPACK_TRANSPILER_TOKEN,
       useFactory: ({ config }) => {
         return {
+          name: 'babel',
           loader: 'babel-loader',
           configFactory: (parameters: WebpackTranspilerInputParameters) => {
             return configFactory(parameters);
@@ -41,6 +42,7 @@ export const BabelTranspilerPlugin = declareModule({
       provide: RSPACK_TRANSPILER_TOKEN,
       useFactory: ({ config }) => {
         return {
+          name: 'babel',
           loader: 'babel-loader',
           configFactory: (parameters: RspackTranspilerInputParameters) => {
             return configFactory(parameters);

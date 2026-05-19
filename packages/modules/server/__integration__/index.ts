@@ -10,7 +10,7 @@ import {
 } from '@tramvai/module-server';
 import { LogModule } from '@tramvai/module-log';
 import { createPapiMethod } from '@tramvai/papi';
-import { bundles } from '../../../../test/shared/common';
+import { bundles } from '@tramvai/internal-test-utils/shared/common';
 
 createApp({
   providers: [
@@ -25,7 +25,9 @@ createApp({
     },
     {
       provide: LIVENESS_PATH_TOKEN,
-      useValue: process.env.CUSTOM_LIVENESS_PATH ?? '/healthz',
+      useFactory: () => {
+        return process.env.CUSTOM_LIVENESS_PATH ?? '/healthz';
+      },
     },
     provide({
       provide: SERVER_MODULE_PAPI_PRIVATE_ROUTE,

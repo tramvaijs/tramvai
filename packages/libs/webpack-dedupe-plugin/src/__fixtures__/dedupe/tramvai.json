@@ -27,7 +27,7 @@
       }
     },
     "dedupe-ignore": {
-      "name": "dedupe",
+      "name": "dedupe-ignore",
       "root": "src",
       "type": "application",
       "dedupe": {

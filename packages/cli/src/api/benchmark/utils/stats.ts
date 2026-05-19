@@ -55,8 +55,8 @@ export const getResultStats = ({
     serverCompilationStats: getCompilationMeanStats(serverCompilationTimings),
     clientBuildTime: getMeanValue(clientBuildTimeSamples),
     clientCompilationStats: getCompilationMeanStats(clientCompilationTimings),
-    maxMemoryRss: getMeanValue(maxMemoryRssSamples),
     clientMaxMemoryRss: getMeanValue(clientMaxMemoryRssSamples),
     serverMaxMemoryRss: getMeanValue(serverMaxMemoryRssSamples),
+    maxMemoryRss: getMeanValue(maxMemoryRssSamples),
   };
 };

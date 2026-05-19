@@ -224,6 +224,12 @@ Starting from version 6, Tramvai provides a new local development option:
 
 It runs Webpack builds for both client and server in separate threads using `worker_threads`, accelerating cold builds by 30-40%.
 
+:::info
+
+Starting from version 7 enabled for development build by default
+
+:::
+
 ## Build performance analysis
 
 Tramvai includes special tooling for evaluating build performance via the commands `analyze` and `benchmark`.

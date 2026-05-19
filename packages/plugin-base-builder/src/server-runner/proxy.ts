@@ -3,6 +3,10 @@ import https from 'node:https';
 import fs from 'node:fs';
 import httpProxy from 'http-proxy';
 import { ExtractDependencyType } from '@tinkoff/dippy';
+// @ts-ignore
+// eslint-disable-next-line no-restricted-imports
+import webOutgoing from 'http-proxy/lib/http-proxy/passes/web-outgoing';
+import eachObj from '@tinkoff/utils/object/each';
 
 import { logger } from '@tramvai/api/lib/services/logger';
 import { CompilationWatcher } from '../utils/compilation-watcher';
@@ -25,6 +29,7 @@ function createServer(selfSignedCertificate: SelfSignedCertificate, handler: Req
 export const createProxy = ({
   port,
   staticPort,
+  staticHost,
   serverRunnerPort,
   serverBuildPort,
   selfSignedCertificate,
@@ -35,6 +40,7 @@ export const createProxy = ({
   port: number;
   hostname: string;
   staticPort: number;
+  staticHost: string;
   selfSignedCertificate: SelfSignedCertificate;
   serverRunnerPort: number;
   serverBuildPort: number;
@@ -43,6 +49,40 @@ export const createProxy = ({
 }) => {
   const devProxy = httpProxy.createProxyServer({
     ws: true,
+    selfHandleResponse: true,
+  });
+
+  // Early Hints support
+  devProxy.on('proxyReq', (proxyReq, req, res) => {
+    proxyReq.socket?.on('data', (data) => {
+      try {
+        const chunk = data.toString();
+
+        if (chunk.startsWith('HTTP/1.1 103 Early Hints')) {
+          res.socket?.write(data);
+        }
+      } catch (e) {
+        // do nothing
+      }
+    });
+
+    // http-proxy always collapses multiple slashes in the URL,
+    // which is somewhat unexpected when working with the server directly
+    // https://github.com/http-party/node-http-proxy/issues/775
+    // so we try to restore all slashes back
+    (proxyReq as any).path = req.url;
+  });
+
+  devProxy.on('proxyRes', (proxyRes, req, res) => {
+    if (!res.headersSent) {
+      // duplicate the entire proxy logic and send the response manually
+      // a bit of a hack inspired by https://github.com/http-party/node-http-proxy/issues/1263#issuecomment-394758768
+      eachObj((handler) => {
+        handler(req, res, proxyRes, {});
+      }, webOutgoing);
+    }
+
+    proxyRes.pipe(res);
   });
 
   devProxy.on('error', async (error, req, res) => {
@@ -88,7 +128,13 @@ export const createProxy = ({
     }
   });
 
+  // WebSockets support for hot reload
   devServer.on('upgrade', (req, socket, head) => {
+    // prevent uncaughtException when WS is not supported in application server
+    socket.on('error', (err) => {
+      console.error('[dev-server-error] websocket proxy error', err.message);
+    });
+
     devProxy.ws(req, socket, head, {
       target: `ws://localhost:${browserBuildPort}`,
     });
@@ -99,7 +145,7 @@ export const createProxy = ({
     staticServer,
     listen: () => {
       return Promise.all([
-        new Promise<void>((resolve) => {
+        new Promise<void>((resolve, reject) => {
           devServer.listen(port, hostname, () => {
             logger.event({
               type: 'info',
@@ -108,15 +154,24 @@ export const createProxy = ({
             });
             resolve();
           });
+
+          devServer.on('error', (err: Error) => {
+            reject(err);
+          });
         }),
-        new Promise<void>((resolve) => {
-          staticServer.listen(staticPort, () => {
+
+        new Promise<void>((resolve, reject) => {
+          staticServer.listen(staticPort, staticHost.replace('localhost', '0.0.0.0'), () => {
             logger.event({
               type: 'info',
               event: 'dev-proxy',
               message: `Static server started at ${staticPort} port`,
             });
             resolve();
+          });
+
+          staticServer.on('error', (err: Error) => {
+            reject(err);
           });
         }),
       ]);

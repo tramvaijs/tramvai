@@ -2,7 +2,7 @@ import mergeDeep from '@tinkoff/utils/object/mergeDeep';
 import { Writable } from 'stream';
 import { setDefaultResultOrder } from 'dns';
 import envCi from 'env-ci';
-import { start } from '@tramvai/cli';
+import { ApplicationConfigEntry, ConvertToSchema, start } from '@tramvai/cli';
 import type { PromiseType } from 'utility-types';
 import waitOn from 'wait-on';
 import { requestFactory, renderFactory } from '@tramvai/test-helpers';
@@ -115,6 +115,8 @@ export const startCli = async (
     stderr,
     noClientRebuild: !enableRebuild,
     noServerRebuild: !enableRebuild,
+    showBanner: false,
+    showProgress: false,
     // build cache made tests unstable in CI, because of cache writing process are async,
     // and there is no way to wait this process (`idleTimeoutForInitialStore: 0` helps sometimes, but no guarantees)
     fileCache: !ciInfo.isCi,
@@ -127,6 +129,7 @@ export const startCli = async (
             {
               // disable hot-refresh that may break checks for full page load because of never-ending request
               hotRefresh: { enabled: false },
+              liveReload: false,
               // faster builds
               sourceMap: false,
               // faster builds
@@ -139,13 +142,8 @@ export const startCli = async (
                     '@tramvai-tinkoff/module-push-web',
                   ],
                 },
-                // Playwright Inspector collects a stack trace for the ability to show in which file or step of the test a transition occurred
-                // internak stack trace utility uses process.cwd() to correctly calculate the path to the files
-                // @tramvai/cli when using threads loader does process.chdir(rootDir) because workers don't allow to change cwd
-                // this breaks stack traces, there are now broken paths to files, the inspector works incorrectly
-                serverRunner: 'process',
               },
-            },
+            } satisfies Partial<ConvertToSchema<ApplicationConfigEntry>>,
             targetOrConfig
           ),
         }),

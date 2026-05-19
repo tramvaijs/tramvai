@@ -149,6 +149,13 @@ export type ApplicationExperiments = {
    * @default false
    */
   lightningcss?: boolean;
+  /**
+   * https://github.com/facebook/react/blob/main/compiler/packages/babel-plugin-react-compiler/src/Entrypoint/Options.ts
+   *
+   * @title Enable React Compiler. You can pass some options, or use it with meaningful defaults.
+   * @default false
+   */
+  reactCompiler?: boolean | ReactCompilerOptions;
 };
 
 export type TranspilationOptions = {
@@ -200,6 +207,7 @@ export type InputParameters = {
   httpsKey?: string;
   httpsCert?: string;
   benchmark?: boolean;
+  runtimeEnv?: Record<string, string>;
   analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   staticPort?: number;
   staticHost?: string;
@@ -252,6 +260,11 @@ export type InputParameters = {
    */
   showProgress?: boolean;
   /**
+   * @description Show banner with tips for build process
+   * @default false
+   */
+  showBanner?: boolean;
+  /**
    * Enables cache for build
    * @default true
    */
@@ -274,7 +287,6 @@ export type InputParameters = {
 };
 
 export type Project = ApplicationProject | ChildAppProject;
-
 export interface BaseProject {
   /**
    * [svgo](https://github.com/svg/svgo) configuration, used for SVG and [SVGR](https://react-svgr.com/) optimization
@@ -299,6 +311,11 @@ export interface BaseProject {
    * React hot-refresh options
    */
   hotRefresh?: HotRefreshOptions;
+
+  /**
+   * Live reload after build in browser
+   */
+  liveReload?: boolean;
 
   /**
    * @title Configure webpack dev server writeToDisk option
@@ -422,12 +439,6 @@ export interface ApplicationProject extends BaseProject {
   modernPolyfill?: string;
   dedupe?: DedupeOptions;
   integrity?: SubresourceIntegrityPluginOptions;
-  /**
-   * @title Webpack Runtime Chunk settings
-   * @see https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
-   * @default false
-   */
-  runtimeChunk?: 'single' | 'multiple' | boolean;
 }
 
 export interface ChildAppProject extends BaseProject {
@@ -461,8 +472,11 @@ export type Configuration = {
 
 export type SerializableConfig = {
   projectType: string;
+  projectName: string;
   staticPort: number;
   staticHost: string;
+  port: number;
+  host: string;
   httpProtocol: string;
   assetsPrefix: string | null;
   output: {
@@ -477,7 +491,7 @@ export type Extension<Value> = ({
   parameters,
   project,
 }: {
-  config: Configuration;
+  config: ConfigService;
   parameters: InputParameters;
   project: Project;
 }) => Value;
@@ -558,7 +572,7 @@ export class ConfigService {
       for (const key in currentExtension) {
         extensions[key] = () =>
           currentExtension[key]({
-            config: this.#config!,
+            config: this,
             parameters: this.#parameters,
             project: this.#project,
           });
@@ -603,6 +617,10 @@ export class ConfigService {
 
   get port() {
     return this.#parameters.port ?? 3000;
+  }
+
+  get runtimeEnv() {
+    return this.#parameters.runtimeEnv ?? {};
   }
 
   get staticHost() {
@@ -653,11 +671,15 @@ export class ConfigService {
   }
 
   get entryFile() {
-    return this.#project.entryFile ?? 'index.ts';
+    return this.#project.entryFile ?? 'index';
   }
 
   get showProgress() {
-    return this.#parameters.showProgress;
+    return this.#parameters.showProgress ?? false;
+  }
+
+  get showBanner() {
+    return this.#parameters.showBanner ?? false;
   }
 
   get mode() {
@@ -780,6 +802,7 @@ export class ConfigService {
 
     const experiments = this.#project.experiments ?? {};
     return {
+      reactCompiler: experiments.reactCompiler ?? false,
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
       lightningcss: experiments.lightningcss ?? false,
@@ -809,14 +832,6 @@ export class ConfigService {
     return this.#project.integrity ?? false;
   }
 
-  get runtimeChunk() {
-    if (this.#project.type === 'child-app') {
-      return null;
-    }
-
-    return this.#project.runtimeChunk ?? false;
-  }
-
   get sourceMap(): boolean {
     // eslint-disable-next-line no-nested-ternary
     return typeof this.#project.sourceMap === 'boolean'
@@ -834,6 +849,10 @@ export class ConfigService {
         ...this.#project.hotRefresh?.options,
       },
     };
+  }
+
+  get liveReload(): BaseProject['liveReload'] {
+    return this.#project.liveReload ?? true;
   }
 
   get writeToDisk(): BaseProject['writeToDisk'] {
@@ -930,12 +949,9 @@ export class ConfigService {
           this.#configPath = result.filepath;
           return result.config;
         }
-        // TODO: flag to throw error if config not found?
-        logger.event({
-          type: 'error',
-          event: 'config-service',
-          message: '"tramvai.config.ts" configuration file not found',
-        });
+        // TODO: add flag to throw error if config not found
+        // after migration on new ts config
+
         return {
           projects: {},
           plugins: [],
@@ -943,9 +959,20 @@ export class ConfigService {
       });
   }
 
+  getParams() {
+    return this.#parameters;
+  }
+
+  updateParam<K extends keyof InputParameters>(name: K, value: InputParameters[K]) {
+    this.#parameters[name] = value;
+  }
+
   dehydrate(): SerializableConfig {
     return {
       projectType: this.projectType,
+      projectName: this.projectName,
+      port: this.port,
+      host: this.host,
       staticPort: this.staticPort,
       staticHost: this.staticHost,
       httpProtocol: this.httpProtocol,

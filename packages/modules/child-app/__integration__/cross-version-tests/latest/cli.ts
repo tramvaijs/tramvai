@@ -33,6 +33,9 @@ export const startRootApp = ({
       define: {
         development: define,
       },
+      hotRefresh: {
+        enabled: false,
+      },
       experiments: {
         transpilation: {
           loader: 'swc',

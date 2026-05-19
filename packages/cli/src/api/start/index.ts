@@ -3,8 +3,10 @@ import type { PromiseType } from 'utility-types';
 import type { Provider } from '@tinkoff/dippy';
 import { createCommand } from '../../commands/createCommand';
 import type { WithConfig } from '../shared/types/withConfig';
-import { COMMAND_PARAMETERS_TOKEN, CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from '../../di/tokens';
+import { CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from '../../di/tokens';
 import type { Builder } from '../../typings/build/Builder';
+import { ConvertToSchema } from '../../schema/ConfigSchema';
+import { ApplicationConfigEntry } from '../../typings/configEntry/application';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all';
@@ -15,7 +17,11 @@ export type Params = WithConfig<{
   port?: number;
   staticPort?: number;
   staticHost?: string;
+  showProgress?: boolean;
+  showBanner?: boolean;
   debug?: boolean;
+  // for manual call in tests
+  config?: ConvertToSchema<ApplicationConfigEntry>;
   trace?: boolean;
   verboseWebpack?: boolean;
   profile?: boolean;
@@ -31,6 +37,8 @@ export type Params = WithConfig<{
   onlyBundles?: string[];
   strictErrorHandle?: boolean;
   fileCache?: boolean;
+  disableServerRunnerWaiting?: boolean;
+  noRebuild?: boolean;
   experimentalWebpackWorkerThreads?: boolean;
 }>;
 
@@ -48,27 +56,15 @@ export type StartCommand = (params: Params, providers?: Provider[]) => Result;
 export default createCommand({
   name: 'start',
   command: async (di): Result => {
-    const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
     const configEntry = di.get(CONFIG_ENTRY_TOKEN);
     const portManager = di.get(PORT_MANAGER_TOKEN);
-
-    if (options.experimentalWebpackWorkerThreads) {
-      if (configEntry.type !== 'application') {
-        throw new Error(
-          '--experimentalWebpackWorkerThreads option is only available for application project'
-        );
-      }
-
-      const { startApplicationExperimental } = require('./application.experimental');
-      return startApplicationExperimental(di);
-    }
 
     await portManager.computeAvailablePorts();
 
     switch (configEntry.type) {
       case 'application':
         // eslint-disable-next-line no-case-declarations
-        const { startApplication } = require('./application');
+        const { startApplication } = require('./application.experimental');
         return startApplication(di);
       case 'module':
         // eslint-disable-next-line no-case-declarations

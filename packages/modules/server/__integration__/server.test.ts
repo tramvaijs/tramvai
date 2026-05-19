@@ -6,8 +6,8 @@ import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
 const externalWebsite = startExternalWebsite();
 let utilityPort: number;
 
-beforeAll(async () => {
-  utilityPort = await getPort();
+beforeAll(() => {
+  utilityPort = getPort();
 });
 
 describe('default utility port', () => {

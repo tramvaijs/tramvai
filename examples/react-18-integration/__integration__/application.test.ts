@@ -24,6 +24,10 @@ describe('react-18-integration', () => {
     const page = await browser.newPage();
 
     await page.goto(`${app.serverUrl}/`);
+    await page
+      .locator('p')
+      .filter({ hasText: /^Async component$/ })
+      .waitFor();
 
     expect(await page.$eval('.application', (node) => (node as HTMLElement).innerText))
       .toMatchInlineSnapshot(`

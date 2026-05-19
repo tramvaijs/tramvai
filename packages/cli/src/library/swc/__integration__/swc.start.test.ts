@@ -29,9 +29,13 @@ const getModuleCode = (code: string, name: string) => {
 beforeAll(async () => {
   app = await start({
     rootDir: __dirname,
+    disableServerRunnerWaiting: true,
     strictErrorHandle: true,
     config: {
       name: 'swc-app',
+      hotRefresh: {
+        enabled: false,
+      },
       webpack: {
         devtool: 'eval',
       },
@@ -41,18 +45,15 @@ beforeAll(async () => {
         transpilation: {
           loader: 'swc',
         },
-        // for threads "chdir" is used, cwd is changed and it breaks some integration tests,
-        // because current "tsconfig.json" is used, where @tramvai/core and @tramvai/react is mocked in "paths"
-        serverRunner: 'process',
       },
     },
   });
 
   const staticUrl = getStaticUrl(app);
 
-  const platform = await fetch(`${staticUrl}/dist/client/platform.js`);
+  const tramvai = await fetch(`${staticUrl}/dist/client/tramvai.js`);
 
-  clientCode = await platform.text();
+  clientCode = await tramvai.text();
 
   const server = await fetch(`${staticUrl}/dist/server/server.js`);
 

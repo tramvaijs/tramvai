@@ -3,7 +3,6 @@
 import { Writable } from 'node:stream';
 
 import rspack, { Configuration } from '@rspack/core';
-import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
@@ -40,6 +39,7 @@ import {
   RESOLVE_FALLBACK_TOKEN,
   defaultExtensions,
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
+import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 
 import {
   RSPACK_TRANSPILER_TOKEN,
@@ -81,19 +81,14 @@ stderrWithWarningFilters.on('error', (error: Error) =>
   console.error('[infrastructureLogging] stream error', error)
 );
 
-export const rspackConfig: RspackConfigurationFactory = async (
-  inputParameters,
-  extraConfiguration
-): Promise<Configuration> => {
-  const di = await initDi(inputParameters, extraConfiguration, {
+export const rspackConfig: RspackConfigurationFactory = async (config): Promise<Configuration> => {
+  const di = await initDi(config, {
     type: 'application',
     target: 'server',
   });
-  const config = di.get(CONFIG_SERVICE_TOKEN);
   const { verboseLogging, rootDir } = config;
 
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
-  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(RSPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
@@ -110,6 +105,9 @@ export const rspackConfig: RspackConfigurationFactory = async (
   Object.assign(fallback, rspackConfigExtension.resolveFallback);
   Object.assign(alias, rspackConfigExtension.resolveAlias);
   Object.assign(provideList, rspackConfigExtension.provide);
+
+  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  defineOptions.push(config.extensions.define());
 
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
   const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);

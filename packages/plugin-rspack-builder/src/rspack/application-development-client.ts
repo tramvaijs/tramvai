@@ -1,6 +1,5 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
-import path from 'node:path';
 import { Writable } from 'node:stream';
 
 import { Compilation } from '@rspack/core';
@@ -11,7 +10,6 @@ import { optional } from '@tinkoff/dippy';
 import WebpackBar from 'webpackbar/rspack';
 import { StatsWriterPlugin } from 'webpack-stats-plugin';
 import { SubresourceIntegrityPlugin } from '@rspack/core';
-import { CONFIG_SERVICE_TOKEN, InputParameters, Configuration } from '@tramvai/api/lib/config';
 import flatten from '@tinkoff/utils/array/flatten';
 import { DedupePlugin } from '@tinkoff/webpack-dedupe-plugin';
 import {
@@ -102,14 +100,12 @@ stderrWithWarningFilters.on('error', (error: Error) =>
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
 
 export const rspackConfig: RspackConfigurationFactory = async (
-  inputParameters,
-  extraConfiguration
+  config
 ): Promise<RspackConfiguration> => {
-  const di = await initDi(inputParameters, extraConfiguration, {
+  const di = await initDi(config, {
     type: 'application',
     target: 'client',
   });
-  const config = di.get(CONFIG_SERVICE_TOKEN);
 
   const {
     polyfill,
@@ -124,7 +120,6 @@ export const rspackConfig: RspackConfigurationFactory = async (
   } = config;
 
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
-  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(RSPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
@@ -141,6 +136,9 @@ export const rspackConfig: RspackConfigurationFactory = async (
   Object.assign(fallback, rspackConfigExtension.resolveFallback);
   Object.assign(alias, rspackConfigExtension.resolveAlias);
   Object.assign(provideList, rspackConfigExtension.provide);
+
+  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  defineOptions.push(config.extensions.define());
 
   const transpilerParameters = resolveRspackTranspilerParameters({ di, buildTarget: 'client' });
 
@@ -163,7 +161,7 @@ export const rspackConfig: RspackConfigurationFactory = async (
 
   const polyfillPath = safeRequireResolve(
     resolveAbsolutePathForFile({
-      file: polyfill ?? './src/polyfill',
+      file: polyfill ?? 'polyfill',
       sourceDir,
       rootDir,
     }),
@@ -171,7 +169,7 @@ export const rspackConfig: RspackConfigurationFactory = async (
   );
   const modernPolyfillPath = safeRequireResolve(
     resolveAbsolutePathForFile({
-      file: modernPolyfill ?? './src/modern.polyfill',
+      file: modernPolyfill ?? 'modern.polyfill',
       sourceDir,
       rootDir,
     }),
@@ -196,13 +194,11 @@ export const rspackConfig: RspackConfigurationFactory = async (
     entry: {
       // TODO: more missed files watchers with absolute path?
       platform: {
-        import: [
-          resolveAbsolutePathForFile({
-            file: config.entryFile,
-            sourceDir: config.sourceDir,
-            rootDir: config.rootDir,
-          }),
-        ].filter(Boolean) as string[],
+        import: resolveAbsolutePathForFile({
+          file: config.entryFile,
+          sourceDir: config.sourceDir,
+          rootDir: config.rootDir,
+        }),
       },
       ...(polyfillPath
         ? {
@@ -384,10 +380,6 @@ export const rspackConfig: RspackConfigurationFactory = async (
           ]
         : []),
       new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
-      new rspack.ProvidePlugin({
-        process: 'process',
-        ...provideList,
-      }),
       config.benchmark &&
         // require `@rsdoctor/rspack-plugin` here to speed up webpack worker initialization when benchmarking is not used
         new (require('@rsdoctor/rspack-plugin').RsdoctorRspackMultiplePlugin)(
@@ -426,6 +418,10 @@ export const rspackConfig: RspackConfigurationFactory = async (
           ]
         : []),
       ...stylesConfiguration.plugins,
+      new rspack.ProvidePlugin({
+        process: 'process',
+        ...provideList,
+      }),
       new rspack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,

@@ -58,13 +58,18 @@ export function createDevServer({
       ]);
 
       if (!inputParameters.staticPort) {
-        inputParameters.staticPort = portManager.staticPort!;
+        config.updateParam('staticPort', portManager.staticPort!);
+      }
+
+      if (!inputParameters.port) {
+        config.updateParam('port', portManager.port!);
       }
 
       const compilationWatcher = new CompilationWatcher();
       const proxy = createProxy({
         port: portManager.port!,
         staticPort: portManager.staticPort!,
+        staticHost: config.staticHost,
         hostname: config.host,
         selfSignedCertificate,
         serverBuildPort: buildPort,
@@ -93,6 +98,7 @@ export function createDevServer({
         workerPath: serverRunnerWorkerPath,
         workerData: {
           port: serverRunnerPort,
+          cwd: config.rootDir,
           proxyPort: portManager.port!,
           disableServerRunnerWaiting: config.disableServerRunnerWaiting,
         },
@@ -171,7 +177,6 @@ export function createDevServer({
         {
           buildPort,
           devServerPort: portManager.port!,
-          inputParameters,
           isServerBuildNeeded,
           isClientBuildNeeded,
           tracer,
