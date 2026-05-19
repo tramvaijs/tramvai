@@ -15,7 +15,7 @@ import {
   provide,
   optional,
 } from '@tinkoff/dippy';
-import type { Bundle, TramvaiHooks } from '@tramvai/tokens-core';
+import type { Bundle } from '@tramvai/tokens-core';
 import {
   ACTIONS_LIST_TOKEN,
   BUNDLE_LIST_TOKEN,
