@@ -18,7 +18,7 @@ export type Params = WithConfig<{
   resolveSymlinks?: boolean;
   disableProdOptimization?: boolean;
   showConfig?: boolean;
-  env?: Record<string, string>;
+  env?: Record<string, string | null>;
   fileCache?: boolean;
   withBuildStats?: boolean;
   benchmark?: boolean;

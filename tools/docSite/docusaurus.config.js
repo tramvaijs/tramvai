@@ -66,6 +66,18 @@ const docusaurusConfig = {
             from: '/docs/features/logging',
             to: '/docs/features/monitoring/logging',
           },
+          {
+            from: '/docs/guides/server-optimization',
+            to: '/docs/guides/server-optimization/best-practices',
+          },
+          {
+            from: '/docs/guides/cpu-profiling',
+            to: '/docs/guides/server-optimization/cpu-profiling',
+          },
+          {
+            from: '/docs/mistakes/memory-leak',
+            to: '/docs/guides/server-optimization/memory-profiling',
+          },
         ],
       },
     ],
