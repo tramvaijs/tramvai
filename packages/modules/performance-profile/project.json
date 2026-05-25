@@ -1,0 +1,14 @@
+{
+  "name": "@tramvai/module-performance-profile",
+  "sourceRoot": "packages/modules/performance-profile/src",
+  "projectType": "library",
+  "targets": {
+    "build-publish": {
+      "outputs": [
+        "packages/modules/performance-profile/package.json",
+        "packages/modules/performance-profile/lib"
+      ],
+      "executor": "@tramvai/nx-plugin:build"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 ---
-id: server-optimization
-title: Server optimization
+id: best-practices
+title: Best practices
+sidebar_position: 1
 ---
 
 ## Introduction
@@ -235,8 +236,12 @@ Best way to optimize application CPU or memory usage is to profile it with Chrom
 
 ### CPU profiling
 
-[Complete guide to tramvai apps CPU profiling](guides/cpu-profiling.md)
+[Complete guide to tramvai apps CPU profiling](guides/server-optimization/cpu-profiling.md)
 
 ### Memory profiling
 
-[Complete guide to tramvai apps memory leak debugging](mistakes/memory-leak.md)
+[Complete guide to tramvai apps memory leak debugging](guides/server-optimization/memory-profiling.md)
+
+### Runtime profiling
+
+[Complete guide to tramvai cpu and memory profiling module](guides/server-optimization/runtime-profiling.md) that uses the [Node.js Inspector](https://nodejs.org/api/inspector.html). Allows collecting CPU profiles and heap snapshots from real running applications on different environments such as test, staging or production (with caution), including Kubernetes deployments.

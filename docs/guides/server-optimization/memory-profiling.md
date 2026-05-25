@@ -1,5 +1,6 @@
 ---
-title: Memory leak
+id: memory-profiling
+title: Memory profiling
 ---
 
 In case you are facing critical errors for the server like `FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory` than this is probably caused by memory leak in your app.
