@@ -10,9 +10,6 @@ export const sharedProviders = [
     useFactory: ({ logger, tramvaiHooks }) => {
       const log = logger({
         name: LOGGER_NAME,
-        defaults: {
-          remote: true,
-        },
       });
 
       return function applicationHealthSubscribe() {

@@ -145,7 +145,7 @@ There is a possibility to monitor the main events that occur while the Tramvai a
 - `react:render`
 - `react:error`
 
-When you are using ApplicationMonitoringModule, these events are sent to your remote logger by default. But in some cases, you will need custom metrics. Here is an example of how to do this:
+When you are using ApplicationMonitoringModule, these events are sent to your logger by default. But in some cases, you will need custom metrics. Here is an example of how to do this:
 
 ```typescript
 import { provide } from '@tramvai/core';
