@@ -3,6 +3,7 @@ import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { FileSystemCache } from './fileSystemCache';
 import { StaticPagesCacheEntry } from '../tokens';
+import { CONFUCIUS_PROD_URL } from '@tramvai-tinkoff/module-common/lib/modules/confucius';
 
 const createLogger = () => (name: string) => ({
   trace: jest.fn(),
@@ -656,6 +657,18 @@ describe('FileSystemCache', () => {
         .then(() => true)
         .catch(() => false);
       expect(exists).toBe(true);
+    });
+
+    it('should not handle if path is outside of root directory', async () => {
+      await cache.set('../../a/b/c^', createCacheEntry('<html>Wrong path</html>'));
+
+      const filePath = path.join(testDir, '../../a/b/c', 'index.html');
+
+      const exists = await fs
+        .access(filePath)
+        .then(() => true)
+        .catch(() => false);
+      expect(exists).toBe(false);
     });
 
     it('should handle multiple cache keys for same pathname', async () => {

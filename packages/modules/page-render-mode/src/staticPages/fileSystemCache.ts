@@ -243,6 +243,13 @@ and copy "dist/static" folder into the Docker image, to ensure the pages cache i
     const metaFilePath = path.join(this.directory, pathname, metaFilename);
 
     try {
+      const resolvedRoot = path.resolve(this.directory);
+      const resolvedFilePath = path.resolve(filePath);
+
+      if (!resolvedFilePath.startsWith(resolvedRoot)) {
+        throw new Error(`Invalid filesystem cache pathname: "${filePath}"`);
+      }
+
       await fs.mkdir(path.dirname(filePath), { recursive: true });
 
       await fs.writeFile(filePath, cacheEntry.body, 'utf-8');
