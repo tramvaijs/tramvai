@@ -64,6 +64,21 @@ function cacheFactory<T>(
   return cache;
 }
 
+function getUniqueName(name: string, cacheNames: Set<string>): string {
+  if (!cacheNames.has(name)) {
+    return name;
+  }
+
+  const baseName = `${name}-unsafe-copy`;
+  let index = 1;
+
+  while (cacheNames.has(`${baseName}-${index}`)) {
+    index += 1;
+  }
+
+  return `${baseName}-${index}`;
+}
+
 export function getCacheFactory({
   cacheNames,
   metrics,
@@ -79,7 +94,11 @@ export function getCacheFactory({
     }
 
     if (cacheNames.has(options.name)) {
-      throw new Error(`Cache with name ${options.name} is already created`);
+      if (process.env.NODE_ENV === 'development') {
+        throw new Error(`Cache with name ${options.name} is already created`);
+      }
+
+      options.name = getUniqueName(options.name, cacheNames);
     }
 
     cacheNames.add(options.name);

@@ -48,6 +48,12 @@
         },
         {
             "path": "../../../tools/build"
+        },
+        {
+            "path": "../../tramvai/child-app-core"
+        },
+        {
+            "path": "../../tokens/child-app"
         }
     ]
 }
