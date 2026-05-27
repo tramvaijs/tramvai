@@ -1,9 +1,12 @@
+import noop from '@tinkoff/utils/function/noop';
 import { commandLineListTokens, declareModule, optional, provide } from '@tramvai/core';
 import {
   HTTP_CLIENT_AGENT,
   HTTP_CLIENT_AGENT_INTERCEPTORS,
   HTTP_CLIENT_AGENT_OPTIONS,
 } from '@tramvai/tokens-http-client';
+import { commandLineListTokens as childAppCommandLineListTokens } from '@tramvai/child-app-core';
+import { IS_CHILD_APP_DI_TOKEN } from '@tramvai/tokens-child-app';
 import { PapiClientModule } from './papiClientModule';
 import { providers } from './shared';
 
@@ -52,6 +55,22 @@ export const HttpClientModule = /* @__PURE__ */ declareModule({
           provide({
             provide: HTTP_CLIENT_AGENT_OPTIONS,
             useValue: {},
+          }),
+          provide({
+            provide: childAppCommandLineListTokens.customerStart,
+            useFactory: ({ isChildAppRunner }) => {
+              if (isChildAppRunner && process.env.NODE_ENV === 'development') {
+                process.emitWarning(
+                  'HttpClientModule cannot be imported in a child app. This module must be used in host application.',
+                  'http-client-module-error'
+                );
+              }
+
+              return noop;
+            },
+            deps: {
+              isChildAppRunner: optional(IS_CHILD_APP_DI_TOKEN),
+            },
           }),
         ]
       : []),
