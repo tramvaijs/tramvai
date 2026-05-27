@@ -45,6 +45,12 @@
     },
     {
       "path": "../../tramvai/test/unit"
+    },
+    {
+      "path": "../../tramvai/child-app-core"
+    },
+    {
+      "path": "../../tokens/child-app"
     }
   ]
 }

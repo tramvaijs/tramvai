@@ -1,6 +1,7 @@
+import noop from '@tinkoff/utils/function/noop';
 import type { MakeRequest } from '@tinkoff/request-core';
 import { createToken } from '@tinkoff/dippy';
-import { Module, APP_INFO_TOKEN, Scope, provide } from '@tramvai/core';
+import { Module, APP_INFO_TOKEN, Scope, provide, optional } from '@tramvai/core';
 import {
   HTTP_CLIENT_FACTORY,
   HTTP_CLIENT,
@@ -10,6 +11,8 @@ import {
   DEFAULT_HTTP_CLIENT_FACTORY_OPTIONS,
   DEFAULT_HTTP_CLIENT_INTERCEPTORS,
 } from '@tramvai/tokens-http-client';
+import { commandLineListTokens as childAppCommandLineListTokens } from '@tramvai/child-app-core';
+import { IS_CHILD_APP_DI_TOKEN } from '@tramvai/tokens-child-app';
 import {
   LOGGER_TOKEN,
   CREATE_CACHE_TOKEN,
@@ -123,5 +126,25 @@ export const HttpClientModule = /* @__PURE__ */ Module({
       provide: API_CLIENT_PASS_HEADERS,
       useValue: ['x-request-id'],
     }),
+    ...(typeof window === 'undefined'
+      ? [
+          provide({
+            provide: childAppCommandLineListTokens.customerStart,
+            useFactory: ({ isChildAppRunner }) => {
+              if (isChildAppRunner && process.env.NODE_ENV === 'development') {
+                process.emitWarning(
+                  'HttpClientModule cannot be imported in a child app. This module must be used in host application.',
+                  'http-client-module-error'
+                );
+              }
+
+              return noop;
+            },
+            deps: {
+              isChildAppRunner: optional(IS_CHILD_APP_DI_TOKEN),
+            },
+          }),
+        ]
+      : []),
   ],
 })(class HttpClientModule {});
