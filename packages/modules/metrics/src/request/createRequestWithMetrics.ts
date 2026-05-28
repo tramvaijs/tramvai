@@ -1,13 +1,13 @@
-import { format } from '@tinkoff/url';
 import { subscribe } from 'diagnostics_channel';
+import type { ClientRequest } from 'http';
+import net from 'node:net';
+import tls from 'node:tls';
 import type { DiagnosticsChannel } from 'undici';
 
 // eslint-disable-next-line no-restricted-imports
 import { UndiciError } from 'undici/lib/core/errors';
 
-import type { ClientRequest } from 'http';
-import type { Socket } from 'net';
-import { TLSSocket } from 'tls';
+import { format } from '@tinkoff/url';
 import type { Args, CreateRequestWithMetrics } from './types';
 
 // https://nodejs.org/api/errors.html#nodejs-error-codes - Common system errors possible for net/http/dns
@@ -19,6 +19,27 @@ const POSSIBLE_ERRORS = [
   'EPIPE',
   'ETIMEDOUT',
 ];
+
+const kMetricsAttached = Symbol('metricsAttached');
+const UNKNOWN_HOST = 'unknown';
+const isCorrectEmitNet = Number(process.versions.node.split('.')[0]) > 20;
+const removeDefaultPorts = (urlWithPort: string | URL) => {
+  try {
+    const url = new URL(urlWithPort.toString());
+    const currentPort = url.port;
+
+    if (currentPort === '80' || currentPort === '443') {
+      url.port = '';
+    }
+
+    return url.origin;
+  } catch (_err) {}
+
+  return urlWithPort;
+};
+
+const originalNetConnect = net.Socket.prototype.connect;
+const originalTlsConnect = tls.connect;
 
 // eslint-disable-next-line max-statements
 export const getUrlAndOptions = (args: Args) => {
@@ -110,60 +131,96 @@ export const createRequestWithMetrics: CreateRequestWithMetrics = ({
   };
 };
 
-export function initConnectionResolveMetrics({
-  metricsInstances: { dnsResolveDuration, tcpConnectDuration, tlsHandshakeDuration },
-}) {
-  subscribe('net.client.socket', ({ socket }: { socket: TLSSocket | Socket }) => {
-    const socketInfo = {
-      start: Date.now(),
-      lookupEnd: 0,
-      connectEnd: 0,
-      secureConnectEnd: 0,
-      host: 'unknown',
+export function initConnectionResolveMetrics({ metricsInstances }) {
+  if (isCorrectEmitNet) {
+    subscribe('net.client.socket', ({ socket }: { socket: tls.TLSSocket | net.Socket }) => {
+      instrumentSocket(socket, {
+        metricsInstances,
+      });
+    });
+  } else {
+    net.Socket.prototype.connect = function patchedNetConnect(...args) {
+      const socket = originalNetConnect.apply(this, args);
+
+      instrumentSocket(socket, {
+        metricsInstances,
+      });
+
+      return socket;
     };
-    const protocol = socket instanceof TLSSocket ? 'https' : 'http';
 
-    socket.once('lookup', (_err, _address, _family, host) => {
-      socketInfo.lookupEnd = Date.now();
-      dnsResolveDuration.observe(
-        { service: host },
-        getDuration(socketInfo.lookupEnd, socketInfo.start)
+    tls.connect = function patchedTlsConnect(...args) {
+      const socket = originalTlsConnect.apply(this, args);
+
+      instrumentSocket(socket, {
+        metricsInstances,
+      });
+
+      return socket;
+    };
+  }
+}
+
+function instrumentSocket(
+  socket: net.Socket | tls.TLSSocket,
+  { metricsInstances: { dnsResolveDuration, tcpConnectDuration, tlsHandshakeDuration } }
+) {
+  // ignore reused sockets
+  if (socket[kMetricsAttached]) {
+    return;
+  }
+
+  socket[kMetricsAttached] = true;
+
+  const socketInfo = {
+    start: Date.now(),
+    lookupEnd: 0,
+    connectEnd: 0,
+    secureConnectEnd: 0,
+    host: UNKNOWN_HOST,
+  };
+  const protocol = socket instanceof tls.TLSSocket ? 'https' : 'http';
+
+  socket.once('lookup', (_err, _address, _family, host) => {
+    socketInfo.lookupEnd = Date.now();
+    socketInfo.host = host;
+
+    dnsResolveDuration.observe(
+      { service: host },
+      getDuration(socketInfo.lookupEnd, socketInfo.start)
+    );
+  });
+
+  socket.once('connect', () => {
+    socketInfo.connectEnd = Date.now();
+
+    if (protocol === 'http') {
+      // _host is internal field - https://github.com/nodejs/node/blob/main/lib/net.js#L1383
+      const { _host: host } = <net.Socket & { _host: string }>socket;
+      socketInfo.host = `http://${host ?? socketInfo.host}`;
+    } else {
+      // connect-options also internal - https://github.com/nodejs/node/blob/main/lib/internal/tls/wrap.js#L1749
+      const connectOptionsSymbol = Object.getOwnPropertySymbols(socket).find(
+        (smb) => smb.toString() === 'Symbol(connect-options)'
       );
-    });
+      const connectOptions = socket[connectOptionsSymbol];
+      const { servername } = connectOptions;
 
-    socket.on('connect', () => {
-      socketInfo.connectEnd = Date.now();
-      let service;
+      socketInfo.host = `https://${servername ?? socketInfo.host}`;
+    }
 
-      if (protocol === 'http') {
-        // _host is internal field - https://github.com/nodejs/node/blob/main/lib/net.js#L1383
-        const { remotePort: port, _host: host } = <Socket & { _host: string }>socket;
-        service = `${protocol}://${host}:${port}`;
-        socketInfo.host = host;
-      } else {
-        // connect-options also internal - https://github.com/nodejs/node/blob/main/lib/internal/tls/wrap.js#L1749
-        const connectOptionsSymbol = Object.getOwnPropertySymbols(socket).find(
-          (smb) => smb.toString() === 'Symbol(connect-options)'
-        );
-        const connectOptions = socket[connectOptionsSymbol];
-        const { port, host } = connectOptions;
-        service = `${protocol}://${host}:${port}`;
-        socketInfo.host = host;
-      }
+    tcpConnectDuration.observe(
+      { service: socketInfo.host },
+      getDuration(socketInfo.connectEnd, socketInfo.lookupEnd)
+    );
+  });
 
-      tcpConnectDuration.observe(
-        { service },
-        getDuration(socketInfo.connectEnd, socketInfo.lookupEnd)
-      );
-    });
-
-    socket.on('secureConnect', () => {
-      socketInfo.secureConnectEnd = Date.now();
-      tlsHandshakeDuration.observe(
-        { service: socketInfo.host },
-        getDuration(socketInfo.secureConnectEnd, socketInfo.connectEnd)
-      );
-    });
+  socket.once('secureConnect', () => {
+    socketInfo.secureConnectEnd = Date.now();
+    tlsHandshakeDuration.observe(
+      { service: socketInfo.host },
+      getDuration(socketInfo.secureConnectEnd, socketInfo.connectEnd)
+    );
   });
 }
 
@@ -180,13 +237,14 @@ export const addMetricsForFetch = ({
 }) => {
   subscribe('undici:request:create', ({ request }: { request: RequestWithMetrics }) => {
     const { method, origin, path } = request;
-    const url = origin + path;
+    const host = removeDefaultPorts(origin);
+    const url = `${host}${path}`;
     const serviceName = getServiceName(url, request);
 
     const timerDone = requestsDuration.startTimer();
     const labelsValues = {
       method: method ?? 'unknown',
-      service: serviceName || origin || 'unknown',
+      service: serviceName || host || 'unknown',
       status: 'unknown',
     };
 

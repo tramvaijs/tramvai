@@ -29,14 +29,13 @@ export const TramvaiDnsCacheModule = declareModule({
         const maxTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
         const maxItems = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
 
-        if (!dnsLookupEnabled) {
-          return function noopInterceptor(dispatch) {
-            return function noopInterceptorDispatch(opts, handler) {
-              return dispatch(opts, handler);
-            };
+        return function noopInterceptor(dispatch) {
+          return function noopInterceptorDispatch(opts, handler) {
+            return dispatch(opts, handler);
           };
-        }
+        };
 
+        // TODO: enable back in TCORE-5509
         const dnsInterceptor = interceptors.dns({
           maxTTL,
           maxItems,
