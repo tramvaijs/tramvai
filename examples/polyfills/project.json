@@ -1,6 +1,6 @@
 {
   "name": "polyfills",
-  "sourceRoot": "tinkoff-examples/polyfills/src",
+  "sourceRoot": "examples/polyfills/src",
   "projectType": "library",
   "targets": {}
 }
