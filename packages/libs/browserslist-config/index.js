@@ -5,17 +5,17 @@
 
 const defaults = [
   // desktop
-  'Chrome >= 80',
-  'Safari >= 14.0',
+  'Chrome >= 88',
+  'Safari >= 15.0',
   'Firefox >= 115',
-  'Opera >= 67',
-  'Edge >= 80',
+  'Opera >= 74',
+  'Edge >= 88',
   // mobile
-  'ChromeAndroid >= 80',
-  'ios_saf >= 14.0',
-  'OperaMobile >= 57',
+  'ChromeAndroid >= 88',
+  'ios_saf >= 15.0',
+  'OperaMobile >= 63',
   'FirefoxAndroid >= 115',
-  'Samsung >= 13',
+  'Samsung >= 15',
   'UCAndroid >= 13',
 ];
 
