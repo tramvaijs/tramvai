@@ -36,20 +36,13 @@ exports[`polyfills modern list of polyfills: modern 1`] = `
 exports[`polyfills stable list of polyfills: default 1`] = `
 {
   "polyfills": [
-    "../../node_modules/core-js/modules/es.aggregate-error.constructor.js",
-    "../../node_modules/core-js/modules/es.aggregate-error.js",
     "../../node_modules/core-js/modules/es.array.at.js",
-    "../../node_modules/core-js/modules/es.array.reduce-right.js",
-    "../../node_modules/core-js/modules/es.array.reduce.js",
     "../../node_modules/core-js/modules/es.json.stringify.js",
     "../../node_modules/core-js/modules/es.object.has-own.js",
-    "../../node_modules/core-js/modules/es.promise.any.js",
-    "../../node_modules/core-js/modules/es.reflect.to-string-tag.js",
     "../../node_modules/core-js/modules/es.string.at-alternative.js",
-    "../../node_modules/core-js/modules/es.string.replace-all.js",
     "./src/polyfill.ts + 1 modules",
     "webpack/runtime/global",
   ],
-  "polyfillsCount": 13,
+  "polyfillsCount": 6,
 }
 `;

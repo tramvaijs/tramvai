@@ -1,4 +1,14 @@
-extends @tinkoff/browserslist-config
+Chrome >= 80
+Safari >= 14.0
+Firefox >= 115
+Opera >= 67
+Edge >= 80
+ChromeAndroid >= 80
+ios_saf >= 14.0
+OperaMobile >= 57
+FirefoxAndroid >= 115
+Samsung >= 13
+UCAndroid >= 13
 
 [node]
 extends @tinkoff/browserslist-config
