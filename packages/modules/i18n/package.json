@@ -18,18 +18,24 @@
     "build": "tramvai-build --forPublish --preserveModules",
     "watch": "tsc -w"
   },
+  "devDependencies": {
+    "@tinkoff/hook-runner": "0.0.0-stub"
+  },
   "dependencies": {
     "@tinkoff/errors": "0.0.0-stub",
     "@tinkoff/url": "0.0.0-stub",
     "@tramvai/module-client-hints": "0.0.0-stub",
+    "@tramvai/module-seo": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-cookie": "0.0.0-stub",
+    "@tramvai/tokens-core": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "^1.0.0",
     "@tinkoff/logger": "^0.10.518",
+    "@tinkoff/utils": "^2.1.2",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/state": "0.0.0-stub",

@@ -39,6 +39,15 @@
         },
         {
             "path": "../../tramvai/react"
+        },
+        {
+            "path": "../seo"
+        },
+        {
+            "path": "../../libs/hooks"
+        },
+        {
+            "path": "../../tokens/core"
         }
     ]
 }

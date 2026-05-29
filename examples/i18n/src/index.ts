@@ -28,7 +28,15 @@ createApp({
   name: 'i18n',
   modules: [
     CommonModule,
-    SpaRouterModule,
+    SpaRouterModule.forRoot([
+      {
+        name: 'acquisition',
+        path: '/acquisition/',
+        config: {
+          pageComponent: '@/pages/acquisition',
+        },
+      },
+    ]),
     RenderModule.forRoot({ useStrictMode: true }),
     SeoModule,
     ServerModule,

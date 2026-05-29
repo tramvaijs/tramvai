@@ -7,15 +7,25 @@ import {
   ENV_MANAGER_TOKEN,
 } from '@tramvai/tokens-common';
 import { COOKIE_MANAGER_TOKEN } from '@tramvai/tokens-cookie';
-import { ROUTER_GUARD_TOKEN, ROUTER_PLUGIN, ROUTER_TOKEN } from '@tramvai/tokens-router';
+import {
+  PAGE_SERVICE_TOKEN,
+  ROUTER_GUARD_TOKEN,
+  ROUTER_PLUGIN,
+  ROUTER_TOKEN,
+} from '@tramvai/tokens-router';
 import { USER_LANGUAGE_TOKEN } from '@tramvai/module-client-hints';
-import { HTML_ATTRS, RENDER_SLOTS, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
+import { HTML_ATTRS } from '@tramvai/tokens-render';
+import { META_PRIORITY_ROUTE, META_UPDATER_TOKEN } from '@tramvai/module-seo';
+import { TAPABLE_HOOK_FACTORY_TOKEN } from '@tramvai/tokens-core';
+import type { RouteConfig } from '@tinkoff/router';
 import {
   I18N_CONFIGURATION_TOKEN,
   I18N_TOKEN,
   I18N_RESOLVE_LANGUAGE_TOKEN,
   I18N_RESOLVE_AVAILABLE_LANGUAGES_TOKEN,
   I18N_RESOLVE_LANGUAGE_SOURCE_TOKEN,
+  I18N_LANGUAGE_COOKIE_EXPIRES_VALUE,
+  I18N_HOOKS_TOKEN,
 } from '../tokens';
 import { I18nStore, setLanguage, setAvailableLanguages } from './store';
 import { I18nServiceImpl } from './service';
@@ -33,12 +43,26 @@ export const sharedProviders = [
     useValue: [I18nStore],
   }),
   provide({
+    provide: I18N_LANGUAGE_COOKIE_EXPIRES_VALUE,
+    useValue: 7 * 24 * 60 * 60,
+  }),
+  provide({
     provide: I18N_RESOLVE_AVAILABLE_LANGUAGES_TOKEN,
-    useFactory: ({ config }) => {
-      // TODO: sync with state from server if SSR?
+    useFactory: ({ config, store, envManager }) => {
+      // At client-side, for SSR mode, we can resolve available languages from server state
+      if (
+        typeof window !== 'undefined' &&
+        envManager.get('TRAMVAI_FORCE_CLIENT_SIDE_RENDERING') !== 'true'
+      ) {
+        const { availableLanguages } = store.getState(I18nStore);
+
+        return async () => availableLanguages;
+      }
       return async () => config.availableLanguages ?? [config.defaultLanguage];
     },
     deps: {
+      store: STORE_TOKEN,
+      envManager: ENV_MANAGER_TOKEN,
       config: I18N_CONFIGURATION_TOKEN,
     },
   }),
@@ -52,6 +76,7 @@ export const sharedProviders = [
       router: ROUTER_TOKEN,
       requestManager: REQUEST_MANAGER_TOKEN,
       logger: LOGGER_TOKEN,
+      languageCookieExpiresValue: I18N_LANGUAGE_COOKIE_EXPIRES_VALUE,
     },
   }),
   // Language from cookie has higher priority
@@ -205,28 +230,20 @@ export const sharedProviders = [
               store.dispatch(setAvailableLanguages(availableLanguages));
 
               const language = await resolveLanguage();
-
               log.info(
                 `Resolved language: "${language.language}" from "${language.source}" source`
               );
 
               store.dispatch(setLanguage(language));
-
               if (!cookieManager.get(config.cookieName!)) {
                 log.info(
                   `${config.cookieName!} cookie is not found, save resolved "${language.language}" language to cookie`
                 );
-
-                cookieManager.set({
-                  name: config.cookieName!,
-                  value: language.language,
-                  // TODO valid params!
-                });
+                i18n.setLanguageToCookie(language.language);
               }
 
               const currentUrl = router.getCurrentUrl() ?? requestManager.getParsedUrl();
               const languageFromUrl = i18n.getLanguageFromUrl(currentUrl);
-
               if (typeof languageFromUrl === 'string' && languageFromUrl !== language.language) {
                 log.info(
                   `Language "${languageFromUrl}" from current url "${currentUrl}" is not matched to resolved language "${language.language}"`
@@ -367,6 +384,23 @@ export const sharedProviders = [
     },
   }),
   provide({
+    provide: I18N_HOOKS_TOKEN,
+    useFactory: ({ tapableHookFactory }) => {
+      return {
+        'i18n:get-alternate-languages': tapableHookFactory.createSync<
+          {
+            availableLanguages: string[];
+            routeConfig: RouteConfig;
+          },
+          Language[]
+        >('i18n:get-alternate-languages'),
+      };
+    },
+    deps: {
+      tapableHookFactory: TAPABLE_HOOK_FACTORY_TOKEN,
+    },
+  }),
+  provide({
     provide: HTML_ATTRS,
     useFactory: ({ i18n }) => {
       return {
@@ -381,25 +415,43 @@ export const sharedProviders = [
     },
   }),
   provide({
-    provide: RENDER_SLOTS,
-    multi: true,
-    useFactory: ({ i18n, requestManager }) => {
-      const parsedUrl = requestManager.getParsedUrl();
-      const url = `${parsedUrl.origin}${parsedUrl.pathname}`;
+    provide: META_UPDATER_TOKEN,
+    useFactory: ({ pageService, i18n, requestManager, i18nHooks }) => {
+      return (meta) => {
+        const parsedUrl = requestManager.getParsedUrl();
+        const routeConfig = pageService.getConfig() || {};
 
-      // TODO: dynamic list of available languages for specific route to generate alternate links
-      // TODO: `x-default` link?
-      return [
-        {
-          type: ResourceType.asIs,
-          slot: ResourceSlot.HEAD_META,
-          payload: `<link rel="alternate" hreflang="${i18n.getLanguage()}" href="${url}" />`,
-        },
-      ];
+        const urlWithoutLanguage = i18n.removeLanguageFromUrl(parsedUrl);
+
+        const baseAvailableLanguages = i18n.getAvailableLanguages();
+        const alternateLanguages =
+          i18nHooks['i18n:get-alternate-languages'].call({
+            availableLanguages: baseAvailableLanguages,
+            routeConfig,
+          }) ?? baseAvailableLanguages;
+        const tags = alternateLanguages.reduce((result, languageCode) => {
+          const { pathname } = i18n.addLanguageToUrl(urlWithoutLanguage, languageCode);
+          //@ts-expect-error
+          result[`i18nAlternate_${languageCode}`] = {
+            tag: 'link',
+            attributes: {
+              rel: 'alternate',
+              hreflang: languageCode,
+              href: `${parsedUrl.origin}${pathname}${parsedUrl.search}${parsedUrl.hash}`,
+            },
+          };
+          return result;
+        }, {});
+
+        meta.updateMeta(META_PRIORITY_ROUTE, tags);
+      };
     },
     deps: {
-      i18n: I18N_TOKEN,
+      pageService: PAGE_SERVICE_TOKEN,
+      i18nHooks: I18N_HOOKS_TOKEN,
       requestManager: REQUEST_MANAGER_TOKEN,
+      i18nConfiguration: I18N_CONFIGURATION_TOKEN,
+      i18n: I18N_TOKEN,
     },
   }),
 ];
