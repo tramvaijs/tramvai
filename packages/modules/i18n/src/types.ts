@@ -1,3 +1,5 @@
+import { SyncTapableHookInstance } from '@tinkoff/hook-runner';
+import type { RouteConfig } from '@tinkoff/router';
 import { Url } from '@tinkoff/url';
 
 /**
@@ -85,4 +87,12 @@ export interface I18nService {
   switchLanguage(language: Language): Promise<void>;
   removeLanguageFromUrl(url: string | Url): Url;
   addLanguageToUrl(url: string | Url, language: Language): Url;
+  setLanguageToCookie(language: string, expires?: number): void;
 }
+
+export type I18nHooks = {
+  'i18n:get-alternate-languages': SyncTapableHookInstance<
+    { availableLanguages: string[]; routeConfig: RouteConfig },
+    Language[]
+  >;
+};

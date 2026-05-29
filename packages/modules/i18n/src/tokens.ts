@@ -1,5 +1,5 @@
 import { Scope, createToken } from '@tramvai/core';
-import type { I18nConfiguration, I18nService, Language } from './types';
+import type { I18nConfiguration, I18nHooks, I18nService, Language } from './types';
 
 export const I18N_CONFIGURATION_TOKEN = createToken<I18nConfiguration>(
   'tramvai i18n configuration',
@@ -8,6 +8,12 @@ export const I18N_CONFIGURATION_TOKEN = createToken<I18nConfiguration>(
 
 export const I18N_TOKEN = createToken<I18nService>('tramvai i18n service');
 
+export const I18N_LANGUAGE_COOKIE_EXPIRES_VALUE = createToken<number>(
+  'tramvai i18n language cookie expires value'
+);
+export const I18N_HOOKS_TOKEN = createToken<I18nHooks>('tramvai i18n tapable hooks', {
+  scope: Scope.REQUEST,
+});
 export const I18N_RESOLVE_LANGUAGE_TOKEN = createToken<
   () => Promise<{
     language: Language;

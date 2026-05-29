@@ -6,7 +6,7 @@ import { Url, parse } from '@tinkoff/url';
 import { RedirectFoundError, makeErrorSilent } from '@tinkoff/errors';
 import type { I18nService, Language } from '../types';
 import { I18nStore } from './store';
-import { I18N_CONFIGURATION_TOKEN } from '../tokens';
+import { I18N_CONFIGURATION_TOKEN, I18N_LANGUAGE_COOKIE_EXPIRES_VALUE } from '../tokens';
 
 type Deps = {
   store: ExtractDependencyType<typeof STORE_TOKEN>;
@@ -15,6 +15,7 @@ type Deps = {
   router: ExtractDependencyType<typeof ROUTER_TOKEN>;
   requestManager: ExtractDependencyType<typeof REQUEST_MANAGER_TOKEN>;
   logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
+  languageCookieExpiresValue: ExtractDependencyType<typeof I18N_LANGUAGE_COOKIE_EXPIRES_VALUE>;
 };
 
 export class I18nServiceImpl implements I18nService {
@@ -24,6 +25,7 @@ export class I18nServiceImpl implements I18nService {
   private router: Deps['router'];
   private requestManager: Deps['requestManager'];
   private log: ReturnType<Deps['logger']>;
+  private languageCookieExpiresValue: Deps['languageCookieExpiresValue'];
 
   constructor(deps: Deps) {
     this.store = deps.store;
@@ -32,6 +34,7 @@ export class I18nServiceImpl implements I18nService {
     this.router = deps.router;
     this.requestManager = deps.requestManager;
     this.log = deps.logger('i18n');
+    this.languageCookieExpiresValue = deps.languageCookieExpiresValue;
   }
 
   getLanguage(): Language {
@@ -44,26 +47,30 @@ export class I18nServiceImpl implements I18nService {
     return state.availableLanguages;
   }
 
+  setLanguageToCookie(language: string, expires?: number) {
+    this.cookieManager.set({
+      name: this.config.cookieName!,
+      value: language,
+      expires: expires ?? this.languageCookieExpiresValue,
+    });
+  }
+
   // eslint-disable-next-line max-statements
-  async switchLanguage(language: Language): Promise<void> {
+  async switchLanguage(switchToLanguage: Language): Promise<void> {
     const availableLanguages = this.getAvailableLanguages();
-
+    const language = switchToLanguage;
     if (!availableLanguages.includes(language)) {
-      // TODO: is throwing an error is a best solution?
-      throw new Error(
-        `Language "${language}" is not available. Available languages: ${availableLanguages.join(', ')}`
+      this.log.info(
+        `Language ${language} is not in availableLanguages list. Available languages is ${availableLanguages}`
       );
+      return;
     }
-
     this.log.info(`Switch language to "${language}"`);
 
     const { cookieName, routingStrategy, updateStrategy } = this.config;
-
-    this.cookieManager.set({
-      name: cookieName!,
-      value: language,
-      // TODO valid params!
-    });
+    if (this.cookieManager.get(cookieName!) !== language) {
+      this.setLanguageToCookie(language);
+    }
 
     const currentUrl = this.router.getCurrentUrl() ?? this.requestManager.getUrl();
     const parsedUrl = typeof currentUrl === 'string' ? parse(currentUrl) : currentUrl;

@@ -14,6 +14,24 @@ test.describe('i18n - Default Configuration', () => {
     await I18n.clearLanguageCookie();
   });
 
+  test.describe('Page with alternate languages', () => {
+    test('should set supportedLanguageCodes available for page in meta alternate tag - from config', async ({
+      app,
+      I,
+      page,
+    }) => {
+      await I.gotoPage(`${app.serverUrl}/acquisition/`);
+      const enAlternate = page.locator('link[rel="alternate"][hreflang="en"]');
+      const ruAlternate = page.locator('link[rel="alternate"][hreflang="ru"]');
+
+      const enHref = await enAlternate.getAttribute('href');
+      const ruHref = await ruAlternate.getAttribute('href');
+
+      expect(new URL(enHref!).pathname).toBe('/en/acquisition/');
+      expect(new URL(ruHref!).pathname).toBe('/acquisition/');
+    });
+  });
+
   test.describe('Language Detection', () => {
     test('should use default language on first visit', async ({ app, I, I18n }) => {
       await I.gotoPage(`${app.serverUrl}/`);

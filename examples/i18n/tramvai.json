@@ -10,7 +10,7 @@
       "type": "application",
       "fileSystemPages": {
         "enabled": true,
-        "pagesDir": false
+        "pagesDir": "pages"
       },
       "sourceMap": {
         "development": false,
