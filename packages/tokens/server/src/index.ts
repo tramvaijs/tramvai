@@ -51,6 +51,15 @@ export const SERVER_MODULE_PAPI_PUBLIC_ROUTE = createToken<Papi>('serverModulePa
 
 /**
  * @description
+ * Add form action papi route
+ */
+export const SERVER_MODULE_PAPI_FORM_ACTIONS = createToken<Papi>('serverModulePapiFormActions', {
+  multi: true,
+  scope: Scope.SINGLETON,
+});
+
+/**
+ * @description
  * Settings for the static server
  */
 export const SERVER_MODULE_STATICS_OPTIONS = createToken<ServerModuleStaticsOptions>(

@@ -77,6 +77,7 @@
     "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/build": "0.0.0-stub",
+    "@tramvai/papi": "0.0.0-stub",
     "@tramvai/plugin-babel-transpiler": "0.0.0-stub",
     "@tramvai/plugin-base-builder": "0.0.0-stub",
     "@tramvai/plugin-swc-transpiler": "0.0.0-stub",

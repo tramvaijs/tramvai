@@ -346,6 +346,7 @@ export const rspackConfig: RspackConfigurationFactory = async (
             rootDir: config.rootDir,
             sourceDir: config.sourceDir,
             extensions,
+            isServer: false,
           },
         },
         ...(config.sourceMap ? sourceMapsConfiguration.rules : []),

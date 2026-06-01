@@ -7,6 +7,7 @@ import { readdirAsync } from '../utils';
 
 export const LAYOUT_FILENAME = '_layout.tsx';
 export const ERROR_BOUNDARY_FILENAME = '_error.tsx';
+export const FORM_ACTION_FILENAME = '_formAction.ts';
 export const WILDCARD_TOKEN = '[...';
 
 export interface FileSystemPagesLoaderOptions {
@@ -14,6 +15,13 @@ export interface FileSystemPagesLoaderOptions {
   sourceDir: string;
   extensions: string[];
   fileSystemPages: FileSystemPagesOptions;
+  /**
+   * Is client or server chunks are loaded.
+   *
+   * This option is passed in `server/common.ts` to differ
+   * loading chunks from those that are loaded on the client in `client/common.ts`.
+   */
+  isServer: boolean;
 }
 
 const removeExtension = (filename: string): string => {
@@ -32,11 +40,12 @@ const normalizePath = (pathToNormalize: string) => {
 export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemPagesLoaderOptions> =
   async function fileSystemPagesLoader() {
     const loaderOptions = this.getOptions();
-    const { fileSystemPages, sourceDir, rootDir, extensions } = loaderOptions;
+    const { fileSystemPages, sourceDir, rootDir, extensions, isServer } = loaderOptions;
     const extensionsRegexp = new RegExp(`\\.(${extensions.map((ext) => ext.slice(1)).join('|')})$`);
     const fsLayouts: string[] = [];
     const fsErrorBoundaries: string[] = [];
     const fsWildcards: string[] = [];
+    const fsFormActions: string[] = [];
 
     // eslint-disable-next-line max-statements
     const filesToPages = async ({
@@ -88,6 +97,7 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
 
             const layoutPath = path.join(pageDirname, LAYOUT_FILENAME);
             const errorBoundaryPath = path.join(pageDirname, ERROR_BOUNDARY_FILENAME);
+            const formActionPath = path.join(pageDirname, FORM_ACTION_FILENAME);
 
             const routeContent = (await fs.promises.readdir(pageDirname, { withFileTypes: true }))
               .filter((item) => item.isFile())
@@ -118,6 +128,15 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
               // @example '@/pages/MainPage': lazy(() => import(/* webpackChunkName: "@_pages_MainPage__wildcard" */ '/tramvai-app/src/pages/MainPage_wildcard'))
               fsWildcards.push(
                 `'${componentName}': lazy(() => import(/* webpackChunkName: "${chunkname}__wildcard" */ '${filename}'))`
+              );
+            }
+
+            if (isServer && fs.existsSync(formActionPath)) {
+              const filename = normalizePath(removeExtension(formActionPath));
+
+              // @example '@/pages/MainPage': require(/* webpackChunkName: "@_pages_MainPage__formAction" #/ '/tramvai-app/src/pages/MainPage_formAction').default
+              fsFormActions.push(
+                `'${pageComponentName}': require(/* webpackChunkName: "${chunkname}__formAction" */ '${filename}').default`
               );
             }
           }
@@ -163,6 +182,9 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
     wildcards: {
       ${fsWildcards.join(',\n')}
     },
+    formActions: {
+      ${fsFormActions.join(',\n')}
+    }
   }`;
 
     return code;

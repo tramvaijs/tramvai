@@ -116,6 +116,7 @@ describe('@tramvai/cli start command', () => {
           layouts: {},
           errorBoundaries: {},
           wildcards: {},
+          formActions: {},
         });
       });
 

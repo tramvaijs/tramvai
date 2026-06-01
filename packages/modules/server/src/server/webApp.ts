@@ -1,6 +1,8 @@
 import fastify from 'fastify';
+import type { IncomingMessage } from 'http';
 import { fastifyCookie } from '@fastify/cookie';
 import fastifyFormBody from '@fastify/formbody';
+
 import type {
   ASYNC_LOCAL_STORAGE_TOKEN,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
@@ -29,13 +31,49 @@ import type {
 import { REACT_SERVER_RENDER_MODE, type FETCH_WEBPACK_STATS_TOKEN } from '@tramvai/tokens-render';
 import type { DI_TOKEN, ExtractDependencyType } from '@tinkoff/dippy';
 import { optional, provide } from '@tinkoff/dippy';
+
 import type { STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN } from '@tramvai/tokens-server';
+import { FormActionRoutingService } from './formActionRoutingService';
 import { errorHandler } from './error';
 
 export const webAppFactory = ({ server }: { server: typeof SERVER_TOKEN }) => {
   const app = fastify({
+    ajv: {
+      customOptions: {
+        allErrors: true,
+      },
+    },
     routerOptions: {
       ignoreTrailingSlash: true,
+      constraints: {
+        accept: {
+          name: 'accept',
+          mustMatchWhenDerived: false,
+          storage() {
+            const handlers: Record<string, any> = {};
+            return {
+              get: (type: string) => handlers[type] ?? null,
+              set: (type: string, handler: any) => {
+                handlers[type] = handler;
+              },
+              del: (type: string) => {
+                delete handlers[type];
+              },
+              empty: () => {
+                Object.keys(handlers).forEach((k) => delete handlers[k]);
+              },
+            };
+          },
+          deriveConstraint(req: IncomingMessage) {
+            return req.headers.accept;
+          },
+          validate(value: unknown) {
+            if (typeof value !== 'string') {
+              throw new Error('accept constraint value must be a string');
+            }
+          },
+        },
+      },
     },
     bodyLimit: 2097152, // 2mb
     serverFactory: (handler) => {
@@ -84,6 +122,7 @@ export const webAppInitCommand = ({
   asyncLocalStorage: ExtractDependencyType<typeof ASYNC_LOCAL_STORAGE_TOKEN>;
 }) => {
   const log = logger('server:webapp');
+  const formActionService = new FormActionRoutingService();
 
   const runHandlers = (
     instance: ExtractDependencyType<typeof WEB_FASTIFY_APP_TOKEN>,
@@ -150,6 +189,11 @@ export const webAppInitCommand = ({
 
             const di = commandLineRunner.resolveDi('server', 'customer', rootDi, providers);
             const storage = asyncLocalStorage.getStore();
+            // Handle no-JS form action submissions (Accept: text/html).
+            // JS-enhanced submissions (Accept: application/json) are handled by constrained PAPI routes.
+            if (request.method.toUpperCase() === 'POST') {
+              await formActionService.routeRequestToFormAction(request, di);
+            }
 
             if (storage) {
               // save Request DI container to async local storage context for current request

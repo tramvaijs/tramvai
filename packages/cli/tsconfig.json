@@ -58,6 +58,9 @@
         },
         {
             "path": "../plugin-base-builder"
+        },
+        {
+            "path": "../tramvai/papi"
         }
     ]
 }

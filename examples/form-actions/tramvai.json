@@ -1,0 +1,36 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "analytics": {
+    "enabled": false
+  },
+  "projects": {
+    "form-actions": {
+      "name": "form-actions",
+      "root": "src",
+      "type": "application",
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "splitChunks": {
+        "mode": "granularChunks"
+      },
+      "postcss": {
+        "config": "src/postcss",
+        "cssLocalIdentName": {}
+      },
+      "hotRefresh": {
+        "enabled": true
+      },
+      "sourceMap": {
+        "development": false,
+        "production": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc"
+        }
+      }
+    }
+  }
+}

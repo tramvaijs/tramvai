@@ -30,6 +30,7 @@ export const papiExecutorProvider = provide({
       headers: requestManager.getHeaders(),
       body: requestManager.getBody(),
       parsedUrl: requestManager.getParsedUrl(),
+      validationError: fastifyRequest.validationError,
     };
 
     return (papi) => {

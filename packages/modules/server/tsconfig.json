@@ -26,6 +26,9 @@
             "path": "../../tramvai/papi"
         },
         {
+            "path": "../../tramvai/state"
+        },
+        {
             "path": "../common"
         },
         {
@@ -72,6 +75,9 @@
         },
         {
             "path": "../../tokens/router"
+        },
+        {
+            "path": "../../tramvai/experiments"
         }
     ]
 }

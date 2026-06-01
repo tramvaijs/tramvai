@@ -29,6 +29,7 @@ import {
 } from '@tramvai/tokens-server-private';
 import {
   ASYNC_LOCAL_STORAGE_TOKEN,
+  COMBINE_REDUCERS,
   ENV_MANAGER_TOKEN,
   ENV_USED_TOKEN,
   EXECUTION_CONTEXT_MANAGER_TOKEN,
@@ -45,8 +46,10 @@ import { xHeadersFactory } from './server/xHeaders';
 import * as modules from './modules';
 import { ServerResponseTaskManager } from './server/taskManager';
 import { providers as etagProviders } from './server/etag/providers';
+import { FormActionResultStore } from './formActionStore';
 
 export * from '@tramvai/tokens-server';
+export { FormActionResultStore, setFormActionResult } from './formActionStore';
 
 declare module '@tramvai/tokens-common' {
   export interface AsyncLocalStorageState {
@@ -83,6 +86,11 @@ EventEmitter.defaultMaxListeners = 50;
   ].filter(Boolean),
   providers: [
     ...etagProviders,
+    provide({
+      provide: COMBINE_REDUCERS,
+      useValue: [FormActionResultStore],
+      multi: true,
+    }),
     provide({
       provide: SERVER_FACTORY_TOKEN,
       scope: Scope.SINGLETON,
@@ -121,13 +129,28 @@ EventEmitter.defaultMaxListeners = 50;
         logger: LOGGER_TOKEN,
         commandLineRunner: COMMAND_LINE_RUNNER_TOKEN,
         executionContextManager: EXECUTION_CONTEXT_MANAGER_TOKEN,
-        beforeInit: { token: WEB_FASTIFY_APP_BEFORE_INIT_TOKEN, optional: true },
+        beforeInit: {
+          token: WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
+          optional: true,
+        },
         init: { token: WEB_FASTIFY_APP_INIT_TOKEN, optional: true },
         afterInit: { token: WEB_FASTIFY_APP_AFTER_INIT_TOKEN, optional: true },
-        requestMetrics: { token: WEB_FASTIFY_APP_METRICS_TOKEN, optional: true },
-        limiterRequest: { token: WEB_FASTIFY_APP_LIMITER_TOKEN, optional: true },
-        beforeError: { token: WEB_FASTIFY_APP_BEFORE_ERROR_TOKEN, optional: true },
-        afterError: { token: WEB_FASTIFY_APP_AFTER_ERROR_TOKEN, optional: true },
+        requestMetrics: {
+          token: WEB_FASTIFY_APP_METRICS_TOKEN,
+          optional: true,
+        },
+        limiterRequest: {
+          token: WEB_FASTIFY_APP_LIMITER_TOKEN,
+          optional: true,
+        },
+        beforeError: {
+          token: WEB_FASTIFY_APP_BEFORE_ERROR_TOKEN,
+          optional: true,
+        },
+        afterError: {
+          token: WEB_FASTIFY_APP_AFTER_ERROR_TOKEN,
+          optional: true,
+        },
         fetchWebpackStats: FETCH_WEBPACK_STATS_TOKEN,
         staticRootErrorBoundaryError: {
           token: STATIC_ROOT_ERROR_BOUNDARY_ERROR_TOKEN,
@@ -155,7 +178,10 @@ EventEmitter.defaultMaxListeners = 50;
         },
       deps: {
         logger: LOGGER_TOKEN,
-        rootErrorBoundary: { token: ROOT_ERROR_BOUNDARY_COMPONENT_TOKEN, optional: true },
+        rootErrorBoundary: {
+          token: ROOT_ERROR_BOUNDARY_COMPONENT_TOKEN,
+          optional: true,
+        },
       },
     }),
     {
@@ -184,7 +210,12 @@ EventEmitter.defaultMaxListeners = 50;
       useValue: [
         { key: 'DEV_STATIC', optional: true, dehydrate: false },
         { key: 'PORT_STATIC', optional: true, dehydrate: false, value: 4000 },
-        { key: 'HOST_STATIC', optional: true, dehydrate: false, value: 'localhost' },
+        {
+          key: 'HOST_STATIC',
+          optional: true,
+          dehydrate: false,
+          value: 'localhost',
+        },
         { key: 'PORT', optional: true, dehydrate: false, value: 3000 },
         {
           key: 'APP_VERSION',
@@ -197,8 +228,18 @@ EventEmitter.defaultMaxListeners = 50;
         { key: 'DEPLOY_COMMIT', optional: true, dehydrate: false },
         { key: 'DEPLOY_VERSION', optional: true, dehydrate: false },
         { key: 'DEPLOY_REPOSITORY', optional: true, dehydrate: false },
-        { key: 'HOST', optional: true, dehydrate: false, value: process.env.HOST },
-        { key: 'HTTPS', optional: true, dehydrate: false, value: process.env.HTTPS },
+        {
+          key: 'HOST',
+          optional: true,
+          dehydrate: false,
+          value: process.env.HOST,
+        },
+        {
+          key: 'HTTPS',
+          optional: true,
+          dehydrate: false,
+          value: process.env.HTTPS,
+        },
       ],
     },
     {

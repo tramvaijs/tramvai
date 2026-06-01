@@ -15,15 +15,18 @@ import {
 } from '@tramvai/tokens-server-private';
 import type { Papi } from '@tramvai/papi';
 import { createPapiMethod, getPapiParameters } from '@tramvai/papi';
+import { SERVER_MODULE_PAPI_FORM_ACTIONS } from '@tramvai/tokens-server';
 import { createApi } from './api';
 import { fileApiProvider } from './server/fileApi';
 import { sharedProviders } from './shared';
 import { papiExecutorProvider } from './server/executor';
+import { formActionProvider } from './server/formActionProvider';
 
 @Module({
   providers: [
     papiExecutorProvider,
     fileApiProvider,
+    formActionProvider,
     ...sharedProviders,
     provide({
       provide: WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
@@ -36,6 +39,7 @@ import { papiExecutorProvider } from './server/executor';
           publicBaseUrl,
           privateBaseUrl,
           papiInitHandlers,
+          formActions,
         }) =>
         (app) => {
           if (process.env.NODE_ENV === 'development') {
@@ -88,6 +92,20 @@ import { papiExecutorProvider } from './server/executor';
               papiInitHandlers,
             });
           }
+
+          if (formActions) {
+            const flattenedFormActions = flatten<Papi>(formActions);
+
+            if (flattenedFormActions.length > 0) {
+              createApi(app, flattenedFormActions, {
+                baseUrl: '', // No "/papi" and any other prefix for form actions
+                di,
+                logger,
+                papiInitHandlers,
+                isFormActions: true,
+              });
+            }
+          }
         },
       deps: {
         di: DI_TOKEN,
@@ -105,6 +123,10 @@ import { papiExecutorProvider } from './server/executor';
         privateBaseUrl: SERVER_MODULE_PAPI_PRIVATE_URL,
         publicBaseUrl: SERVER_MODULE_PAPI_PUBLIC_URL,
         papiInitHandlers: optional(PAPI_FASTIFY_INIT_TOKEN),
+        formActions: {
+          token: SERVER_MODULE_PAPI_FORM_ACTIONS,
+          optional: true as const,
+        },
       },
       multi: true,
     }),

@@ -5,6 +5,7 @@ import type { ApplicationConfigEntry } from '../../../api';
 
 const LAYOUT_FILENAME = '_layout.tsx';
 const ERROR_BOUNDARY_FILENAME = '_error.tsx';
+const FORM_ACTION_FILENAME = '_formAction.ts';
 const WILDCARD_TOKEN = '[...';
 
 export interface PagesResolveOptions {
@@ -12,6 +13,13 @@ export interface PagesResolveOptions {
   root: string;
   extensions: string[];
   fileSystemPages: ApplicationConfigEntry['fileSystemPages'];
+  /**
+   * Is client or server chunks are loaded.
+   *
+   * This option is passed in `server/common.ts` to differ
+   * loading chunks from those that are loaded on the client in `client/common.ts`.
+   */
+  isServer: boolean;
 }
 
 const removeExtension = (filename: string): string => {
@@ -45,11 +53,12 @@ const readdirAsync = async (dir, prefix = '', filelist = [], filter = (file: str
 
 // eslint-disable-next-line func-style
 const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async function () {
-  const { fileSystemPages, rootDir, root, extensions } = this.getOptions();
+  const { fileSystemPages, rootDir, root, extensions, isServer } = this.getOptions();
   const extensionsRegexp = new RegExp(`\\.(${extensions.map((ext) => ext.slice(1)).join('|')})$`);
   const fsLayouts: string[] = [];
   const fsErrorBoundaries: string[] = [];
   const fsWildcards: string[] = [];
+  const fsFormActions: string[] = [];
 
   this.cacheable(false);
 
@@ -96,6 +105,7 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
 
           const layoutPath = path.join(pageDirname, LAYOUT_FILENAME);
           const errorBoundaryPath = path.join(pageDirname, ERROR_BOUNDARY_FILENAME);
+          const formActionPath = path.join(pageDirname, FORM_ACTION_FILENAME);
 
           const routeContent = (await fs.promises.readdir(pageDirname, { withFileTypes: true }))
             .filter((item) => item.isFile())
@@ -126,6 +136,15 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
             // @example '@/pages/MainPage': lazy(() => import(/* webpackChunkName: "@_pages_MainPage__wildcard" */ '/tramvai-app/src/pages/MainPage_wildcard'))
             fsWildcards.push(
               `'${componentName}': lazy(() => import(/* webpackChunkName: "${chunkname}__wildcard" */ '${filename}'))`
+            );
+          }
+
+          if (isServer && fs.existsSync(formActionPath)) {
+            const filename = normalizePath(removeExtension(formActionPath));
+
+            // @example '@/pages/MainPage': require(/* webpackChunkName: "@_pages_MainPage__formAction" #/ '/tramvai-app/src/pages/MainPage_formAction').default
+            fsFormActions.push(
+              `'${pageComponentName}': require(/* webpackChunkName: "${chunkname}__formAction" */ '${filename}').default`
             );
           }
         }
@@ -169,6 +188,9 @@ const pagesResolve: LoaderDefinitionFunction<PagesResolveOptions> = async functi
     wildcards: {
       ${fsWildcards.join(',\n')}
     },
+    formActions: {
+      ${fsFormActions.join(',\n')}
+    }
   }`;
 
   return code;

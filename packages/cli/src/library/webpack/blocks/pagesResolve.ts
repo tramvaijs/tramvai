@@ -21,6 +21,7 @@ export const pagesResolve =
         rootDir: configManager.rootDir,
         root: configManager.root,
         extensions: config.resolve.extensions.values(),
+        isServer: configManager.buildType === 'server',
       } as PagesResolveOptions)
       .end()
       // babel-loader is required to process this file

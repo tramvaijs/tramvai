@@ -1,0 +1,6 @@
+{
+  "name": "form-actions",
+  "sourceRoot": "examples/form-actions/src",
+  "projectType": "library",
+  "targets": {}
+}

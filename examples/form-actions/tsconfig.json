@@ -1,0 +1,61 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2015", "DOM", "DOM.Iterable"],
+    "rootDir": "./src",
+    "declarationDir": "./lib",
+    "outDir": "./lib",
+    "strict": true
+  },
+  "exclude": ["__integration__", "lib"],
+  "references": [
+    {
+      "path": "../../packages/tramvai/core"
+    },
+    {
+      "path": "../../packages/modules/common"
+    },
+    {
+      "path": "../../packages/modules/render"
+    },
+    {
+      "path": "../../packages/modules/router"
+    },
+    {
+      "path": "../../packages/modules/server"
+    },
+    {
+      "path": "../../packages/tramvai/papi"
+    },
+    {
+      "path": "../../packages/tramvai/react"
+    },
+    {
+      "path": "../../packages/tramvai/state"
+    },
+    {
+      "path": "../../packages/tokens/common"
+    },
+    {
+      "path": "../../packages/tokens/render"
+    },
+    {
+      "path": "../../packages/tokens/router"
+    },
+    {
+      "path": "../../packages/tokens/server"
+    },
+    {
+      "path": "../../packages/cli"
+    },
+    {
+      "path": "../../packages/tramvai/test/integration"
+    },
+    {
+      "path": "../../packages/tramvai/test/integration-jest"
+    },
+    {
+      "path": "../../packages/libs/errors"
+    }
+  ]
+}

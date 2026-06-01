@@ -310,6 +310,7 @@ export default appConfig;`;
             rootDir: config.rootDir,
             sourceDir: config.sourceDir,
             extensions,
+            isServer: true,
           },
         },
         {
@@ -321,6 +322,7 @@ export default appConfig;`;
             rootDir: config.rootDir,
             sourceDir: config.sourceDir,
             extensions,
+            isServer: true,
           },
         },
         ...(config.sourceMap ? sourceMapsConfiguration.rules : []),

@@ -31,6 +31,10 @@ export const getAllFileSystemWildcards = () => {
   return fsPagesAndRoutes.wildcards;
 };
 
+export const getAllFileSystemFormActions = () => {
+  return fsPagesAndRoutes.formActions;
+};
+
 export const isFileSystemPageComponent = (pageComponent: string): boolean => {
   return (
     fileSystemPagesEnabled() &&

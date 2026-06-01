@@ -357,6 +357,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             rootDir: config.rootDir,
             sourceDir: config.sourceDir,
             extensions,
+            isServer: false,
           },
         },
         ...(isRootErrorBoundaryEnabled

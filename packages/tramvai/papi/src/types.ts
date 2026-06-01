@@ -3,6 +3,7 @@ import type { IncomingHttpHeaders } from 'http';
 import type { ProvideDepsIterator } from '@tinkoff/dippy';
 import type { Url } from '@tinkoff/url';
 import type { Logger, REQUEST_MANAGER_TOKEN, RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
+import type { FastifyRequest } from 'fastify';
 import type { PAPI_PARAMETERS } from './createPapiMethod';
 
 export type Method = 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';
@@ -26,6 +27,7 @@ export interface PapiHandlerOptions {
   parsedUrl: Url;
   requestManager: typeof REQUEST_MANAGER_TOKEN;
   responseManager: typeof RESPONSE_MANAGER_TOKEN;
+  validationError?: FastifyRequest['validationError'];
 }
 
 export interface PapiHandlerContext<Deps> {

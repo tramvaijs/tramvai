@@ -1,26 +1,30 @@
-import type { FastifyInstance } from 'fastify';
+import type { FastifyError, FastifyInstance } from 'fastify';
 import { fastifyCookie } from '@fastify/cookie';
 import fastifyFormBody from '@fastify/formbody';
 
-import type { Papi } from '@tramvai/papi';
-import { getPapiParameters } from '@tramvai/papi';
-import type { DI_TOKEN, ExtractDependencyType } from '@tramvai/core';
-import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
-import { RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
-import { FASTIFY_REQUEST, FASTIFY_RESPONSE } from '@tramvai/tokens-server-private';
-import { Scope, createChildContainer } from '@tinkoff/dippy';
-import { HttpError } from '@tinkoff/errors';
+import {
+  FormActionParameters,
+  getPapiParameters,
+  Papi,
+  PapiResponse,
+  PapiResultCode,
+} from '@tramvai/papi';
+import { DI_TOKEN, ExtractDependencyType } from '@tramvai/core';
+import { LOGGER_TOKEN, RESPONSE_MANAGER_TOKEN } from '@tramvai/tokens-common';
 import type {
-  WEB_FASTIFY_APP_TOKEN,
   PAPI_FASTIFY_INIT_TOKEN,
+  WEB_FASTIFY_APP_TOKEN,
 } from '@tramvai/tokens-server-private';
-import { PAPI_EXECUTOR } from '@tramvai/tokens-server-private';
+import { FASTIFY_REQUEST, FASTIFY_RESPONSE, PAPI_EXECUTOR } from '@tramvai/tokens-server-private';
+import { createChildContainer, Scope } from '@tinkoff/dippy';
+import { HttpError, RedirectFoundError } from '@tinkoff/errors';
 
 export interface CreateOptions {
   baseUrl: string;
   di: typeof DI_TOKEN;
   logger: typeof LOGGER_TOKEN;
   papiInitHandlers: ExtractDependencyType<typeof PAPI_FASTIFY_INIT_TOKEN>;
+  isFormActions?: boolean;
 }
 
 const runHandlers = (
@@ -30,10 +34,14 @@ const runHandlers = (
   return Promise.all([handlers && Promise.all(handlers.map((handler) => handler(instance)))]);
 };
 
+const getErrorHttpStatus = (error: FastifyError): number => {
+  return (error as unknown as HttpError).httpStatus ?? (error.validation ? 400 : 503);
+};
+
 export function createApi(
   rootApp: FastifyInstance,
   papiList: Papi[],
-  { baseUrl, di, logger, papiInitHandlers }: CreateOptions
+  { baseUrl, di, logger, papiInitHandlers, isFormActions = false }: CreateOptions
 ) {
   const paths = new Set();
   const papiLog = logger('papi');
@@ -53,12 +61,14 @@ export function createApi(
         got: ${JSON.stringify(papi)}`);
         }
 
-        const { method, path, options } = papiParams;
+        const { path, options } = papiParams;
         const { timeout, schema } = options;
 
         if (!path) {
           throw new Error(`No path in papi handler, got: ${JSON.stringify(papi)}`);
         }
+
+        const method = isFormActions ? 'post' : papiParams.method;
 
         const key = `${method} ${path}`;
 
@@ -68,24 +78,54 @@ export function createApi(
 
         paths.add(key);
 
-        const childLog = papiLog.child(`${papiParams.method}_${papiParams.path}`);
+        const childLog = papiLog.child(`${method}_${path}`);
 
         app[method](
           path,
           {
             schema,
-            errorHandler: async (error, req, res) => {
-              res.status(error.validation ? 400 : 503);
+            ...(isFormActions
+              ? { constraints: { accept: 'application/json' }, attachValidation: true }
+              : {}),
+            errorHandler: async (error, req, res): Promise<PapiResponse> => {
+              if (isFormActions) {
+                const formActionParams = papiParams as FormActionParameters;
+
+                // Handle form action redirects that are invoked via throwRedirectFoundError() function
+                if (error.name === RedirectFoundError.errorName) {
+                  const redirect = error as unknown as RedirectFoundError;
+
+                  res.status(redirect.httpStatus ?? 303);
+
+                  return {
+                    resultCode: PapiResultCode.REDIRECT,
+                    nextUrl: redirect.nextUrl,
+                  };
+                }
+
+                const httpStatus = getErrorHttpStatus(error);
+                res.status(httpStatus);
+
+                childLog.error(error);
+
+                return {
+                  resultCode: PapiResultCode.ERROR,
+                  error: { ...error },
+                };
+              }
+
+              const httpStatus = getErrorHttpStatus(error);
+              res.status(httpStatus);
 
               childLog.error(error);
 
               return {
-                resultCode: 'INTERNAL_ERROR',
+                resultCode: PapiResultCode.INTERNAL_ERROR,
                 errorMessage: error.message ?? 'internal error',
               };
             },
           },
-          async (req, res) => {
+          async (req, res): Promise<PapiResponse> => {
             const childDi = createChildContainer(di, [
               {
                 provide: FASTIFY_REQUEST,
@@ -106,7 +146,13 @@ export function createApi(
               papiExecutor(papi),
               new Promise((resolve, reject) =>
                 setTimeout(
-                  () => reject(new HttpError({ httpStatus: 503, message: 'Execution timeout' })),
+                  () =>
+                    reject(
+                      new HttpError({
+                        httpStatus: 503,
+                        message: 'Execution timeout',
+                      })
+                    ),
                   timeout
                 )
               ),
@@ -120,13 +166,20 @@ export function createApi(
               return;
             }
 
+            if (isFormActions) {
+              return {
+                resultCode: PapiResultCode.OK,
+                payload,
+              };
+            }
+
             if (!payload && responseManager.getBody()) {
               res.send(responseManager.getBody());
               return res;
             }
 
             return {
-              resultCode: 'OK',
+              resultCode: PapiResultCode.OK,
               payload,
             };
           }
