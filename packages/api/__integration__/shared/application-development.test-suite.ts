@@ -235,7 +235,15 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-css-modules': {
       name: 'app-css-modules',
       type: 'application',
-      entryFile: path.join(fixturesFolder, 'application', 'css-modules', 'index.ts'),
+      entryFile: path.join(fixturesFolder, 'application', 'css', 'index.ts'),
+    },
+    'app-css-no-modules': {
+      name: 'app-css-no-modules',
+      type: 'application',
+      postcss: {
+        cssModulePattern: '^(?!.*global\\.css$).*$',
+      },
+      entryFile: path.join(fixturesFolder, 'application', 'css', 'index.ts'),
     },
     'app-postcss': {
       name: 'app-postcss',
@@ -1804,6 +1812,50 @@ export default bar;`,
             test.expect(platformCss).not.toContain('-webkit-user-select: none;');
             test.expect(platformCss).toContain('padding: 8px;');
             test.expect(serverJs).toContain('style--module__header_');
+            test.expect(serverCssResponse.status).toBe(404);
+          });
+        });
+
+        test.describe('app-css-no-modules', () => {
+          test.use({
+            inputParameters: {
+              name: 'app-css-no-modules',
+              rootDir: testSuiteFolder,
+              disableServerRunnerWaiting: true,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('css: no modules for css file', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const platformJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
+            ).text();
+            const platformCss = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.css`)
+            ).text();
+            const serverJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+            const serverCssResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/server/platform.css`
+            );
+
+            const extractedComment =
+              builder === 'webpack'
+                ? '// extracted by mini-css-extract-plugin'
+                : '// extracted by css-extract-rspack-plugin';
+            test.expect(platformCss).toContain('.mt-3');
+            test.expect(platformCss).toContain('.flex');
+            test.expect(platformCss).toContain('.custom');
+            test.expect(platformJs).toContain(extractedComment);
+            test.expect(serverJs).toContain(extractedComment);
             test.expect(serverCssResponse.status).toBe(404);
           });
         });

@@ -45,7 +45,7 @@ export const createStylesConfiguration = ({
   const buildTarget = di.get(BUILD_TARGET_TOKEN);
   const { mode } = config;
 
-  const cssLocalIdentName = config.postcss?.cssLocalIdentName;
+  const { cssLocalIdentName, cssModulePattern } = config.postcss ?? {};
 
   const cssModulesOptions: Record<string, any> = {
     localIdentName: '[name]__[local]_[minicss]',
@@ -61,6 +61,10 @@ export const createStylesConfiguration = ({
 
   if (/\[minicss]/.test(cssModulesOptions.localIdentName)) {
     cssModulesOptions.getLocalIdent = createGenerator();
+  }
+
+  if (cssModulePattern) {
+    cssModulesOptions.auto = new RegExp(cssModulePattern);
   }
 
   return {
