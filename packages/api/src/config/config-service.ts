@@ -29,6 +29,15 @@ export interface SharpEncodeOptions {
   };
 }
 
+/**
+ * @see https://github.com/waysact/webpack-subresource-integrity/tree/main/webpack-subresource-integrity#options
+ */
+export interface IntegrityOptions {
+  enabled: boolean | 'auto';
+  hashFuncNames: ('sha256' | 'sha384' | 'sha512')[];
+  hashLoading: 'eager' | 'lazy';
+}
+
 export type PostcssOptions = {
   /**
    * @title Path to postcss config file. By default, `postcss.config.js` file is used
@@ -438,7 +447,7 @@ export interface ApplicationProject extends BaseProject {
   polyfill?: string;
   modernPolyfill?: string;
   dedupe?: DedupeOptions;
-  integrity?: SubresourceIntegrityPluginOptions;
+  integrity?: IntegrityOptions | boolean;
 }
 
 export interface ChildAppProject extends BaseProject {
@@ -827,6 +836,10 @@ export class ConfigService {
   get integrity() {
     if (this.#project.type === 'child-app') {
       return null;
+    }
+
+    if (this.#project.integrity === true) {
+      return {};
     }
 
     return this.#project.integrity ?? false;

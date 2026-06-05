@@ -1,7 +1,7 @@
 import type { Compiler, MultiCompiler } from '@rspack/core';
 import type { Compiler as WebpackCompiler, MultiCompiler as WebpackMultiCompiler } from 'webpack';
 
-type AnyCompiler = WebpackCompiler | Compiler;
+type AnyCompiler = WebpackCompiler | WebpackMultiCompiler | Compiler | MultiCompiler;
 
 export function calculateBuildTime(compiler: AnyCompiler): any {
   let startTime = Date.now();

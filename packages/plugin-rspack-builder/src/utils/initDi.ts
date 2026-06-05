@@ -1,4 +1,4 @@
-import { initContainer, isValidModule, optional, provide } from '@tinkoff/dippy';
+import { Container, isValidModule, optional, provide } from '@tinkoff/dippy';
 import {
   CONFIG_SERVICE_TOKEN,
   ConfigService,
@@ -36,7 +36,7 @@ export async function initDi(
     return plugin;
   });
 
-  const di = initContainer({
+  const di = new Container({
     modules: plugins,
     providers: [
       provide({

@@ -50,6 +50,8 @@ describe('@tramvai/cli start command', () => {
       beforeAll(async () => {
         startResult = await start({
           rootDir: FIXTURES_DIR,
+          showBanner: false,
+          showProgress: false,
           target: 'app',
           resolveSymlinks: false,
         });
@@ -154,6 +156,8 @@ describe('@tramvai/cli start command', () => {
       const { server, staticServer, close } = await start({
         rootDir: root,
         resolveSymlinks: false,
+        showBanner: false,
+        showProgress: false,
         config: {
           name: 'app',
           liveReload: false,
@@ -199,6 +203,8 @@ describe('@tramvai/cli start command', () => {
     it.skip('should allow to exclude bundles from build', async () => {
       let { server, close } = await start({
         rootDir: FIXTURES_DIR,
+        showBanner: false,
+        showProgress: false,
         target: 'app',
         resolveSymlinks: false,
       });
@@ -214,6 +220,8 @@ describe('@tramvai/cli start command', () => {
 
       ({ server, close } = await start({
         rootDir: FIXTURES_DIR,
+        showBanner: false,
+        showProgress: false,
         target: 'app',
         resolveSymlinks: false,
         onlyBundles: ['main', 'second'],
@@ -240,6 +248,8 @@ describe('@tramvai/cli start command', () => {
         start({
           rootDir: FIXTURES_DIR,
           target: 'app',
+          showBanner: false,
+          showProgress: false,
           resolveSymlinks: false,
           port: getListeningPort(testServerStub),
           staticPort: getListeningPort(testStaticServerStub),
@@ -254,6 +264,8 @@ describe('@tramvai/cli start command', () => {
     it('should start module by target', async () => {
       const { staticServer, close } = await start({
         rootDir: FIXTURES_DIR,
+        showBanner: false,
+        showProgress: false,
         target: 'module',
         resolveSymlinks: false,
       });

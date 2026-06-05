@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { provide, isValidModule, initContainer } from '@tinkoff/dippy';
+import { provide, isValidModule, Container } from '@tinkoff/dippy';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -69,7 +69,7 @@ export async function start(
     return plugin;
   });
 
-  const di = initContainer({
+  const di = new Container({
     modules: plugins,
     providers: [
       provide({

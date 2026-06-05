@@ -214,7 +214,7 @@ export const createSplitChunksOptions = ({
     rspackSplitChunks.cacheGroups!.hmr = {
       name: 'hmr',
       enforce: true,
-      test: /[\\/]node_modules[\\/](react-refresh|@rspack[\\/]plugin-react-refresh|@rspack[\\/]hot)[\\/]/,
+      test: /[\\/]node_modules[\\/](react-refresh|@rspack[\\/]plugin-react-refresh|@rspack[\\/]core[\\/]hot|@rspack[\\/]hot|@rspack[\\/]dev-server)[\\/]/,
       chunks: 'all',
       priority: 20,
     };

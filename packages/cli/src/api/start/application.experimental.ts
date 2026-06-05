@@ -216,30 +216,56 @@ function mapApplicationProjectToNewConfig(
   if ('liveReload' in applicationProject) {
     mappedProject.liveReload = applicationProject.liveReload;
   }
-  if (applicationProject.experiments && 'runtimeChunk' in applicationProject.experiments) {
-    if (!mappedProject.experiments) {
-      mappedProject.experiments = {};
+  if (applicationProject.experiments) {
+    mappedProject.experiments = {};
+    if ('runtimeChunk' in applicationProject.experiments) {
+      mappedProject.runtimeChunk = applicationProject.experiments.runtimeChunk;
     }
-    mappedProject.runtimeChunk = applicationProject.experiments.runtimeChunk;
-  }
-  if (applicationProject.experiments && 'viewTransitions' in applicationProject.experiments) {
-    if (!mappedProject.experiments) {
-      mappedProject.experiments = {};
+    if ('viewTransitions' in applicationProject.experiments) {
+      mappedProject.experiments.viewTransitions = applicationProject.experiments.viewTransitions;
     }
-    mappedProject.experiments.viewTransitions = applicationProject.experiments.viewTransitions;
-  }
-  if (applicationProject.experiments && 'reactTransitions' in applicationProject.experiments) {
-    if (!mappedProject.experiments) {
-      mappedProject.experiments = {};
+    if ('reactTransitions' in applicationProject.experiments) {
+      mappedProject.experiments.reactTransitions = applicationProject.experiments.reactTransitions;
     }
-    mappedProject.experiments.reactTransitions = applicationProject.experiments.reactTransitions;
-  }
-  if (
-    applicationProject.experiments &&
-    'enableFillDeclareActionNamePlugin' in applicationProject.experiments
-  ) {
-    mappedProject.enableFillDeclareActionNamePlugin =
-      applicationProject.experiments.enableFillDeclareActionNamePlugin;
+    if ('enableFillDeclareActionNamePlugin' in applicationProject.experiments) {
+      mappedProject.enableFillDeclareActionNamePlugin =
+        applicationProject.experiments.enableFillDeclareActionNamePlugin;
+    }
+    if ('autoResolveSharedRequiredVersions' in applicationProject.experiments) {
+      if (!mappedProject.shared) {
+        mappedProject.shared = {};
+      }
+      mappedProject.shared.autoResolveSharedRequiredVersions =
+        applicationProject.experiments.autoResolveSharedRequiredVersions;
+    }
+    if (applicationProject.experiments.transpilation?.include) {
+      const applicationProjectInclude = applicationProject.experiments.transpilation.include;
+      mappedProject.transpilation = {
+        include: {
+          development:
+            typeof applicationProjectInclude === 'string' ||
+            Array.isArray(applicationProjectInclude)
+              ? applicationProjectInclude
+              : // @ts-ignore
+                applicationProjectInclude.development,
+        },
+      };
+    }
+    if (applicationProject.experiments.pwa) {
+      mappedProject.pwa = {
+        workbox: {
+          ...applicationProject.experiments.pwa.workbox,
+          enabled:
+            typeof applicationProject.experiments.pwa.workbox?.enabled === 'boolean'
+              ? applicationProject.experiments.pwa.workbox.enabled
+              : applicationProject.experiments.pwa.workbox?.enabled.development,
+        },
+        sw: applicationProject.experiments.pwa.sw,
+        webmanifest: applicationProject.experiments.pwa.webmanifest,
+        icon: applicationProject.experiments.pwa.icon,
+        meta: applicationProject.experiments.pwa.meta,
+      };
+    }
   }
   if (applicationProject.serverApiDir) {
     mappedProject.fileSystemPapiDir = path.resolve(rootDir, applicationProject.serverApiDir);
@@ -249,16 +275,6 @@ function mapApplicationProjectToNewConfig(
   }
   if (applicationProject.shared) {
     mappedProject.shared = applicationProject.shared;
-  }
-  if (
-    applicationProject.experiments &&
-    'autoResolveSharedRequiredVersions' in applicationProject.experiments
-  ) {
-    if (!mappedProject.shared) {
-      mappedProject.shared = {};
-    }
-    mappedProject.shared.autoResolveSharedRequiredVersions =
-      applicationProject.experiments.autoResolveSharedRequiredVersions;
   }
   if (applicationProject.shared && 'flexibleTramvaiVersions' in applicationProject.shared) {
     if (!mappedProject.shared) {
@@ -310,14 +326,7 @@ function mapApplicationProjectToNewConfig(
     mappedProject.dedupe = applicationProject.dedupe;
   }
   if ('integrity' in applicationProject) {
-    if (typeof applicationProject.integrity === 'boolean') {
-      mappedProject.integrity = {
-        enabled: applicationProject.integrity,
-      };
-    } else {
-      // @ts-expect-error inconsistent `hashFuncNames` types
-      mappedProject.integrity = applicationProject.integrity;
-    }
+    mappedProject.integrity = applicationProject.integrity;
   }
   if (
     applicationProject.splitChunks &&
@@ -345,38 +354,14 @@ function mapApplicationProjectToNewConfig(
     }
     mappedProject.webpack.watchOptions = applicationProject.webpack.watchOptions;
   }
+  if (applicationProject.webpack?.writeToDisk) {
+    mappedProject.writeToDisk = applicationProject.webpack.writeToDisk;
+  }
   if (applicationProject.webpack && 'devtool' in applicationProject.webpack) {
     if (!mappedProject.webpack) {
       mappedProject.webpack = {};
     }
     mappedProject.webpack.devtool = applicationProject.webpack.devtool;
-  }
-  if (applicationProject.experiments?.transpilation?.include) {
-    const applicationProjectInclude = applicationProject.experiments.transpilation.include;
-    mappedProject.transpilation = {
-      include: {
-        development:
-          typeof applicationProjectInclude === 'string' || Array.isArray(applicationProjectInclude)
-            ? applicationProjectInclude
-            : // @ts-ignore
-              applicationProjectInclude.development,
-      },
-    };
-  }
-  if (applicationProject.experiments?.pwa) {
-    mappedProject.pwa = {
-      workbox: {
-        ...applicationProject.experiments.pwa.workbox,
-        enabled:
-          typeof applicationProject.experiments.pwa.workbox?.enabled === 'boolean'
-            ? applicationProject.experiments.pwa.workbox.enabled
-            : applicationProject.experiments.pwa.workbox?.enabled.development,
-      },
-      sw: applicationProject.experiments.pwa.sw,
-      webmanifest: applicationProject.experiments.pwa.webmanifest,
-      icon: applicationProject.experiments.pwa.icon,
-      meta: applicationProject.experiments.pwa.meta,
-    };
   }
   if (applicationProject.externals) {
     if (!mappedProject.webpack) {

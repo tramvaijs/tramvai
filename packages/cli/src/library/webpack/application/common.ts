@@ -4,7 +4,7 @@ import { container } from 'webpack';
 import {
   ModuleFederationIgnoreEntries,
   ModuleFederationIgnoreEntriesOptions,
-} from '@tramvai/plugin-base-builder/lib/plugins';
+} from '../plugins/ModuleFederationIgnoreEntries';
 
 import {
   ModuleFederationFixRange,

@@ -33,6 +33,7 @@ import {
   DEV_STATS_OPTIONS,
   DEV_STATS_FIELDS,
   STATS_FILE_NAME,
+  POLYFILLS_STATS_FILE_NAME,
 } from '@tramvai/plugin-base-builder/lib/shared/stats';
 import { normalizeBrowserslistConfig } from '@tramvai/plugin-base-builder/lib/shared/browserslist';
 import { configToEnv } from '@tramvai/plugin-base-builder/lib/shared/config-to-env';
@@ -55,6 +56,8 @@ import {
   PolyfillConditionPlugin,
   RuntimePathPlugin,
   getPurifyStatsPlugin,
+  getCollectStatsPlugin,
+  getMergeStatsPlugin,
 } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import {
@@ -98,10 +101,13 @@ stderrWithWarningFilters.on('error', (error: Error) =>
 );
 
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
+const CollectStatsPlugin = getCollectStatsPlugin(Compilation);
+const MergeStatsPlugin = getMergeStatsPlugin(Compilation);
 
-export const rspackConfig: RspackConfigurationFactory = async (
-  config
-): Promise<RspackConfiguration> => {
+export const clientBuildName = 'client';
+export const polyfillBuildName = 'polyfill';
+
+export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const di = await initDi(config, {
     type: 'application',
     target: 'client',
@@ -182,8 +188,9 @@ export const rspackConfig: RspackConfigurationFactory = async (
 
   const sourceMapsConfiguration = createSourceMaps<'rspack'>({ config, target: 'client' });
 
-  return {
-    name: 'client',
+  const isPolyfillsExists = Boolean(polyfillPath || modernPolyfillPath);
+
+  const buildRspackConfig: RspackConfiguration = {
     // https://webpack.js.org/configuration/target/#browserslist
     target: normalizedBrowserslistConfig.defaults
       ? // unknown support for UCAndroid browser lead to false checks for some ES features
@@ -191,28 +198,6 @@ export const rspackConfig: RspackConfigurationFactory = async (
         `browserslist:${normalizedBrowserslistConfig.defaults.filter((query) => !query.includes('UCAndroid'))}`
       : 'web',
     context: rootDir,
-    entry: {
-      // TODO: more missed files watchers with absolute path?
-      platform: {
-        import: resolveAbsolutePathForFile({
-          file: config.entryFile,
-          sourceDir: config.sourceDir,
-          rootDir: config.rootDir,
-        }),
-      },
-      ...(polyfillPath
-        ? {
-            polyfill: polyfillPath,
-          }
-        : {}),
-      ...(modernPolyfillPath
-        ? {
-            'modern.polyfill': modernPolyfillPath,
-          }
-        : {}),
-      // platform: './src/index.ts',
-      ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
-    },
     cache: true,
     output: {
       path: resolveAbsolutePathForFolder({
@@ -227,9 +212,6 @@ export const rspackConfig: RspackConfigurationFactory = async (
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',
       crossOriginLoading: 'anonymous',
-      // uniqueName are used for various webpack internals
-      // currently, we use that value in the ModuleFederation glue code
-      uniqueName: `${projectType}:${config.projectName}:${config.projectVersion}`,
       // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
       devtoolNamespace: '@tramvai/cli',
       // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
@@ -237,6 +219,15 @@ export const rspackConfig: RspackConfigurationFactory = async (
     },
     mode: 'development',
     devtool: config.sourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
+    // TODO: check is it configuration optimal?
+    stats: {
+      // TODO: missmatch types with webpack
+      // @ts-expect-error
+      preset: 'errors-warnings',
+      // disables the compilation success notification, the webpackbar already displays it
+      warningsCount: false,
+      ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
+    },
     node: {
       // "warn" with `futureDefaults`
       global: true,
@@ -270,15 +261,6 @@ export const rspackConfig: RspackConfigurationFactory = async (
         ...alias,
       },
     },
-    experiments: {
-      futureDefaults: true,
-      cache: createCacheConfig({
-        config,
-        additionalCacheFlags,
-        transpilerParameters,
-        target: 'client',
-      }),
-    },
     snapshot: createSnapshot({ config }),
     externals: [
       ...flatten<RegExp>(externals),
@@ -286,26 +268,74 @@ export const rspackConfig: RspackConfigurationFactory = async (
         ? rspackConfigExtension.externals
         : (rspackConfigExtension.externals?.development ?? [])),
     ].map((s) => new RegExp(`^${s}`)),
-    optimization: {
-      emitOnErrors: false,
-      ...createSplitChunksOptions({ config }),
-      ...createOptimizeOptions<'rspack'>({ config, target: 'client' }),
-    },
-    // TODO: check is it configuration optimal?
-    stats: {
-      // TODO: missmatch types with webpack
-      // @ts-expect-error
-      preset: 'errors-warnings',
-      // disables the compilation success notification, the webpackbar already displays it
-      warningsCount: false,
-      ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
-    },
-    ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),
       ...(verboseLogging ? {} : { stream: stderrWithWarningFilters }),
+    },
+    ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
+    plugins: [
+      new rspack.ProvidePlugin({
+        process: 'process',
+        ...provideList,
+      }),
+      new rspack.DefinePlugin({
+        'process.env.BROWSER': true,
+        'process.env.SERVER': false,
+        'process.env.NODE_ENV': JSON.stringify('development'),
+        // https://github.com/node-formidable/formidable/issues/295
+        'global.GENTLY': false,
+        'process.env.APP_ID': JSON.stringify(config.projectName || 'tramvai'),
+        'process.env.APP_VERSION': process.env.APP_VERSION
+          ? JSON.stringify(process.env.APP_VERSION)
+          : undefined,
+        'typeof window': JSON.stringify('object'),
+        ...configToEnv({ config }),
+        ...defineOptions.reduce((allOptions, options) => {
+          return {
+            ...allOptions,
+            ...options,
+          };
+        }, {}),
+      }),
+    ],
+  };
+
+  const clientBuildRspackConfig: RspackConfiguration = {
+    ...buildRspackConfig,
+    name: clientBuildName,
+    dependencies: isPolyfillsExists ? [polyfillBuildName] : [],
+    entry: {
+      // TODO: more missed files watchers with absolute path?
+      platform: {
+        import: resolveAbsolutePathForFile({
+          file: config.entryFile,
+          sourceDir: config.sourceDir,
+          rootDir: config.rootDir,
+        }),
+      },
+      ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
+    },
+    output: {
+      ...buildRspackConfig.output,
+      // uniqueName are used for various webpack internals
+      // currently, we use that value in the ModuleFederation glue code
+      uniqueName: `${projectType}:${config.projectName}:${clientBuildName}:${config.projectVersion}`,
+    },
+    optimization: {
+      emitOnErrors: false,
+      ...createSplitChunksOptions({ config }),
+      ...createOptimizeOptions<'rspack'>({ config, target: 'client' }),
+    },
+    experiments: {
+      futureDefaults: true,
+      cache: createCacheConfig({
+        config,
+        additionalCacheFlags,
+        transpilerParameters,
+        target: clientBuildName,
+      }),
     },
     module: {
       parser: {
@@ -353,6 +383,7 @@ export const rspackConfig: RspackConfigurationFactory = async (
       ],
     },
     plugins: [
+      ...buildRspackConfig.plugins!,
       new rspack.experiments.VirtualModulesPlugin({
         '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
       }),
@@ -366,21 +397,25 @@ export const rspackConfig: RspackConfigurationFactory = async (
       }) as any,
       showProgress &&
         // @ts-expect-error
-        new WebpackBar({ name: 'client', color: 'green', reporters: [new FancyReporter()] }),
+        new WebpackBar({ name: clientBuildName, color: 'green', reporters: [new FancyReporter()] }),
       new PurifyStatsPlugin({ fileName: STATS_FILE_NAME, target: projectType }),
       ...(integrity
         ? [
             new SubresourceIntegrityPlugin({
               enabled: 'auto',
-              // @ts-expect-error
               hashFuncNames: ['sha256'],
-              hashLoading: 'eager',
+              // not supported in rspack
+              // hashLoading: 'eager',
               ...integrity,
             }),
             new AssetsIntegritiesPlugin({ fileName: STATS_FILE_NAME }),
           ]
         : []),
-      new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
+      isPolyfillsExists &&
+        new MergeStatsPlugin({
+          currentStatsName: STATS_FILE_NAME,
+          statsNames: [polyfillBuildName],
+        }),
       config.benchmark &&
         // require `@rsdoctor/rspack-plugin` here to speed up webpack worker initialization when benchmarking is not used
         new (require('@rsdoctor/rspack-plugin').RsdoctorRspackMultiplePlugin)(
@@ -419,29 +454,6 @@ export const rspackConfig: RspackConfigurationFactory = async (
           ]
         : []),
       ...stylesConfiguration.plugins,
-      new rspack.ProvidePlugin({
-        process: 'process',
-        ...provideList,
-      }),
-      new rspack.DefinePlugin({
-        'process.env.BROWSER': true,
-        'process.env.SERVER': false,
-        'process.env.NODE_ENV': JSON.stringify('development'),
-        // https://github.com/node-formidable/formidable/issues/295
-        'global.GENTLY': false,
-        'process.env.APP_ID': JSON.stringify(config.projectName || 'tramvai'),
-        'process.env.APP_VERSION': process.env.APP_VERSION
-          ? JSON.stringify(process.env.APP_VERSION)
-          : undefined,
-        'typeof window': JSON.stringify('object'),
-        ...configToEnv({ config }),
-        ...defineOptions.reduce((allOptions, options) => {
-          return {
-            ...allOptions,
-            ...options,
-          };
-        }, {}),
-      }),
       config.dedupe.enabledDev &&
         new DedupePlugin({
           strategy: config.dedupe.strategy,
@@ -451,4 +463,84 @@ export const rspackConfig: RspackConfigurationFactory = async (
       ...plugins.flat(),
     ].filter(Boolean),
   };
+
+  const polyfillBuildRspackConfig: RspackConfiguration = {
+    ...buildRspackConfig,
+    name: polyfillBuildName,
+    entry: {
+      ...(polyfillPath
+        ? {
+            polyfill: polyfillPath,
+          }
+        : {}),
+      ...(modernPolyfillPath
+        ? {
+            'modern.polyfill': modernPolyfillPath,
+          }
+        : {}),
+    },
+    output: {
+      ...buildRspackConfig.output,
+      // uniqueName are used for various webpack internals
+      // currently, we use that value in the ModuleFederation glue code
+      uniqueName: `${projectType}:${config.projectName}:${polyfillBuildName}:${config.projectVersion}`,
+    },
+    optimization: {
+      emitOnErrors: false,
+    },
+    experiments: {
+      futureDefaults: true,
+      cache: createCacheConfig({
+        config,
+        additionalCacheFlags,
+        transpilerParameters,
+        target: polyfillBuildName,
+      }),
+    },
+    module: {
+      parser: {
+        javascript: {
+          // "error" with `futureDefaults`
+          exportsPresence: 'warn',
+        },
+      },
+      unsafeCache: true,
+      rules: [
+        ...createTranspilerRules({
+          transpiler,
+          transpilerParameters,
+        }),
+        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
+      ],
+    },
+    plugins: [
+      ...buildRspackConfig.plugins!,
+      new StatsWriterPlugin({
+        filename: POLYFILLS_STATS_FILE_NAME,
+        stats: {
+          ...DEV_STATS_OPTIONS,
+          ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
+        },
+        fields: [...DEV_STATS_FIELDS, ...(verboseLogging ? DEBUG_STATS_FIELDS : [])],
+      }) as any,
+      new CollectStatsPlugin({ filename: POLYFILLS_STATS_FILE_NAME }),
+      new PurifyStatsPlugin({ fileName: POLYFILLS_STATS_FILE_NAME, target: projectType }),
+      ...(integrity
+        ? [
+            new SubresourceIntegrityPlugin({
+              enabled: 'auto',
+              hashFuncNames: ['sha256'],
+              // not supported in rspack
+              // hashLoading: 'eager',
+              ...integrity,
+            }),
+            new AssetsIntegritiesPlugin({ fileName: POLYFILLS_STATS_FILE_NAME }),
+          ]
+        : []),
+      new PolyfillConditionPlugin({ filename: POLYFILLS_STATS_FILE_NAME }),
+      ...plugins.flat(),
+    ].filter(Boolean),
+  };
+
+  return [clientBuildRspackConfig].concat(isPolyfillsExists ? polyfillBuildRspackConfig : []);
 };

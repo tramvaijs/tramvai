@@ -1256,7 +1256,9 @@ export default createPapiMethod({
             ).text();
 
             test.expect(runtimeJs).toContain('chunkLoadingGlobal');
-            test.expect(runtimeJs).toContain('webpackChunkapplication_app_bundle_0_0_0_stub');
+            test
+              .expect(runtimeJs)
+              .toContain('webpackChunkapplication_app_bundle_client_0_0_0_stub');
 
             // check that desctructuring and globalThis exists - it means that build target respect browserslist
             test.expect(runtimeJs).toContain('var [chunkIds, fn, priority] = deferred[i]');
@@ -1389,12 +1391,12 @@ export default createPapiMethod({
             await devServer.buildPromise;
             const integrities = {
               rspack: {
-                babel: 'sha256-5ujTfkBprDga6jd7brd04LVm/J//E8CrAs4fTHVCwAU=',
-                swc: 'sha256-GNmALC0ldUkPTlGkvrhlir6ceAhXAUWWViZcSceP7hs=',
+                babel: 'sha256-ZCGUKj00neHHbqBBAYn5gXF2VlGlV/k9+H4CrxkGwwY=',
+                swc: 'sha256-7R06YYKSa2zdvkYkzFjWy8zjYkRyP3a0U9tONlWonq0=',
               },
               webpack: {
-                babel: 'sha256-+5PtjFPwPfz/xVMsQ953D6plfv4cuAKAhbpgtu1Uu3A=',
-                swc: 'sha256-7+VVUOoeRXkEj1oD9OK/joIbb6PkdcXzLNsLW2kGiik=',
+                babel: 'sha256-xgUGFHOD5oQy77yphzIeLVtuKp7ob7p9TEIZD5m/QFw=',
+                swc: 'sha256-dnML2EXtL+GbE9UIwYTlUfHCClpGJG9TF/192GEgO/U=',
               },
             };
 
@@ -2187,11 +2189,10 @@ export default Cmp;`,
 };
 `;
 
-            const runtimeJs = await (
-              await fetch(`http://localhost:${devServer.staticPort}/dist/client/runtime.js`)
-            ).text();
-
             await page.goto(`http://localhost:${devServer.port}`);
+
+            let loadCounter = 0;
+            page.on('load', () => loadCounter++);
 
             test.expect(await page.locator('#container').textContent()).toEqual('hello world');
 
@@ -2202,6 +2203,7 @@ export default Cmp;`,
             test
               .expect(await page.locator('#container').textContent())
               .toEqual('super hello world');
+            test.expect(loadCounter).toEqual(1);
           });
 
           test.afterEach(async () => {
@@ -2305,7 +2307,7 @@ export default Cmp;`,
             },
           });
 
-          test.beforeEach(async () => {
+          test.beforeAll(async () => {
             await fs.promises.rm(
               path.resolve(__dirname, `../${builder}-${transpiler}/node_modules/.cache/${builder}`),
               {
@@ -2944,7 +2946,7 @@ export default Cmp;`,
           await page.goto(`http://localhost:${devServer.port}`);
 
           const criticalChunksObj = await page.evaluate(
-            () => (window as any).webpackChunkapplication_app_mf_host_0_0_0_stub
+            () => (window as any).webpackChunkapplication_app_mf_host_client_0_0_0_stub
           );
           const criticalChunks = criticalChunksObj.flat(Infinity).reduce((acc, item) => {
             if (typeof item === 'object') {
@@ -3112,7 +3114,8 @@ export default Cmp;`,
           await page.goto(`http://localhost:${devServer.port}`);
 
           const criticalChunksRaw = await page.evaluate(
-            () => (window as any).webpackChunkapplication_app_mf_host_critical_chunks_0_0_0_stub
+            () =>
+              (window as any).webpackChunkapplication_app_mf_host_critical_chunks_client_0_0_0_stub
           );
           const criticalChunks = criticalChunksRaw
             .flat(Infinity)

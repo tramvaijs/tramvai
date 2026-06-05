@@ -131,6 +131,11 @@ exports[`assets runtime chunk snapshot 1`] = `
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/getFullHash */
+/******/ 	(() => {
+/******/ 		__webpack_require__.h = () => ("stable_hash")
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -139,7 +144,7 @@ exports[`assets runtime chunk snapshot 1`] = `
 /******/ 	/* webpack/runtime/load script */
 /******/ 	(() => {
 /******/ 		var inProgress = {};
-/******/ 		var dataWebpackPrefix = "application:assets:0.0.0-stub:";
+/******/ 		var dataWebpackPrefix = "application:assets:client:0.0.0-stub:";
 /******/ 		// loadScript function to load a script via script tag
 /******/ 		__webpack_require__.l = (url, done, key, chunkId) => {
 /******/ 			if(inProgress[url]) { inProgress[url].push(done); return; }
@@ -226,7 +231,7 @@ exports[`assets runtime chunk snapshot 1`] = `
 /******/ 			var warn = (msg) => {
 /******/ 				if (typeof console !== "undefined" && console.warn) console.warn(msg);
 /******/ 			};
-/******/ 			var uniqueName = "application:assets:0.0.0-stub";
+/******/ 			var uniqueName = "application:assets:client:0.0.0-stub";
 /******/ 			var register = (name, version, factory, eager) => {
 /******/ 				var versions = scope[name] = scope[name] || {};
 /******/ 				var activeVersion = versions[version];
@@ -532,7 +537,7 @@ exports[`assets runtime chunk snapshot 1`] = `
 /******/ 			return __webpack_require__.O(result);
 /******/ 		}
 /******/ 		
-/******/ 		var chunkLoadingGlobal = globalThis["webpackChunkapplication_assets_0_0_0_stub"] = globalThis["webpackChunkapplication_assets_0_0_0_stub"] || [];
+/******/ 		var chunkLoadingGlobal = globalThis["webpackChunkapplication_assets_client_0_0_0_stub"] = globalThis["webpackChunkapplication_assets_client_0_0_0_stub"] || [];
 /******/ 		chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
 /******/ 		chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
 /******/ 	})();

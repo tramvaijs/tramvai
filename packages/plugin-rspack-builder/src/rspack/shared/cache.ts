@@ -43,7 +43,7 @@ export const createCacheConfig = ({
   config: ConfigService;
   additionalCacheFlags: string[] | string[][];
   transpilerParameters: RspackTranspilerInputParameters;
-  target: 'client' | 'server';
+  target: 'client' | 'server' | 'polyfill';
 }): ExperimentCacheOptions => {
   const transpilerParametersHash = crypto.createHash('sha256');
   transpilerParametersHash.update(JSON.stringify(transpilerParameters));

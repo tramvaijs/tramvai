@@ -113,6 +113,7 @@ export function createDevServer({
 
       async function compileServerAfterBuild() {
         const signal = serverRunnerAbortController?.signal;
+        compilationWatcher.setCompilationAlive();
 
         try {
           const code = await tracer.wrap(
@@ -218,6 +219,7 @@ export function createDevServer({
             category: ['plugin-rspack-builder'],
           });
 
+          compilationWatcher.destroyCompilation();
           closedPromise = Promise.all([
             proxy.close(),
             serverRunnerWorker.destroy(),

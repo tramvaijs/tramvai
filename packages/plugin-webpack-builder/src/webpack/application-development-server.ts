@@ -41,11 +41,7 @@ import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/e
 import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
-import {
-  RuntimePathPlugin,
-  ModuleFederationIgnoreEntries,
-  VirtualProtocolPlugin,
-} from '@tramvai/plugin-base-builder/lib/plugins';
+import { RuntimePathPlugin, VirtualProtocolPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import {
   WEBPACK_TRANSPILER_TOKEN,
@@ -166,8 +162,10 @@ export default appConfig;`;
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'server' });
 
   const resolveOptions = await createResolveOptions({ di, mainFields });
+  const serverBuildName = 'server';
 
   return {
+    name: serverBuildName,
     // https://webpack.js.org/configuration/target/#browserslist
     target: normalizedBrowserslistConfig.node
       ? `browserslist:${normalizedBrowserslistConfig.node}`
@@ -194,7 +192,7 @@ export default appConfig;`;
         host: config.staticHost,
         port: config.staticPort,
         protocol: config.httpProtocol,
-      })}${resolvePublicPathDirectory(config.outputClient)}`,
+      })}${resolvePublicPathDirectory(config.outputServer)}`,
       filename: 'server.js',
       library: {
         type: 'commonjs2',
@@ -349,8 +347,7 @@ export default appConfig;`;
         name: 'host',
         shared: getSharedModules(config),
       }),
-      new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
-      config.showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
+      config.showProgress && new WorkerProgressPlugin({ name: serverBuildName, color: 'orange' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': false,
         'process.env.SERVER': true,

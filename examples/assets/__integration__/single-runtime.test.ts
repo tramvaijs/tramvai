@@ -21,6 +21,13 @@ describe('assets', () => {
     const runtimeChunkResponse = await fetch(`${app.staticUrl}/dist/client/runtime.js`);
     const runtimeChunkContent = await runtimeChunkResponse.text();
 
-    expect(runtimeChunkContent.replace(app.staticUrl, 'http://localhost:4000')).toMatchSnapshot();
+    expect(
+      runtimeChunkContent
+        .replace(app.staticUrl, 'http://localhost:4000')
+        .replace(
+          /__webpack_require__\.h = \(\) => \(".*"\)/,
+          '__webpack_require__.h = () => ("stable_hash")'
+        )
+    ).toMatchSnapshot();
   });
 });

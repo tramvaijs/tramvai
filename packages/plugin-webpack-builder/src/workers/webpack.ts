@@ -1,24 +1,18 @@
 import '@tramvai/plugin-base-builder/lib/utils/inspector';
 import '@tramvai/plugin-base-builder/lib/utils/cpu-profile';
 import { parentPort, workerData } from 'node:worker_threads';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import webpackHotMiddleware from 'webpack-hot-middleware';
-import webpack from 'webpack';
-import express from 'express';
+import webpack, { Compiler, MultiCompiler, MultiStats, Stats } from 'webpack';
+import WebpackDevServer, { Configuration as WebpackDevServerConfig } from 'webpack-dev-server';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
   ConfigService,
   INPUT_PARAMETERS_TOKEN,
 } from '@tramvai/api/lib/config';
-import { initContainer, isValidModule, optional, provide } from '@tinkoff/dippy';
+import { Container, isValidModule, optional, provide } from '@tinkoff/dippy';
 import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
 import { logger } from '@tramvai/api/lib/services/logger';
-import {
-  calculateBuildTime,
-  maxMemoryRss,
-  resolvePublicPathDirectory,
-} from '@tramvai/plugin-base-builder/lib/utils';
+import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-base-builder/lib/utils';
 import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
@@ -42,12 +36,14 @@ declare global {
   var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
 }
 
+const isMultiCompiler = (compiler: Compiler | MultiCompiler): compiler is MultiCompiler =>
+  'compilers' in compiler;
+
 // eslint-disable-next-line max-statements
 async function runWebpackDevServer() {
   const getMaxMemoryRss = maxMemoryRss();
-  const { type, target, port, inputParameters, extraConfiguration } =
+  const { type, target, buildPort, devServerPort, inputParameters, extraConfiguration } =
     workerData as WebpackWorkerData;
-  const app = express();
 
   const config = new ConfigService(
     {
@@ -74,7 +70,7 @@ async function runWebpackDevServer() {
     return plugin;
   });
 
-  const di = initContainer({
+  const di = new Container({
     modules: plugins,
     providers: [
       provide({
@@ -112,7 +108,7 @@ async function runWebpackDevServer() {
     config.loadExtensions(configExtensions);
   }
 
-  let webpackConfig: webpack.Configuration;
+  let webpackConfig: webpack.Configuration | webpack.Configuration[];
 
   switch (`${type}-${target}`) {
     case 'application-client': {
@@ -123,21 +119,29 @@ async function runWebpackDevServer() {
       webpackConfig = await webpackApplicationDevelopmentServerConfig({ di });
       break;
     }
+    default: {
+      throw new Error(`Unknown config type: ${type}-${target}`);
+    }
   }
 
-  const compiler = webpack(webpackConfig!)!;
+  const compiler: Compiler | MultiCompiler =
+    // @ts-expect-error - cannot use config | config[] union type in webpack call
+    webpack(webpackConfig!)!;
   const getBuildTime = calculateBuildTime(compiler);
 
-  compiler.hooks.done.tap('worker-dev-server', async (stats) => {
+  // Create shared store for multicompiler build
+  // Used for transfer information from one build to another
+  if ('compilers' in compiler) {
+    const sharedStore = new Map<string, any>();
+    compiler.compilers.forEach((singleCompiler) => {
+      // @ts-expect-error
+      singleCompiler.sharedStore = sharedStore;
+    });
+  }
+
+  compiler.hooks.done.tap('worker-dev-server', async (stats: Stats | MultiStats) => {
     if (stats.hasErrors()) {
       const { errors } = stats.toJson({ all: false, errors: true, errorDetails: true });
-
-      logger.event({
-        type: 'warning',
-        event: 'webpack-worker',
-        message: 'Compilation done with errors',
-        payload: { errors },
-      });
 
       parentPort!.postMessage({
         event: BUILD_FAILED,
@@ -160,19 +164,19 @@ async function runWebpackDevServer() {
     }
   });
 
-  compiler.hooks.failed.tap('worker-dev-server', async (error) => {
-    logger.event({
-      type: 'warning',
-      event: 'webpack-worker',
-      message: `${target} compilation failed`,
-      payload: { error },
-    });
+  // MultiCompiler does not have a failed hook
+  const failedHooks = isMultiCompiler(compiler)
+    ? compiler.compilers.map((childCompiler) => childCompiler.hooks.failed)
+    : [compiler.hooks.failed];
 
-    parentPort!.postMessage({
-      event: BUILD_FAILED,
-      errors: [error],
-    } as WebpackWorkerOutgoingEventsPayload['build-failed']);
-  });
+  failedHooks.forEach((failedHook) =>
+    failedHook.tap('worker-dev-server', async (error) => {
+      parentPort!.postMessage({
+        event: BUILD_FAILED,
+        errors: [error],
+      } as WebpackWorkerOutgoingEventsPayload['build-failed']);
+    })
+  );
 
   compiler.hooks.watchRun.tap('worker-dev-server', async () => {
     parentPort!.postMessage({
@@ -180,44 +184,48 @@ async function runWebpackDevServer() {
     } as WebpackWorkerOutgoingEventsPayload['watch-run']);
   });
 
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Timing-Allow-Origin', '*');
+  const devServerOptions: WebpackDevServerConfig = {
+    devMiddleware: {
+      writeToDisk: config.writeToDisk,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Timing-Allow-Origin': '*',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+      },
+    },
+    hot: config.hotRefresh?.enabled,
+    // compressing server.js takes longer than request without compression
+    compress: false,
+    client: {
+      webSocketURL: {
+        port: devServerPort,
+      },
+      overlay: {
+        errors: true,
+        warnings: false,
+        runtimeErrors: true,
+      },
+    },
+    port: buildPort,
+  };
 
-    next();
-  });
+  if (config.disableWebSocketServer || !config.liveReload) {
+    devServerOptions.webSocketServer = false;
+  }
 
-  const devMiddleware = webpackDevMiddleware(compiler, {
-    writeToDisk: config.writeToDisk,
-    publicPath: resolvePublicPathDirectory(
-      target === 'server' ? config.outputServer : config.outputClient
-    ),
-  });
+  const devServer = new WebpackDevServer(devServerOptions, compiler);
 
-  // TODO: parameter to configure { writeToDisk: true } - can be much less memory consumption
-  app.use(devMiddleware);
-
-  app.use(
-    getHotModulePrefix(config),
-    // @ts-ignore - https://github.com/DefinitelyTyped/DefinitelyTyped/pull/73338
-    webpackHotMiddleware(compiler, { log: false, statsOptions: { cached: false } })
-  );
-
-  app.listen(port, () => {
+  devServer.startCallback((err) => {
     logger.event({
       type: 'debug',
       event: 'webpack-worker',
-      message: `dev-server for ${target} compilation started at ${port} port`,
+      message: `dev-server for ${target} compilation started at ${buildPort} port`,
     });
 
     parentPort!.postMessage({
       event: DEV_SERVER_STARTED,
     } as WebpackWorkerOutgoingEventsPayload['dev-server-started']);
   });
-
-  // setTimeout(() => {
-  //   write();
-  // }, 15000);
 
   parentPort?.on(
     'message',
@@ -226,32 +234,20 @@ async function runWebpackDevServer() {
         // we need to terminate worker after compiler is closed, and all event loop active handles are closed,
         // for example `chokidar` file watchers, otherwise, parent process will be exited prematurelly with "SIGABRT" signal.
         case EXIT:
-          // @ts-expect-error
-          if (devMiddleware.context.watching?.running) {
-            // we don't need to wait for callback, because if build in progress, it will be waiting for finish
-            compiler.close(() => {});
-
-            setTimeout(() => {
+          // wait for compiler close for cache storing
+          devServer.compiler.close(() => {
+            devServer.stop();
+            devServer.stopCallback(() => {
               process.exit(0);
             });
-          } else {
-            compiler.close((error) => {
-              process.exit(0);
-            });
-          }
+          });
           break;
         case INVALIDATE:
-          if (devMiddleware.context.watching) {
-            devMiddleware.context.watching.invalidate(() => {
-              parentPort!.postMessage({
-                event: INVALIDATE_DONE,
-              } as WebpackWorkerOutgoingEventsPayload['invalidate-done']);
-            });
-          } else {
+          devServer.invalidate(() => {
             parentPort!.postMessage({
               event: INVALIDATE_DONE,
             } as WebpackWorkerOutgoingEventsPayload['invalidate-done']);
-          }
+          });
           break;
       }
     }
@@ -259,18 +255,6 @@ async function runWebpackDevServer() {
 }
 
 runWebpackDevServer();
-
-function getHotModulePrefix(config: ConfigService): string {
-  if (config.projectType === 'application') {
-    return `/${config.outputClient}`;
-  }
-
-  if (config.projectType === 'child-app') {
-    return `/${config.projectName}`;
-  }
-
-  throw new Error(`${config.projectType} is not supported`);
-}
 
 process.on('unhandledRejection', (error) => {
   logger.event({

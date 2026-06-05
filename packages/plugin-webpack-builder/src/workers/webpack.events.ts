@@ -16,7 +16,8 @@ export const EXIT = 'exit';
 export type WebpackWorkerData = {
   type: BuildType;
   target: BuildTarget;
-  port: number;
+  buildPort: number;
+  devServerPort: number;
   inputParameters: InputParameters;
   extraConfiguration: Partial<Configuration>;
 };

@@ -86,6 +86,14 @@ export const createProxy = ({
   });
 
   devProxy.on('error', async (error, req, res) => {
+    // if no compilation exists ignore all requests
+    if (!compilationWatcher.compilationAlive) {
+      // @ts-expect-error
+      res.statusCode = 503;
+      res.end();
+      return;
+    }
+
     if (compilationWatcher.isCompilationInProgress()) {
       await compilationWatcher.waitCompilation();
 

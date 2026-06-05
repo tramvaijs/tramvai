@@ -20,4 +20,4 @@ export type SplitChunksOptions = Required<Required<Configuration>['optimization'
 
 export type WebpackConfigurationFactory = (options: {
   di: Container;
-}) => Promise<webpack.Configuration>;
+}) => Promise<webpack.Configuration[] | webpack.Configuration>;

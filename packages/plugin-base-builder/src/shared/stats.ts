@@ -12,6 +12,7 @@ export const DEFAULT_STATS_OPTIONS: StatsOptions = {
 };
 
 export const STATS_FILE_NAME = 'stats.json';
+export const POLYFILLS_STATS_FILE_NAME = 'polyfill_stats.json';
 
 export const DEFAULT_STATS_FIELDS: string[] = [
   'publicPath',

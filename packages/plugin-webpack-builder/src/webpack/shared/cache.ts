@@ -37,7 +37,7 @@ export const createCacheConfig = ({
   config: ConfigService;
   additionalCacheFlags: string[] | string[][];
   transpilerParameters: WebpackTranspilerInputParameters;
-  target: 'client' | 'server';
+  target: 'client' | 'server' | 'polyfill';
 }): Configuration['cache'] => {
   const transpilerParametersHash = crypto.createHash('sha256');
   transpilerParametersHash.update(JSON.stringify(transpilerParameters));

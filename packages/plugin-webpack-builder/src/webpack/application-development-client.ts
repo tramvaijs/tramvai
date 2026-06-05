@@ -34,6 +34,7 @@ import {
   DEV_STATS_OPTIONS,
   DEV_STATS_FIELDS,
   STATS_FILE_NAME,
+  POLYFILLS_STATS_FILE_NAME,
 } from '@tramvai/plugin-base-builder/lib/shared/stats';
 import { normalizeBrowserslistConfig } from '@tramvai/plugin-base-builder/lib/shared/browserslist';
 import { configToEnv } from '@tramvai/plugin-base-builder/lib/shared/config-to-env';
@@ -52,12 +53,13 @@ import {
   defaultExtensions,
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 import {
-  ModuleFederationIgnoreEntries,
   RuntimePathPlugin,
   PolyfillConditionPlugin,
   AssetsIntegritiesPlugin,
   getPurifyStatsPlugin,
   VirtualProtocolPlugin,
+  getMergeStatsPlugin,
+  getCollectStatsPlugin,
 } from '@tramvai/plugin-base-builder/lib/plugins';
 
 import {
@@ -103,10 +105,13 @@ stderrWithWarningFilters.on('error', (error: Error) =>
 );
 
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
+const MergeStatsPlugin = getMergeStatsPlugin(Compilation);
+const CollectStatsPlugin = getCollectStatsPlugin(Compilation);
 
-export const webpackConfig: WebpackConfigurationFactory = async ({
-  di,
-}): Promise<Configuration> => {
+export const clientBuildName = 'client';
+export const polyfillBuildName = 'polyfill';
+
+export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
   const {
@@ -117,14 +122,12 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     showProgress,
     hotRefresh,
     noClientRebuild,
-    liveReload,
     integrity,
     projectType,
     verboseLogging,
   } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
-  const isLiveReloadEnabled = liveReload && !noClientRebuild;
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
@@ -205,7 +208,9 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'client' });
   const resolveOptions = await createResolveOptions({ di, mainFields });
 
-  return {
+  const isPolyfillsExists = Boolean(polyfillPath || modernPolyfillPath);
+
+  const buildWebpackConfig: webpack.Configuration = {
     // https://webpack.js.org/configuration/target/#browserslist
     target: normalizedBrowserslistConfig.defaults
       ? // unknown support for UCAndroid browser lead to false checks for some ES features
@@ -213,38 +218,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         `browserslist:${normalizedBrowserslistConfig.defaults.filter((query) => !query.includes('UCAndroid'))}`
       : 'web',
     context: config.rootDir,
-    entry: {
-      // TODO: more missed files watchers with absolute path?
-      platform: {
-        import: [
-          resolveAbsolutePathForFile({
-            file: config.entryFile,
-            sourceDir: config.sourceDir,
-            rootDir: config.rootDir,
-          }),
-          (isLiveReloadEnabled || isHotEnabled) &&
-            'webpack-hot-middleware/client?name=client&dynamicPublicPath=true&path=__webpack_hmr&reload=true',
-        ].filter(Boolean) as string[],
-      },
-      ...(polyfillPath
-        ? {
-            polyfill: polyfillPath,
-          }
-        : {}),
-      ...(modernPolyfillPath
-        ? {
-            'modern.polyfill': modernPolyfillPath,
-          }
-        : {}),
-      // platform: './src/index.ts',
-      ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
-    },
-    cache: createCacheConfig({
-      config,
-      additionalCacheFlags,
-      transpilerParameters,
-      target: 'client',
-    }),
     output: {
       path: resolveAbsolutePathForFolder({
         folder: config.outputClient,
@@ -258,13 +231,16 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',
       crossOriginLoading: 'anonymous',
-      // uniqueName are used for various webpack internals
-      // currently, we use that value in the ModuleFederation glue code
-      uniqueName: `${config.projectType}:${config.projectName}:${config.projectVersion}`,
       // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
       devtoolNamespace: '@tramvai/cli',
       // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
       pathinfo: config.inspectBuildProcess,
+    },
+    stats: {
+      preset: 'errors-warnings',
+      // disables the compilation success notification, the webpackbar already displays it
+      warningsCount: false,
+      ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
     mode: 'development',
     devtool: config.sourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
@@ -301,18 +277,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             ? ['**/.git/**']
             : ['**/node_modules/**', '**/.git/**'],
         }),
-    optimization: {
-      emitOnErrors: false,
-      ...createSplitChunksOptions({ config }),
-      ...createOptimizeOptions<'webpack'>({ config, target: 'client' }),
-    },
-    // TODO: check is it configuration optimal?
-    stats: {
-      preset: 'errors-warnings',
-      // disables the compilation success notification, the webpackbar already displays it
-      warningsCount: false,
-      ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
-    },
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?
     infrastructureLogging: {
@@ -331,6 +295,68 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         ? webpackConfigExtension.externals
         : (webpackConfigExtension.externals?.development ?? [])),
     ].map((s) => new RegExp(`^${s}`)),
+    plugins: [
+      new webpack.ProvidePlugin({
+        process: 'process',
+        ...provideList,
+      }),
+      new webpack.DefinePlugin({
+        'process.env.BROWSER': true,
+        'process.env.SERVER': false,
+        'process.env.NODE_ENV': JSON.stringify('development'),
+        // https://github.com/node-formidable/formidable/issues/295
+        'global.GENTLY': false,
+        'process.env.APP_ID': JSON.stringify(config.projectName || 'tramvai'),
+        'process.env.APP_VERSION': process.env.APP_VERSION
+          ? JSON.stringify(process.env.APP_VERSION)
+          : undefined,
+        'typeof window': JSON.stringify('object'),
+        ...configToEnv({ config }),
+        ...defineOptions.reduce((allOptions, options) => {
+          return {
+            ...allOptions,
+            ...options,
+          };
+        }, {}),
+      }),
+    ],
+  };
+
+  const clientBuildWebpackConfig: webpack.Configuration = {
+    ...buildWebpackConfig,
+    name: clientBuildName,
+    dependencies: isPolyfillsExists ? [polyfillBuildName] : [],
+    cache: createCacheConfig({
+      config,
+      additionalCacheFlags,
+      transpilerParameters,
+      target: clientBuildName,
+    }),
+    entry: {
+      // TODO: more missed files watchers with absolute path?
+      platform: {
+        import: [
+          resolveAbsolutePathForFile({
+            file: config.entryFile,
+            sourceDir: config.sourceDir,
+            rootDir: config.rootDir,
+          }),
+        ].filter(Boolean) as string[],
+      },
+      // platform: './src/index.ts',
+      ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
+    },
+    output: {
+      ...buildWebpackConfig.output,
+      // uniqueName are used for various webpack internals
+      // currently, we use that value in the ModuleFederation glue code
+      uniqueName: `${projectType}:${config.projectName}:${clientBuildName}:${config.projectVersion}`,
+    },
+    optimization: {
+      emitOnErrors: false,
+      ...createSplitChunksOptions({ config }),
+      ...createOptimizeOptions<'webpack'>({ config, target: 'client' }),
+    },
     module: {
       parser: {
         javascript: {
@@ -378,6 +404,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
       ],
     },
     plugins: [
+      ...buildWebpackConfig.plugins!,
       virtualModulesPlugin,
       new VirtualProtocolPlugin(),
       config.benchmark &&
@@ -411,32 +438,12 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
         new RuntimePathPlugin({
           publicPath: 'window.ap',
         }),
-      new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
-      showProgress && new WorkerProgressPlugin({ name: 'client', color: 'green' }),
-      new PolyfillConditionPlugin({ filename: STATS_FILE_NAME }),
-      new webpack.ProvidePlugin({
-        process: 'process',
-        ...provideList,
-      }),
-      new webpack.DefinePlugin({
-        'process.env.BROWSER': true,
-        'process.env.SERVER': false,
-        'process.env.NODE_ENV': JSON.stringify('development'),
-        // https://github.com/node-formidable/formidable/issues/295
-        'global.GENTLY': false,
-        'process.env.APP_ID': JSON.stringify(config.projectName || 'tramvai'),
-        'process.env.APP_VERSION': process.env.APP_VERSION
-          ? JSON.stringify(process.env.APP_VERSION)
-          : undefined,
-        'typeof window': JSON.stringify('object'),
-        ...configToEnv({ config }),
-        ...defineOptions.reduce((allOptions, options) => {
-          return {
-            ...allOptions,
-            ...options,
-          };
-        }, {}),
-      }),
+      showProgress && new WorkerProgressPlugin({ name: clientBuildName, color: 'green' }),
+      isPolyfillsExists &&
+        new MergeStatsPlugin({
+          currentStatsName: STATS_FILE_NAME,
+          statsNames: [polyfillBuildName],
+        }),
       ...(integrity
         ? [
             new SubresourceIntegrityPlugin({
@@ -448,7 +455,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
             new AssetsIntegritiesPlugin({ fileName: STATS_FILE_NAME }),
           ]
         : []),
-      (isLiveReloadEnabled || isHotEnabled) && new webpack.HotModuleReplacementPlugin(),
       ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({
@@ -468,8 +474,85 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
           ignorePackages: config.dedupe.ignore?.map((ignore) => new RegExp(`^${ignore}`)),
           showLogs: false,
         }),
-      ...plugins.flat(),
       new PurifyStatsPlugin({ fileName: STATS_FILE_NAME, target: projectType }),
+      ...plugins.flat(),
     ].filter(Boolean),
   };
+
+  const polyfillBuildWebpackConfig: webpack.Configuration = {
+    ...buildWebpackConfig,
+    name: polyfillBuildName,
+    entry: {
+      ...(polyfillPath
+        ? {
+            polyfill: polyfillPath,
+          }
+        : {}),
+      ...(modernPolyfillPath
+        ? {
+            'modern.polyfill': modernPolyfillPath,
+          }
+        : {}),
+    },
+    cache: createCacheConfig({
+      config,
+      additionalCacheFlags,
+      transpilerParameters,
+      target: polyfillBuildName,
+    }),
+    optimization: {
+      emitOnErrors: false,
+    },
+    output: {
+      ...buildWebpackConfig.output,
+      // uniqueName are used for various webpack internals
+      // currently, we use that value in the ModuleFederation glue code
+      uniqueName: `${projectType}:${config.projectName}:${polyfillBuildName}:${config.projectVersion}`,
+    },
+    // stats: 'none',
+    module: {
+      parser: {
+        javascript: {
+          // "error" with `futureDefaults`
+          exportsPresence: 'warn',
+        },
+      },
+      unsafeCache: true,
+      rules: [
+        ...createTranspilerRules({
+          transpiler,
+          transpilerParameters,
+          workerPoolConfig,
+        }),
+        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
+      ],
+    },
+    plugins: [
+      ...buildWebpackConfig.plugins!,
+      new StatsWriterPlugin({
+        filename: POLYFILLS_STATS_FILE_NAME,
+        stats: {
+          ...DEV_STATS_OPTIONS,
+          ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
+        },
+        fields: [...DEV_STATS_FIELDS, ...(verboseLogging ? DEBUG_STATS_FIELDS : [])],
+      }) as any as WebpackPluginInstance,
+      new PolyfillConditionPlugin({ filename: POLYFILLS_STATS_FILE_NAME }),
+      ...(integrity
+        ? [
+            new SubresourceIntegrityPlugin({
+              enabled: 'auto',
+              hashFuncNames: ['sha256'],
+              hashLoading: 'eager',
+              ...integrity,
+            }),
+            new AssetsIntegritiesPlugin({ fileName: POLYFILLS_STATS_FILE_NAME }),
+          ]
+        : []),
+      new CollectStatsPlugin({ filename: POLYFILLS_STATS_FILE_NAME }),
+      new PurifyStatsPlugin({ fileName: POLYFILLS_STATS_FILE_NAME, target: projectType }),
+    ].filter(Boolean),
+  };
+
+  return [clientBuildWebpackConfig].concat(isPolyfillsExists ? polyfillBuildWebpackConfig : []);
 };

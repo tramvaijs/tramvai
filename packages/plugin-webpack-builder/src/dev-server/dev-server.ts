@@ -126,7 +126,8 @@ export function createDevServer({
         workerData: {
           type: config.projectType,
           target: 'server',
-          port: serverBuildPort,
+          buildPort: serverBuildPort,
+          devServerPort: portManager.port!,
           // provide patched input parameters from config service
           inputParameters: config.getParams(),
           extraConfiguration: config.extraConfiguration,
@@ -139,7 +140,8 @@ export function createDevServer({
         workerData: {
           type: config.projectType,
           target: 'client',
-          port: browserBuildPort,
+          buildPort: browserBuildPort,
+          devServerPort: portManager.port!,
           // provide patched input parameters from config service
           inputParameters: config.getParams(),
           extraConfiguration: config.extraConfiguration,
@@ -156,6 +158,7 @@ export function createDevServer({
 
       async function compileServerAfterBuild() {
         const signal = serverRunnerAbortController?.signal;
+        compilationWatcher.setCompilationAlive();
 
         try {
           const code = await tracer.wrap(
@@ -228,7 +231,6 @@ export function createDevServer({
         serverWebpackWorker.create();
 
         // TODO: DEV_SERVER_STARTED
-        // TODO: debounce?
         serverWebpackWorker.subscribe(BUILD_DONE, ({ stats }) => {
           serverStats = stats;
           compileServerAfterBuild();
@@ -358,6 +360,7 @@ export function createDevServer({
             category: ['plugin-webpack-builder'],
           });
 
+          compilationWatcher.destroyCompilation();
           closedPromise = Promise.all([
             proxy.close(),
             serverRunnerWorker.destroy(),

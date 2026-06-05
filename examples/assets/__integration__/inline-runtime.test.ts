@@ -31,7 +31,12 @@ describe('assets', () => {
     );
 
     expect(
-      webpackRuntimeScriptContent.replace(app.staticUrl, 'http://localhost:4000')
+      webpackRuntimeScriptContent
+        .replace(app.staticUrl, 'http://localhost:4000')
+        .replace(
+          /__webpack_require__\.h = \(\) => \(".*"\)/,
+          '__webpack_require__.h = () => ("stable_hash")'
+        )
     ).toMatchSnapshot();
 
     await browser.close();

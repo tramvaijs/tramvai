@@ -1,15 +1,8 @@
 /* eslint-disable max-statements */
-import {
-  Compiler,
-  Configuration,
-  DevServer,
-  RspackOptions,
-  StatsError,
-  rspack,
-} from '@rspack/core';
+import { Compiler, Configuration, DevServer, RspackOptions, rspack } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 
-import { CONFIG_SERVICE_TOKEN, InputParameters } from '@tramvai/api/lib/config';
+import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { logger } from '@tramvai/api/lib/services/logger';
 import { TRACER_TOKEN } from '@tramvai/api/lib/tokens';
@@ -56,9 +49,17 @@ export async function runBuild(
     }
   }
 
-  const multiCompiler = rspack(rspackConfig!);
+  const multiCompiler = rspack(rspackConfig!.flat());
   const serverCompiler = multiCompiler.compilers.find((cmp) => cmp.name === 'server');
   const clientCompiler = multiCompiler.compilers.find((cmp) => cmp.name === 'client');
+
+  // Create shared store for multicompiler build
+  // Used for transfer information from one build to another
+  const sharedStore = new Map<string, any>();
+  multiCompiler.compilers.forEach((singleCompiler) => {
+    // @ts-expect-error
+    singleCompiler.sharedStore = sharedStore;
+  });
 
   const getMaxMemoryRss = maxMemoryRss();
   const getClientTime = clientCompiler && calculateBuildTime(clientCompiler);
@@ -84,24 +85,6 @@ export async function runBuild(
     hooks.onBuildEnd();
   }
 
-  const onSuccessBuild = () => {
-    logger.event({
-      type: 'debug',
-      event: 'rspack-builder',
-      message: 'Compilation done',
-    });
-  };
-  const onFailedBuild = (errors?: StatsError[]) => {
-    logger.event({
-      type: 'warning',
-      event: 'rspack-builder',
-      message: 'Compilation done with errors',
-      payload: { errors },
-    });
-
-    hooks.onBuildFail(errors);
-  };
-
   multiCompiler.hooks.done.tap('rspack-dev-server', async (stats) => {
     onBuildEnd();
 
@@ -111,9 +94,14 @@ export async function runBuild(
         errors: true,
         errorDetails: true,
       });
-      onFailedBuild(errors);
+
+      hooks.onBuildFail(errors);
     } else {
-      onSuccessBuild();
+      logger.event({
+        type: 'debug',
+        event: 'rspack-builder',
+        message: 'Compilation done',
+      });
     }
   });
 
@@ -148,8 +136,10 @@ export async function runBuild(
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Timing-Allow-Origin': '*',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
       },
     },
+    hot: config.hotRefresh?.enabled,
     client: {
       webSocketURL: {
         port: devServerPort,
