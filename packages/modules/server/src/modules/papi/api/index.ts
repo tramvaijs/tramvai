@@ -87,6 +87,19 @@ export function createApi(
             ...(isFormActions
               ? { constraints: { accept: 'application/json' }, attachValidation: true }
               : {}),
+            onRequest: async () => {
+              childLog.info({
+                event: 'papi:request',
+              });
+            },
+            onResponse: async (req, res) => {
+              if (res.statusCode >= 400) {
+                childLog.error({
+                  event: 'papi:request-failed',
+                  statusCode: res.statusCode,
+                });
+              }
+            },
             errorHandler: async (error, req, res): Promise<PapiResponse> => {
               if (isFormActions) {
                 const formActionParams = papiParams as FormActionParameters;

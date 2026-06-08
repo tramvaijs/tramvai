@@ -11,6 +11,7 @@ import {
 } from '@tramvai/tokens-server';
 import {
   PAPI_FASTIFY_INIT_TOKEN,
+  PAPI_METRICS_TOKEN,
   WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
 } from '@tramvai/tokens-server-private';
 import type { Papi } from '@tramvai/papi';
@@ -40,6 +41,7 @@ import { formActionProvider } from './server/formActionProvider';
           privateBaseUrl,
           papiInitHandlers,
           formActions,
+          papiMetrics,
         }) =>
         (app) => {
           if (process.env.NODE_ENV === 'development') {
@@ -74,6 +76,8 @@ import { formActionProvider } from './server/formActionProvider';
               ? [...toArray(privateRoutes), papiListRoute]
               : [papiListRoute];
           }
+
+          papiMetrics?.(app);
 
           if (privateRoutes) {
             createApi(app, flatten(privateRoutes), {
@@ -127,6 +131,7 @@ import { formActionProvider } from './server/formActionProvider';
           token: SERVER_MODULE_PAPI_FORM_ACTIONS,
           optional: true as const,
         },
+        papiMetrics: optional(PAPI_METRICS_TOKEN),
       },
       multi: true,
     }),

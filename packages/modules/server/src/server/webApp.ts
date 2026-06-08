@@ -145,6 +145,18 @@ export const webAppInitCommand = ({
     });
 
     await app.register(async (instance) => {
+      // `instance` passed to `requestMetrics` is effectively ignored
+      // and the root Fastify instance is resolved from DI instead.
+      //
+      // This may suggest that metrics are registered on the root
+      // Fastify instance. In practice, `requestMetrics` is wrapped with
+      // `fastify-plugin`, and due to the plugin registration hierarchy Fastify still
+      // associates the registration with the current plugin scope `instance` rather
+      // than with root.
+      //
+      // As a result, metrics hooks only apply to endpoints registered within
+      // this scope. Endpoints registered in sibling scopes (e.g. PAPI routes or
+      // health-check registrations) are not covered by these metrics.
       await runHandlers(instance, requestMetrics);
       await runHandlers(instance, limiterRequest);
 

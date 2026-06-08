@@ -6,6 +6,7 @@ import {
   WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
   WEB_FASTIFY_APP_METRICS_TOKEN,
   WEB_FASTIFY_APP_TOKEN,
+  PAPI_METRICS_TOKEN,
 } from '@tramvai/tokens-server-private';
 import { METRICS_MODULE_TOKEN, METRICS_MODULE_CONFIG_TOKEN } from '@tramvai/tokens-metrics';
 import { fastifyMeasureRequests } from '@tinkoff/measure-fastify-requests';
@@ -16,6 +17,7 @@ import { RequestModule } from './request';
 import { InstantMetricsModule } from './instantMetrics/server';
 import { eventLoopMetrics } from './metrics/eventLoop';
 import { commandLineMetrics } from './metrics/commandLine';
+import { papiMetrics } from './metrics/papi';
 import { METRICS_DEFAULT_REGISTRY } from './tokens';
 
 export { getUrlAndOptions } from './request/createRequestWithMetrics';
@@ -145,6 +147,15 @@ export * from '@tramvai/tokens-metrics';
       scope: Scope.SINGLETON,
       useFactory: ({ metrics }) => {
         return commandLineMetrics(metrics);
+      },
+      deps: {
+        metrics: METRICS_MODULE_TOKEN,
+      },
+    }),
+    provide({
+      provide: PAPI_METRICS_TOKEN,
+      useFactory: ({ metrics }) => {
+        return (app) => papiMetrics(app, { metrics });
       },
       deps: {
         metrics: METRICS_MODULE_TOKEN,

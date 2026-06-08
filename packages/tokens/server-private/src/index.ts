@@ -197,3 +197,14 @@ export interface EarlyHintsManager {
 export const PAPI_FASTIFY_INIT_TOKEN = createToken<FASTIFY_APP_INIT_HANDLER>('papi fastify init', {
   multi: true,
 });
+
+/**
+ * @description
+ * Token for PAPI metrics initialization function.
+ * Receives Fastify instance and metrics, registers hooks for PAPI request monitoring.
+ */
+export const PAPI_METRICS_TOKEN = createToken<PapiMetricsInitHandler>('papi metrics', {
+  scope: Scope.SINGLETON,
+});
+
+export type PapiMetricsInitHandler = (app: FastifyInstance) => Promise<void> | void;
