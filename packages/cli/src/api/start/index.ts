@@ -3,7 +3,7 @@ import type { PromiseType } from 'utility-types';
 import type { Provider } from '@tinkoff/dippy';
 import { createCommand } from '../../commands/createCommand';
 import type { WithConfig } from '../shared/types/withConfig';
-import { CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from '../../di/tokens';
+import { COMMAND_PARAMETERS_TOKEN, CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from '../../di/tokens';
 import type { Builder } from '../../typings/build/Builder';
 import { ConvertToSchema } from '../../schema/ConfigSchema';
 import { ApplicationConfigEntry } from '../../typings/configEntry/application';
@@ -39,7 +39,7 @@ export type Params = WithConfig<{
   fileCache?: boolean;
   disableServerRunnerWaiting?: boolean;
   noRebuild?: boolean;
-  experimentalWebpackWorkerThreads?: boolean;
+  experimentalRspack?: boolean;
 }>;
 
 export type Result<T extends string = any> = Promise<
@@ -56,15 +56,25 @@ export type StartCommand = (params: Params, providers?: Provider[]) => Result;
 export default createCommand({
   name: 'start',
   command: async (di): Result => {
+    const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
     const configEntry = di.get(CONFIG_ENTRY_TOKEN);
     const portManager = di.get(PORT_MANAGER_TOKEN);
 
     await portManager.computeAvailablePorts();
 
+    if (options.experimentalRspack) {
+      if (configEntry.type !== 'application') {
+        throw new Error('--experimentalRspack option is only available for application project');
+      }
+
+      const { startExperimentalApplication } = require('./application');
+      return startExperimentalApplication(di);
+    }
+
     switch (configEntry.type) {
       case 'application':
         // eslint-disable-next-line no-case-declarations
-        const { startApplication } = require('./application.experimental');
+        const { startApplication } = require('./application');
         return startApplication(di);
       case 'module':
         // eslint-disable-next-line no-case-declarations

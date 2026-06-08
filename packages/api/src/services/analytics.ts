@@ -86,7 +86,7 @@ export type FeaturesProperties = {
   modulePwa?: boolean;
   viewTransitions?: boolean;
   transitionsRouterProvider?: boolean;
-  experimentalWebpackWorkerThreads?: boolean;
+  experimentalRspack?: boolean;
 };
 
 export type VcsProperties = {

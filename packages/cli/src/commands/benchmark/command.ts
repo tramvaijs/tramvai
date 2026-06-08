@@ -50,11 +50,10 @@ export class BenchmarkCommand extends CLICommand<Params> {
       description: 'How many times to run single type of benchmark',
     },
     {
-      name: '--experimentalWebpackWorkerThreads',
-      value: '[experimentalWebpackWorkerThreads]',
+      name: '--experimentalRspack',
+      value: '[experimentalRspack]',
       transformer: (value: string) => value !== 'false',
-      description:
-        'Enable new experimental @tramvai/api builder to run webpack compilation in worker threads',
+      description: 'Enable new experimental @tramvai/api rspack builder',
     },
   ];
 

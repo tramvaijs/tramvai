@@ -19,7 +19,15 @@ declare global {
   var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
 }
 
-export const startApplication = async (di: Container): Result => {
+export const startApplication = (di: Container) => {
+  return baseStartApplication('webpack', di);
+};
+
+export const startExperimentalApplication = (di: Container) => {
+  return baseStartApplication('rspack', di);
+};
+
+async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container): Result {
   const configEntry = di.get(CONFIG_ENTRY_TOKEN);
   const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
   const rootDir = di.get(CONFIG_ROOT_DIR_TOKEN);
@@ -92,7 +100,7 @@ export const startApplication = async (di: Container): Result => {
   const extraConfiguration: Partial<Configuration> = {
     projects,
     plugins: [
-      '@tramvai/plugin-webpack-builder',
+      `@tramvai/plugin-${builder}-builder`,
       hasSwcTranspiler ? '@tramvai/plugin-swc-transpiler' : '@tramvai/plugin-babel-transpiler',
       hasPwa && '@tramvai/plugin-webpack-pwa',
     ].filter(Boolean),
@@ -130,7 +138,7 @@ export const startApplication = async (di: Container): Result => {
       return devServer.getStats();
     },
     builder: {
-      name: '@tramvai/plugin-webpack-builder',
+      name: `@tramvai/plugin-${builder}-builder`,
       start: async (options) => {
         return {
           close: async () => {
@@ -157,7 +165,7 @@ export const startApplication = async (di: Container): Result => {
       },
     },
   };
-};
+}
 
 /**
  * Mapping from tramvai.json config format to new tramvai.config.ts,
