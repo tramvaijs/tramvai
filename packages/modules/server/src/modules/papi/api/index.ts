@@ -74,6 +74,19 @@ export function createApi(
           path,
           {
             schema,
+            onRequest: async () => {
+              childLog.info({
+                event: 'papi:request',
+              });
+            },
+            onResponse: async (req, res) => {
+              if (res.statusCode >= 400) {
+                childLog.error({
+                  event: 'papi:request-failed',
+                  statusCode: res.statusCode,
+                });
+              }
+            },
             errorHandler: async (error, req, res) => {
               res.status(error.validation ? 400 : 503);
 

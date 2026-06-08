@@ -31,7 +31,7 @@ type WorkerFixture = {
 export const test = base.extend<AppFixtures, WorkerFixture>({
   targetApp: [
     {
-      name: 'request-metrics',
+      name: 'metrics',
       cwd: __dirname,
     },
     { scope: 'worker', auto: true },

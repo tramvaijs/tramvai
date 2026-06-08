@@ -11,6 +11,7 @@ import {
 } from '@tramvai/tokens-server';
 import {
   PAPI_FASTIFY_INIT_TOKEN,
+  PAPI_METRICS_TOKEN,
   WEB_FASTIFY_APP_BEFORE_INIT_TOKEN,
 } from '@tramvai/tokens-server-private';
 import type { Papi } from '@tramvai/papi';
@@ -36,6 +37,7 @@ import { papiExecutorProvider } from './server/executor';
           publicBaseUrl,
           privateBaseUrl,
           papiInitHandlers,
+          papiMetrics,
         }) =>
         (app) => {
           if (process.env.NODE_ENV === 'development') {
@@ -71,6 +73,8 @@ import { papiExecutorProvider } from './server/executor';
               : [papiListRoute];
           }
 
+          papiMetrics?.(app);
+
           if (privateRoutes) {
             createApi(app, flatten(privateRoutes), {
               baseUrl: privateBaseUrl,
@@ -105,6 +109,7 @@ import { papiExecutorProvider } from './server/executor';
         privateBaseUrl: SERVER_MODULE_PAPI_PRIVATE_URL,
         publicBaseUrl: SERVER_MODULE_PAPI_PUBLIC_URL,
         papiInitHandlers: optional(PAPI_FASTIFY_INIT_TOKEN),
+        papiMetrics: optional(PAPI_METRICS_TOKEN),
       },
       multi: true,
     }),
