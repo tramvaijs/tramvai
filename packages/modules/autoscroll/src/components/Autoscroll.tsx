@@ -1,5 +1,5 @@
 import { memo, useMemo, useRef } from 'react';
-import { useRoute, useUrl, useViewTransition } from '@tramvai/module-router';
+import { useRoute, useUrl } from '@tramvai/module-router';
 import { optional } from '@tinkoff/dippy';
 import { useDi } from '@tramvai/react';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
@@ -34,7 +34,6 @@ const scrollToAnchor = (anchor: string, behavior: ScrollBehavior): boolean => {
 export const Autoscroll = memo(() => {
   const route = useRoute();
   const url = useUrl();
-  const { isTransitioning } = useViewTransition(url.pathname);
   const scrollBehaviorFactory =
     useDi(optional(AUTOSCROLL_BEHAVIOR_MODE_TOKEN)) ?? DEFAULT_AUTOSCROLL_BEHAVIOR;
   const scrollTopFactory =
@@ -53,11 +52,6 @@ export const Autoscroll = memo(() => {
     if (!shouldScroll.current) {
       return;
     }
-    // when VT is enabled, we will have a two re-renderw with `isTransitioning: true` (with current and next url),
-    // and only after that `isTransitioning` will be false and url will be updated to the next one.
-    if (isTransitioning) {
-      return;
-    }
     // disable autoscroll for current page if `disableAutoscroll` is set in route history state
     if (route.navigateState?.disableAutoscroll) {
       previousUrl.current = url;
@@ -72,10 +66,12 @@ export const Autoscroll = memo(() => {
     const scrollBehavior =
       route.navigateState?.autoscrollBehavior ??
       (typeof scrollBehaviorFactory === 'function'
-        ? scrollBehaviorFactory()
+        ? scrollBehaviorFactory(DEFAULT_AUTOSCROLL_BEHAVIOR)
         : scrollBehaviorFactory);
     const scrollTop =
-      typeof scrollTopFactory === 'function' ? scrollTopFactory() : scrollTopFactory;
+      typeof scrollTopFactory === 'function'
+        ? scrollTopFactory(DEFAULT_AUTOSCROLL_SCROLL_TOP, false)
+        : scrollTopFactory;
 
     function scroll() {
       if (!url.hash) {
@@ -89,7 +85,7 @@ export const Autoscroll = memo(() => {
 
     scroll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [route, url, isTransitioning]);
+  }, [route, url]);
 
   return null;
 });

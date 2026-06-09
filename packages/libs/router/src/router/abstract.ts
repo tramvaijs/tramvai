@@ -318,6 +318,14 @@ export abstract class AbstractRouter {
     return this.lastNavigation?.url;
   }
 
+  getCurrentNavigation() {
+    return this.currentNavigation;
+  }
+
+  getLastNavigation() {
+    return this.lastNavigation;
+  }
+
   protected commitNavigation(navigation: Navigation) {
     logger.debug({
       event: 'commit-navigation',

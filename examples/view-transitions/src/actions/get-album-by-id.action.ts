@@ -6,9 +6,12 @@ import type { AlbumWithTracks } from '../types';
 
 export const albumLoaded = createEvent<AlbumWithTracks>('album loaded');
 
-export const AlbumStore = createReducer<AlbumWithTracks | null>('album', null).on(
+export const AlbumStore = createReducer<Record<string, AlbumWithTracks>>('album', {}).on(
   albumLoaded,
-  (state, payload) => payload
+  (state, payload) => ({
+    ...state,
+    [payload.id]: payload,
+  })
 );
 
 export const getAlbumByIdAction = declareAction({

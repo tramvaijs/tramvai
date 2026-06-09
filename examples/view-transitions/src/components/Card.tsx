@@ -21,8 +21,11 @@ export function Card({ id, name, artist, imageUrl }: CardProps) {
         url={url}
         viewTransition
         id={getAlbumId(id)}
-        style={isTransitioning ? { viewTransitionName: 'album-expand' } : undefined}
-        className="text-black hover:text-pink-500"
+        className={[
+          'ctext-black',
+          'hover:text-pink-500',
+          isTransitioning ? 'transitioning' : '',
+        ].join(' ')}
       >
         <div className="shadow-md hover:shadow-lg relative">
           <img
@@ -36,7 +39,7 @@ export function Card({ id, name, artist, imageUrl }: CardProps) {
             src={vinylImage}
             width="400"
             height="400"
-            style={isTransitioning ? { viewTransitionName: 'vinyl-expand' } : undefined}
+            // style={isTransitioning ? { viewTransitionName: 'vinyl-expand' } : undefined}
             className="absolute top-0 opacity-0 vinyl-image c-card--vinyl"
           />
         </div>

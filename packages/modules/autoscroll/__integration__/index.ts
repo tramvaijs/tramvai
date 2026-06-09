@@ -2,13 +2,18 @@ import { createApp, provide } from '@tramvai/core';
 import { CommonModule } from '@tramvai/module-common';
 import { MetricsModule } from '@tramvai/module-metrics';
 import { RenderModule } from '@tramvai/module-render';
-import { ROUTER_VIEW_TRANSITIONS_ENABLED, SpaRouterModule } from '@tramvai/module-router';
+import {
+  ROUTER_VIEW_TRANSITIONS_ENABLED,
+  ROUTER_TOKEN,
+  SpaRouterModule,
+} from '@tramvai/module-router';
 import { ServerModule } from '@tramvai/module-server';
 import type { AutoscrollBehavior } from '../lib';
 import {
   AUTOSCROLL_BEHAVIOR_MODE_TOKEN,
+  AUTOSCROLL_DISABLED_TOKEN,
   AUTOSCROLL_SCROLL_TOP_TOKEN,
-  AutoscrollModule,
+  ScrollRestorationModule,
 } from '../lib';
 
 createApp({
@@ -28,10 +33,17 @@ createApp({
           pageComponent: 'pageB',
         },
       },
+      {
+        name: 'pageC',
+        path: '/c/',
+        config: {
+          pageComponent: 'pageC',
+        },
+      },
     ]),
     RenderModule,
     ServerModule,
-    AutoscrollModule,
+    ScrollRestorationModule,
   ],
   providers: [
     provide({
@@ -42,22 +54,29 @@ createApp({
     }),
     provide({
       provide: AUTOSCROLL_BEHAVIOR_MODE_TOKEN,
-      useValue: (): AutoscrollBehavior => {
-        if (typeof window === 'undefined') {
-          return 'smooth';
-        }
+      useValue: (defaultBehavior): AutoscrollBehavior => {
         const params = new URLSearchParams(window.location.search);
-        return params.get('autoscroll_behavior') === 'auto' ? 'auto' : 'smooth';
+        return params.get('autoscroll_behavior') === 'auto' ? 'auto' : defaultBehavior;
+      },
+    }),
+    provide({
+      provide: AUTOSCROLL_DISABLED_TOKEN,
+      useFactory:
+        ({ router }) =>
+        () => {
+          if (router.getCurrentUrl().query.autoscroll_disabled === 'true') {
+            return true;
+          }
+        },
+      deps: {
+        router: ROUTER_TOKEN,
       },
     }),
     provide({
       provide: AUTOSCROLL_SCROLL_TOP_TOKEN,
-      useValue: (): number => {
-        if (typeof window === 'undefined') {
-          return 0;
-        }
+      useValue: (defaultScrollTop): number => {
         const stored = window.sessionStorage.getItem('autoscroll_scroll_top');
-        return stored !== null ? Number(stored) : 0;
+        return stored !== null ? Number(stored) : defaultScrollTop;
       },
     }),
   ],

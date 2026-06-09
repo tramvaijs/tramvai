@@ -1,5 +1,5 @@
 import type { PageComponent } from '@tramvai/react';
-import { useStore } from '@tramvai/state';
+import { useStore, useStoreSelector } from '@tramvai/state';
 import { Link, useRoute, useViewTransition } from '@tramvai/module-router';
 
 import Record from '../../../components/Record';
@@ -8,8 +8,10 @@ import PlayButton from '../../../components/PlayButton';
 import { AlbumStore, getAlbumByIdAction } from '../../../actions/get-album-by-id.action';
 
 const Album: PageComponent = () => {
-  const album = useStore(AlbumStore);
   const { params } = useRoute();
+  const album = useStoreSelector(AlbumStore, (albumList) => {
+    return albumList[params.id];
+  });
 
   const currentAlbumId = parseInt(params.id, 10);
   const isNextVisible = currentAlbumId < 8;
@@ -24,7 +26,7 @@ const Album: PageComponent = () => {
   }
 
   return (
-    <section className={['c-album--container', isTransitioning ? 'transition' : ''].join(' ')}>
+    <section className={['c-album--container', isTransitioning ? 'transitioning' : ''].join(' ')}>
       <div className="container mx-auto max-w-screen-lg px-6 lg:px-0 flex flex-col items-start md:items-end md:flex-row pt-8 pb-12 overflow-hidden">
         <Record
           albumId={album.id}

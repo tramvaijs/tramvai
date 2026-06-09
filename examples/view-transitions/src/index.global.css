@@ -2,41 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.vinyl-animation-in {
+  animation: appear 600ms ease-in-out 300ms forwards;
+}
+.vinyl-animation-in-spinning {
+  animation: appear 600ms ease-in-out 300ms forwards, spin 5s linear infinite;
+}
+.vinyl-animation-out {
+  animation: disappear 300ms ease-in-out forwards;
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 @keyframes appear {
-    0% {
-        left: 0;
-        opacity: 0;
-    }
-    1% {
-        opacity: 1;
-    }
-    100% {
-        left: 24%;
-        opacity: 1;
-    }
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  100% {
+    left: 24%;
+    opacity: 1;
+  }
 }
 
 @keyframes disappear {
-    0% {
-        left: 24%;
-        opacity: 1;
-    }
-    99% {
-        opacity: 1;
-    }
-    100% {
-        left: 0;
-        opacity: 0;
-    }
+  0% {
+    left: 24%;
+    opacity: 1;
+  }
+  99% {
+    opacity: 1;
+  }
+  100% {
+    left: 0;
+    opacity: 0;
+  }
+}
+
+a.transitioning .c-card--album,
+.c-record--album {
+    view-transition-name: album-expand;
+}
+
+::view-transition-old(album-expand):not(:only-child),
+::view-transition-new(album-expand):not(:only-child) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+a.transitioning .c-card--vinyl,
+.c-record--vinyl {
+    view-transition-name: vinyl-expand;
+}
+
+::view-transition-old(vinyl-expand):not(:only-child),
+::view-transition-new(vinyl-expand):not(:only-child) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+.c-player {
+  view-transition-name: "player";
+}
+
+::view-transition-old(player) {
+  display: none;
+}
+
+::view-transition-new(player) {
+  animation: none;
 }
 
 @keyframes slide-in {
@@ -45,7 +88,7 @@
     }
 }
 
-@keyframes slide-out{
+@keyframes slide-out {
     to {
         transform: translateX(-100%);
     }
@@ -57,72 +100,59 @@
     }
 }
 
-@keyframes reverse-slide-out{
+@keyframes reverse-slide-out {
     to {
       transform: translateX(100%);
     }
 }
 
-.vinyl-animation-in {
-    animation: appear 600ms ease-in-out 300ms forwards;
-}
-.vinyl-animation-in-spinning {
-    animation: appear 600ms ease-in-out 300ms forwards, spin 5s linear infinite;
-}
-.vinyl-animation-out {
-    animation: disappear 300ms ease-in-out forwards;
-}
-
-.c-record--album {
-    view-transition-name: album-expand;
-}
-
-::view-transition-old(album-expand):not(:only-child),
-::view-transition-new(album-expand):not(:only-child) {
-    animation: none;
-    mix-blend-mode: normal;
-}
-
-.c-record--vinyl {
-    view-transition-name: vinyl-expand;
-}
-
-::view-transition-old(vinyl-expand):not(:only-child),
-::view-transition-new(vinyl-expand):not(:only-child) {
-    animation: none;
-    mix-blend-mode: normal;
-}
-
-.c-album--container.transition {
+.c-album--container {
     view-transition-name: route-slide
 }
 
 /* Animation styles for forwards type only */
 html:active-view-transition-type(forwards) {
+  :root {
+    view-transition-name: none;
+  }
+  a.transitioning .c-card--album,
+  .c-record--album {
+    view-transition-name: none;
+  }
+  a.transitioning .c-card--vinyl,
+  .c-record--vinyl {
+    view-transition-name: none;
+  }
+
+
   &::view-transition-old(route-slide) {
-    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-out;
+    animation: 350ms cubic-bezier(0.76, 0, 0.24, 1) both slide-out;
   }
   &::view-transition-new(route-slide) {
-    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both slide-in;
+    animation: 350ms cubic-bezier(0.76, 0, 0.24, 1) both slide-in;
   }
 }
 
 /* Animation styles for backwards type only */
 html:active-view-transition-type(backwards) {
+  :root {
+    view-transition-name: none;
+  }
+  a.transitioning .c-card--album,
+  .c-record--album {
+    view-transition-name: none;
+  }
+  a.transitioning .c-card--vinyl,
+  .c-record--vinyl {
+    view-transition-name: none;
+  }
+
   &::view-transition-old(route-slide) {
     animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-out;
   }
   &::view-transition-new(route-slide) {
+    /* mix-blend-mode: normal; */
     animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-in;
   }
 }
 
-/* Animation styles for standard tramvai types */
-html:active-view-transition-type(tramvai_vt_back) {
-  &::view-transition-old(route-slide) {
-    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-out;
-  }
-  &::view-transition-new(route-slide) {
-    animation: 300ms cubic-bezier(0.76, 0, 0.24, 1) both reverse-slide-in;
-  }
-}

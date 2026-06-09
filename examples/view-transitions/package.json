@@ -28,6 +28,7 @@
     "@tinkoff/layout-factory": "0.0.0-stub",
     "@tinkoff/router": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-autoscroll": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub",
     "@tramvai/module-render": "0.0.0-stub",
     "@tramvai/module-router": "0.0.0-stub",
