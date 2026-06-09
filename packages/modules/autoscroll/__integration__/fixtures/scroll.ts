@@ -4,9 +4,11 @@ export class ScrollComponentObject {
   constructor(private page: Page) {}
 
   async scrollTo(options?: ScrollToOptions) {
-    return this.page.evaluate((scrollOptions?: ScrollToOptions) => {
+    await this.page.evaluate((scrollOptions?: ScrollToOptions) => {
       return window.scrollTo(scrollOptions);
     }, options);
+
+    return this.waitForSmoothScrollEnd();
   }
 
   async getCurrentScrollValue() {

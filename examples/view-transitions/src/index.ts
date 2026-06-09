@@ -4,6 +4,8 @@ import {
   SpaRouterModule,
   ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
   ROUTER_VIEW_TRANSITIONS_ENABLED,
+  ROUTER_PLUGIN,
+  ROUTER_TOKEN,
 } from '@tramvai/module-router';
 import {
   DEFAULT_FOOTER_COMPONENT,
@@ -15,6 +17,11 @@ import {
   ResourceType,
 } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
+import {
+  ScrollRestorationModule,
+  AUTOSCROLL_BEHAVIOR_MODE_TOKEN,
+  AUTOSCROLL_DISABLED_TOKEN,
+} from '@tramvai/module-autoscroll';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -38,6 +45,7 @@ createApp({
     ]),
     RenderModule,
     ServerModule,
+    ScrollRestorationModule,
   ],
   providers: [
     provide({
@@ -47,6 +55,66 @@ createApp({
     provide({
       provide: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
       useValue: 'before',
+    }),
+    provide({
+      provide: AUTOSCROLL_BEHAVIOR_MODE_TOKEN,
+      useValue: 'instant',
+    }),
+    provide({
+      provide: AUTOSCROLL_DISABLED_TOKEN,
+      useFactory: ({ router }) => {
+        return () => {
+          const navigation = router.getCurrentNavigation() ?? router.getLastNavigation();
+
+          if (navigation && navigation.replace) {
+            return true;
+          }
+        };
+      },
+      deps: {
+        router: ROUTER_TOKEN,
+      },
+    }),
+    provide({
+      provide: ROUTER_PLUGIN,
+      useFactory: (deps) => {
+        return {
+          apply(router) {
+            router.internalHooks['router:resolve-view-transition'].tap(
+              'supreme',
+              (_, params, viewTransition) => {
+                const { navigation, previousViewTransition } = params;
+
+                // mirror previous navigation type for browser back/forward navigations
+                if (navigation.history) {
+                  if (
+                    previousViewTransition.viewTransition &&
+                    previousViewTransition.viewTransitionTypes?.includes('forwards')
+                  ) {
+                    return {
+                      viewTransition: true,
+                      viewTransitionTypes: navigation.isBack ? ['backwards'] : ['forwards'],
+                    };
+                  }
+                  if (
+                    previousViewTransition.viewTransition &&
+                    previousViewTransition.viewTransitionTypes?.includes('backwards')
+                  ) {
+                    return {
+                      viewTransition: true,
+                      viewTransitionTypes: navigation.isBack ? ['forwards'] : ['backwards'],
+                    };
+                  }
+                }
+
+                // default resolved view transition state
+                return viewTransition;
+              }
+            );
+          },
+        };
+      },
+      deps: {},
     }),
     provide({
       provide: LAYOUT_OPTIONS,

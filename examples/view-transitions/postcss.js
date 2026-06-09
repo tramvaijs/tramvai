@@ -7,7 +7,7 @@ module.exports = {
     require('postcss-custom-media')({
       preserve: false,
     }),
-    require('tailwindcss'),
     require('tailwindcss/nesting'),
+    require('tailwindcss'),
   ],
 };

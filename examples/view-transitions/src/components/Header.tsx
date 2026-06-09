@@ -8,7 +8,7 @@ export default function Header() {
       <div className="w-full container mx-auto max-w-screen-lg px-6 lg:px-0 flex flex-wrap items-center mt-0 py-6">
         <div>
           <Link
-            url="/"
+            url="/home/"
             viewTransition
             id={HEADER_LINK_ID}
             className="flex items-center tracking-tight no-underline hover:no-underline font-bold text-black text-xl"

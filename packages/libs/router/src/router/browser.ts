@@ -6,7 +6,7 @@ import { RouteTree } from '../tree/tree';
 import { NAVIGATION_TYPE } from './constants';
 
 const DELAY_CHECK_INTERVAL = 50;
-const APPLIED_VIEW_TRANSITIONS_KEY = '_t_view_transitions_v2';
+const APPLIED_VIEW_TRANSITIONS_KEY = '_t_view_transitions_v3';
 
 type NavigationTypeKeys = keyof typeof NAVIGATION_TYPE;
 type NavigationType = (typeof NAVIGATION_TYPE)[NavigationTypeKeys];
@@ -21,7 +21,8 @@ export class Router extends ClientRouter {
   private appliedViewTransitions: Map<
     number,
     {
-      path: string;
+      from: string;
+      to: string;
       viewTransitionTypes?: string[];
     }
   >;
@@ -113,7 +114,8 @@ export class Router extends ClientRouter {
         if (navigation.viewTransition) {
           // add transition except history navigations with VT enabled
           this.appliedViewTransitions.set(historyState.index, {
-            path: from,
+            from,
+            to,
             viewTransitionTypes: navigation.viewTransitionTypes,
           });
           // if we have forward navigation without VT enabled and stored val for this index
@@ -361,7 +363,9 @@ export class Router extends ClientRouter {
     if (result) {
       // can't be sure, but this check looks like replace state protection,
       // when we save a different route on the same index
-      return result && result.path === target ? result : false;
+      return result && (isBrowserBackNavigation ? result.from === target : result.to === target)
+        ? result
+        : false;
     }
     return false;
   }
@@ -376,7 +380,7 @@ export class Router extends ClientRouter {
         this.appliedViewTransitions = new Map(
           Object.entries(parsedValue).map(([key, value]) => [
             Number.parseInt(key, 10),
-            value as { path: string },
+            value as { from: string; to: string },
           ])
         );
 
