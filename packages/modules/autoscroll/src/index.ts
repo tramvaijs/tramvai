@@ -1,4 +1,11 @@
-import { commandLineListTokens, declareModule, provide } from '@tramvai/core';
+import noop from '@tinkoff/utils/function/noop';
+import {
+  commandLineListTokens,
+  createToken,
+  declareModule,
+  optional,
+  provide,
+} from '@tramvai/core';
 import { LAYOUT_OPTIONS } from '@tramvai/tokens-render';
 import { ROUTER_TOKEN } from '@tramvai/module-router';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
@@ -13,6 +20,10 @@ export { Autoscroll, ScrollRestoration };
 
 const APPLIED_NAVIGATIONS_KEY = '_t_autoscroll_applied_navigations';
 
+const NEW_SCROLL_RESTORATION_IS_USED = createToken<boolean>(
+  'tramvai autoscroll new scroll restoration'
+);
+
 /**
  * @deprecated use ScrollRestorationModule instead, which includes autoscroll and compatible with View Transitions
  */
@@ -21,19 +32,29 @@ export const AutoscrollModule = declareModule({
   providers: [
     provide({
       provide: LAYOUT_OPTIONS,
-      useValue: {
-        components: {
-          autoscroll: Autoscroll,
-        },
-      },
+      useFactory: ({ newScrollRestoration }) =>
+        newScrollRestoration
+          ? {}
+          : {
+              components: {
+                autoscroll: Autoscroll,
+              },
+            },
       multi: true,
+      deps: {
+        newScrollRestoration: optional(NEW_SCROLL_RESTORATION_IS_USED),
+      },
     }),
     ...(typeof window !== 'undefined'
       ? [
           provide({
             provide: commandLineListTokens.customerStart,
-            useFactory: ({ logger, router }) => {
+            useFactory: ({ logger, router, newScrollRestoration }) => {
               const log = logger('autoscroll');
+
+              if (newScrollRestoration) {
+                return noop;
+              }
 
               // disable browser scroll restoration, to avoid conflicts with autoscroll
               const disableBrowserScrollRestoration = () => {
@@ -68,6 +89,7 @@ export const AutoscrollModule = declareModule({
             deps: {
               logger: LOGGER_TOKEN,
               router: ROUTER_TOKEN,
+              newScrollRestoration: optional(NEW_SCROLL_RESTORATION_IS_USED),
             },
           }),
         ]
@@ -78,6 +100,10 @@ export const AutoscrollModule = declareModule({
 export const ScrollRestorationModule = declareModule({
   name: 'ScrollRestorationModule',
   providers: [
+    provide({
+      provide: NEW_SCROLL_RESTORATION_IS_USED,
+      useValue: true,
+    }),
     provide({
       provide: LAYOUT_OPTIONS,
       useValue: {
