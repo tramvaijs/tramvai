@@ -52,7 +52,11 @@ export function getFeaturesProperties({
   configManager,
   env,
 }: {
-  parameters: { target?: string; experimentalWebpackWorkerThreads?: boolean };
+  parameters: {
+    target?: string;
+    experimentalWebpackWorkerThreads?: boolean;
+    experimentalRspack?: boolean;
+  };
   configManager: ConfigManager;
   env: 'development' | 'production';
 }): FeaturesProperties {
@@ -116,6 +120,8 @@ export function getFeaturesProperties({
 
       featuresCache[projectName].experimentalWebpackWorkerThreads =
         parameters.experimentalWebpackWorkerThreads;
+
+      featuresCache[projectName].experimentalRspack = parameters.experimentalRspack;
     }
 
     if (project.type === 'child-app') {

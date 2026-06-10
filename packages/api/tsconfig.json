@@ -1,8 +1,6 @@
 {
     "extends": "../../tsconfig.lib.json",
-    "include": [
-        "./src"
-    ],
+    "include": ["./src"],
     "compilerOptions": {
         "module": "CommonJS",
         "moduleResolution": "nodenext",
@@ -24,6 +22,9 @@
         },
         {
             "path": "../libs/package-manager-wrapper"
+        },
+        {
+            "path": "../tramvai/react"
         }
     ]
 }

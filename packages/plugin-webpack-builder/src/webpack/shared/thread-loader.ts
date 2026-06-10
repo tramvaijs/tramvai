@@ -1,7 +1,10 @@
 import os from 'node:os';
 import type { Container } from '@tinkoff/dippy';
 import * as threadLoader from 'thread-loader';
-import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from '../webpack-config';
+import {
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
 
 export type WorkerPoolConfig = {
   name: string;

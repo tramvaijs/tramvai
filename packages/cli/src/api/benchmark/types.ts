@@ -21,7 +21,7 @@ export type RunStats = {
   serverBuildTime: number | undefined;
   clientMaxMemoryRss: number | undefined;
   serverMaxMemoryRss: number | undefined;
-  maxMemoryRss: number | undefined;
+  maxMemoryRss?: number | undefined;
 };
 
 type PlainObject<T = any> = {

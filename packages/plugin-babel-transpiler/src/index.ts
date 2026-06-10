@@ -1,13 +1,11 @@
 import { declareModule, provide } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
+import type { TranspilerInputParameters } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import {
   WEBPACK_TRANSPILER_TOKEN,
-  WebpackTranspilerInputParameters,
-} from '@tramvai/plugin-webpack-builder';
-import {
   RSPACK_TRANSPILER_TOKEN,
-  RspackTranspilerInputParameters,
-} from '@tramvai/plugin-rspack-builder';
+} from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+
 import { configFactory } from './config-factory';
 
 export const BabelTranspilerPlugin = declareModule({
@@ -17,8 +15,9 @@ export const BabelTranspilerPlugin = declareModule({
       provide: WEBPACK_TRANSPILER_TOKEN,
       useFactory: ({ config }) => {
         return {
+          name: 'babel',
           loader: 'babel-loader',
-          configFactory: (parameters: WebpackTranspilerInputParameters) => {
+          configFactory: (parameters: TranspilerInputParameters) => {
             return configFactory(parameters);
           },
           useThreadLoader:
@@ -41,8 +40,9 @@ export const BabelTranspilerPlugin = declareModule({
       provide: RSPACK_TRANSPILER_TOKEN,
       useFactory: ({ config }) => {
         return {
+          name: 'babel',
           loader: 'babel-loader',
-          configFactory: (parameters: RspackTranspilerInputParameters) => {
+          configFactory: (parameters: TranspilerInputParameters) => {
             return configFactory(parameters);
           },
           useThreadLoader: false,

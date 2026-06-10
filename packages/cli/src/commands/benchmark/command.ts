@@ -56,6 +56,12 @@ export class BenchmarkCommand extends CLICommand<Params> {
       description:
         'Enable new experimental @tramvai/api builder to run webpack compilation in worker threads',
     },
+    {
+      name: '--experimentalRspack',
+      value: '[experimentalRspack]',
+      transformer: (value: string) => value !== 'false',
+      description: 'Enable new experimental @tramvai/api rspack builder',
+    },
   ];
 
   alias = 'bench';

@@ -1,77 +1,15 @@
-import { createToken } from '@tinkoff/dippy';
 import type { Container } from '@tinkoff/dippy';
-import {
-  CONFIG_SERVICE_TOKEN,
-  ReactCompilerOptions,
-  TranspilationOptions,
-} from '@tramvai/api/lib/config';
+import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import envTargets from '@tinkoff/browserslist-config';
 import type { RuleSetRule } from '@rspack/core';
 import browserslist from 'browserslist';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
-import { BUILD_MODE_TOKEN } from '../rspack-config';
+import { BUILD_MODE_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 
-export type RspackTranspilerInputParameters = {
-  // TODO: rename to "mode"
-  env: 'development' | 'production';
-  // TODO: useless
-  target: 'node' | 'defaults' | 'modern';
-  actualTarget: 'node' | 'defaults' | 'modern';
-  isServer: boolean;
-  generateDataQaTag: boolean;
-  enableFillActionNamePlugin: boolean;
-  enableFillDeclareActionNamePlugin: boolean;
-  typescript: boolean;
-  modules: 'es6' | 'commonjs' | false;
-  loader: boolean;
-  removeTypeofWindow: boolean;
-  tramvai: boolean;
-  hot: boolean;
-  excludesPresetEnv: string[];
-  rootDir: string;
-  sourceDir: string;
-  browsersListTargets: string[];
-  reactCompiler: boolean | ReactCompilerOptions;
-  include: TranspilationOptions['include'];
-  /**
-   * Enable or disable `loose` transformations:
-   * with swc loader - https://swc.rs/docs/configuration/compilation#jscloose
-   * with babel loader - https://babeljs.io/docs/babel-preset-env#loose
-   */
-  loose?: boolean;
-  /**
-   * Enable or disable external transpiler runtime helpers:
-   * with swc loader, pass value directly to `jsc.externalHelpers` option - https://swc.rs/docs/configuration/compilation#jscexternalhelpers
-   * with babel loader, when `false`, disable `@babel/plugin-transform-runtime` - https://babeljs.io/docs/babel-plugin-transform-runtime
-   */
-  externalHelpers?: boolean;
-};
-
-export type RspackTranspiler = {
-  /**
-   * Name of rspack loader for processing JS and TS files
-   */
-  loader: string;
-  /**
-   * Configuration object to provided rspack loader
-   */
-  configFactory: (parameters: RspackTranspilerInputParameters) => Record<string, any>;
-  /**
-   * Enable or not "thread-loader"
-   */
-  useThreadLoader?: boolean;
-  /**
-   * Warmup or not "thread-loader"
-   */
-  warmupThreadLoader?: boolean;
-};
-
-/**
- * @description Options for babel-loader or swc-loader
- */
-export const RSPACK_TRANSPILER_TOKEN = createToken<RspackTranspiler>(
-  'tramvai rspack builder transpiler'
-);
+import {
+  Transpiler,
+  TranspilerInputParameters,
+} from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 export const resolveRspackTranspilerParameters = (
   {
@@ -84,7 +22,7 @@ export const resolveRspackTranspilerParameters = (
     buildEnv?: 'development' | 'production';
   }
   // overrideOptions: Partial<WebpackTranspilerInputParameters> = {}
-): RspackTranspilerInputParameters => {
+): TranspilerInputParameters => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
   const {
@@ -95,7 +33,7 @@ export const resolveRspackTranspilerParameters = (
     rootDir,
     //   enableFillActionNamePlugin,
     //   excludesPresetEnv,
-    //   experiments: { reactCompiler },
+    experiments: { reactCompiler },
   } = config;
   // const { env, modern } = configManager;
   const isServer = buildTarget === 'server';
@@ -120,7 +58,7 @@ export const resolveRspackTranspilerParameters = (
     modules: false,
     typescript: false,
     enableFillDeclareActionNamePlugin,
-    // reactCompiler,
+    reactCompiler: reactCompiler ?? false,
     // ...overrideOptions,
   };
 };
@@ -143,8 +81,8 @@ export const createTranspilerRules = ({
   transpiler,
   transpilerParameters,
 }: {
-  transpiler: RspackTranspiler;
-  transpilerParameters: RspackTranspilerInputParameters;
+  transpiler: Transpiler;
+  transpilerParameters: TranspilerInputParameters;
 }): RuleSetRule[] => {
   const { env } = transpilerParameters;
   const include =
@@ -154,16 +92,26 @@ export const createTranspilerRules = ({
   const shouldSkipTranspile = include === 'none';
   const shouldTranspileManualList = Array.isArray(include);
   const shouldTranspileOnlyModern = include === 'only-modern';
-  const defaultIncludeList = [
+  const virtualList = [
     /[\\/]cli[\\/]lib[\\/]external[\\/]/,
     /[\\/]api[\\/]lib[\\/]virtual[\\/]/,
     /virtual:tramvai/,
   ];
   const manualIncludeList = Array.isArray(include)
-    ? include.map((dependencyPath) => new RegExp(dependencyPath)).concat(defaultIncludeList)
-    : defaultIncludeList;
+    ? include.map((dependencyPath) => new RegExp(dependencyPath))
+    : [];
 
   return [
+    {
+      test: /\.js$/,
+      include: virtualList,
+      use: [
+        {
+          loader: transpiler.loader,
+          options: transpiler.configFactory(transpilerParameters),
+        },
+      ],
+    },
     {
       test: /\.[cm]?js[x]?$/,
       exclude: /node_modules/,
@@ -185,7 +133,12 @@ export const createTranspilerRules = ({
             : /node_modules/,
       // thread-loader trying to resolve virtual modules as real files and fail webpack build,
       // so we should ignore such modules in our filter
-      exclude: [/virtual:tramvai/],
+      exclude: virtualList,
+      // esm packages with invalid imports break build
+      // if package.json has type module import must contain extension
+      resolve: {
+        fullySpecified: false,
+      },
       use: [
         {
           loader: transpiler.loader,

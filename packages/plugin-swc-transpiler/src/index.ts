@@ -2,12 +2,9 @@ import { declareModule, provide } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import {
   WEBPACK_TRANSPILER_TOKEN,
-  WebpackTranspilerInputParameters,
-} from '@tramvai/plugin-webpack-builder';
-import {
   RSPACK_TRANSPILER_TOKEN,
-  RspackTranspilerInputParameters,
-} from '@tramvai/plugin-rspack-builder';
+  TranspilerInputParameters,
+} from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { configFactory } from './config-factory';
 
 export const SwcTranspilerPlugin = declareModule({
@@ -17,8 +14,9 @@ export const SwcTranspilerPlugin = declareModule({
       provide: WEBPACK_TRANSPILER_TOKEN,
       useFactory: ({ config }) => {
         return {
+          name: 'swc',
           loader: 'swc-loader',
-          configFactory: (parameters: WebpackTranspilerInputParameters) => {
+          configFactory: (parameters: TranspilerInputParameters) => {
             return configFactory(parameters);
           },
         };
@@ -31,8 +29,9 @@ export const SwcTranspilerPlugin = declareModule({
       provide: RSPACK_TRANSPILER_TOKEN,
       useFactory: ({ config }) => {
         return {
+          name: 'swc',
           loader: 'builtin:swc-loader',
-          configFactory: (parameters: RspackTranspilerInputParameters) => {
+          configFactory: (parameters: TranspilerInputParameters) => {
             return configFactory(parameters);
           },
         };

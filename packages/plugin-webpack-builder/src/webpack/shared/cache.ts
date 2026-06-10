@@ -7,8 +7,9 @@ import type { Configuration } from 'webpack';
 
 import { ConfigService } from '@tramvai/api/lib/config';
 import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
+import { TranspilerInputParameters } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+
 import { getPostcssConfigPath } from './styles';
-import { WebpackTranspilerInputParameters } from './transpiler';
 
 const getConfigCacheNameAdditionalFlags = (
   configManager: ConfigService,
@@ -36,8 +37,8 @@ export const createCacheConfig = ({
 }: {
   config: ConfigService;
   additionalCacheFlags: string[] | string[][];
-  transpilerParameters: WebpackTranspilerInputParameters;
-  target: 'client' | 'server';
+  transpilerParameters: TranspilerInputParameters;
+  target: 'client' | 'server' | 'polyfill';
 }): Configuration['cache'] => {
   const transpilerParametersHash = crypto.createHash('sha256');
   transpilerParametersHash.update(JSON.stringify(transpilerParameters));

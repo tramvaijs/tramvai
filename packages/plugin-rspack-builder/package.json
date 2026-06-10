@@ -21,6 +21,7 @@
     "@tinkoff/browserslist-config": "0.0.0-stub",
     "@tinkoff/dippy": "^1.0.0",
     "@tinkoff/is-modern-lib": "0.0.0-stub",
+    "@tinkoff/minicss-class-generator": "0.0.0-stub",
     "@tinkoff/utils": "^2.1.3",
     "@tinkoff/webpack-dedupe-plugin": "0.0.0-stub",
     "@tramvai/plugin-base-builder": "0.0.0-stub",

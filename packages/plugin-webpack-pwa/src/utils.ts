@@ -37,7 +37,7 @@ export function getWorkboxOptions({
             const assetName = asset.url.replace(assetsPrefix!, '');
             // in development build `publicPath` is localhost, in production is empty string
             const publicPath = compilation.outputOptions?.publicPath || assetsPrefix;
-            const assetInfo = compilation.assetsInfo.get(asset.url.replace(publicPath, ''));
+            const assetInfo = compilation.getAsset(asset.url.replace(publicPath, ''));
 
             if (assetInfo?._webmanifestFilename) {
               return {

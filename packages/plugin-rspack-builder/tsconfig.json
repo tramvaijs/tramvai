@@ -28,6 +28,9 @@
         },
         {
             "path": "../plugin-base-builder"
+        },
+        {
+            "path": "../libs/minicss"
         }
     ]
 }

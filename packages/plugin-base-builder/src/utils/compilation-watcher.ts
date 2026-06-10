@@ -1,6 +1,7 @@
 export class CompilationWatcher {
   compilationPromise?: Promise<void>;
   resolveCompilation?: () => void;
+  compilationAlive: boolean = false;
 
   isCompilationInProgress = () => {
     return Boolean(this.compilationPromise);
@@ -20,4 +21,13 @@ export class CompilationWatcher {
   waitCompilation = () => {
     return this.compilationPromise;
   };
+
+  setCompilationAlive() {
+    this.compilationAlive = true;
+  }
+
+  destroyCompilation() {
+    console.log('destroy compilation');
+    this.compilationAlive = false;
+  }
 }

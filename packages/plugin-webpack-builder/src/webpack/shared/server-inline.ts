@@ -1,6 +1,8 @@
 import { Container, optional } from '@tinkoff/dippy';
 import type webpack from 'webpack';
-import { WEBPACK_TRANSPILER_TOKEN, resolveWebpackTranspilerParameters } from './transpiler';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+
+import { resolveWebpackTranspilerParameters } from './transpiler';
 
 export const createServerInlineRules = ({ di }: { di: Container }): webpack.RuleSetRule[] => {
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;

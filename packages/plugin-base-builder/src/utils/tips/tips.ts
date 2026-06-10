@@ -1,0 +1,132 @@
+import path from 'path';
+import { existsSync } from 'fs-extra';
+import { sync as resolveSync } from 'resolve';
+import type { TramvaiTip } from './types';
+
+const DEFAULT_ROOT_DIR = process.cwd();
+
+const safeRequireResolve = (id: string, rootDir = DEFAULT_ROOT_DIR) => {
+  try {
+    return resolveSync(id, { basedir: rootDir });
+  } catch (_) {
+    return null;
+  }
+};
+
+export const tips: TramvaiTip[] = [
+  {
+    text: `Suffer from the slow builds/rebuilds while using @tramvai/cli?
+Consider to test out swc support.`,
+    docLink: 'references/cli/experiments#swc',
+    isApplicable(_config, { transpiler }) {
+      return transpiler.name !== 'swc';
+    },
+  },
+  {
+    text: `Forget about reloading page with hotRefresh cli option`,
+    docLink: 'references/cli/start/#react-hot-refresh',
+    isApplicable(config) {
+      return config.hotRefresh?.enabled !== true;
+    },
+  },
+  {
+    text: `You can use file-based routing with tramvai.
+It may reduce the boilerplate code required with bundles`,
+    docLink: 'features/routing/file-system-pages',
+    isApplicable(config) {
+      const { rootDir, sourceDir } = config;
+
+      if (config.projectType !== 'application') {
+        return false;
+      }
+
+      const { fileSystemPages } = config;
+
+      if (!fileSystemPages?.enabled) {
+        return true;
+      }
+
+      const routesDir = path.resolve(rootDir, sourceDir, fileSystemPages.routesDir || '');
+
+      if (!existsSync(routesDir)) {
+        return true;
+      }
+
+      return false;
+    },
+  },
+  {
+    text: `@tramvai/react-query is a great way to manage requests in React components`,
+    docLink: 'references/tramvai/react-query',
+    isApplicable() {
+      return !safeRequireResolve('@tramvai/react-query');
+    },
+  },
+  {
+    text: `Did you know tramvai has a set of helpers for testing?`,
+    docLink: 'guides/testing',
+    isApplicable() {
+      return (
+        !safeRequireResolve('@tramvai/test-unit') ||
+        !safeRequireResolve('@tramvai/test-integration')
+      );
+    },
+  },
+  {
+    text: `Do you love typescript as we do?
+Check out our guide how to use typescript with tramvai`,
+    docLink: 'guides/strong-typing',
+    isApplicable() {
+      return true;
+    },
+  },
+  {
+    text: `In case if you are looking how to optimize your bundle`,
+    docLink: 'guides/bundle-optimization',
+    isApplicable() {
+      return true;
+    },
+  },
+  {
+    text: `Do you use storybook?
+Check storybook integration with tramvai`,
+    docLink: 'guides/storybook',
+    isApplicable(config) {
+      const { rootDir } = config;
+      let storybookDir = path.resolve(rootDir, 'storybook');
+
+      if (!existsSync(storybookDir)) {
+        storybookDir = rootDir;
+      }
+
+      return (
+        Boolean(safeRequireResolve('@storybook/react', storybookDir)) &&
+        !safeRequireResolve('@tramvai/storybook-addon')
+      );
+    },
+  },
+  {
+    text: `Looking for another way to render your app?
+Check available render modes in tramvai`,
+    docLink: 'references/modules/page-render-mode',
+    isApplicable() {
+      return !safeRequireResolve('@tramvai/module-page-render-mode');
+    },
+  },
+  {
+    text: `Optimize your child-app size by enabling shared dependencies`,
+    docLink: 'references/modules/child-app#module-federation-sharing-dependencies',
+    isApplicable(config) {
+      const { projectType, shared } = config;
+
+      return projectType === 'child-app' && shared?.deps?.length === 0;
+    },
+  },
+  {
+    text: `Optimize client render performance by enabling React compiler`,
+    docLink: 'guides/react-compiler',
+    isApplicable(config) {
+      return !config.experiments?.reactCompiler;
+    },
+  },
+];

@@ -1,0 +1,11 @@
+.flex {
+  display: flex
+}
+
+.mt-3 {
+  flex-shrink: 3;
+}
+
+.custom {
+  font-size: 100px;
+}

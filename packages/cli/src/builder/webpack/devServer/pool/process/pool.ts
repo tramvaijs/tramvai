@@ -5,15 +5,9 @@ import type { WorkerBridgeFactory } from '../base/types';
 import { TRACE_ARGV } from '../../../../../config/constants';
 import { getDebugArg } from '../../../../../config/utils';
 import { SERVER_CONFIG_MANAGER_TOKEN } from '../../../tokens';
-import {
-  STDOUT_TOKEN,
-  STDERR_TOKEN,
-  COMMAND_PARAMETERS_TOKEN,
-  CONFIG_ROOT_DIR_TOKEN,
-} from '../../../../../di/tokens';
+import { STDOUT_TOKEN, STDERR_TOKEN, CONFIG_ROOT_DIR_TOKEN } from '../../../../../di/tokens';
 
 export const ProcessWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
-  const { env } = di.get(COMMAND_PARAMETERS_TOKEN);
   const configManager = di.get(SERVER_CONFIG_MANAGER_TOKEN);
   const stdout = di.get(STDOUT_TOKEN);
   const stderr = di.get(STDERR_TOKEN);
@@ -35,7 +29,7 @@ export const ProcessWorkerBridge: WorkerBridgeFactory<Worker> = (di) => {
     },
     async create() {
       const worker = cluster.fork({
-        ...env,
+        ...configManager.appEnv,
         NODE_ENV: 'development',
         // port=0 позволяет запустить сервер на случайном доступном порту
         // https://nodejs.org/dist/latest-v15.x/docs/api/all.html#cluster_how_it_works

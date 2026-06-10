@@ -134,7 +134,7 @@ export class ConfigManager {
         .map((error) => {
           let message = ajv.errorsText([error]);
 
-          if (error.message === 'should NOT have additional properties') {
+          if (error.message === 'must NOT have additional properties') {
             message += ` - remove or rename "${(error.params as any).additionalProperty}" property`;
           }
 

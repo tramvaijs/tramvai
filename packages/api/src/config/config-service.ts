@@ -27,6 +27,15 @@ export interface SharpEncodeOptions {
   };
 }
 
+/**
+ * @see https://github.com/waysact/webpack-subresource-integrity/tree/main/webpack-subresource-integrity#options
+ */
+export interface IntegrityOptions {
+  enabled: boolean | 'auto';
+  hashFuncNames: ('sha256' | 'sha384' | 'sha512')[];
+  hashLoading: 'eager' | 'lazy';
+}
+
 export type PostcssOptions = {
   /**
    * @title Path to postcss config file. By default, `postcss.config.js` file is used
@@ -143,16 +152,17 @@ export type ApplicationExperiments = {
    */
   reactTransitions?: boolean;
   /**
-   * @title automatically resolve requiredVersion for shared dependencies
-   * @see https://webpack.js.org/plugins/module-federation-plugin/#requiredversion
-   * @default false
-   */
-  autoResolveSharedRequiredVersions?: boolean;
-  /**
    * @title Enable Lightningcss for css transpiling as Postcss alternative
    * @default false
    */
   lightningcss?: boolean;
+  /**
+   * https://github.com/facebook/react/blob/main/compiler/packages/babel-plugin-react-compiler/src/Entrypoint/Options.ts
+   *
+   * @title Enable React Compiler. You can pass some options, or use it with meaningful defaults.
+   * @default false
+   */
+  reactCompiler?: boolean | ReactCompilerOptions;
 };
 
 export type TranspilationOptions = {
@@ -203,6 +213,7 @@ export type InputParameters = {
   httpsKey?: string;
   httpsCert?: string;
   benchmark?: boolean;
+  runtimeEnv?: Record<string, string>;
   analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   staticPort?: number;
   staticHost?: string;
@@ -255,6 +266,11 @@ export type InputParameters = {
    */
   showProgress?: boolean;
   /**
+   * @description Show banner with tips for build process
+   * @default false
+   */
+  showBanner?: boolean;
+  /**
    * Enables cache for build
    * @default true
    */
@@ -277,7 +293,6 @@ export type InputParameters = {
 };
 
 export type Project = ApplicationProject | ChildAppProject;
-
 export interface BaseProject {
   /**
    * [svgo](https://github.com/svg/svgo) configuration, used for SVG and [SVGR](https://react-svgr.com/) optimization
@@ -302,6 +317,11 @@ export interface BaseProject {
    * React hot-refresh options
    */
   hotRefresh?: HotRefreshOptions;
+
+  /**
+   * Live reload after build in browser
+   */
+  liveReload?: boolean;
 
   /**
    * @title Configure webpack dev server writeToDisk option
@@ -355,11 +375,11 @@ export interface BaseProject {
      */
     defaultTramvaiDependencies?: boolean;
     /**
-     * @title add caret range specifier for tramvai dependencies
-     * @description minimal versions are inferred from package.json
+     * @title automatically resolve requiredVersion for shared dependencies
+     * @see https://webpack.js.org/plugins/module-federation-plugin/#requiredversion
      * @default true
      */
-    flexibleTramvaiVersions?: boolean;
+    autoResolveSharedRequiredVersions?: boolean;
     /**
      * @title add chunks to preload as critical in-parallel with "platform.js"
      * @description this option is useful when you need to create async boundary for app dependencies.
@@ -424,13 +444,7 @@ export interface ApplicationProject extends BaseProject {
   polyfill?: string;
   modernPolyfill?: string;
   dedupe?: DedupeOptions;
-  integrity?: SubresourceIntegrityPluginOptions;
-  /**
-   * @title Webpack Runtime Chunk settings
-   * @see https://webpack.js.org/configuration/optimization/#optimizationruntimechunk
-   * @default false
-   */
-  runtimeChunk?: 'single' | 'multiple' | boolean;
+  integrity?: IntegrityOptions | boolean;
 }
 
 export interface ChildAppProject extends BaseProject {
@@ -464,8 +478,11 @@ export type Configuration = {
 
 export type SerializableConfig = {
   projectType: string;
+  projectName: string;
   staticPort: number;
   staticHost: string;
+  port: number;
+  host: string;
   httpProtocol: string;
   assetsPrefix: string | null;
   output: {
@@ -480,7 +497,7 @@ export type Extension<Value> = ({
   parameters,
   project,
 }: {
-  config: Configuration;
+  config: ConfigService;
   parameters: InputParameters;
   project: Project;
 }) => Value;
@@ -556,7 +573,7 @@ export class ConfigService {
       for (const key in currentExtension) {
         extensions[key] = () =>
           currentExtension[key]({
-            config: this.#config!,
+            config: this,
             parameters: this.#parameters,
             project: this.#project,
           });
@@ -601,6 +618,10 @@ export class ConfigService {
 
   get port() {
     return this.#parameters.port ?? 3000;
+  }
+
+  get runtimeEnv() {
+    return this.#parameters.runtimeEnv ?? {};
   }
 
   get staticHost() {
@@ -651,11 +672,15 @@ export class ConfigService {
   }
 
   get entryFile() {
-    return this.#project.entryFile ?? 'index.ts';
+    return this.#project.entryFile ?? 'index';
   }
 
   get showProgress() {
-    return this.#parameters.showProgress;
+    return this.#parameters.showProgress ?? false;
+  }
+
+  get showBanner() {
+    return this.#parameters.showBanner ?? false;
   }
 
   get mode() {
@@ -770,10 +795,10 @@ export class ConfigService {
 
     const experiments = this.#project.experiments ?? {};
     return {
+      reactCompiler: experiments.reactCompiler ?? false,
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
       lightningcss: experiments.lightningcss ?? false,
-      autoResolveSharedRequiredVersions: experiments.autoResolveSharedRequiredVersions ?? false,
     };
   }
 
@@ -797,15 +822,11 @@ export class ConfigService {
       return null;
     }
 
-    return this.#project.integrity ?? false;
-  }
-
-  get runtimeChunk() {
-    if (this.#project.type === 'child-app') {
-      return null;
+    if (this.#project.integrity === true) {
+      return {};
     }
 
-    return this.#project.runtimeChunk ?? false;
+    return this.#project.integrity ?? false;
   }
 
   get sourceMap(): boolean {
@@ -825,6 +846,10 @@ export class ConfigService {
         ...this.#project.hotRefresh?.options,
       },
     };
+  }
+
+  get liveReload(): BaseProject['liveReload'] {
+    return this.#project.liveReload ?? true;
   }
 
   get writeToDisk(): BaseProject['writeToDisk'] {
@@ -885,8 +910,8 @@ export class ConfigService {
 
     return {
       defaultTramvaiDependencies: configShared?.defaultTramvaiDependencies,
-      flexibleTramvaiVersions: configShared?.flexibleTramvaiVersions ?? true,
       criticalChunks: configShared?.criticalChunks ?? [],
+      autoResolveSharedRequiredVersions: configShared?.autoResolveSharedRequiredVersions ?? true,
       deps: configShared?.deps ?? [],
     };
   }
@@ -921,12 +946,9 @@ export class ConfigService {
           this.#configPath = result.filepath;
           return result.config;
         }
-        // TODO: flag to throw error if config not found?
-        logger.event({
-          type: 'error',
-          event: 'config-service',
-          message: '"tramvai.config.ts" configuration file not found',
-        });
+        // TODO: add flag to throw error if config not found
+        // after migration on new ts config
+
         return {
           projects: {},
           plugins: [],
@@ -934,9 +956,20 @@ export class ConfigService {
       });
   }
 
+  getParams() {
+    return this.#parameters;
+  }
+
+  updateParam<K extends keyof InputParameters>(name: K, value: InputParameters[K]) {
+    this.#parameters[name] = value;
+  }
+
   dehydrate(): SerializableConfig {
     return {
       projectType: this.projectType,
+      projectName: this.projectName,
+      port: this.port,
+      host: this.host,
       staticPort: this.staticPort,
       staticHost: this.staticHost,
       httpProtocol: this.httpProtocol,

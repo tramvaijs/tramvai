@@ -1,5 +1,5 @@
 import type { Configuration as WebpackConfiguration } from 'webpack';
-import { DevtoolOption, Extension } from '@tramvai/api/lib/config';
+import type { DevtoolOption, Extension } from '@tramvai/api/lib/config';
 
 /**
  * @title Configure the options on webpack splitChunks
@@ -113,15 +113,31 @@ export const runtimeChunkExtension = {
   },
 };
 
-type SplitChunksConfigExtensionType = typeof splitChunksConfigExtension;
-type сonfigExtensionType = typeof configExtension;
-type RuntimeChunkConfigExtensionType = typeof runtimeChunkExtension;
+export const defineExtension = {
+  define: ({ project, config }: Parameters<Extension<any>>[0]) => {
+    if (project.type === 'child-app') {
+      return {};
+    }
 
+    return { ...project.define?.shared, ...project.define?.[config.mode] };
+  },
+};
+
+type SplitChunksConfigExtensionType = typeof splitChunksConfigExtension;
+type ConfigExtensionType = typeof configExtension;
+type RuntimeChunkConfigExtensionType = typeof runtimeChunkExtension;
+type DefineExtensinType = typeof defineExtension;
+type Define = Record<string, string>;
 declare module '@tramvai/api/lib/config' {
   export interface ApplicationProject {
     splitChunks?: SplitChunksConfig;
     webpack?: СonfigOptions;
     runtimeChunk?: RuntimeChunk;
+    define?: {
+      shared: Define;
+      development: Define;
+      production: Define;
+    };
   }
 
   export interface ChildAppProject {
@@ -130,6 +146,7 @@ declare module '@tramvai/api/lib/config' {
 
   export interface ConfigurationExtensions
     extends SplitChunksConfigExtensionType,
-      сonfigExtensionType,
+      DefineExtensinType,
+      ConfigExtensionType,
       RuntimeChunkConfigExtensionType {}
 }

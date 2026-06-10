@@ -1,6 +1,5 @@
 import type { Container } from '@tinkoff/dippy';
 import type { Result } from './index';
-import { showBanner } from './utils/banner';
 import { runHandlers } from '../../utils/runHandlers';
 import {
   INIT_HANDLER_TOKEN,
@@ -12,6 +11,7 @@ import { sharedProviders as commonSharedProviders } from './providers/shared';
 import { sharedProviders } from './providers/module/shared';
 import { ABSTRACT_BUILDER_FACTORY_TOKEN, STATIC_SERVER_TOKEN } from '../../di/tokens';
 import { registerProviders } from '../../utils/di';
+import { showBanner } from './utils/banner';
 
 export const startModule = async (di: Container): Result => {
   registerProviders(di, [...commonSharedProviders, ...sharedProviders]);

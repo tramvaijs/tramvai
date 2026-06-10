@@ -7,8 +7,9 @@ import type { PathData, RuleSetRule } from '@rspack/core';
 import { Container, optional } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import { getSvgoOptions } from '@tramvai/plugin-base-builder/lib/shared/assets';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
-import { RSPACK_TRANSPILER_TOKEN, resolveRspackTranspilerParameters } from './transpiler';
+import { resolveRspackTranspilerParameters } from './transpiler';
 
 export const createAssetsRules = ({
   di,
@@ -41,6 +42,12 @@ export const createAssetsRules = ({
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
       type: 'asset/resource',
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       generator: {
         filename: (pathInfo: PathData) => {
           // hash computation exactly how it is working in react-ui-kit
@@ -56,6 +63,12 @@ export const createAssetsRules = ({
   } else {
     rules.push({
       test: /\.svg$/,
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       resourceQuery: { not: /react/ },
       type: 'asset/source',
     });

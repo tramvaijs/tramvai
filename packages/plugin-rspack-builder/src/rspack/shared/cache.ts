@@ -8,8 +8,9 @@ import { createToken } from '@tinkoff/dippy';
 
 import { ConfigService } from '@tramvai/api/lib/config';
 import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
+import { TranspilerInputParameters } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+
 import { getPostcssConfigPath } from './styles';
-import { RspackTranspilerInputParameters } from './transpiler';
 
 export const CACHE_ADDITIONAL_FLAGS_TOKEN = createToken<string[]>(
   'tramvai rspack cache additional flags',
@@ -42,8 +43,8 @@ export const createCacheConfig = ({
 }: {
   config: ConfigService;
   additionalCacheFlags: string[] | string[][];
-  transpilerParameters: RspackTranspilerInputParameters;
-  target: 'client' | 'server';
+  transpilerParameters: TranspilerInputParameters;
+  target: 'client' | 'server' | 'polyfill';
 }): ExperimentCacheOptions => {
   const transpilerParametersHash = crypto.createHash('sha256');
   transpilerParametersHash.update(JSON.stringify(transpilerParameters));

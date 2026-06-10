@@ -5,6 +5,6 @@ createTestSuite({
   plugins: [
     '@tramvai/plugin-rspack-builder',
     '@tramvai/plugin-swc-transpiler',
-    // '@tramvai/plugin-webpack-pwa',
+    '@tramvai/plugin-webpack-pwa',
   ],
 });

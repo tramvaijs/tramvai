@@ -16,8 +16,10 @@ import {
 
 export type ServerRunnerWorkerData = {
   port: number;
+  env?: Record<string, string>;
   proxyPort: number;
   disableServerRunnerWaiting: boolean;
+  cwd: string;
 };
 
 export class ServerRunnerWorkerBridge {
@@ -43,11 +45,13 @@ export class ServerRunnerWorkerBridge {
   create() {
     const env: Record<string, string | undefined> = {
       ...process.env,
+      ...this.#config.runtimeEnv,
       HOST: this.#config.host,
       PORT: this.#config.port?.toString(),
+      HOST_STATIC: `${this.#config.staticHost}`,
+      PORT_STATIC: `${this.#config.staticPort}`,
       // force color output for worker - https://github.com/chalk/supports-color#info
       FORCE_COLOR: '1',
-      ASSETS_PREFIX: this.#config.assetsPrefix!,
     };
 
     if (process.env.TRAMVAI_INSPECT_SERVER_RUNTIME || this.#config.inspectServerRuntime) {

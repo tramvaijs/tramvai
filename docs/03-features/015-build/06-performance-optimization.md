@@ -224,6 +224,24 @@ Starting from version 6, Tramvai provides a new local development option:
 
 It runs Webpack builds for both client and server in separate threads using `worker_threads`, accelerating cold builds by 30-40%.
 
+:::info
+
+Starting from version 7 enabled for development build by default
+
+:::
+
+### Rspack
+
+Starting from Tramvai 6, it is possible to use Rspack as a replacement for Webpack. At the moment, only local builds for applications are supported:
+
+`tramvai start --experimentalRspack`
+
+Also you need to install rspack plugin:
+
+`npx tramvai add @tramvai/plugin-rspack-builder`
+
+Rspack consumes significantly less memory and is, on average, about 2× faster than Webpack for cold builds.
+
 ## Build performance analysis
 
 Tramvai includes special tooling for evaluating build performance via the commands `analyze` and `benchmark`.

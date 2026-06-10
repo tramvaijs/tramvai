@@ -1,4 +1,4 @@
-import { provide, isValidModule, initContainer } from '@tinkoff/dippy';
+import { provide, isValidModule, Container } from '@tinkoff/dippy';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -14,6 +14,7 @@ import { Logger } from '../services/logger';
 import { PORT_MANAGER_TOKEN, PortManager } from '../services/port-manager';
 import { TRACER_TOKEN, tracer } from '../services/tracer';
 import { TramvaiPlugin } from '../core/plugin';
+import { SHOW_BANNER_TOKEN } from '../services/banner';
 
 export interface StartParameters extends InputParameters {}
 
@@ -21,6 +22,8 @@ export async function start(
   inputParameters: StartParameters,
   extraConfiguration?: Partial<Configuration>
 ): Promise<DevServer> {
+  // Freeze input for restrict unexpected mutations
+  Object.freeze(inputParameters);
   tracer.init();
 
   tracer.mark({
@@ -61,7 +64,7 @@ export async function start(
     return plugin;
   });
 
-  const di = initContainer({
+  const di = new Container({
     modules: plugins,
     providers: [
       provide({
@@ -97,6 +100,11 @@ export async function start(
     throw Error(
       `Development server not found, make sure you add "@tramvai/plugin-webpack-builder" plugin to tramvai config file`
     );
+  }
+
+  if (config.showBanner) {
+    const showBanner = tramvai.resolve(SHOW_BANNER_TOKEN);
+    showBanner?.();
   }
 
   if (Array.isArray(configExtensions)) {

@@ -1,7 +1,8 @@
 import { Container, optional } from '@tinkoff/dippy';
 import type { RuleSetRule } from '@rspack/core';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
-import { RSPACK_TRANSPILER_TOKEN, resolveRspackTranspilerParameters } from './transpiler';
+import { resolveRspackTranspilerParameters } from './transpiler';
 
 export const createServerInlineRules = ({ di }: { di: Container }): RuleSetRule[] => {
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;

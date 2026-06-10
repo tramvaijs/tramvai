@@ -2,11 +2,14 @@ import type Config from 'webpack-chain';
 import { container } from 'webpack';
 
 import {
-  ModuleFederationFixRange,
-  ModuleFederationFixRangeOptions,
   ModuleFederationIgnoreEntries,
   ModuleFederationIgnoreEntriesOptions,
-} from '@tramvai/plugin-base-builder/lib/plugins';
+} from '../plugins/ModuleFederationIgnoreEntries';
+
+import {
+  ModuleFederationFixRange,
+  ModuleFederationFixRangeOptions,
+} from '../plugins/ModuleFederationFixRange';
 
 import { getSharedModules } from '../child-app/moduleFederationShared';
 import type { ModuleFederationPluginOptions } from '../types/webpack';

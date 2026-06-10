@@ -4,11 +4,12 @@ import path from 'path';
 import crypto from 'crypto';
 
 import { UniversalFederationPlugin } from '@module-federation/node';
+import { PatchAutoPublicPathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
+
 import {
   ModuleFederationFixRange,
   ModuleFederationFixRangeOptions,
-  PatchAutoPublicPathPlugin,
-} from '@tramvai/plugin-base-builder/lib/plugins';
+} from '../plugins/ModuleFederationFixRange';
 
 import common from '../common/main';
 import type { ConfigManager } from '../../../config/configManager';

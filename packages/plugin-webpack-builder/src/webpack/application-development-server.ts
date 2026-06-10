@@ -1,5 +1,4 @@
 /* eslint-disable max-statements, complexity */
-import path from 'node:path';
 import { Writable } from 'node:stream';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
@@ -7,6 +6,7 @@ import VirtualModulesPlugin from 'webpack-virtual-modules';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
+import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import { optional } from '@tinkoff/dippy';
 import {
   resolveAbsolutePathForFile,
@@ -41,27 +41,19 @@ import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/e
 import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
-import {
-  RuntimePathPlugin,
-  ModuleFederationIgnoreEntries,
-  ModuleFederationFixRange,
-  VirtualProtocolPlugin,
-} from '@tramvai/plugin-base-builder/lib/plugins';
+import { RuntimePathPlugin, VirtualProtocolPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 
-import {
-  WEBPACK_TRANSPILER_TOKEN,
-  createTranspilerRules,
-  resolveWebpackTranspilerParameters,
-} from './shared/transpiler';
+import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
-import { WebpackConfigurationFactory } from './webpack-config';
 import { createStylesConfiguration } from './shared/styles';
 import { createResolveOptions } from './shared/resolve';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createAssetsRules } from './shared/assets';
 import { createServerInlineRules } from './shared/server-inline';
-import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createCacheConfig } from './shared/cache';
+import { WebpackConfigurationFactory } from './types/webpack';
 
 const mainFields = ['module', 'main'];
 
@@ -93,10 +85,11 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 }): Promise<Configuration> => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
-  const { verboseLogging } = config;
+  const { verboseLogging, hotRefresh, noServerRebuild } = config;
+
+  const isHotEnabled = hotRefresh?.enabled && !noServerRebuild;
 
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
-  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
@@ -110,7 +103,13 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   Object.assign(alias, webpackConfigExtension.resolveAlias);
   Object.assign(provideList, webpackConfigExtension.provide);
 
-  const transpilerParameters = resolveWebpackTranspilerParameters({ di });
+  const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
+  defineOptions.push(config.extensions.define());
+
+  const transpilerParameters = resolveWebpackTranspilerParameters({
+    di,
+    hot: isHotEnabled,
+  });
   const workerPoolConfig = createWorkerPoolConfig({ di });
 
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
@@ -160,8 +159,10 @@ export default appConfig;`;
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'server' });
 
   const resolveOptions = await createResolveOptions({ di, mainFields });
+  const serverBuildName = 'server';
 
   return {
+    name: serverBuildName,
     // https://webpack.js.org/configuration/target/#browserslist
     target: normalizedBrowserslistConfig.node
       ? `browserslist:${normalizedBrowserslistConfig.node}`
@@ -188,7 +189,7 @@ export default appConfig;`;
         host: config.staticHost,
         port: config.staticPort,
         protocol: config.httpProtocol,
-      })}${resolvePublicPathDirectory(config.outputClient)}`,
+      })}${resolvePublicPathDirectory(config.outputServer)}`,
       filename: 'server.js',
       library: {
         type: 'commonjs2',
@@ -341,11 +342,7 @@ export default appConfig;`;
         name: 'host',
         shared: getSharedModules(config),
       }),
-      new ModuleFederationIgnoreEntries({ entries: ['polyfill', 'modern.polyfill'] }),
-      new ModuleFederationFixRange({
-        flexibleTramvaiVersions: config.shared?.flexibleTramvaiVersions,
-      }),
-      config.showProgress && new WorkerProgressPlugin({ name: 'server', color: 'orange' }),
+      config.showProgress && new WorkerProgressPlugin({ name: serverBuildName, color: 'orange' }),
       new webpack.DefinePlugin({
         'process.env.BROWSER': false,
         'process.env.SERVER': true,

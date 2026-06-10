@@ -10,7 +10,7 @@ export type ProxyServer = {
 
 export const proxyHttpsServerFixture: [
   WorkerFixture<ProxyServer, { createApp: CreateApp.CreateCustomApp }>,
-  { scope: 'worker'; timeout: number }
+  { scope: 'worker'; timeout: number },
 ] = [
   async ({ createApp }, use) => {
     const { port, proxy } = await startHttpsProxyServer({
@@ -26,11 +26,11 @@ export const proxyHttpsServerFixture: [
 
 export const proxyHttpsStaticServerFixture: [
   WorkerFixture<{}, { createApp: CreateApp.CreateCustomApp; optionsApp: CreateApp.OptionsApp }>,
-  { scope: 'worker'; timeout: number }
+  { scope: 'worker'; timeout: number },
 ] = [
   async ({ createApp, optionsApp }, use) => {
     const { proxy } = await startHttpsProxyServer({
-      sourcePort: Number(new URL(optionsApp.env!.ASSETS_PREFIX).port),
+      sourcePort: Number(new URL(optionsApp.env!.ASSETS_PREFIX as string).port),
       targetPort: Number(new URL(createApp.staticUrl).port),
     });
 
@@ -42,7 +42,10 @@ export const proxyHttpsStaticServerFixture: [
 ];
 
 export class CookieComponentObject {
-  constructor(private page: Page, private context: BrowserContext) {}
+  constructor(
+    private page: Page,
+    private context: BrowserContext
+  ) {}
 
   async setTestCookie() {
     return this.page.evaluate(

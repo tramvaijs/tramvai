@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node start.js",
+    "start:inspect": "node --inspect-wait start.js",
     "start:prod": "tramvai start-prod cli-rewrited",
     "build": "tramvai build cli-rewrited",
     "lint": "eslint --ext .ts,.tsx --ignore-path .gitignore .",
@@ -17,6 +18,7 @@
     "@tramvai/api": "0.0.0-stub",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/plugin-babel-transpiler": "0.0.0-stub",
+    "@tramvai/plugin-base-builder": "0.0.0-stub",
     "@tramvai/plugin-rspack-builder": "0.0.0-stub",
     "@tramvai/plugin-swc-transpiler": "0.0.0-stub",
     "@tramvai/plugin-webpack-builder": "0.0.0-stub",
@@ -31,6 +33,7 @@
     "postcss-nested": "^5.0.5"
   },
   "dependencies": {
+    "@tinkoff/pack-polyfills": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/module-common": "0.0.0-stub",
     "@tramvai/module-error-interceptor": "0.0.0-stub",

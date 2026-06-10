@@ -14,21 +14,23 @@ import {
   runtimeChunkExtension,
   splitChunksConfigExtension,
   configExtension,
+  defineExtension,
 } from '@tramvai/plugin-base-builder';
+import { SHOW_BANNER_TOKEN } from '@tramvai/api/lib/services/banner';
+import { showBanner } from '@tramvai/plugin-base-builder/lib/utils/banner';
 import {
   createSelfSignedCertificate,
   SELF_SIGNED_CERTIFICATE_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 import { createDevServer } from './dev-server/dev-server';
 
-export { BUILD_TYPE_TOKEN, BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN } from './webpack/webpack-config';
 export {
-  WEBPACK_TRANSPILER_TOKEN,
-  WebpackTranspiler,
-  WebpackTranspilerInputParameters,
-} from './webpack/shared/transpiler';
-export { WEBPACK_PLUGINS_TOKEN } from './webpack/shared/plugins';
+  BUILD_TYPE_TOKEN,
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
 export * from '@tramvai/plugin-base-builder';
 export { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 export { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';
@@ -57,6 +59,16 @@ export const WebpackBuilderPlugin = declareModule({
       },
     }),
     provide({
+      provide: SHOW_BANNER_TOKEN,
+      useFactory: ({ config, transpiler }) => {
+        return () => showBanner(config, { transpiler });
+      },
+      deps: {
+        config: CONFIG_SERVICE_TOKEN,
+        transpiler: WEBPACK_TRANSPILER_TOKEN,
+      },
+    }),
+    provide({
       provide: SELF_SIGNED_CERTIFICATE_TOKEN,
       useFactory: ({ configManager, parameters }) => {
         const { host } = configManager;
@@ -77,6 +89,10 @@ export const WebpackBuilderPlugin = declareModule({
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,
       useValue: splitChunksConfigExtension,
+    }),
+    provide({
+      provide: CONFIGURATION_EXTENSION_TOKEN,
+      useValue: defineExtension,
     }),
     provide({
       provide: CONFIGURATION_EXTENSION_TOKEN,

@@ -5,8 +5,10 @@ import { Container, optional } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import { getSvgoOptions } from '@tramvai/plugin-base-builder/lib/shared/assets';
 
-import { BUILD_TARGET_TOKEN } from '../webpack-config';
-import { WEBPACK_TRANSPILER_TOKEN, resolveWebpackTranspilerParameters } from './transpiler';
+import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+
+import { resolveWebpackTranspilerParameters } from './transpiler';
 
 export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRule[] => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
@@ -34,6 +36,12 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
       type: 'asset/resource',
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       generator: {
         filename: (pathInfo: any) => {
           // hash computation exactly how it is working in react-ui-kit
@@ -46,6 +54,12 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
     rules.push({
       test: /\.svg$/,
       resourceQuery: { not: /react/ },
+      use: [
+        {
+          loader: 'svgo-loader',
+          options: svgoOptions,
+        },
+      ],
       type: 'asset/source',
     });
   }

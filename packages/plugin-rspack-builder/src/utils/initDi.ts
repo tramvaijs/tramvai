@@ -1,4 +1,4 @@
-import { initContainer, isValidModule, optional, provide } from '@tinkoff/dippy';
+import { Container, isValidModule, optional, provide } from '@tinkoff/dippy';
 import {
   CONFIG_SERVICE_TOKEN,
   ConfigService,
@@ -9,23 +9,17 @@ import {
 } from '@tramvai/api/lib/config';
 import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
 import { BuildTarget, BuildType } from '@tramvai/plugin-base-builder/lib/types';
-import { BUILD_MODE_TOKEN, BUILD_TARGET_TOKEN, BUILD_TYPE_TOKEN } from '../rspack/rspack-config';
-import { RSPACK_TRANSPILER_TOKEN } from '../rspack/shared/transpiler';
+import {
+  BUILD_MODE_TOKEN,
+  BUILD_TARGET_TOKEN,
+  BUILD_TYPE_TOKEN,
+} from '@tramvai/plugin-base-builder/lib/build-config';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 export async function initDi(
-  inputParameters: InputParameters,
-  extraConfiguration: Partial<Configuration>,
+  config: ConfigService,
   { type, target }: { type: BuildType; target: BuildTarget }
 ) {
-  const config = new ConfigService(
-    {
-      mode: 'development',
-      ...inputParameters,
-    },
-    extraConfiguration
-  );
-  await config.initialize();
-
   const plugins: Array<ModuleType | ExtendedModule> = config.plugins.map((plugin) => {
     if (typeof plugin === 'string') {
       const possibleModule = require(plugin).default;
@@ -42,7 +36,7 @@ export async function initDi(
     return plugin;
   });
 
-  const di = initContainer({
+  const di = new Container({
     modules: plugins,
     providers: [
       provide({
@@ -51,7 +45,7 @@ export async function initDi(
       }),
       provide({
         provide: INPUT_PARAMETERS_TOKEN,
-        useValue: inputParameters,
+        useValue: config.getParams(),
       }),
       provide({
         provide: BUILD_TYPE_TOKEN,

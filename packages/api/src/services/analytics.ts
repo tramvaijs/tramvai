@@ -87,6 +87,7 @@ export type FeaturesProperties = {
   viewTransitions?: boolean;
   transitionsRouterProvider?: boolean;
   experimentalWebpackWorkerThreads?: boolean;
+  experimentalRspack?: boolean;
 };
 
 export type VcsProperties = {

@@ -1,6 +1,4 @@
 import type { Options as ParserOptions } from 'node-html-parser';
-import { parse } from 'node-html-parser';
-import prettier from 'prettier';
 
 export type ParseOptions = Partial<ParserOptions>;
 
@@ -13,6 +11,9 @@ export const parseHtml = (
   if (!html) {
     return null;
   }
+
+  const prettier = require('prettier');
+  const { parse } = require('node-html-parser');
 
   const prettyHtml = prettier.format(html, { parser: 'html', printWidth: 120 });
   // @ts-ignore - используется тайпинг от 3 prettier, а в проекте 2
