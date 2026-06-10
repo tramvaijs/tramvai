@@ -163,6 +163,22 @@ tramvai-copy
 tramvai-build --help
 ```
 
+### Standalone build with all dependencies
+
+To build a package with all its dependencies bundled together, use the `--standalone` flag. This creates two separate builds: one for the browser and one for Node.js.
+
+```bash
+tramvai-build --standalone
+```
+
+When using `--standalone`, only built-in exclusions (@tramvai packages and react), peer dependencies and explicitly specified packages via `--externals` are excluded from the bundle. All other dependencies are bundled together.
+
+```bash
+tramvai-build --standalone --externals some-package
+```
+
+> The `--externals` flag accepts a space separated list of package names that should be excluded from the bundle in addition to peer dependencies and built-in exclusions.
+
 ## JavaScript API
 
 ### TramvaiBuild

@@ -1,5 +1,5 @@
 import { resolve, basename, relative } from 'path';
-import type { OutputOptions, RollupOptions, ModuleFormat, PreRenderedChunk } from 'rollup';
+import type { OutputOptions, RollupOptions, ModuleFormat, PreRenderedChunk, Plugin } from 'rollup';
 import type { ScriptTarget, CompilerOptions } from 'typescript';
 import { ModuleKind } from 'typescript';
 import isObject from '@tinkoff/utils/is/object';
@@ -51,6 +51,8 @@ export const createInputOptions = (
     browser,
     newTsPlugin,
     typescriptConfig,
+    checkExternal: customCheckExternal,
+    plugins: extraPlugins = [],
   }: {
     entry: string;
     target: ScriptTarget | string;
@@ -59,6 +61,8 @@ export const createInputOptions = (
     browser?: boolean;
     newTsPlugin?: boolean;
     typescriptConfig?: CompilerOptions;
+    checkExternal?: (path: string) => boolean;
+    plugins?: Plugin[];
   }
 ): RollupOptions => {
   const input = resolve(params.cwd, entry);
@@ -69,7 +73,7 @@ export const createInputOptions = (
   return {
     input,
     perf,
-    external: checkExternal,
+    external: customCheckExternal ?? checkExternal,
     plugins: [
       jsonPlugin(),
       browser &&
@@ -137,6 +141,7 @@ export const createInputOptions = (
       // Before, this plugin was required also to support conditional loading while building package in single file (dynamic chunks were built as separate files),
       // but now we build with preserveModules and we get separate chunks any way
       addRequireChunkPlugin(),
+      ...extraPlugins,
     ].filter(Boolean),
   };
 };

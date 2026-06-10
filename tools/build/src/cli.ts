@@ -35,6 +35,16 @@ const args = (yargs as Argv<Options>)
   .option('only', {
     choices: ['migrations', 'tests'] as const,
   })
+  .option('standalone', {
+    type: 'boolean',
+    description: 'сreate a standalone build with all runtime dependencies included',
+  })
+  .option('externals', {
+    type: 'array',
+    string: true,
+    description:
+      'additional package names to treat as external. Applies only to --standalone builds',
+  })
   .alias('h', 'help')
   .help().argv;
 

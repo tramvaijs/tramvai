@@ -6,4 +6,6 @@ export type Options = {
   preserveModules?: boolean;
   only?: 'migrations' | 'tests';
   cwd?: string;
+  standalone?: boolean;
+  externals?: string[];
 };
