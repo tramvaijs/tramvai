@@ -1,0 +1,27 @@
+{
+  "name": "library-standalone",
+  "version": "0.1.0",
+  "main": "lib/server.js",
+  "browser": {
+    "./lib/server.js": "./lib/browser.js",
+    "./lib/foo.server.js": "./lib/foo.browser.js"
+  },
+  "typings": "src/server.ts",
+  "scripts": {
+    "build": "tramvai-build --forPublish --standalone --externals @tinkoff/dippy",
+    "watch": "tramvai-build --watch"
+  },
+  "dependencies": {
+    "@tinkoff/utils": "^2.1.2",
+    "tslib": "^2.4.0",
+    "@tinkoff/dippy": "^1.0.0"
+  },
+  "devDependencies": {
+    "@tramvai/build": "file:./../../../../build"
+  },
+  "peerDependencies": {
+    "@tramvai/module-mocker": "file:./../../../../../packages/modules/mocker"
+  },
+  "private": true,
+  "license": "Apache-2.0"
+}

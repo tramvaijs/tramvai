@@ -9,6 +9,8 @@ import { build as nodeCjsBuild } from './builds/node-cjs';
 import { build as nodeEsBuild } from './builds/node-es';
 import { build as browserBuild } from './builds/browser';
 import { createBuild as createMigrationsBuild } from './builds/migrations';
+import { build as browserStandaloneBuild } from './builds/browser-standalone';
+import { build as nodeEsStandaloneBuild } from './builds/node-es-standalone';
 import { testsBuild } from './builds/tests';
 import { clearOutput } from './clearOutput';
 import { copyStaticAssets } from './copyStaticAssets';
@@ -26,6 +28,8 @@ const BUILDS: Record<Options['only'], Build[]> = {
   tests: [testsBuild],
 };
 
+const STANDALONE_BUILDS = [browserStandaloneBuild, nodeEsStandaloneBuild];
+
 export class TramvaiBuild {
   private cwd: string;
   private options: Options;
@@ -40,7 +44,11 @@ export class TramvaiBuild {
   ) {
     this.cwd = options.cwd ?? process.cwd();
     this.options = this.normalizeOptions(options);
-    this.builds = builds ?? (options.only ? BUILDS[options.only] : undefined) ?? ALL_BUILDS;
+    this.builds =
+      builds ??
+      (options.standalone ? STANDALONE_BUILDS : undefined) ??
+      (options.only ? BUILDS[options.only] : undefined) ??
+      ALL_BUILDS;
 
     this.readPackageJson();
   }

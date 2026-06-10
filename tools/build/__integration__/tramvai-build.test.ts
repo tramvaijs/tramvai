@@ -984,6 +984,57 @@ describe('tramvai-build', () => {
       `);
     });
   });
+
+  describe('standalone', () => {
+    it('build standalone library without externals and peers', async () => {
+      const { files, readOutFile, packageJson } = await buildLibAndReadOutput(
+        'library-standalone',
+        {
+          args: ['-p', '--standalone', '--externals', '@tinkoff/dippy'],
+        }
+      );
+
+      expect(files).toEqual([
+        'a.d.ts',
+        'b.d.ts',
+        'browser.d.ts',
+        'browser.js',
+        'foo.browser.d.ts',
+        'foo.server.d.ts',
+        'global.d.ts',
+        'icon.svg',
+        'server.d.ts',
+        'server.js',
+        'style.module.css',
+        'ui.d.ts',
+      ]);
+
+      const serverOutput = await readOutFile('server.js');
+
+      expect(
+        serverOutput.includes("import { MockerModule } from '@tramvai/module-mocker';")
+      ).toBeTruthy();
+      expect(serverOutput.includes("import { createToken } from '@tinkoff/dippy';")).toBeTruthy();
+
+      expect(serverOutput.includes("import isObject from '@tinkoff/utils/is/object'")).toBeFalsy();
+      expect(serverOutput.includes("import noop from '@tinkoff/utils/function/noop'")).toBeFalsy();
+
+      expect(serverOutput.includes('server test')).toBeTruthy();
+
+      const browserOutput = await readOutFile('browser.js');
+
+      expect(browserOutput.includes('M50 10a40 40 0 1 1 0 80 40 40 0 1 1 0-80Z')).toBeTruthy();
+      expect(browserOutput.includes('color: black')).toBeTruthy();
+
+      expect(browserOutput.includes('browser test')).toBeTruthy();
+
+      expect(packageJson.browser).toMatchObject({
+        './lib/foo.server.js': './lib/foo.browser.js',
+        './lib/server.js': './lib/browser.js',
+      });
+      expect(packageJson.module).toBe('lib/server.js');
+    });
+  });
 });
 
 async function buildLibAndReadOutput(name: string, { args = [] }: { args?: string[] } = {}) {
