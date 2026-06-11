@@ -1,11 +1,9 @@
 /* eslint-disable max-statements */
 import fs from 'node:fs';
 import path from 'node:path';
-import { InjectManifest as WebpackInjectManifestPlugin } from 'workbox-webpack-plugin';
-// @ts-expect-error
-import { InjectManifest as RspackInfectManifestPlugin } from '@aaroon/workbox-rspack-plugin';
-import { createToken, declareModule, provide } from '@tinkoff/dippy';
+import type { InjectManifest as WebpackInjectManifestPlugin } from 'workbox-webpack-plugin';
 
+import { createToken, declareModule, provide } from '@tinkoff/dippy';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -124,16 +122,22 @@ export const PwaPlugin = declareModule({
     }),
     provide({
       provide: RSPACK_PLUGINS_TOKEN,
-      useFactory: ({ createPlugins }) =>
-        createPlugins({ InjectManifestPlugin: RspackInfectManifestPlugin }),
+      useFactory: ({ createPlugins }) => {
+        const {
+          InjectManifest: RspackInfectManifestPlugin,
+        } = require('@aaroon/workbox-rspack-plugin');
+        return createPlugins({ InjectManifestPlugin: RspackInfectManifestPlugin });
+      },
       deps: {
         createPlugins: CREATE_PWA_PLUGINS_TOKEN,
       },
     }),
     provide({
       provide: WEBPACK_PLUGINS_TOKEN,
-      useFactory: ({ createPlugins }) =>
-        createPlugins({ InjectManifestPlugin: WebpackInjectManifestPlugin }),
+      useFactory: ({ createPlugins }) => {
+        const { InjectManifest: WebpackInjectManifestPlugin } = require('workbox-webpack-plugin');
+        return createPlugins({ InjectManifestPlugin: WebpackInjectManifestPlugin });
+      },
       deps: {
         createPlugins: CREATE_PWA_PLUGINS_TOKEN,
       },
