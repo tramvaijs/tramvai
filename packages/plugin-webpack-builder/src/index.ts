@@ -22,21 +22,15 @@ import {
   createSelfSignedCertificate,
   SELF_SIGNED_CERTIFICATE_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 import { createDevServer } from './dev-server/dev-server';
-import { WEBPACK_TRANSPILER_TOKEN } from './webpack/shared/transpiler';
 
 export {
   BUILD_TYPE_TOKEN,
   BUILD_MODE_TOKEN,
   BUILD_TARGET_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/build-config';
-export {
-  WEBPACK_TRANSPILER_TOKEN,
-  WebpackTranspiler,
-  WebpackTranspilerInputParameters,
-} from './webpack/shared/transpiler';
-export { WEBPACK_PLUGINS_TOKEN } from './webpack/shared/plugins';
 export * from '@tramvai/plugin-base-builder';
 export { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 export { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';

@@ -6,6 +6,10 @@ import type {
   PwaMetaOptions,
   WebManifestOptions,
 } from '@tramvai/plugin-webpack-pwa';
+
+// for @tramvai/api/lib/config type extension
+import '@tramvai/plugin-base-builder';
+
 import type { CliConfigEntry, Experiments } from './cli';
 import type { OverridableOption } from './common';
 

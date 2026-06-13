@@ -1,11 +1,6 @@
-import { createToken } from '@tinkoff/dippy';
 import type { Container } from '@tinkoff/dippy';
-import {
-  CONFIG_SERVICE_TOKEN,
-  ReactCompilerOptions,
-  TranspilationOptions,
-} from '@tramvai/api/lib/config';
-import envTargets, { modern } from '@tinkoff/browserslist-config';
+import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
+import envTargets from '@tinkoff/browserslist-config';
 import {
   BUILD_MODE_TOKEN,
   BUILD_TARGET_TOKEN,
@@ -13,76 +8,12 @@ import {
 import type webpack from 'webpack';
 import browserslist from 'browserslist';
 import { modernLibsFilter } from '@tinkoff/is-modern-lib';
+import {
+  TranspilerInputParameters,
+  Transpiler,
+} from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 import { WorkerPoolConfig } from './thread-loader';
-
-export type WebpackTranspilerInputParameters = {
-  // TODO: rename to "mode"
-  env: 'development' | 'production';
-  // TODO: useless
-  target: 'node' | 'defaults' | 'modern';
-  actualTarget: 'node' | 'defaults' | 'modern';
-  // TODO: useless
-  modern: boolean;
-  isServer: boolean;
-  generateDataQaTag: boolean;
-  enableFillActionNamePlugin: boolean;
-  enableFillDeclareActionNamePlugin: boolean;
-  typescript: boolean;
-  modules: 'es6' | 'commonjs' | false;
-  loader: boolean;
-  removeTypeofWindow: boolean;
-  tramvai: boolean;
-  hot: boolean;
-  excludesPresetEnv: string[];
-  rootDir: string;
-  sourceDir: string;
-  browsersListTargets: string[];
-  reactCompiler: boolean | ReactCompilerOptions;
-  include: TranspilationOptions['include'];
-  /**
-   * Enable or disable `loose` transformations:
-   * with swc loader - https://swc.rs/docs/configuration/compilation#jscloose
-   * with babel loader - https://babeljs.io/docs/babel-preset-env#loose
-   */
-  loose?: boolean;
-  /**
-   * Enable or disable external transpiler runtime helpers:
-   * with swc loader, pass value directly to `jsc.externalHelpers` option - https://swc.rs/docs/configuration/compilation#jscexternalhelpers
-   * with babel loader, when `false`, disable `@babel/plugin-transform-runtime` - https://babeljs.io/docs/babel-plugin-transform-runtime
-   */
-  externalHelpers?: boolean;
-};
-
-export type WebpackTranspiler = {
-  /**
-   * Name of loader for logging purpose
-   */
-  name: string;
-  /**
-   * Name of webpack loader for processing JS and TS files
-   */
-  loader: string;
-  /**
-   * Configuration object to provided webpack loader
-   */
-  configFactory: (parameters: WebpackTranspilerInputParameters) => Record<string, any>;
-  /**
-   * Enable or not "thread-loader"
-   */
-  useThreadLoader?: boolean;
-  /**
-   * Warmup or not "thread-loader"
-   */
-  warmupThreadLoader?: boolean;
-};
-
-/**
- * @description Options for babel-loader or swc-loader
- */
-export const WEBPACK_TRANSPILER_TOKEN = createToken<WebpackTranspiler>(
-  'tramvai webpack transpiler'
-);
 
 export const resolveWebpackTranspilerParameters = (
   {
@@ -97,7 +28,7 @@ export const resolveWebpackTranspilerParameters = (
     hot?: boolean;
   }
   // overrideOptions: Partial<WebpackTranspilerInputParameters> = {}
-): WebpackTranspilerInputParameters => {
+): TranspilerInputParameters => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
   const {
@@ -157,8 +88,8 @@ export const createTranspilerRules = ({
   transpilerParameters,
   workerPoolConfig,
 }: {
-  transpiler: WebpackTranspiler;
-  transpilerParameters: WebpackTranspilerInputParameters;
+  transpiler: Transpiler;
+  transpilerParameters: TranspilerInputParameters;
   workerPoolConfig: WorkerPoolConfig;
 }): webpack.RuleSetRule[] => {
   const { env } = transpilerParameters;

@@ -1,6 +1,6 @@
 import path from 'node:path';
 import type { TransformOptions } from '@babel/core';
-import { WebpackTranspilerInputParameters } from '@tramvai/plugin-webpack-builder';
+import type { TranspilerInputParameters } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { hasJsxRuntime } from '@tramvai/plugin-base-builder/lib/utils';
 import { getReactCompilerPlugin } from './plugins/react-compiler';
 
@@ -39,7 +39,7 @@ export const configFactory = ({
   reactCompiler = false,
   loose = true,
   externalHelpers = true,
-}: Partial<WebpackTranspilerInputParameters>) => {
+}: Partial<TranspilerInputParameters>) => {
   const cfg = envConfig[env] || {};
 
   const babelConfig: Record<string, any> = {

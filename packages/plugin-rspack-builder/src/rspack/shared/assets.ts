@@ -7,8 +7,9 @@ import type { PathData, RuleSetRule } from '@rspack/core';
 import { Container, optional } from '@tinkoff/dippy';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import { getSvgoOptions } from '@tramvai/plugin-base-builder/lib/shared/assets';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
-import { RSPACK_TRANSPILER_TOKEN, resolveRspackTranspilerParameters } from './transpiler';
+import { resolveRspackTranspilerParameters } from './transpiler';
 
 export const createAssetsRules = ({
   di,

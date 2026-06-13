@@ -14,10 +14,11 @@ import type { ModuleType, ExtendedModule } from '@tinkoff/dippy';
 import { logger } from '@tramvai/api/lib/services/logger';
 import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-base-builder/lib/utils';
 import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
-import { BUILD_MODE_TOKEN, BUILD_TYPE_TOKEN, WEBPACK_TRANSPILER_TOKEN } from '../index';
+import { BUILD_MODE_TOKEN, BUILD_TYPE_TOKEN } from '../index';
 import {
   BUILD_DONE,
   BUILD_FAILED,

@@ -22,21 +22,16 @@ import {
 } from '@tramvai/plugin-base-builder/lib/utils/selfSignedCertificate';
 import { showBanner } from '@tramvai/plugin-base-builder/lib/utils/banner';
 import { SHOW_BANNER_TOKEN } from '@tramvai/api/lib/services/banner';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 import { createDevServer } from './dev-server/dev-server';
-import { RSPACK_TRANSPILER_TOKEN } from './rspack/shared/transpiler';
 
 export {
   BUILD_TYPE_TOKEN,
   BUILD_MODE_TOKEN,
   BUILD_TARGET_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/build-config';
-export { RSPACK_PLUGINS_TOKEN } from './rspack/shared/plugins';
-export {
-  RSPACK_TRANSPILER_TOKEN,
-  RspackTranspiler,
-  RspackTranspilerInputParameters,
-} from './rspack/shared/transpiler';
+export { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 
 export { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 export { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';

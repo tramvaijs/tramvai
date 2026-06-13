@@ -14,7 +14,7 @@ import {
   BUILD_TARGET_TOKEN,
   BUILD_TYPE_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/build-config';
-import { RSPACK_TRANSPILER_TOKEN } from '../rspack/shared/transpiler';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
 export async function initDi(
   config: ConfigService,

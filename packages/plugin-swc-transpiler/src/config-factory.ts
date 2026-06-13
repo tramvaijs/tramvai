@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 
-import { WebpackTranspilerInputParameters } from '@tramvai/plugin-webpack-builder';
+import { TranspilerInputParameters } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import isEmpty from '@tinkoff/utils/is/empty';
 import { sync as resolve } from 'resolve';
 import findCacheDir from 'find-cache-dir';
@@ -9,12 +9,10 @@ import type { Options as SwcOptions } from '@swc/core';
 
 const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasip1';
 
-const NOT_SUPPORTED_FIELDS: (keyof WebpackTranspilerInputParameters)[] = [
-  'enableFillActionNamePlugin',
-];
+const NOT_SUPPORTED_FIELDS: (keyof TranspilerInputParameters)[] = ['enableFillActionNamePlugin'];
 let warningWasShown = false;
 
-export const configFactory = (config: Partial<WebpackTranspilerInputParameters>): SwcOptions => {
+export const configFactory = (config: Partial<TranspilerInputParameters>): SwcOptions => {
   const {
     env = 'development',
     isServer = false,

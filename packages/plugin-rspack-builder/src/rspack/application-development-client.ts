@@ -59,17 +59,14 @@ import {
   getCollectStatsPlugin,
   getMergeStatsPlugin,
 } from '@tramvai/plugin-base-builder/lib/plugins';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 
-import {
-  RSPACK_TRANSPILER_TOKEN,
-  createTranspilerRules,
-  resolveRspackTranspilerParameters,
-} from './shared/transpiler';
+import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
 import { createSplitChunksOptions } from './shared/split-chunks';
 import { getResolveTsConfig } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
-import { RSPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 
 import { RspackConfigurationFactory } from './types/rspack';

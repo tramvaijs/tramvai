@@ -42,19 +42,16 @@ import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/o
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
 import { RuntimePathPlugin, VirtualProtocolPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 
-import {
-  WEBPACK_TRANSPILER_TOKEN,
-  createTranspilerRules,
-  resolveWebpackTranspilerParameters,
-} from './shared/transpiler';
+import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
 import { createStylesConfiguration } from './shared/styles';
 import { createResolveOptions } from './shared/resolve';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createAssetsRules } from './shared/assets';
 import { createServerInlineRules } from './shared/server-inline';
-import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { createCacheConfig } from './shared/cache';
 import { WebpackConfigurationFactory } from './types/webpack';
 

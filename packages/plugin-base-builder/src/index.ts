@@ -1,5 +1,5 @@
 import type { Configuration as WebpackConfiguration } from 'webpack';
-import { DevtoolOption, Extension } from '@tramvai/api/lib/config';
+import type { DevtoolOption, Extension } from '@tramvai/api/lib/config';
 
 /**
  * @title Configure the options on webpack splitChunks

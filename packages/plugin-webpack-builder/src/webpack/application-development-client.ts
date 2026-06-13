@@ -61,17 +61,14 @@ import {
   getMergeStatsPlugin,
   getCollectStatsPlugin,
 } from '@tramvai/plugin-base-builder/lib/plugins';
+import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 
-import {
-  WEBPACK_TRANSPILER_TOKEN,
-  createTranspilerRules,
-  resolveWebpackTranspilerParameters,
-} from './shared/transpiler';
+import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
 import { createStylesConfiguration } from './shared/styles';
 import { createResolveOptions } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
-import { WEBPACK_PLUGINS_TOKEN } from './shared/plugins';
 
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createCacheConfig } from './shared/cache';

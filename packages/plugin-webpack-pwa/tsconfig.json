@@ -20,16 +20,10 @@
             "path": "../api"
         },
         {
-            "path": "../plugin-webpack-builder"
-        },
-        {
             "path": "../tramvai/core"
         },
         {
             "path": "../plugin-base-builder"
-        },
-        {
-            "path": "../plugin-rspack-builder"
         }
     ]
 }

@@ -39,18 +39,15 @@ import {
   RESOLVE_FALLBACK_TOKEN,
   defaultExtensions,
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
-import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 
-import {
-  RSPACK_TRANSPILER_TOKEN,
-  createTranspilerRules,
-  resolveRspackTranspilerParameters,
-} from './shared/transpiler';
+import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
+
 import { getResolveTsConfig } from './shared/resolve';
 import { createServerInlineRules } from './shared/server-inline';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
-import { RSPACK_PLUGINS_TOKEN } from './shared/plugins';
 import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache';
 
 import { RspackConfigurationFactory } from './types/rspack';
