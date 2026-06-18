@@ -32,6 +32,7 @@
     "@tramvai/react": "0.0.0-stub",
     "@tramvai/safe-strings": "0.0.0-stub",
     "@tramvai/tokens-child-app": "0.0.0-stub",
+    "@tramvai/tokens-core": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-router": "0.0.0-stub",
     "@tramvai/tokens-server": "0.0.0-stub"

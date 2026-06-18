@@ -14,6 +14,7 @@ import {
   DISPATCHER_CONTEXT_TOKEN,
   DISPATCHER_TOKEN,
 } from '@tramvai/tokens-common';
+import { ROOT_DI_TOKEN } from '@tramvai/tokens-core';
 import { routeTransformToken } from '../../tokens';
 import { routeTransform } from './routeTransform';
 import { routeSetDefaults } from './routeSetDefaults';
@@ -69,6 +70,7 @@ export const commonTokens: Provider[] = [
       actionRegistry: ACTION_REGISTRY_TOKEN,
       dispatcher: DISPATCHER_TOKEN,
       dispatcherContext: DISPATCHER_CONTEXT_TOKEN,
+      rootDi: ROOT_DI_TOKEN,
     },
   }),
 ];

@@ -21,6 +21,7 @@ import {
   BUNDLE_LIST_TOKEN,
   MODULES_LIST_TOKEN,
   APP_INFO_TOKEN,
+  ROOT_DI_TOKEN,
   COMMAND_LINE_RUNNER_TOKEN,
   TRAMVAI_HOOKS_TOKEN,
   TAPABLE_HOOK_FACTORY_TOKEN,
@@ -109,6 +110,7 @@ export class App {
 
   constructor({ name, modules = [], bundles = {}, actions = [], providers }: AppOptions) {
     this.di = createContainer();
+    this.di.register({ provide: ROOT_DI_TOKEN, useValue: this.di });
     this.modulesToResolve = new Set<ModuleType>();
 
     this.walkOfProviders(appProviders(name, bundles, actions, modules));
