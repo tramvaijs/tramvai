@@ -262,7 +262,9 @@ export default appConfig;`;
             : ['**/node_modules/**', '**/.git/**'],
         }),
     optimization: {
-      emitOnErrors: false,
+      // TODO: in rspack@1 breaks hot-reload
+      // fixed in rspack@2
+      // emitOnErrors: false,
       ...createOptimizeOptions<'rspack'>({ config, target: 'server' }),
     },
     stats: {

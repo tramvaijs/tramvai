@@ -321,7 +321,9 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       uniqueName: `${projectType}:${config.projectName}:${clientBuildName}:${config.projectVersion}`,
     },
     optimization: {
-      emitOnErrors: false,
+      // TODO: in rspack@1 breaks hot-reload
+      // fixed in rspack@2
+      // emitOnErrors: false,
       ...createSplitChunksOptions({ config }),
       ...createOptimizeOptions<'rspack'>({ config, target: 'client' }),
     },
@@ -482,7 +484,9 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       uniqueName: `${projectType}:${config.projectName}:${polyfillBuildName}:${config.projectVersion}`,
     },
     optimization: {
-      emitOnErrors: false,
+      // TODO: in rspack@1 breaks hot-reload
+      // fixed in rspack@2
+      // emitOnErrors: false,
     },
     experiments: {
       futureDefaults: true,
