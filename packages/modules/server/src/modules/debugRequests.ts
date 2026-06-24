@@ -1,7 +1,7 @@
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import { createPapiMethod } from '@tramvai/papi';
 import { SERVER_MODULE_PAPI_PRIVATE_ROUTE } from '@tramvai/tokens-server';
-import { Module, Scope, commandLineListTokens } from '@tramvai/core';
+import { Module, Scope, TRAMVAI_INITED_SYMBOL, commandLineListTokens } from '@tramvai/core';
 import { parse } from '@tinkoff/url';
 import { EventEmitter } from 'events';
 import monkeypatch from '@tinkoff/monkeypatch';
@@ -66,6 +66,10 @@ type RequestWithStatus = DiagnosticsChannel.RequestCreateMessage['request'] & {
         const log = logger('server:node-debug:request');
 
         return function debugHttp() {
+          if (globalThis[TRAMVAI_INITED_SYMBOL]) {
+            return;
+          }
+
           const handler = (request, options, cb) => {
             const parsed = typeof options === 'string' ? parse(options) : options;
             const wasHandled = typeof cb === 'function';

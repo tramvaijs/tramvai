@@ -161,6 +161,12 @@ export default appConfig;`;
   const resolveOptions = await createResolveOptions({ di, mainFields });
   const serverBuildName = 'server';
 
+  const entryPath = resolveAbsolutePathForFile({
+    file: config.entryFile,
+    sourceDir: config.sourceDir,
+    rootDir: config.rootDir,
+  });
+
   return {
     name: serverBuildName,
     // https://webpack.js.org/configuration/target/#browserslist
@@ -170,11 +176,7 @@ export default appConfig;`;
     context: config.rootDir,
     entry: {
       // TODO: more missed files watchers with absolute path?
-      server: resolveAbsolutePathForFile({
-        file: config.entryFile,
-        sourceDir: config.sourceDir,
-        rootDir: config.rootDir,
-      }),
+      server: entryPath,
       // server: './src/index.ts',
     },
     cache: createCacheConfig({
@@ -200,7 +202,7 @@ export default appConfig;`;
       // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
       devtoolNamespace: '@tramvai/cli',
       // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
-      pathinfo: config.inspectBuildProcess,
+      pathinfo: Boolean(config.debugBuild),
     },
     mode: 'development',
     devtool: config.sourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
@@ -239,9 +241,7 @@ export default appConfig;`;
         }
       : (webpackConfigExtension.watchOptions ?? {
           aggregateTimeout: 20,
-          ignored: config.inspectBuildProcess
-            ? ['**/.git/**']
-            : ['**/node_modules/**', '**/.git/**'],
+          ignored: config.debug ? ['**/.git/**'] : ['**/node_modules/**', '**/.git/**'],
         }),
     optimization: {
       emitOnErrors: false,
@@ -320,6 +320,16 @@ export default appConfig;`;
             isServer: true,
           },
         },
+        ...(config.serverHot
+          ? [
+              {
+                test: entryPath,
+                loader: require.resolve(
+                  '@tramvai/plugin-base-builder/lib/loaders/entry-hot-loader'
+                ),
+              },
+            ]
+          : []),
         ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },

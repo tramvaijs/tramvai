@@ -3,6 +3,7 @@ export { createBundle } from './bundles/createBundle';
 export { createAction } from './actions/createActions';
 export * from './actions/declareAction';
 export * from '@tramvai/tokens-core';
+export * from './const';
 
 export {
   DI_TOKEN,

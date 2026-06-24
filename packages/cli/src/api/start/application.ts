@@ -38,6 +38,7 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
     benchmark: options.benchmark,
     buildType: options.buildType,
     noRebuild: options.noRebuild,
+    debug: options.debug ? String(options.debug) : false,
     https: options.https,
     httpsCert: options.httpsCert,
     httpsKey: options.httpsKey,
@@ -45,6 +46,7 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
     analyze: options.analyze,
     port: options.port,
     host: options.host ?? '0.0.0.0',
+    serverHot: options.serverHot,
     rootDir,
     staticPort: options.staticPort,
     staticHost: options.staticHost,
@@ -214,6 +216,9 @@ function mapApplicationProjectToNewConfig(
     if (applicationProject.output.static) {
       mappedProject.output.static = applicationProject.output.static;
     }
+  }
+  if (applicationProject.sourceMap) {
+    mappedProject.sourceMap = applicationProject.sourceMap;
   }
   if (applicationProject.fileSystemPages) {
     mappedProject.fileSystemPages = applicationProject.fileSystemPages;

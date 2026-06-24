@@ -3,7 +3,10 @@
 import path from 'node:path';
 import fs from 'node:fs';
 import { outputFile } from 'fs-extra';
+import WebSocket from 'ws';
+
 import { ApplicationProject } from '@tramvai/api/lib/config';
+
 import { test } from './test.fixture';
 
 const sleep = (ms: number) => {
@@ -482,6 +485,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       name: 'app-refresh',
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'refresh', 'index.tsx'),
+    },
+    'app-server-hot': {
+      name: 'app-server-hot',
+      type: 'application',
+      entryFile: path.join(fixturesFolder, 'application', 'server-hot', 'index.tsx'),
     },
     'app-hmr': {
       name: 'app-hmr',
@@ -1082,7 +1090,7 @@ export default createPapiMethod({
           });
         });
 
-        test.describe('server', () => {
+        test.describe('app-server-custom-host', () => {
           test.use({
             inputParameters: {
               name: 'app-ssr',
@@ -1098,12 +1106,150 @@ export default createPapiMethod({
             },
           });
 
-          test('custom host', async ({ devServer }) => {
+          test('should use custom host', async ({ devServer }) => {
             await devServer.buildPromise;
 
             const response = await (await fetch(`http://localhost:${devServer.port}`)).text();
 
             test.expect(response).toBe(`0.0.0.0:${devServer.port}`);
+          });
+        });
+
+        test.describe('app-disabled-server-hot-reload', () => {
+          const refreshPath = path.join(fixturesFolder, 'application', 'server-hot', 'App.tsx');
+          const initialContent = `export const App = () => {
+  return <div id="container">hello world</div>;
+};
+`;
+          const outputPromise = outputFile(refreshPath, initialContent);
+          test.use({
+            inputParameters: {
+              name: 'app-server-hot',
+              rootDir: testSuiteFolder,
+              debug: true,
+              buildType: 'server',
+              fileCache: false,
+              noRebuild: false,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should disconnect debug session after changes', async ({ devServer }) => {
+            await devServer.buildPromise;
+            await outputPromise;
+
+            // wait for debugger start
+            await sleep(300);
+
+            const response = await fetch('http://127.0.0.1:9229/json/list');
+            const [{ webSocketDebuggerUrl }] = await response.json();
+            let ws;
+            let status;
+
+            await new Promise((resolve) => {
+              ws = new WebSocket(webSocketDebuggerUrl);
+
+              ws.on('error', console.error);
+
+              ws.on('open', function onOpen() {
+                status = 'connected';
+                resolve();
+              });
+
+              ws.on('close', () => {
+                status = 'closed';
+              });
+            });
+
+            const updatedContent = `export const App = () => {
+  return <div id="container">super hello world</div>;
+};
+`;
+
+            await outputFile(refreshPath, updatedContent);
+            // wait for reload
+            await sleep(300);
+
+            await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            // server should be restarted so websocket closed
+            test.expect(status).toBe('closed');
+            ws.close();
+          });
+        });
+
+        test.describe('app-server-hot-reload', () => {
+          const refreshPath = path.join(fixturesFolder, 'application', 'server-hot', 'App.tsx');
+          const initialContent = `export const App = () => {
+  return <div id="container">hello world</div>;
+};
+`;
+          const outputPromise = outputFile(refreshPath, initialContent);
+          test.use({
+            inputParameters: {
+              name: 'app-server-hot',
+              rootDir: testSuiteFolder,
+              debug: true,
+              buildType: 'server',
+              serverHot: true,
+              fileCache: false,
+              noRebuild: false,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should keep debug session connection after changes', async ({ devServer }) => {
+            await devServer.buildPromise;
+            await outputPromise;
+
+            // wait for debugger start
+            await sleep(300);
+
+            const response = await fetch('http://127.0.0.1:9229/json/list');
+            const [{ webSocketDebuggerUrl }] = await response.json();
+            let currentPid;
+            let ws;
+            let status;
+
+            await new Promise((resolve) => {
+              ws = new WebSocket(webSocketDebuggerUrl);
+
+              ws.on('error', console.error);
+
+              ws.on('open', function onOpen() {
+                status = 'connected';
+                resolve();
+              });
+
+              ws.on('close', () => {
+                status = 'closed';
+              });
+            });
+
+            const updatedContent = `export const App = () => {
+  return <div id="container">super hello world</div>;
+};
+`;
+
+            await outputFile(refreshPath, updatedContent);
+            // wait for reload
+            await sleep(300);
+
+            await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            // server should be hot reloaded so websocket connection keep
+            test.expect(status).toBe('connected');
+            ws.close();
           });
         });
       });

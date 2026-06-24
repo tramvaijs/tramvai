@@ -1,4 +1,11 @@
-import { Scope, Module, provide, commandLineListTokens } from '@tramvai/core';
+import {
+  Scope,
+  Module,
+  provide,
+  commandLineListTokens,
+  DI_TOKEN,
+  TRAMVAI_INITED_SYMBOL,
+} from '@tramvai/core';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { UTILITY_SERVER_PATHS } from '@tramvai/tokens-server';
 import {
@@ -42,7 +49,9 @@ export * from '@tramvai/tokens-metrics';
     provide({
       provide: METRICS_MODULE_TOKEN,
       useFactory: ({ registry }): typeof METRICS_MODULE_TOKEN => {
-        collectDefaultMetrics({ register: registry });
+        if (!globalThis[TRAMVAI_INITED_SYMBOL]) {
+          collectDefaultMetrics({ register: registry });
+        }
 
         return {
           counter: (opt) => new Counter({ registers: [registry], ...opt }),
@@ -132,13 +141,19 @@ export * from '@tramvai/tokens-metrics';
     }),
     provide({
       provide: commandLineListTokens.listen,
-      useFactory: ({ metrics }) => {
+      useFactory: ({ metrics, di }) => {
         return () => {
-          eventLoopMetrics(metrics);
+          const clearEventLoopMetrics = eventLoopMetrics(metrics);
+
+          di.register({
+            provide: commandLineListTokens.close,
+            useValue: clearEventLoopMetrics,
+          });
         };
       },
       deps: {
         metrics: METRICS_MODULE_TOKEN,
+        di: DI_TOKEN,
       },
       multi: true,
     }),

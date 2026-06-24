@@ -1,4 +1,4 @@
-import { Module, Scope, provide } from '@tramvai/core';
+import { Module, Scope, commandLineListTokens, provide } from '@tramvai/core';
 import { METRICS_MODULE_TOKEN } from '@tramvai/tokens-metrics';
 import { ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
 import { WEB_FASTIFY_APP_LIMITER_TOKEN } from '@tramvai/tokens-server-private';
@@ -80,6 +80,16 @@ export * from './tokens';
       deps: {
         requestsLimiter: REQUESTS_LIMITER_TOKEN,
         featureEnable: { token: REQUESTS_LIMITER_ACTIVATE_TOKEN, optional: true },
+      },
+    }),
+    provide({
+      provide: commandLineListTokens.close,
+      useFactory:
+        ({ requestsLimiter }) =>
+        () =>
+          requestsLimiter.stop(),
+      deps: {
+        requestsLimiter: REQUESTS_LIMITER_TOKEN,
       },
     }),
     provide({

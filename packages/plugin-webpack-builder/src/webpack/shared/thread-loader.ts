@@ -50,7 +50,7 @@ export const createWorkerPoolConfig = ({ di }: { di: Container }): WorkerPoolCon
     workers: calculateNumberOfWorkers(),
   };
 
-  if (process.env.TRAMVAI_INSPECT_THREAD_LOADER) {
+  if (process.env.TRAMVAI_DEBUG_THREAD_LOADER) {
     const inspectPort = target === 'client' ? '9230' : '9231';
 
     config.workerNodeArgs = ['--inspect-brk', `--inspect=${inspectPort}`];

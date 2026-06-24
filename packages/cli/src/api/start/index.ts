@@ -40,6 +40,7 @@ export type Params = WithConfig<{
   disableServerRunnerWaiting?: boolean;
   noRebuild?: boolean;
   experimentalRspack?: boolean;
+  serverHot?: boolean;
 }>;
 
 export type Result<T extends string = any> = Promise<

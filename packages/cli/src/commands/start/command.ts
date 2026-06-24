@@ -129,6 +129,12 @@ export class StartCommand extends CLICommand<Params> {
       transformer: (value: string) => value !== 'false',
       description: 'Enable new experimental @tramvai/api rspack builder',
     },
+    {
+      name: '--serverHot',
+      value: '[serverHot]',
+      transformer: (value: string) => value !== 'false',
+      description: 'Enable new experimental hot mode for server code',
+    },
   ];
 
   alias = 's';

@@ -244,35 +244,7 @@ Rspack consumes significantly less memory and is, on average, about 2× faster t
 
 ## Build performance analysis
 
-Tramvai includes special tooling for evaluating build performance via the commands `analyze` and `benchmark`.
-
-### Analyze
-
-`tramvai start --analyze=<plugin>`
-
-Allowed plugin values: `rsdoctor`, `statoscope`, `bundle`, `whybundler`.
-
-To analyze build performance, use `rsdoctor`
-
-It shows statistics for all major build stages and detailed timing information for loaders and plugins.
-
-`Rsdoctor` works as a Webpack plugin and adds a small overhead to the build time. However, the Tramvai configuration of `rsdoctor` is heavily optimized and adds only about 5-7%.
-
-You can also run `analyze` with the `build` command:
-
-`tramvai build --analyze=rsdoctor`
-
-### Benchmark
-
-`tramvai bencmark <command>`
-
-Allowed values: `start`, `build`
-
-`benchmark` provides more reliable measurements of current build performance.
-
-By default, the build runs 3 times. Major build stages and the slowest loaders/plugins are measured, and then the results are averaged.
-
-This produces less volatile timing data, which you can use to make informed decisions.
+[Complete guide to build performance analysis](03-features/015-build/07-debug.md)
 
 ## Known build performance issues
 

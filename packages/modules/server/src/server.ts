@@ -47,6 +47,7 @@ import * as modules from './modules';
 import { ServerResponseTaskManager } from './server/taskManager';
 import { providers as etagProviders } from './server/etag/providers';
 import { FormActionResultStore } from './formActionStore';
+import { SIGNALS } from './modules/const';
 
 export * from '@tramvai/tokens-server';
 export { FormActionResultStore, setFormActionResult } from './formActionStore';
@@ -261,6 +262,20 @@ EventEmitter.defaultMaxListeners = 50;
       provide: SERVER_RESPONSE_TASK_MANAGER,
       scope: Scope.REQUEST,
       useClass: ServerResponseTaskManager,
+    }),
+    provide({
+      provide: commandLineListTokens.close,
+      useFactory: ({ server }) => {
+        return function clear() {
+          server.close();
+          SIGNALS.forEach((signal) => {
+            process.removeAllListeners(signal);
+          });
+        };
+      },
+      deps: {
+        server: SERVER_TOKEN,
+      },
     }),
   ],
 })

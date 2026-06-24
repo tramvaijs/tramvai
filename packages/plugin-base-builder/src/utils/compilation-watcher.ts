@@ -27,7 +27,6 @@ export class CompilationWatcher {
   }
 
   destroyCompilation() {
-    console.log('destroy compilation');
     this.compilationAlive = false;
   }
 }

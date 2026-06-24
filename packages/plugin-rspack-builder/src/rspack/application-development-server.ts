@@ -134,6 +134,12 @@ export default appConfig;`;
 
   const sourceMapsConfiguration = createSourceMaps<'rspack'>({ config, target: 'server' });
 
+  const entryPath = resolveAbsolutePathForFile({
+    file: config.entryFile,
+    sourceDir: config.sourceDir,
+    rootDir,
+  });
+
   return {
     name: 'server',
     target: normalizedBrowserslistConfig.node
@@ -141,11 +147,7 @@ export default appConfig;`;
       : 'node',
     context: rootDir,
     entry: {
-      server: resolveAbsolutePathForFile({
-        file: config.entryFile,
-        sourceDir: config.sourceDir,
-        rootDir,
-      }),
+      server: entryPath,
     },
     devtool: config.sourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
     node: {
@@ -172,7 +174,7 @@ export default appConfig;`;
       // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
       devtoolNamespace: '@tramvai/cli',
       // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
-      pathinfo: config.inspectBuildProcess,
+      pathinfo: Boolean(config.debugBuild),
     },
     mode: 'development',
     // TODO: research why this list?
@@ -250,6 +252,16 @@ export default appConfig;`;
             isServer: true,
           },
         },
+        ...(config.serverHot
+          ? [
+              {
+                test: entryPath,
+                loader: require.resolve(
+                  '@tramvai/plugin-base-builder/lib/loaders/entry-hot-loader'
+                ),
+              },
+            ]
+          : []),
         ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
@@ -259,9 +271,7 @@ export default appConfig;`;
         }
       : (rspackConfigExtension.watchOptions ?? {
           aggregateTimeout: 20,
-          ignored: config.inspectBuildProcess
-            ? ['**/.git/**']
-            : ['**/node_modules/**', '**/.git/**'],
+          ignored: config.debugBuild ? ['**/.git/**'] : ['**/node_modules/**', '**/.git/**'],
         }),
     optimization: {
       emitOnErrors: false,

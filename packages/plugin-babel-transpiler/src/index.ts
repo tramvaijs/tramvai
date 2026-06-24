@@ -24,8 +24,8 @@ export const BabelTranspilerPlugin = declareModule({
             process.env.TRAMVAI_DISABLE_THREAD_LOADER === 'true'
               ? false
               : // TODO: maybe just a config parameter?
-                !!process.env.TRAMVAI_INSPECT_THREAD_LOADER ||
-                (!config.inspectBuildProcess && !process.env.TRAMVAI_CPU_PROFILE),
+                !!process.env.TRAMVAI_DEBUG_THREAD_LOADER ||
+                (!config.debug && !process.env.TRAMVAI_CPU_PROFILE),
           // TODO: research, when warmup really useful?
           // can't find a big difference on a small project with one thread-loader worker
           // TODO: maybe just a config parameter?

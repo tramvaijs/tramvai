@@ -64,7 +64,6 @@ const IS_CUSTOM_SERVER_TOKEN = createToken<boolean>('server utility isCustomServ
         server: UTILITY_SERVER_TOKEN,
       },
     }),
-
     provide({
       provide: commandLineListTokens.listen,
       multi: true,
@@ -98,6 +97,16 @@ const IS_CUSTOM_SERVER_TOKEN = createToken<boolean>('server utility isCustomServ
         port: UTILITY_SERVER_PORT_TOKEN,
         app: UTILITY_WEB_FASTIFY_APP_TOKEN,
         server: UTILITY_SERVER_TOKEN,
+      },
+    }),
+    provide({
+      provide: commandLineListTokens.close,
+      useFactory:
+        ({ utilityServer }) =>
+        () =>
+          utilityServer.close(),
+      deps: {
+        utilityServer: UTILITY_SERVER_TOKEN,
       },
     }),
   ],

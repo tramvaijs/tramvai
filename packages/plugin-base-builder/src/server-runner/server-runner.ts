@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import '../utils/inspector';
 import '../utils/cpu-profile';
 // speed up sequential server.js compilations after restarts
@@ -7,17 +8,21 @@ import path from 'node:path';
 import { parentPort, workerData } from 'node:worker_threads';
 import { Module } from 'node:module';
 import { AddressInfo, Server } from 'node:net';
-import { subscribe, unsubscribe } from 'node:diagnostics_channel';
+import { subscribe } from 'node:diagnostics_channel';
 import { logger } from '@tramvai/api/lib/services/logger';
+// eslint-disable-next-line no-restricted-imports
+import { TRAMVAI_INITED_SYMBOL } from '@tramvai/core/lib/const';
 
 import {
   APPLICATION_SERVER_STARTED,
   APPLICATION_SERVER_START_FAILED,
   COMPILE,
   EXIT,
+  RELOAD,
   ServerRunnerIncomingEventsPayload,
   ServerRunnerOutgoingEventsPayload,
 } from './events';
+import { ServerRunnerWorkerData } from './worker-bridge';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
@@ -37,20 +42,19 @@ const requireFromString = (code: string, filename: string) => {
 
 const warmupModules = ['fastify'];
 
+let serverRuntime: any;
+
 interface NetServerListenAsyncEndMessage {
   server: Server;
 }
 
 const originalAddress = Server.prototype.address;
 const originalListen = Server.prototype.listen;
-const initListenHandler = (onListen: (port: number | undefined) => boolean) => {
+const initListenHandler = (onListen: (port: number | undefined) => void) => {
   const listenHandler = (msg: unknown) => {
     const address = <AddressInfo>(<NetServerListenAsyncEndMessage>msg).server.address();
     const { port } = address;
-
-    if (onListen(port)) {
-      unsubscribe('tracing:net.server.listen:asyncEnd', listenHandler);
-    }
+    onListen(port);
   };
 
   subscribe('tracing:net.server.listen:asyncEnd', listenHandler);
@@ -99,7 +103,8 @@ function monkeyPatchCWD(cwd: string) {
 }
 
 async function runServer() {
-  const { port, proxyPort, disableServerRunnerWaiting, cwd } = workerData;
+  const { port, proxyPort, disableServerRunnerWaiting, cwd, hotReload } =
+    workerData as ServerRunnerWorkerData;
   process.env.PORT = String(proxyPort);
 
   monkeyPatchPort(port);
@@ -110,26 +115,54 @@ async function runServer() {
       parentPort!.postMessage({
         event: APPLICATION_SERVER_STARTED,
       } as ServerRunnerOutgoingEventsPayload['application-server-started']);
-
-      // we can open different port for metrics, so unsubscribe only when our port is started
-      return true;
     }
-    return false;
   });
 
   parentPort?.on(
     'message',
-    (message: ServerRunnerIncomingEventsPayload[keyof ServerRunnerIncomingEventsPayload]) => {
+    async (message: ServerRunnerIncomingEventsPayload[keyof ServerRunnerIncomingEventsPayload]) => {
       switch (message.event) {
+        case RELOAD: {
+          logger.event({
+            type: 'debug',
+            event: 'server-runner-worker',
+            message: 'Reload server runner worker',
+          });
+
+          try {
+            const app = await serverRuntime.app;
+            app.di.get('commandLineRunner').run('server', 'close');
+            serverRuntime = requireFromString(message.code, 'server.js');
+          } catch (err) {
+            console.error(err);
+
+            logger.event({
+              type: 'info',
+              event: 'server-runner-worker',
+              message: 'Failed to dispose already running server instance',
+            });
+
+            parentPort!.postMessage({
+              event: APPLICATION_SERVER_START_FAILED,
+            } as ServerRunnerOutgoingEventsPayload['application-server-start-failed']);
+          }
+          break;
+        }
+        // eslint-disable-next-line no-fallthrough
         case COMPILE: {
           try {
             // TODO: real filename
-            requireFromString(message.code, 'server.js');
+            serverRuntime = requireFromString(message.code, 'server.js');
 
             if (disableServerRunnerWaiting) {
               parentPort!.postMessage({
                 event: APPLICATION_SERVER_STARTED,
               } as ServerRunnerOutgoingEventsPayload['application-server-started']);
+            }
+
+            if (hotReload) {
+              // @ts-expect-error
+              globalThis[TRAMVAI_INITED_SYMBOL] = true;
             }
 
             logger.event({

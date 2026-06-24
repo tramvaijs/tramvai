@@ -98,6 +98,7 @@ export function createDevServer({
         workerPath: serverRunnerWorkerPath,
         workerData: {
           port: serverRunnerPort,
+          hotReload: config.serverHot,
           cwd: config.rootDir,
           proxyPort: portManager.port!,
           disableServerRunnerWaiting: config.disableServerRunnerWaiting,
@@ -133,10 +134,12 @@ export function createDevServer({
             }
           );
 
-          if (!initialServerBuild) {
-            await createServerRunnerWorker();
-          } else {
-            initialServerBuild = false;
+          if (!config.serverHot) {
+            if (!initialServerBuild) {
+              await createServerRunnerWorker();
+            } else {
+              initialServerBuild = false;
+            }
           }
 
           await tracer.wrap(
@@ -145,7 +148,23 @@ export function createDevServer({
               category: ['plugin-rspack-builder'],
               tid: SERVER_RUNNER_TID,
             },
-            () => {
+            async () => {
+              if (config.serverHot) {
+                if (initialServerBuild) {
+                  initialServerBuild = false;
+                  return serverRunnerWorker.compile({ code });
+                }
+
+                try {
+                  await serverRunnerWorker.reload({ code });
+                  return;
+                } catch (_err) {
+                  // fallback to compile if reload failed
+                  await createServerRunnerWorker();
+                  return serverRunnerWorker.compile({ code });
+                }
+              }
+
               return serverRunnerWorker.compile({ code });
             }
           );

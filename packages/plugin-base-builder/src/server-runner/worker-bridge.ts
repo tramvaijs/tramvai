@@ -10,6 +10,7 @@ import {
   APPLICATION_SERVER_START_FAILED,
   COMPILE,
   EXIT,
+  RELOAD,
   ServerRunnerIncomingEventsPayload,
   ServerRunnerOutgoingEventsPayload,
 } from './events';
@@ -20,6 +21,7 @@ export type ServerRunnerWorkerData = {
   proxyPort: number;
   disableServerRunnerWaiting: boolean;
   cwd: string;
+  hotReload?: boolean;
 };
 
 export class ServerRunnerWorkerBridge {
@@ -54,8 +56,8 @@ export class ServerRunnerWorkerBridge {
       FORCE_COLOR: '1',
     };
 
-    if (process.env.TRAMVAI_INSPECT_SERVER_RUNTIME || this.#config.inspectServerRuntime) {
-      env.INSPECT_WORKER_THREAD = 'break';
+    if (this.#config.debug) {
+      env.INSPECT_WORKER_THREAD = this.#config.debug;
       env.INSPECT_WORKER_THREAD_PORT = '9229';
     }
     if (process.env.TRAMVAI_CPU_PROFILE) {
@@ -72,7 +74,7 @@ export class ServerRunnerWorkerBridge {
       execArgv: [],
       // `--inspect` and `--inspect-brk` for `worker_threads` only in Node.js >= 24.1 - https://github.com/nodejs/node/pull/56759
       // execArgv:
-      //   process.env.TRAMVAI_INSPECT_SERVER_RUNTIME || this.#config.inspectServerRuntime
+      //   process.env.TRAMVAI_DEBUG || this.#config.debug
       //     ? ['--inspect-brk', `--inspect=9229`]
       //     : [],
     });
@@ -129,6 +131,28 @@ export class ServerRunnerWorkerBridge {
         } as ServerRunnerIncomingEventsPayload['exit']);
       });
     }
+  }
+
+  async reload(payload: { code: string }) {
+    return new Promise<void>((resolve, reject) => {
+      this.#worker?.once(
+        'message',
+        (data: ServerRunnerOutgoingEventsPayload[keyof ServerRunnerOutgoingEventsPayload]) => {
+          if (data.event === APPLICATION_SERVER_STARTED) {
+            resolve();
+          }
+
+          if (data.event === APPLICATION_SERVER_START_FAILED) {
+            reject();
+          }
+        }
+      );
+
+      this.#worker?.postMessage({
+        event: RELOAD,
+        code: payload.code,
+      } as ServerRunnerIncomingEventsPayload['reload']);
+    });
   }
 
   async compile(payload: { code: string }) {

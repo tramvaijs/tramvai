@@ -248,16 +248,15 @@ export type InputParameters = {
    */
   noClientRebuild?: boolean;
   /**
-   * @description Inspect server.js process
+   * @description Debug server.js process
    * @default false
    */
-  inspectServerRuntime?: boolean;
-  // TODO: separate inspect for client and server build?
+  debug?: string | false;
   /**
-   * @description Inspect build process
+   * @description Debug build process
    * @default false
    */
-  inspectBuildProcess?: boolean;
+  debugBuild?: string | false;
   /**
    * @description Verbose build logging
    * @default false
@@ -293,6 +292,11 @@ export type InputParameters = {
    * @default false
    */
   disableWebSocketServer?: boolean;
+  /**
+   * Enable experimental server hot reload
+   * @default false
+   */
+  serverHot?: boolean;
 };
 
 export type Project = ApplicationProject | ChildAppProject;
@@ -661,14 +665,20 @@ export class ConfigService {
     return this.#parameters.resolveSymlinks ?? true;
   }
 
-  get inspectServerRuntime() {
-    return this.#parameters.inspectServerRuntime ?? false;
+  get debug() {
+    return process.env.TRAMVAI_DEBUG
+      ? process.env.TRAMVAI_DEBUG
+      : (this.#parameters.debug ?? false);
   }
 
-  get inspectBuildProcess() {
-    return process.env.TRAMVAI_INSPECT_BUILD_PROCESS
-      ? process.env.TRAMVAI_INSPECT_BUILD_PROCESS === 'true'
-      : (this.#parameters.inspectBuildProcess ?? false);
+  get serverHot() {
+    return this.#parameters.serverHot;
+  }
+
+  get debugBuild() {
+    return process.env.TRAMVAI_DEBUG_BUILD
+      ? process.env.TRAMVAI_DEBUG_BUILD
+      : (this.#parameters.debugBuild ?? false);
   }
 
   get verboseLogging() {
