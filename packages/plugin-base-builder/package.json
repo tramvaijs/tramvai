@@ -12,10 +12,16 @@
     "watch": "tsc -w"
   },
   "dependencies": {
+    "@babel/generator": "^7.28.5",
+    "@babel/parser": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "@babel/traverse": "^7.28.5",
+    "@babel/types": "^7.29.0",
     "@rsdoctor/webpack-plugin": "^1.5.4",
     "@tinkoff/dippy": "^1.0.0",
     "@tinkoff/utils": "^2.1.1",
     "@tramvai/api": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
     "ansi-escapes": "^4.3.2",
     "boxen": "^4.2.0",
     "browserslist": "^4.28.1",

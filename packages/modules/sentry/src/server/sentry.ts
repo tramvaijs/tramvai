@@ -4,6 +4,10 @@ import { SENTRY_METHODS } from '../shared/constants';
 import type { Sentry } from '../types.h';
 
 export function createSentry(): Sentry {
+  if (globalThis.sentry) {
+    return globalThis.sentry;
+  }
+
   const SentrySdk = require('@sentry/node');
 
   const sentry = SENTRY_METHODS.reduce((api, method) => {
@@ -17,6 +21,8 @@ export function createSentry(): Sentry {
   };
 
   sentry.forceLoad = noop;
+
+  globalThis.sentry = sentry;
 
   return sentry;
 }

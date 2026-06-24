@@ -19,6 +19,9 @@
     "references": [
         {
             "path": "../api"
+        },
+        {
+            "path": "../tramvai/core"
         }
     ]
 }

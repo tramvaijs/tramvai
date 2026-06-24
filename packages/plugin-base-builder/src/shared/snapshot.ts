@@ -7,7 +7,7 @@ export const createSnapshot = ({
 }: {
   config: ConfigService;
 }): Configuration['snapshot'] => {
-  return config.inspectBuildProcess
+  return config.debugBuild
     ? {
         // allow to debug node_modules
         managedPaths: [],

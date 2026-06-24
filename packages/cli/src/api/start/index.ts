@@ -41,6 +41,7 @@ export type Params = WithConfig<{
   noRebuild?: boolean;
   experimentalWebpackWorkerThreads?: boolean;
   experimentalRspack?: boolean;
+  serverHot?: boolean;
 }>;
 
 export type Result<T extends string = any> = Promise<

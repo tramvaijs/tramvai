@@ -1,5 +1,6 @@
 import monkeypatch from '@tinkoff/monkeypatch';
 import type { ModuleConfig } from '@tramvai/tokens-metrics';
+import { TRAMVAI_INITED_SYMBOL } from '@tramvai/core';
 import { DEFAULT_BUCKETS } from '../constants';
 import type {
   MetricsModule,
@@ -26,6 +27,10 @@ export const initRequestsMetrics = ({
   getServiceName: GetServiceName;
   config: ModuleConfig;
 }) => {
+  if (globalThis[TRAMVAI_INITED_SYMBOL]) {
+    return;
+  }
+
   const metricsInstances: MetricsInstances = {
     requestsTotal: metrics.counter({
       name: 'http_sent_requests_total',

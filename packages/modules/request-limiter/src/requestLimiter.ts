@@ -56,6 +56,7 @@ export class RequestLimiter {
   private maxEventLoopDelay: number;
   private eventLoopHistogram: IntervalHistogram;
   private metrics: RequestsLimiterMetrics;
+  private timer: NodeJS.Timeout;
 
   constructor(options: RequestLimiterOptions, metrics: RequestsLimiterMetrics) {
     const { limit, queue, maxEventLoopDelay, error } = options;
@@ -70,8 +71,8 @@ export class RequestLimiter {
     this.metrics.collectQueueLimit(this.queueLimit);
     this.eventLoopHistogram = monitorEventLoopDelay({ resolution });
     this.eventLoopHistogram.enable();
-    const timer = setInterval(() => this.nextTick(), 1000);
-    timer.unref();
+    this.timer = setInterval(() => this.nextTick(), 1000);
+    this.timer.unref();
   }
 
   onResponse() {
@@ -145,6 +146,10 @@ export class RequestLimiter {
     });
 
     next();
+  }
+
+  stop() {
+    clearInterval(this.timer);
   }
 }
 

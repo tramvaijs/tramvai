@@ -142,46 +142,6 @@ Option `dedupe` controls the settings of plugin for the deduplication process. A
 - `"equality"` - uses strict version comparison. Dedupes modules in `node_modules` with equal package version that are imported from different sources. E.g. imports for `node_modules/package/index.js` and `node_modules/nested-package/node_modules/package/index.js` are deduped into a single `node_modules/package/index.js` import whilst without dedupe it will bundle two files as separate modules.
 - `"semver"` - compares version of packages based on semver. It can dedupe all of the imports with the same major version and any of the minor and patch versions. E.g. next versions will be deduped: from `1.14.0` and `1.16.2` to `1.16.2`, from `0.14.1` and `0.16.5` to `0.16.5`, whilst versions `0.0.2` and `0.0.5` will be left without deduplication.
 
-### Debug an app
-
-While developing sometimes it is needed to debug nodejs app directly so see CPU, memory consumptions etc. To do it the options `--debug` might be passed to commands `start` and `start-prod` which do next:
-
-- enables source maps for build on client and server
-- starts the server process with the flag [`--inspect`](https://nodejs.org/ru/docs/guides/debugging-getting-started/).
-
-After that you can open debugger in the chrome devtools - `chrome://inspect`
-
-#### Webpack Logs
-
-It is possible to get verbose output almost on every cli command where it is using webpack.
-
-To do this, you should pass `--verboseWebpack` option to command. Check availability of option with help command.
-
-It will pass `{ logging: 'verbose', loggingDebug: true }` to webpack stats config.  
-Also, it will turn on [infrastructureLogging](https://webpack.js.org/configuration/other-options/#infrastructurelogging) for webpack with options `{ level: 'verbose', debug: true }`.
-
-#### Source Maps
-
-`webpack` offers several kind of [sourcemap qualities](https://webpack.js.org/configuration/devtool/#qualities). Some of the examples are:
-
-1. Source code - the code before transpilation and bundling. Snapshot of the source code, splitted by modules
-2. Transformed code - the code after transpilation by loaders (etc. babel-loader), splitted by modules
-3. Generated code - the code after transpilation and bundling, splitted by modules. Every import and exported are replaced by webpack wrapper code
-
-For development source maps for transformed or generated code is used as it is more performant and shows the exact code that is executed in the target environment. The main differences from the debugging without sourcemaps is that code has links to modules to original source files.
-
-`tramvai` generates big single bundle with server code and that's why it is preferred to not include sourcemaps in the code itself and put it to the separate `.js.map` file.
-
-##### Development
-
-By default in development mode for browser is used the fastest sourcemaps (`devtool: "eval"` in webpack config), while for server no sourcemaps is used.
-
-Flag `--debug` enables sourcemap generation for the client and server code.
-
-Also, `tramvai.json` option [`sourceMap`](references/cli/start.md#enable-sourcemaps-in-dev-mode) enables sourcemap generation both for browser and server code.
-
-Also, `tramvai.json` option [`webpack`](references/cli/start.md#enable-sourcemaps-in-dev-mode) allows set one of the following values for the `devtool` option in webpack config: `eval-cheap-module-source-map`, `eval-cheap-source-map`, `eval-source-map` - both for browser and server code.
-
 ##### Production
 
 By default, sourcemaps are disabled both for the client and server code in production mode.
@@ -195,6 +155,12 @@ Also, `tramvai.json` option [`sourceMap`](references/cli/build.md#enable-sourcem
 Configuration is provided through json-file with the name `tramvai.json` in the root of the single-application/monorepo
 
 ## How to
+
+### Debug tramvai
+
+[Debug tramvai runtime](guides/debugging.md)
+
+[Debug tramvai/build](03-features/015-build/07-debug.md)
 
 ### Code generation
 
@@ -218,43 +184,6 @@ For the quick start of new project you can use command `tramvai new` that will g
 - choose options based on your preferences: monorepo or multirepo, CI integration and testing framework
 
 After command execution and dependency installation new project will be ready to use
-
-### How to run nodejs app in debug mode?
-
-Add flag `--debug` when running app
-
-```sh
-tramvai start my-app --debug
-```
-
-Then open chrome devTools, click on NodeJs logo in the upper left corner. New window with the nodejs devtools will be opened that allows to debug memory and cpu usage, debug code and take the performance profiles.
-
-Also `--debug` supports `wait` and `break` values for `--inspect` ([doc](https://nodejs.org/en/learn/getting-started/debugging#command-line-options)).
-
-```sh
-tramvai start my-app --debug=wait
-```
-
-Will start tramvai with `--inspect-wait`.
-
-### Get details for deprecated and warning logs
-
-It might be useful to get the stacktraces of some of the warnings.
-
-E.g., while running app if you see logs like this
-
-```
-(node:2898) DeprecationWarning: ...
-(Use `node --trace-deprecation ...` to show where the warning was created)
-```
-
-You may add flag `--trace` in order to run nodejs server with the [additional options](https://nodejs.org/dist/latest-v14.x/docs/api/cli.html#cli_trace_warnings).
-
-```sh
-tramvai start my-app --trace
-```
-
-After that these logs will be printed with their stacktraces
 
 ### How to use browserstack for testing
 
@@ -292,55 +221,3 @@ You can use `NODE_OPTIONS` env variable, e.g.:
 ```bash
 NODE_OPTIONS="--max-semi-space-size=64" tramvai start-prod {appName}
 ```
-
-### How to debug webpack build?
-
-For webpack build debug use `TRAMVAI_DEBUG_BUILD` env variable.
-
-```bash
-TRAMVAI_DEBUG_BUILD=1 tramvai build {appName}
-```
-
-You can also change the inspect command.
-
-```bash
-TRAMVAI_DEBUG_BUILD=wait tramvai build {appName}
-```
-
-Equal to `--inspect-wait`.
-
-```bash
-TRAMVAI_DEBUG_BUILD=break tramvai build {appName}
-```
-
-Equal to `--inspect-break`.
-
-### How to get CPU profile of @tramvai/cli work?
-
-Run application server or production build with env variable `TRAMVAI_CPU_PROFILE`:
-
-```bash
-TRAMVAI_CPU_PROFILE=1 tramvai build {appName}
-```
-
-Then, file with `tramvai-cli.${Date.now()}.cpuprofile` name will be generated in current working directory.
-
-You can open this trace in Chrome DevTools - `chrome://inspect`, "Open dedicated DevTools for Node", `Performance` tab.
-
-### How to enable production profiling for React
-
-```bash
-TRAMVAI_REACT_PROFILE=1 tramvai build {appName}
-# or
-TRAMVAI_REACT_PROFILE=1 tramvai start-prod {appName}
-```
-
-After that, you can use the React DevTools Profiler in the same way as you would in development.
-
-WARNING: The size of the bundle will be larger, because mangling is disabled for such builds. Do not use this env variable for production environment.
-
-Documentation:
-
-- [How to use React Profiler](https://legacy.reactjs.org/blog/2018/09/10/introducing-the-react-profiler.html)
-- [Introducing a new React profiler (React 18)](https://github.com/reactwg/react-18/discussions/76)
-- [React DevTools tutorial](https://react-devtools-tutorial.vercel.app/)

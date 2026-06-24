@@ -44,6 +44,7 @@ import { staticAppCommand } from './server/static';
 import { xHeadersFactory } from './server/xHeaders';
 import * as modules from './modules';
 import { ServerResponseTaskManager } from './server/taskManager';
+import { SIGNALS } from './modules/const';
 
 export * from '@tramvai/tokens-server';
 
@@ -218,6 +219,20 @@ EventEmitter.defaultMaxListeners = 50;
       provide: SERVER_RESPONSE_TASK_MANAGER,
       scope: Scope.REQUEST,
       useClass: ServerResponseTaskManager,
+    }),
+    provide({
+      provide: commandLineListTokens.close,
+      useFactory: ({ server }) => {
+        return function clear() {
+          server.close();
+          SIGNALS.forEach((signal) => {
+            process.removeAllListeners(signal);
+          });
+        };
+      },
+      deps: {
+        server: SERVER_TOKEN,
+      },
     }),
   ],
 })

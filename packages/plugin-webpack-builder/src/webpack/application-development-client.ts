@@ -231,7 +231,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       // by default `devtoolNamespace` value is `uniqueName`, but with new `uniqueName` eval sourcemaps are broken
       devtoolNamespace: '@tramvai/cli',
       // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
-      pathinfo: config.inspectBuildProcess,
+      pathinfo: Boolean(config.debugBuild),
     },
     stats: {
       preset: 'errors-warnings',
@@ -270,9 +270,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
         }
       : (webpackConfigExtension.watchOptions ?? {
           aggregateTimeout: 20,
-          ignored: config.inspectBuildProcess
-            ? ['**/.git/**']
-            : ['**/node_modules/**', '**/.git/**'],
+          ignored: config.debugBuild ? ['**/.git/**'] : ['**/node_modules/**', '**/.git/**'],
         }),
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     // TODO: check is it configuration optimal?

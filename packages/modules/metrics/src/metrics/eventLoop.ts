@@ -6,6 +6,7 @@ const RESOLUTION = 100;
 
 function startEventLoopLagMeasure(histogram: Histogram<string>) {
   let start = process.hrtime();
+  let currentTimer: NodeJS.Timeout;
 
   const measure = () => {
     const delta = process.hrtime(start);
@@ -15,10 +16,14 @@ function startEventLoopLagMeasure(histogram: Histogram<string>) {
 
     histogram.observe(lag / 1e3);
     start = process.hrtime();
-    setTimeout(measure, RESOLUTION).unref();
+    currentTimer = setTimeout(measure, RESOLUTION).unref();
   };
 
-  setTimeout(measure, RESOLUTION).unref();
+  currentTimer = setTimeout(measure, RESOLUTION).unref();
+
+  return () => {
+    clearTimeout(currentTimer);
+  };
 }
 
 export const eventLoopMetrics = (metrics: Metrics) => {
@@ -28,5 +33,5 @@ export const eventLoopMetrics = (metrics: Metrics) => {
     buckets: [0.01, 0.02, 0.1, 0.2, 0.5, 1, 3, 5, 7.5, 10],
   });
 
-  startEventLoopLagMeasure(histogram);
+  return startEventLoopLagMeasure(histogram);
 };
