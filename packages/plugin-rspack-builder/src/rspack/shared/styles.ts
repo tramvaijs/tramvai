@@ -33,11 +33,13 @@ export const createStylesConfiguration = ({
   di,
   emitCssChunks,
   extractCssPluginOptions,
+  sourceMap,
   browserslistConfig,
   buildTarget,
 }: {
   di: Container;
   emitCssChunks: boolean;
+  sourceMap: boolean;
   extractCssPluginOptions: CssExtractRspackPluginOptions;
   browserslistConfig: string[];
   buildTarget: 'client' | 'server';
@@ -87,7 +89,7 @@ export const createStylesConfiguration = ({
             loader: 'css-loader',
             options: {
               modules: cssModulesOptions,
-              sourceMap: config.sourceMap,
+              sourceMap,
               importLoaders: 1,
               esModule: false,
             },
@@ -102,7 +104,7 @@ export const createStylesConfiguration = ({
             : {
                 loader: 'postcss-loader',
                 options: {
-                  sourceMap: config.sourceMap,
+                  sourceMap,
                   postcssOptions: getPostCssOptions(config),
                 },
               },
@@ -120,14 +122,14 @@ export const createStylesConfiguration = ({
           {
             loader: 'css-loader',
             options: {
-              sourceMap: config.sourceMap,
+              sourceMap,
               esModule: false,
             },
           },
           {
             loader: 'postcss-loader',
             options: {
-              sourceMap: config.sourceMap,
+              sourceMap,
               postcssOptions: {
                 plugins: [
                   // imageSetPolyfill,
@@ -141,7 +143,7 @@ export const createStylesConfiguration = ({
           {
             loader: 'less-loader',
             options: {
-              sourceMap: config.sourceMap,
+              sourceMap,
               lessOptions: {
                 globalVars: {
                   mediaDesktop: mediaVars.DESKTOP,

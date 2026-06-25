@@ -6,7 +6,6 @@ import VirtualModulesPlugin from 'webpack-virtual-modules';
 
 import flatten from '@tinkoff/utils/array/flatten';
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
-import { safeRequireResolve } from '@tramvai/api/lib/utils/require';
 import { optional } from '@tinkoff/dippy';
 import {
   resolveAbsolutePathForFile,
@@ -85,7 +84,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 }): Promise<Configuration> => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
-  const { verboseLogging, hotRefresh, noServerRebuild } = config;
+  const { verboseLogging, hotRefresh, noServerRebuild, serverSourceMap } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noServerRebuild;
 
@@ -119,6 +118,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     di,
     // we don't need the css on server, but it's needed to generate proper classnames in js
     emitCssChunks: false,
+    sourceMap: serverSourceMap,
     browserslistConfig: normalizedBrowserslistConfig.node,
     extractCssPluginOptions: {
       filename: 'server.css',
@@ -179,6 +179,10 @@ export default appConfig;`;
       server: entryPath,
       // server: './src/index.ts',
     },
+    // devServer: false disables serving the built files through the development server and emits them to the file system instead
+    // https://github.com/webpack/webpack-dev-middleware/blob/v7.4.2/src/utils/setupOutputFileSystem.js#L53
+    // Wrong typings for devServer options
+    ...((serverSourceMap ? { devServer: false } : {}) as webpack.Configuration['devServer']),
     cache: createCacheConfig({
       config,
       additionalCacheFlags,
@@ -192,7 +196,7 @@ export default appConfig;`;
         port: config.staticPort,
         protocol: config.httpProtocol,
       })}${resolvePublicPathDirectory(config.outputServer)}`,
-      filename: 'server.js',
+      filename: config.outputServerFilename,
       library: {
         type: 'commonjs2',
       },
@@ -203,9 +207,14 @@ export default appConfig;`;
       devtoolNamespace: '@tramvai/cli',
       // disable by default for better performance - https://webpack.js.org/guides/build-performance/#output-without-path-info
       pathinfo: Boolean(config.debugBuild),
+      ...(serverSourceMap
+        ? {
+            devtoolModuleFilenameTemplate: sourceMapsConfiguration.devtoolModuleFilenameTemplate,
+          }
+        : {}),
     },
     mode: 'development',
-    devtool: config.sourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
+    devtool: serverSourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
     node: {
       // TODO https://github.com/tramvaijs/tramvai/-/commit/c3f3db838fd711ee7a53a84f5bd832cdeebc293a
       // __dirname: false
@@ -287,6 +296,7 @@ export default appConfig;`;
       },
       unsafeCache: true,
       rules: [
+        ...(serverSourceMap ? sourceMapsConfiguration.rules : []),
         // *.inline files rules should be before the transpiler rules
         ...createServerInlineRules({ di }),
         ...createTranspilerRules({
@@ -328,7 +338,6 @@ export default appConfig;`;
               },
             ]
           : []),
-        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
     plugins: [

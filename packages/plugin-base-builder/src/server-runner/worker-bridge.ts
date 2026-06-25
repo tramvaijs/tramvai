@@ -20,6 +20,8 @@ export type ServerRunnerWorkerData = {
   env?: Record<string, string>;
   proxyPort: number;
   disableServerRunnerWaiting: boolean;
+  serverPath: string;
+  sourceMap: boolean;
   cwd: string;
   hotReload?: boolean;
 };
@@ -71,7 +73,7 @@ export class ServerRunnerWorkerBridge {
       env,
       stderr: !this.#config.verboseLogging,
       // if `process.execArgv` inherited from main thread, with `--inspect-brk` flag, current thread will be stucked
-      execArgv: [],
+      execArgv: this.#config.serverSourceMap ? ['--enable-source-maps'] : [],
       // `--inspect` and `--inspect-brk` for `worker_threads` only in Node.js >= 24.1 - https://github.com/nodejs/node/pull/56759
       // execArgv:
       //   process.env.TRAMVAI_DEBUG || this.#config.debug

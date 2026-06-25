@@ -122,6 +122,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     integrity,
     projectType,
     verboseLogging,
+    clientSourceMap,
   } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
@@ -155,6 +156,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
   const stylesConfiguration = createStylesConfiguration({
     di,
     emitCssChunks: true,
+    sourceMap: clientSourceMap,
     browserslistConfig: normalizedBrowserslistConfig.defaults,
     extractCssPluginOptions: {
       filename: '[name].css',
@@ -240,7 +242,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
     mode: 'development',
-    devtool: config.sourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
+    devtool: clientSourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
     node: {
       // "warn" with `futureDefaults`
       global: true,
@@ -361,6 +363,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       },
       unsafeCache: true,
       rules: [
+        ...(clientSourceMap ? sourceMapsConfiguration.rules : []),
         ...createTranspilerRules({
           transpiler,
           transpilerParameters,
@@ -394,7 +397,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
               },
             ]
           : []),
-        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
     plugins: [
@@ -513,12 +515,12 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       },
       unsafeCache: true,
       rules: [
+        ...(clientSourceMap ? sourceMapsConfiguration.rules : []),
         ...createTranspilerRules({
           transpiler,
           transpilerParameters,
           workerPoolConfig,
         }),
-        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
     plugins: [

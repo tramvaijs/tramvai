@@ -115,6 +115,8 @@ export function createDevServer({
         workerData: {
           cwd: config.rootDir,
           hotReload: config.serverHot,
+          sourceMap: config.serverSourceMap,
+          serverPath: path.join(config.rootDir, config.outputServer, config.outputServerFilename),
           port: serverRunnerPort,
           proxyPort: config.port!,
           disableServerRunnerWaiting,
@@ -162,22 +164,30 @@ export function createDevServer({
         compilationWatcher.setCompilationAlive();
 
         try {
-          const code = await tracer.wrap(
-            {
-              event: 'dev-server.fetch-server-js',
-              category: ['plugin-webpack-builder'],
-            },
-            async () => {
-              const response = await fetch(
-                `http://localhost:${serverBuildPort}${serverPublicPath}server.js`,
-                {
-                  signal,
-                }
-              );
+          let code: string;
 
-              return response.text();
-            }
-          );
+          // If server source maps enabled skip server.js download
+          // instead real file will be emitted and required in worker
+          if (config.serverSourceMap) {
+            code = '';
+          } else {
+            code = await tracer.wrap(
+              {
+                event: 'dev-server.fetch-server-js',
+                category: ['plugin-webpack-builder'],
+              },
+              async () => {
+                const response = await fetch(
+                  `http://localhost:${serverBuildPort}${serverPublicPath}server.js`,
+                  {
+                    signal,
+                  }
+                );
+
+                return response.text();
+              }
+            );
+          }
 
           if (!config.serverHot) {
             if (!initialServerBuild) {

@@ -83,7 +83,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
     type: 'application',
     target: 'server',
   });
-  const { verboseLogging, rootDir } = config;
+  const { verboseLogging, rootDir, serverSourceMap } = config;
 
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
@@ -113,6 +113,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
     di,
     // we don't need the css on server, but it's needed to generate proper classnames in js
     emitCssChunks: false,
+    sourceMap: serverSourceMap,
     browserslistConfig: normalizedBrowserslistConfig.node,
     buildTarget: 'server',
     extractCssPluginOptions: {
@@ -149,7 +150,11 @@ export default appConfig;`;
     entry: {
       server: entryPath,
     },
-    devtool: config.sourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
+    // devServer: false disables serving the built files through the development server and emits them to the file system instead
+    // https://github.com/webpack/webpack-dev-middleware/blob/v7.4.2/src/utils/setupOutputFileSystem.js#L53
+    // Wrong typings for devServer options
+    ...((serverSourceMap ? { devServer: false } : {}) as Configuration['devServer']),
+    devtool: serverSourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
     node: {
       // TODO https://github.com/tramvaijs/tramvai/-/commit/c3f3db838fd711ee7a53a84f5bd832cdeebc293a
       // __dirname: false
@@ -164,7 +169,7 @@ export default appConfig;`;
         port: config.staticPort,
         protocol: config.httpProtocol,
       })}${resolvePublicPathDirectory(config.outputServer)}`,
-      filename: 'server.js',
+      filename: config.outputServerFilename,
       library: {
         type: 'commonjs2',
       },
@@ -220,6 +225,7 @@ export default appConfig;`;
         },
       },
       rules: [
+        ...(config.serverSourceMap ? sourceMapsConfiguration.rules : []),
         // *.inline files rules should be before the transpiler rules
         ...createServerInlineRules({ di }),
         ...createTranspilerRules({
@@ -260,7 +266,6 @@ export default appConfig;`;
               },
             ]
           : []),
-        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
     watchOptions: config.noServerRebuild
