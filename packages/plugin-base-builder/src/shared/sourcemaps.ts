@@ -20,11 +20,12 @@ export const createSourceMaps = <T extends keyof DevToolMap>({
 }: {
   config: ConfigService;
   target: 'client' | 'server';
-}): {
-  rules: RuleSetMap[T];
-  devtool: DevToolMap[T];
-} => {
-  return {
+}) => {
+  const sourceMapsConfig: {
+    rules: RuleSetMap[T];
+    devtoolModuleFilenameTemplate: string | undefined;
+    devtool: DevToolMap[T];
+  } = {
     rules: [
       {
         test: /\.js$/,
@@ -36,8 +37,13 @@ export const createSourceMaps = <T extends keyof DevToolMap>({
         ],
       },
     ],
-    // Chrome devtools does not support source maps with remote debug nodejs
-    // PR with fix: https://github.com/nodejs/node/pull/58077
+    devtoolModuleFilenameTemplate: config.debug
+      ? // for better file structure view in chrome devtools
+        'file://[absolute-resource-path]'
+      : '[absolute-resource-path]',
+    // TODO: 'source-map' in prod for server build
     devtool: target === 'server' ? 'inline-source-map' : 'source-map',
   };
+
+  return sourceMapsConfig;
 };

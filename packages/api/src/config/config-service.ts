@@ -357,8 +357,18 @@ export interface BaseProject {
   sourceMap?:
     | boolean
     | {
-        development: boolean;
-        production: boolean;
+        development:
+          | boolean
+          | {
+              client: boolean;
+              server: boolean;
+            };
+        production:
+          | boolean
+          | {
+              client: boolean;
+              server: boolean;
+            };
       };
 
   /**
@@ -755,6 +765,10 @@ export class ConfigService {
     return this.#project.output?.server ?? 'dist/server';
   }
 
+  get outputServerFilename() {
+    return 'server.js';
+  }
+
   get outputClient() {
     if (this.#project.type === 'child-app') {
       return this.#project.output ?? 'dist/child-app';
@@ -855,13 +869,12 @@ export class ConfigService {
     return this.#project.integrity ?? false;
   }
 
-  get sourceMap(): boolean {
-    // eslint-disable-next-line no-nested-ternary
-    return typeof this.#project.sourceMap === 'boolean'
-      ? this.#project.sourceMap
-      : this.mode === 'development'
-        ? (this.#project.sourceMap?.development ?? false)
-        : (this.#project.sourceMap?.production ?? true);
+  get clientSourceMap(): boolean {
+    return this.getSourceMap('client');
+  }
+
+  get serverSourceMap(): boolean {
+    return this.getSourceMap('server');
   }
 
   get hotRefresh(): BaseProject['hotRefresh'] {
@@ -956,6 +969,25 @@ export class ConfigService {
       sourceDir: this.sourceDir,
       file: this.buildType === 'server' ? this.outputServer : this.outputClient,
     });
+  }
+
+  private getSourceMap(buildType: 'client' | 'server') {
+    if (typeof this.#project.sourceMap === 'boolean') {
+      return this.#project.sourceMap;
+    }
+
+    let sourceMapSource;
+    if (this.mode === 'development') {
+      sourceMapSource = this.#project.sourceMap?.development ?? false;
+    } else {
+      sourceMapSource = this.#project.sourceMap?.production ?? true;
+    }
+
+    if (typeof sourceMapSource === 'boolean') {
+      return sourceMapSource;
+    }
+
+    return sourceMapSource[buildType];
   }
 
   async readConfigurationFile({ rootDir }: { rootDir: string }) {

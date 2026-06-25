@@ -491,6 +491,12 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       type: 'application',
       entryFile: path.join(fixturesFolder, 'application', 'server-hot', 'index.tsx'),
     },
+    'app-server-hot-sourcemaps': {
+      name: 'app-server-hot-sourcemaps',
+      type: 'application',
+      sourceMap: true,
+      entryFile: path.join(fixturesFolder, 'application', 'server-hot', 'index.tsx'),
+    },
     'app-hmr': {
       name: 'app-hmr',
       type: 'application',
@@ -630,6 +636,12 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
   };
 
   const [builder, transpiler] = key.split('-');
+  const assetsPath = path.resolve(__dirname, '..', `${builder}-${transpiler}`, 'dist');
+  const cleanAssets = async () => {
+    await fs.promises.rm(assetsPath, {
+      recursive: true,
+    });
+  };
 
   test.describe(`@tramvai/api @builder:${builder} @transpiler:${transpiler} @type:application @mode:development`, async () => {
     test.describe('api: application start', () => {
@@ -1215,7 +1227,6 @@ export default createPapiMethod({
 
             const response = await fetch('http://127.0.0.1:9229/json/list');
             const [{ webSocketDebuggerUrl }] = await response.json();
-            let currentPid;
             let ws;
             let status;
 
@@ -1250,6 +1261,76 @@ export default createPapiMethod({
             // server should be hot reloaded so websocket connection keep
             test.expect(status).toBe('connected');
             ws.close();
+          });
+        });
+
+        test.describe('app-server-hot-reload-sourcemaps', () => {
+          const refreshPath = path.join(fixturesFolder, 'application', 'server-hot', 'App.tsx');
+          const initialContent = `export const App = () => {
+  return <div id="container">hello world</div>;
+};
+`;
+          const outputPromise = outputFile(refreshPath, initialContent);
+          test.use({
+            inputParameters: {
+              name: 'app-server-hot-sourcemaps',
+              rootDir: testSuiteFolder,
+              debug: true,
+              buildType: 'server',
+              serverHot: true,
+              fileCache: false,
+              noRebuild: false,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('should keep debug session connection after changes', async ({ devServer }) => {
+            await devServer.buildPromise;
+            await outputPromise;
+
+            // wait for debugger start
+            await sleep(300);
+
+            const response = await fetch('http://127.0.0.1:9229/json/list');
+            const [{ webSocketDebuggerUrl }] = await response.json();
+            let ws;
+            let status;
+
+            await new Promise((resolve) => {
+              ws = new WebSocket(webSocketDebuggerUrl);
+
+              ws.on('error', console.error);
+
+              ws.on('open', function onOpen() {
+                status = 'connected';
+                resolve();
+              });
+
+              ws.on('close', () => {
+                status = 'closed';
+              });
+            });
+
+            const updatedContent = `export const App = () => {
+  return <div id="container">super hello world</div>;
+};
+`;
+
+            await outputFile(refreshPath, updatedContent);
+            // wait for reload
+            await sleep(300);
+
+            await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
+            ).text();
+
+            // server should be hot reloaded so websocket connection keep
+            test.expect(status).toBe('connected');
+            ws.close();
+            await cleanAssets();
           });
         });
       });
@@ -2502,7 +2583,7 @@ export default Cmp;`,
           });
 
           test.beforeEach(async () => {
-            await fs.promises.rm(path.resolve(__dirname, `../${builder}-${transpiler}/dist`), {
+            await fs.promises.rm(assetsPath, {
               recursive: true,
               force: true,
             });
@@ -2512,11 +2593,11 @@ export default Cmp;`,
             await devServer.buildPromise;
             await devServer.close();
 
-            const assetsPath = await fs.readdirSync(
+            const assetsList = await fs.readdirSync(
               path.resolve(__dirname, `../${builder}-${transpiler}/dist`)
             );
 
-            test.expect(assetsPath).toEqual(['client', 'server']);
+            test.expect(assetsList).toEqual(['client', 'server']);
           });
         });
 
@@ -2787,18 +2868,23 @@ export default Cmp;`,
             },
           });
 
-          test('sourcemaps: should generate external sourcemaps', async ({ devServer }) => {
+          test('sourcemaps: should generate sourcemaps', async ({ devServer }) => {
             await devServer.buildPromise;
 
-            const serverJs = await (
-              await fetch(`http://localhost:${devServer.staticPort}/dist/server/server.js`)
-            ).text();
             const platformJs = await (
               await fetch(`http://localhost:${devServer.staticPort}/dist/client/platform.js`)
             ).text();
-
-            test.expect(serverJs).toContain('//# sourceMappingURL=data:application/json');
             test.expect(platformJs).toContain('//# sourceMappingURL=platform.js.map');
+
+            const serverJs = await fs.promises.readFile(
+              path.resolve(assetsPath, 'server/server.js'),
+              'utf-8'
+            );
+            test
+              .expect(serverJs)
+              .toContain('//# sourceMappingURL=data:application/json;charset=utf-8;base64,');
+
+            await cleanAssets();
           });
         });
 

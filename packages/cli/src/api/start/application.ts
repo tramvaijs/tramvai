@@ -296,6 +296,9 @@ function mapApplicationProjectToNewConfig(
     mappedProject.shared.autoResolveSharedRequiredVersions =
       applicationProject.shared.flexibleTramvaiVersions;
   }
+  if (applicationProject.sourceMap) {
+    mappedProject.sourceMap = applicationProject.sourceMap;
+  }
   if (applicationProject.postcss) {
     mappedProject.postcss = applicationProject.postcss;
 

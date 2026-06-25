@@ -1,5 +1,6 @@
 import '@tramvai/plugin-base-builder/lib/utils/cpu-profile';
 
+import path from 'node:path';
 import type { ExtractDependencyType, ExtractTokenType } from '@tinkoff/dippy';
 import type {
   DEV_SERVER_CLOSE_HANDLER_TOKEN,
@@ -97,6 +98,8 @@ export function createDevServer({
         config,
         workerPath: serverRunnerWorkerPath,
         workerData: {
+          sourceMap: config.serverSourceMap,
+          serverPath: path.join(config.rootDir, config.outputServer, config.outputServerFilename),
           port: serverRunnerPort,
           hotReload: config.serverHot,
           cwd: config.rootDir,
@@ -117,22 +120,30 @@ export function createDevServer({
         compilationWatcher.setCompilationAlive();
 
         try {
-          const code = await tracer.wrap(
-            {
-              event: 'dev-server.fetch-server-js',
-              category: ['plugin-rspack-builder'],
-            },
-            async () => {
-              const response = await fetch(
-                `http://localhost:${buildPort}${serverPublicPath}server.js`,
-                {
-                  signal,
-                }
-              );
+          let code: string;
 
-              return response.text();
-            }
-          );
+          // If server source maps enabled skip server.js download
+          // instead real file will be emitted and required in worker
+          if (config.serverSourceMap) {
+            code = '';
+          } else {
+            code = await tracer.wrap(
+              {
+                event: 'dev-server.fetch-server-js',
+                category: ['plugin-rspack-builder'],
+              },
+              async () => {
+                const response = await fetch(
+                  `http://localhost:${buildPort}${serverPublicPath}server.js`,
+                  {
+                    signal,
+                  }
+                );
+
+                return response.text();
+              }
+            );
+          }
 
           if (!config.serverHot) {
             if (!initialServerBuild) {

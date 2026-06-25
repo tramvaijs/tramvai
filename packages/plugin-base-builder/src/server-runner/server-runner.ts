@@ -22,7 +22,7 @@ import {
   ServerRunnerIncomingEventsPayload,
   ServerRunnerOutgoingEventsPayload,
 } from './events';
-import { ServerRunnerWorkerData } from './worker-bridge';
+import type { ServerRunnerWorkerData } from './worker-bridge';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
@@ -102,8 +102,19 @@ function monkeyPatchCWD(cwd: string) {
   };
 }
 
+function requireTemplates(code: string, serverPath: string, sourceMap: boolean) {
+  // Source maps do not work for dynamically loaded code
+  // so we use a real require from the file system
+  if (sourceMap) {
+    delete require.cache[serverPath];
+    return require(serverPath);
+  }
+
+  return requireFromString(code, serverPath);
+}
+
 async function runServer() {
-  const { port, proxyPort, disableServerRunnerWaiting, cwd, hotReload } =
+  const { port, proxyPort, disableServerRunnerWaiting, cwd, sourceMap, serverPath, hotReload } =
     workerData as ServerRunnerWorkerData;
   process.env.PORT = String(proxyPort);
 
@@ -132,7 +143,7 @@ async function runServer() {
           try {
             const app = await serverRuntime.app;
             app.di.get('commandLineRunner').run('server', 'close');
-            serverRuntime = requireFromString(message.code, 'server.js');
+            serverRuntime = requireTemplates(message.code, serverPath, sourceMap);
           } catch (err) {
             console.error(err);
 
@@ -151,8 +162,7 @@ async function runServer() {
         // eslint-disable-next-line no-fallthrough
         case COMPILE: {
           try {
-            // TODO: real filename
-            serverRuntime = requireFromString(message.code, 'server.js');
+            serverRuntime = requireTemplates(message.code, serverPath, sourceMap);
 
             if (disableServerRunnerWaiting) {
               parentPort!.postMessage({

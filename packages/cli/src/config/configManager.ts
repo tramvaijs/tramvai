@@ -30,7 +30,7 @@ export interface Settings<E extends Env> {
   debug?: string | boolean;
   verboseWebpack?: boolean;
   trace?: boolean;
-  sourceMap?: boolean;
+  sourceMap?: boolean | { client: boolean; server: boolean };
   host?: string;
   https?: boolean;
   port?: number;
@@ -126,6 +126,15 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
     target = 'node';
   }
 
+  let sourceMap;
+  if (debug) {
+    sourceMap = typeof settings.sourceMap === 'boolean' ? settings.sourceMap : true;
+  } else {
+    const rawSourceMap = getOption('sourceMap', [settings, normalizedConfigEntry], false);
+    sourceMap =
+      (typeof rawSourceMap === 'boolean' ? rawSourceMap : rawSourceMap[buildType]) ?? false;
+  }
+
   const config: ConfigManager<C, E> = {
     buildId,
     ...normalizedConfigEntry,
@@ -167,12 +176,7 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
           : PortManager.DEFAULT_STATIC_PORT)
     ),
     // eslint-disable-next-line no-nested-ternary
-    sourceMap: debug
-      ? // allow to disable sourcemaps with debug flag, when sourceMap passed to cli api
-        typeof settings.sourceMap === 'boolean'
-        ? settings.sourceMap
-        : true
-      : getOption('sourceMap', [settings, normalizedConfigEntry], false),
+    sourceMap,
     target,
     buildPath: '',
     withSettings(overrideSettings) {

@@ -1,5 +1,7 @@
 import type { Configuration } from 'webpack';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
+import { DevtoolOption } from '@tramvai/api/lib/config';
+
 import type { ConfigEntry, OverridableOption } from './common';
 
 export type TranspilationLoader = 'babel' | 'swc';
@@ -155,7 +157,19 @@ export interface CliConfigEntry extends ConfigEntry {
    * @title Enable source maps
    * @default false
    */
-  sourceMap: OverridableOption<boolean>;
+  sourceMap: OverridableOption<
+    | boolean
+    | {
+        /**
+         * @title Enable client source maps
+         */
+        client?: boolean;
+        /**
+         * @title Enable server source maps
+         */
+        server?: boolean;
+      }
+  >;
   /**
    * @title Integrity generation options
    * @default false
@@ -275,12 +289,7 @@ export interface CliConfigEntry extends ConfigEntry {
     /**
      * @title Use the specified type of source maps for building in development mode
      */
-    devtool:
-      | false
-      | 'eval'
-      | 'eval-cheap-source-map'
-      | 'eval-cheap-module-source-map'
-      | 'eval-source-map';
+    devtool: DevtoolOption;
   };
 
   // options that affect only production builds

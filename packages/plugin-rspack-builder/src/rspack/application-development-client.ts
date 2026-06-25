@@ -120,6 +120,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     integrity,
     verboseLogging,
     projectType,
+    clientSourceMap,
   } = config;
 
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
@@ -151,6 +152,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const stylesConfiguration = createStylesConfiguration({
     di,
     emitCssChunks: true,
+    sourceMap: clientSourceMap,
     browserslistConfig: normalizedBrowserslistConfig.defaults,
     buildTarget: 'client',
     extractCssPluginOptions: {
@@ -215,7 +217,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       pathinfo: Boolean(config.debugBuild),
     },
     mode: 'development',
-    devtool: config.sourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
+    devtool: clientSourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
     // TODO: check is it configuration optimal?
     stats: {
       // TODO: missmatch types with webpack
@@ -341,6 +343,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       },
       unsafeCache: true,
       rules: [
+        ...(clientSourceMap ? sourceMapsConfiguration.rules : []),
         ...createTranspilerRules({
           transpiler,
           transpilerParameters,
@@ -374,7 +377,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
             isServer: false,
           },
         },
-        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
     plugins: [
@@ -505,7 +507,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
           transpiler,
           transpilerParameters,
         }),
-        ...(config.sourceMap ? sourceMapsConfiguration.rules : []),
+        ...(clientSourceMap ? sourceMapsConfiguration.rules : []),
       ],
     },
     plugins: [
