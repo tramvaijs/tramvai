@@ -40,6 +40,7 @@
     "sharp": "0.34.3",
     "svgo": "^3.0.2",
     "text-table": "^0.2.0",
+    "uuid": "^8.3.2",
     "wrap-ansi": "^7.0.0"
   },
   "devDependencies": {

@@ -1,6 +1,7 @@
 import '@tramvai/plugin-base-builder/lib/utils/inspector';
 import '@tramvai/plugin-base-builder/lib/utils/cpu-profile';
 import { parentPort, workerData } from 'node:worker_threads';
+import inspector from 'node:inspector';
 import webpack, { Compiler, MultiCompiler, MultiStats, Stats } from 'webpack';
 import WebpackDevServer, { Configuration as WebpackDevServerConfig } from 'webpack-dev-server';
 import {
@@ -299,6 +300,10 @@ async function runExitHandlersAndQuit(code: number) {
     });
   }
 
+  // When a Chrome DevTools session is active
+  // a worker process may not terminate when the main process exits
+  // To avoid this, explicitly close the debugging session before shutting down the worker
+  inspector.close();
   if (global.__TRAMVAI_EXIT_HANDLERS__) {
     await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
   }

@@ -73,7 +73,12 @@ export class ServerRunnerWorkerBridge {
       env,
       stderr: !this.#config.verboseLogging,
       // if `process.execArgv` inherited from main thread, with `--inspect-brk` flag, current thread will be stucked
-      execArgv: this.#config.serverSourceMap ? ['--enable-source-maps'] : [],
+      execArgv: [
+        ...(this.#config.debug && isNetworkDebugSupported()
+          ? ['--experimental-network-inspection']
+          : []),
+        ...(this.#config.serverSourceMap ? ['--enable-source-maps'] : []),
+      ],
       // `--inspect` and `--inspect-brk` for `worker_threads` only in Node.js >= 24.1 - https://github.com/nodejs/node/pull/56759
       // execArgv:
       //   process.env.TRAMVAI_DEBUG || this.#config.debug
@@ -177,5 +182,16 @@ export class ServerRunnerWorkerBridge {
         code: payload.code,
       } as ServerRunnerIncomingEventsPayload['compile']);
     });
+  }
+}
+
+function isNetworkDebugSupported() {
+  try {
+    // v22.18.1
+    const majorVersion = Number(process.version.slice(1).split('.')[0]);
+    return majorVersion >= 22;
+  } catch (err) {
+    console.error('Failed to determine nodejs version, network debug is not enabled');
+    return false;
   }
 }

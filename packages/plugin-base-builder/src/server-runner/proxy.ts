@@ -7,12 +7,19 @@ import { ExtractDependencyType } from '@tinkoff/dippy';
 // eslint-disable-next-line no-restricted-imports
 import webOutgoing from 'http-proxy/lib/http-proxy/passes/web-outgoing';
 import eachObj from '@tinkoff/utils/object/each';
+// @ts-ignore - no types for package this version
+import { v5 as uuidv5 } from 'uuid';
 
 import { logger } from '@tramvai/api/lib/services/logger';
 import { CompilationWatcher } from '../utils/compilation-watcher';
 import { SELF_SIGNED_CERTIFICATE_TOKEN } from '../utils/selfSignedCertificate';
 
 type SelfSignedCertificate = ExtractDependencyType<typeof SELF_SIGNED_CERTIFICATE_TOKEN>;
+
+const DEVTOOLS_ROUTE = '/.well-known/appspecific/com.chrome.devtools.json';
+const STABLE_UUID = '7d3d2a18-2cf5-4b9f-b9f5-6b6e1d7f8f52';
+
+let projectUuid: string | undefined;
 
 function createServer(selfSignedCertificate: SelfSignedCertificate, handler: RequestListener) {
   return selfSignedCertificate
@@ -28,17 +35,19 @@ function createServer(selfSignedCertificate: SelfSignedCertificate, handler: Req
 
 export const createProxy = ({
   port,
+  hostname,
+  rootDir,
   staticPort,
   staticHost,
   serverRunnerPort,
   serverBuildPort,
   selfSignedCertificate,
   browserBuildPort,
-  hostname,
   compilationWatcher,
 }: {
   port: number;
   hostname: string;
+  rootDir: string;
   staticPort: number;
   staticHost: string;
   selfSignedCertificate: SelfSignedCertificate;
@@ -118,6 +127,36 @@ export const createProxy = ({
   });
 
   const devServer = createServer(selfSignedCertificate, (req, res) => {
+    if (req.url) {
+      try {
+        const url = new URL(req.url, 'http://localhost');
+
+        if (url.pathname === DEVTOOLS_ROUTE) {
+          res.writeHead(200, {
+            'content-type': 'application/json; charset=utf-8',
+            'cache-control': 'no-store',
+          });
+
+          if (!projectUuid) {
+            // Use v5 and add path to uuid generation for uuid stability
+            // /Users/project-a -> always same uuid
+            projectUuid = uuidv5(rootDir, STABLE_UUID);
+          }
+
+          res.end(
+            JSON.stringify({
+              workspace: {
+                root: rootDir,
+                uuid: projectUuid,
+              },
+            })
+          );
+
+          return;
+        }
+      } catch (_err) {}
+    }
+
     // TODO: HTML
     devProxy.web(req, res, {
       target: `http://localhost:${serverRunnerPort}`,

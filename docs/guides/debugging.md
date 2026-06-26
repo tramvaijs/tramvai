@@ -107,6 +107,10 @@ The variable can also accept `--inspect` values such as `break` and `wait` ([doc
 
 For debugging, we recommend using [Chrome DevTools](https://nodejs.org/learn/getting-started/debugging#chrome-devtools-55-microsoft-edge). By default, Tramvai uses port `9229` for server-side debugging.
 
+Starting with Node.js 22, debugging also enables the experimental --experimental-network-inspection flag, which allows you to inspect outgoing Node.js HTTP requests directly in the standard Chrome DevTools Network tab.
+
+Unfortunately, the network inspection capabilities in Node.js 22 are still quite limited—for example, response bodies and some response details are not available in DevTools. The feature works much better starting with Node.js 24, where request and response inspection is significantly more complete.
+
 :::note
 
 Env `TRAMVAI_DEBUG` working only for tramvai v7+ or `--experimentalWebpackWorkerThreads`

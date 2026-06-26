@@ -5,6 +5,7 @@ import '../utils/cpu-profile';
 import '../utils/compile-cache';
 
 import path from 'node:path';
+import inspector from 'node:inspector';
 import { parentPort, workerData } from 'node:worker_threads';
 import { Module } from 'node:module';
 import { AddressInfo, Server } from 'node:net';
@@ -248,7 +249,10 @@ async function runExitHandlersAndQuit(code: number) {
   }
 
   // TODO: restart build process / just log?
-
+  // When a Chrome DevTools session is active
+  // a worker process may not terminate when the main process exits
+  // To avoid this, explicitly close the debugging session before shutting down the worker
+  inspector.close();
   if (global.__TRAMVAI_EXIT_HANDLERS__) {
     await Promise.allSettled(global.__TRAMVAI_EXIT_HANDLERS__.map((handler) => handler()));
   }

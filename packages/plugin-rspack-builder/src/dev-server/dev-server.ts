@@ -69,6 +69,7 @@ export function createDevServer({
       const compilationWatcher = new CompilationWatcher();
       const proxy = createProxy({
         port: portManager.port!,
+        rootDir: config.rootDir,
         staticPort: portManager.staticPort!,
         staticHost: config.staticHost,
         hostname: config.host,
