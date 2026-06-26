@@ -71,6 +71,7 @@ export function createDevServer({
       const compilationWatcher = new CompilationWatcher();
       const proxy = createProxy({
         port: config.port!,
+        rootDir: config.rootDir,
         hostname: config.host,
         selfSignedCertificate,
         staticPort: config.staticPort!,
