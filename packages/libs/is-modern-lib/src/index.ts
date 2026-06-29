@@ -52,7 +52,7 @@ export const modernLibs = [
   '@tui-react',
   '@tui-react-mobile',
   'tinkoff-push-web',
-  '@push-web/tinkoff-push-web',
+  '@push-web',
   'cacheable-lookup',
   'node-abort-controller',
   '@hubert',
