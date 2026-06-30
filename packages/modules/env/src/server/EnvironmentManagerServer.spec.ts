@@ -264,6 +264,11 @@ describe('EnvironmentManagerServer', () => {
         value: 'http://www.$[host:foo,bar].com/',
         dehydrate: true,
       },
+      {
+        key: 'PARAMS_WITH_KEYWORD',
+        value: 'http://www.$[host:foo,localhost:3000].com/',
+        dehydrate: true,
+      },
     ];
     const templates: EnvTemplate[] = [
       {
@@ -308,6 +313,10 @@ describe('EnvironmentManagerServer', () => {
 
     it('multiple parameters for template', () => {
       expect(envManager.get('MULTI_PARAMS')).toBe('http://www.bar.com/');
+    });
+
+    it('parameters with keyword for template', () => {
+      expect(envManager.get('PARAMS_WITH_KEYWORD')).toBe('http://www.localhost:3000.com/');
     });
   });
 
