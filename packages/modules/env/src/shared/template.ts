@@ -25,8 +25,10 @@ export function interpolate({
 
   return envValue.replace(templateRegex, (templateRaw, templateStr) => {
     // expect string in `key:param1,param2` format
-    const [key, ...rest] = templateStr.split(':');
-    const paramsRaw = rest.join('');
+    const separatorIndex = templateStr.indexOf(':');
+    const paramsExists = separatorIndex >= 0;
+    const key = paramsExists ? templateStr.substring(0, separatorIndex) : templateStr;
+    const paramsRaw = paramsExists ? templateStr.substring(separatorIndex + 1) : '';
     const params = paramsRaw.split(',').filter(Boolean);
     const template = templates[key];
 
