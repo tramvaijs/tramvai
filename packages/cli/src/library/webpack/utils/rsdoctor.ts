@@ -1,4 +1,4 @@
-import { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
+import type { RsdoctorWebpackPlugin } from '@rsdoctor/webpack-plugin';
 
 type options = ConstructorParameters<typeof RsdoctorWebpackPlugin<[]>>[0];
 
