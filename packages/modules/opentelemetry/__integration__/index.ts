@@ -11,14 +11,11 @@ import {
 import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { createPapiMethod } from '@tramvai/papi';
 import { safeStringifyJSON } from '@tramvai/safe-strings';
-import {
-  DEFAULT_HTTP_CLIENT_INTERCEPTORS,
-  HTTP_CLIENT_FACTORY,
-  HTTP_CLIENT_LOGGER_EXTENSION,
-} from '@tramvai/tokens-http-client';
+import { HTTP_CLIENT_FACTORY, HTTP_CLIENT_LOGGER_EXTENSION } from '@tramvai/tokens-http-client';
 import { MockerModule } from '@tramvai/module-mocker';
 import { RESOURCES_REGISTRY } from '@tramvai/tokens-render';
 import { providers as httpClientLogExtensionProviders } from '../src/instrumentation/logs.browser';
+import { OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN } from '../src/tokens';
 
 const IN_MEMORY_SPAN_EXPORTER = createToken<InMemorySpanExporter>(
   'opentelemetry in-memory span exporter',
@@ -145,24 +142,12 @@ createApp({
               store: 'LOG_STORE',
             },
           }),
-          // TODO: Убрать когда клиентская телеметрия автоматически будет проставлять traceparent
-          provide({
-            provide: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
-            useValue: (request: any, next: any) => {
-              const meta = document.querySelector('meta[name="traceparent"]');
-
-              if (meta) {
-                request.headers = {
-                  ...request.headers,
-                  traceparent: meta.getAttribute('content'),
-                };
-              }
-
-              return next(request);
-            },
-          }),
         ]
       : []),
+    provide({
+      provide: OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN,
+      useValue: (url: string) => !url.includes('/filtered-json'),
+    }),
     provide({
       provide: commandLineListTokens.customerStart,
       useFactory:

@@ -1,8 +1,13 @@
-import { Module } from '@tramvai/core';
+import { Module, provide } from '@tramvai/core';
 import once from '@tinkoff/utils/function/once';
 import { providers as logsIntegrationProviders } from './instrumentation/logs.browser';
+import { providers as httpClientInstrumentationProviders } from './instrumentation/httpClient.browser';
+import { BrowserTracer } from './tracer/tracer.browser';
+import { OPENTELEMETRY_TRACER_TOKEN } from './tokens';
 
 export * from './tokens';
+export { generateTraceId, generateSpanId } from './generateIds';
+export { BrowserTracer } from './tracer/tracer.browser';
 
 export const extractTraceparentHeader = once((): string | undefined => {
   if (typeof window !== 'undefined') {
@@ -22,7 +27,14 @@ export const extractTraceparentHeader = once((): string | undefined => {
 
 @Module({
   imports: [],
-  providers: [...logsIntegrationProviders],
+  providers: [
+    ...logsIntegrationProviders,
+    ...httpClientInstrumentationProviders,
+    provide({
+      provide: OPENTELEMETRY_TRACER_TOKEN,
+      useFactory: () => new BrowserTracer(),
+    }),
+  ],
 })
 export class OpenTelemetryModule {}
 // todo declareModule!
