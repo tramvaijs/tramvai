@@ -39,7 +39,7 @@ export const testHook = <TProps, TResult>(
 ) => {
   const Wrapper = renderOptions?.wrapper ?? (({ children }) => children);
 
-  const { result, rerender } = renderHook(hookCallback, {
+  const { result, rerender, unmount } = renderHook(hookCallback, {
     ...renderOptions,
     wrapper: ({ children }: { children: React.ReactNode }) => {
       return (
@@ -61,5 +61,6 @@ export const testHook = <TProps, TResult>(
     waitFor,
     context,
     router,
+    unmount,
   };
 };
