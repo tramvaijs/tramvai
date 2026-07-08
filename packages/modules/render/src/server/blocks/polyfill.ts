@@ -64,6 +64,7 @@ export const polyfillResources = async ({
       type: ResourceType.script,
       payload: genHref(script),
       attrs: {
+        'data-critical': 'true',
         id: 'modern-polyfills',
       },
       slot: ResourceSlot.HEAD_POLYFILLS,
