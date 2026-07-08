@@ -1,5 +1,6 @@
 import { Module } from '@tramvai/core';
 import once from '@tinkoff/utils/function/once';
+import { providers as logsIntegrationProviders } from './instrumentation/logs.browser';
 
 export * from './tokens';
 
@@ -21,7 +22,7 @@ export const extractTraceparentHeader = once((): string | undefined => {
 
 @Module({
   imports: [],
-  providers: [],
+  providers: [...logsIntegrationProviders],
 })
 export class OpenTelemetryModule {}
 // todo declareModule!

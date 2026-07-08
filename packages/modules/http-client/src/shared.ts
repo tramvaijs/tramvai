@@ -9,6 +9,7 @@ import {
   DISABLE_CIRCUIT_BREAKER,
   DEFAULT_HTTP_CLIENT_FACTORY_OPTIONS,
   DEFAULT_HTTP_CLIENT_INTERCEPTORS,
+  HTTP_CLIENT_LOGGER_EXTENSION,
 } from '@tramvai/tokens-http-client';
 import {
   LOGGER_TOKEN,
@@ -54,6 +55,10 @@ export const providers = [
       },
       defaultInterceptors: {
         token: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
+        optional: true,
+      },
+      logPluginExtensions: {
+        token: HTTP_CLIENT_LOGGER_EXTENSION,
         optional: true,
       },
       commandLineExecutionContext: {

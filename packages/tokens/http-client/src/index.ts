@@ -1,7 +1,10 @@
 import { Scope, createToken } from '@tinkoff/dippy';
 import type { Agent, Dispatcher } from 'undici';
 import type { BaseHttpClient, HttpClient, HttpClientInterceptor } from '@tramvai/http-client';
-import type { TinkoffRequestOptions } from '@tramvai/tinkoff-request-http-client-adapter';
+import type {
+  TinkoffRequestOptions,
+  LogExtension,
+} from '@tramvai/tinkoff-request-http-client-adapter';
 
 export type HttpClientFactoryOptions = TinkoffRequestOptions & {
   name: string;
@@ -91,3 +94,13 @@ export const PAPI_SERVICE = createToken<BaseHttpClient>('papi service');
  * Enable or disable circuit breaker
  */
 export const DISABLE_CIRCUIT_BREAKER = createToken<boolean>('disable circuit breaker');
+
+/**
+ * @description
+ * Extensions for HTTP client log plugin.
+ * Each extension receives a log object and request context, and returns a modified log object.
+ */
+export const HTTP_CLIENT_LOGGER_EXTENSION = createToken<LogExtension>(
+  'HTTP_CLIENT_LOGGER_EXTENSION',
+  { multi: true }
+);

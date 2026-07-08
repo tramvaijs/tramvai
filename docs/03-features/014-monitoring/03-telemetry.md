@@ -211,7 +211,9 @@ All application logs will be extended with current span and trace ids in `spanId
 
 #### Client-side
 
-In a browser context, `spanId` and `traceId` properties is not added to client logs, because of it will connect current SSR logs and all corresponding backend's logs for current browser session, which can leads to huge amount of logs and inefficient debugging.
+In a browser context, `spanId` and `traceId` properties are not added to all client logs automatically, because it would connect current SSR logs and all corresponding backend's logs for the current browser session, which can lead to a huge amount of logs and inefficient debugging.
+
+However, HTTP client logs are enriched with `traceId` and `spanId` on the client side. `OpenTelemetryModule` registers an `HTTP_CLIENT_LOGGER_EXTENSION` that extracts the `traceparent` header from outgoing HTTP requests and adds parsed `traceId` and `spanId` to the corresponding log entries. This allows correlating specific HTTP client requests with their server-side traces.
 
 ## Debug and testing
 

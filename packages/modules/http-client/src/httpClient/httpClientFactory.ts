@@ -19,6 +19,7 @@ import type {
   HTTP_CLIENT_AGENT,
   HTTP_CLIENT_FACTORY,
   DISABLE_CIRCUIT_BREAKER,
+  HTTP_CLIENT_LOGGER_EXTENSION,
 } from '@tramvai/tokens-http-client';
 import type {
   LOGGER_TOKEN,
@@ -56,6 +57,7 @@ export const httpClientFactory = ({
   disableCircuitBreaker = false,
   defaultOptions,
   defaultInterceptors,
+  logPluginExtensions,
   commandLineExecutionContext,
 }: {
   logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
@@ -70,6 +72,7 @@ export const httpClientFactory = ({
   disableCircuitBreaker: ExtractDependencyType<typeof DISABLE_CIRCUIT_BREAKER> | null;
   defaultOptions: Partial<HttpClientFactoryOptions> | null;
   defaultInterceptors: HttpClientInterceptor[] | null;
+  logPluginExtensions: ExtractDependencyType<typeof HTTP_CLIENT_LOGGER_EXTENSION> | null;
   commandLineExecutionContext: ExtractDependencyType<
     typeof COMMAND_LINE_EXECUTION_CONTEXT_TOKEN
   > | null;
@@ -105,6 +108,7 @@ export const httpClientFactory = ({
             failureThreshold: 75,
             minimumFailureCount: 10,
           },
+          logPluginExtensions,
           signal: commandLineExecutionContext?.()?.abortSignal,
           ...environmentDependentOptions,
         },
