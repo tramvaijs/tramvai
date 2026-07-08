@@ -1,5 +1,4 @@
 import { RandomIdGenerator } from '@opentelemetry/sdk-trace-base';
-import { expect } from '@playwright/test';
 import { test } from './opentelemetry-test-fixture';
 
 const idGenerator = new RandomIdGenerator();
@@ -103,6 +102,25 @@ test.describe('packages/modules/opentelemetry', () => {
 
     // todo http-client instrumentation
 
-    // todo logs correlation
+    test('should add traceId and spanId to http client logs on client', async ({ app, page }) => {
+      await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
+
+      const { traceparent, logs } = await page.evaluate(() => {
+        return {
+          traceparent: document.querySelector('meta[name="traceparent"]')?.getAttribute('content'),
+          logs: (window as any).contextExternal.di.get('LOG_STORE') as Array<Record<string, any>>,
+        };
+      });
+
+      const parsed = traceparent?.split('-');
+      const expectedTraceId = parsed?.[1];
+      const expectedSpanId = parsed?.[2];
+
+      const logsWithTrace = logs.filter((log) => log.traceId === expectedTraceId);
+
+      test.expect(logsWithTrace.length).toBeGreaterThan(0);
+      test.expect(logsWithTrace[0].traceId).toBe(expectedTraceId);
+      test.expect(logsWithTrace[0].spanId).toBe(expectedSpanId);
+    });
   });
 });

@@ -4,6 +4,7 @@ import type { Agent } from 'undici/types';
 import type { ContextState, Plugin, MakeRequest, Request } from '@tinkoff/request-core';
 import request from '@tinkoff/request-core';
 import logPlugin from '@tinkoff/request-plugin-log';
+import type { LogExtension } from '@tinkoff/request-plugin-log';
 import deduplicateCache from '@tinkoff/request-plugin-cache-deduplicate';
 import etagCache from '@tinkoff/request-plugin-cache-etag';
 import memoryCache from '@tinkoff/request-plugin-cache-memory';
@@ -17,6 +18,7 @@ import type { HttpClientBaseOptions } from '@tramvai/http-client';
 import type { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import retry from '@tinkoff/request-plugin-retry';
 
+export type { LogExtension };
 export type RequestValidator = {
   (state: ContextState): any;
 };
@@ -49,6 +51,7 @@ export interface TinkoffRequestOptions extends HttpClientBaseOptions {
     https: Agent;
   };
   querySerializer?: QuerySerializer;
+  logPluginExtensions?: LogExtension[];
 }
 
 export function createTinkoffRequest(options: TinkoffRequestOptions): MakeRequest {
@@ -69,6 +72,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     allowStale = true,
     agent,
     querySerializer,
+    logPluginExtensions,
     retryOptions,
     etagCacheOptions,
     interceptors,
@@ -139,6 +143,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
       name,
       showQueryFields: true,
       showPayloadFields: true,
+      extensions: logPluginExtensions,
     })
   );
 

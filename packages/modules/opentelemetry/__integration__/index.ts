@@ -11,13 +11,14 @@ import {
 import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import { createPapiMethod } from '@tramvai/papi';
 import { safeStringifyJSON } from '@tramvai/safe-strings';
-import { HTTP_CLIENT_FACTORY } from '@tramvai/tokens-http-client';
+import {
+  DEFAULT_HTTP_CLIENT_INTERCEPTORS,
+  HTTP_CLIENT_FACTORY,
+  HTTP_CLIENT_LOGGER_EXTENSION,
+} from '@tramvai/tokens-http-client';
 import { MockerModule } from '@tramvai/module-mocker';
 import { RESOURCES_REGISTRY } from '@tramvai/tokens-render';
-import {
-  OPENTELEMETRY_BROWSER_TRACEPARENT_PROPAGATION_ENABLED_TOKEN,
-  OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN,
-} from '../src/tokens';
+import { providers as httpClientLogExtensionProviders } from '../src/instrumentation/logs.browser';
 
 const IN_MEMORY_SPAN_EXPORTER = createToken<InMemorySpanExporter>(
   'opentelemetry in-memory span exporter',
@@ -124,6 +125,44 @@ createApp({
       provide: ENV_USED_TOKEN,
       useValue: [{ key: 'MOCK_API' }],
     }),
+    ...(typeof window !== 'undefined'
+      ? [
+          ...httpClientLogExtensionProviders,
+          provide({
+            provide: 'LOG_STORE',
+            useFactory: () => [],
+          }),
+          provide({
+            provide: HTTP_CLIENT_LOGGER_EXTENSION,
+            multi: true,
+            useFactory: ({ store }) => {
+              return (logObj: Record<string, any>) => {
+                store.push({ ...logObj });
+                return logObj;
+              };
+            },
+            deps: {
+              store: 'LOG_STORE',
+            },
+          }),
+          // TODO: Убрать когда клиентская телеметрия автоматически будет проставлять traceparent
+          provide({
+            provide: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
+            useValue: (request: any, next: any) => {
+              const meta = document.querySelector('meta[name="traceparent"]');
+
+              if (meta) {
+                request.headers = {
+                  ...request.headers,
+                  traceparent: meta.getAttribute('content'),
+                };
+              }
+
+              return next(request);
+            },
+          }),
+        ]
+      : []),
     provide({
       provide: commandLineListTokens.customerStart,
       useFactory:

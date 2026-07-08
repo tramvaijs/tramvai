@@ -349,6 +349,28 @@ httpClient.request({ path: 'test', silent: true }).catch((error) => {
 });
 ```
 
+### Log Extensions
+
+You can extend HTTP client log entries with custom data using the `HTTP_CLIENT_LOGGER_EXTENSION` token. Each extension is a function that receives a log object and request context, and returns a modified log object.
+
+```ts
+import { provide } from '@tramvai/core';
+import { HTTP_CLIENT_LOGGER_EXTENSION } from '@tramvai/tokens-http-client';
+
+provide({
+  provide: HTTP_CLIENT_LOGGER_EXTENSION,
+  multi: true,
+  useValue: (logObj, context) => {
+    const request = context.getRequest();
+
+    return {
+      ...logObj,
+      customField: request.headers?.['x-custom-header'],
+    };
+  },
+});
+```
+
 ### Debug
 
 You can show all the default logs of http clients by providing these env variables:
