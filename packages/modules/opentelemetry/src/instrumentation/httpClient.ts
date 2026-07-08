@@ -12,6 +12,7 @@ import {
   ATTR_URL_QUERY,
   ATTR_URL_SCHEME,
 } from '@opentelemetry/semantic-conventions';
+import { getUrlFromRequest } from '@tramvai/module-http-client';
 import { OPENTELEMETRY_TRACER_TOKEN } from '../tokens';
 
 export const providers = [
@@ -19,10 +20,7 @@ export const providers = [
     provide: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
     useFactory: ({ tracer, metricsServicesRegistry }) => {
       return (request, next) => {
-        const url =
-          request.url ??
-          // todo add leading slash before path if needed
-          (request.baseUrl ? `${request.baseUrl}${request.path}` : (request.path ?? ''));
+        const url = getUrlFromRequest(request);
         const parsedUrl = new URL(
           request.query ? `${url}?${new URLSearchParams(request.query).toString()}` : url
         );

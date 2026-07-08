@@ -17,6 +17,8 @@ Browser OpenTelemetry SDK is not supported yet, because of it limitations:
 - requires `zone.js` dependency
 - minimum 30+ kb gzip to bundle size and some performance overhead
 
+However, module provides a lightweight `BrowserTracer` that generates `traceId`/`spanId` identifiers and automatically adds `traceparent` header to HTTP client requests. Span export and context propagation are not supported on the client.
+
 :::
 
 ## Usage
@@ -54,7 +56,7 @@ const provider = {
   provide: commandLineListTokens.resolvePageDeps,
   useFactory: ({ tracer, apiService }) => {
     return async function getSmth() {
-      tracer?.trace('get-smth', async (span) => {
+      tracer.trace('get-smth', async (span) => {
         // set attribute to the span
         span.setAttribute('key', 'value');
 
@@ -64,8 +66,7 @@ const provider = {
     };
   },
   deps: {
-    // tracer exists only server-side
-    tracer: optional(OPENTELEMETRY_TRACER_TOKEN),
+    tracer: OPENTELEMETRY_TRACER_TOKEN,
     apiService: API_SERVICE_TOKEN,
   },
 };
@@ -130,7 +131,8 @@ If you need to set attributes to the active span, use `Tracer.getActiveSpan` met
 function doSmt({ tracer }) {
   const span = tracer.getActiveSpan();
 
-  // span can be absent, for example in `init` or `listen` command line stages
+  // span can be absent, for example in `init` or `listen` command line stages,
+  // and always `undefined` on the client (no context propagation)
   span?.setAttribute('key', 'value');
 }
 ```
@@ -178,10 +180,9 @@ const extractTraceparent = (): string | undefined => {
 };
 ```
 
-`traceparent` header is not added to outgoing requests in a browser context, because of it will connect current SSR trace and all corresponding backend's traces for current browser session, which can leads to huge traces and inefficient debugging.
+`OpenTelemetryModule` inject `traceparent` header to all external API requests via Tramvai [HTTP Clients](03-features/09-data-fetching/02-http-client.md) in a browser context too. Each request gets a unique `traceparent` with fresh `traceId` and `spanId`. If consumer already provided `traceparent` header, it will not be overwritten.
 
-<!-- TODO: wait for TCORE-5381 -->
-<!-- #### Filter out `traceparent` header
+#### Filter out `traceparent` header
 
 In a browser context, some cross-origin requests can be blocked by CORS policy (or preflight requests can be not supported) if `traceparent` header is added.
 
@@ -190,16 +191,18 @@ So, you can filter out `traceparent` header for some requests with `OPENTELEMETR
 ```ts
 const provider = provide({
   provide: OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN,
-  useFactory: ({ envManager }) => (url: string) => {
-    const blacklist = ['/excluded-api-path', envManager.get('CDN_WITHOUT_ALLOWED_HEADERS_URL')];
+  useFactory:
+    ({ envManager }) =>
+    (url: string) => {
+      const blacklist = ['/excluded-api-path', envManager.get('CDN_WITHOUT_ALLOWED_HEADERS_URL')];
 
-    return !blacklist.some((blockerUrl) => url.includes(blockerUrl));
-  },
+      return !blacklist.some((blockerUrl) => url.includes(blockerUrl));
+    },
   deps: {
     envManager: ENV_MANAGER_TOKEN,
   },
 });
-``` -->
+```
 
 ### Logs correlation
 

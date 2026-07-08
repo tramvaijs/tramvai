@@ -56,71 +56,66 @@ test.describe('packages/modules/opentelemetry', () => {
       test.expect(response.text).toMatch(/<meta name="traceparent" content="\S+">/);
     });
 
-    // TODO: wait for TCORE-5381
-    // test('should bypass `traceparent` header on client API call', async ({
-    //   app,
-    //   page,
-    //   spyRequest,
-    // }) => {
-    //   await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
+    test('should bypass `traceparent` header on client API call', async ({
+      app,
+      page,
+      spyRequest,
+    }) => {
+      await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
 
-    //   await expect
-    //     .poll(
-    //       async () => {
-    //         const request = await spyRequest.getFirstRequest('/json');
+      await test.expect
+        .poll(
+          async () => {
+            const request = await spyRequest.getFirstRequest('/json');
 
-    //         return request?.headers.traceparent;
-    //       },
-    //       {
-    //         timeout: 1000,
-    //       }
-    //     )
-    //     .toBeTruthy();
-    // });
+            return request?.headers.traceparent;
+          },
+          {
+            timeout: 1000,
+          }
+        )
+        .toMatch(/^00-[0-9a-f]{32}-[0-9a-f]{16}-01$/);
+    });
 
-    // TODO: wait for TCORE-5381
-    // test('should filter client API calls before add `traceparent` header', async ({
-    //   app,
-    //   page,
-    //   spyRequest,
-    // }) => {
-    //   await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
+    test('should filter client API calls before add `traceparent` header', async ({
+      app,
+      page,
+      spyRequest,
+    }) => {
+      await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
 
-    //   await expect
-    //     .poll(
-    //       async () => {
-    //         const request = await spyRequest.getFirstRequest('/filtered-json');
+      await test.expect
+        .poll(
+          async () => {
+            const request = await spyRequest.getFirstRequest('/filtered-json');
 
-    //         return request?.headers.traceparent;
-    //       },
-    //       {
-    //         timeout: 1000,
-    //       }
-    //     )
-    //     .toBeFalsy();
-    // });
-
-    // todo http-client instrumentation
+            return request?.headers.traceparent;
+          },
+          {
+            timeout: 1000,
+          }
+        )
+        .toBeFalsy();
+    });
 
     test('should add traceId and spanId to http client logs on client', async ({ app, page }) => {
       await page.goto(`${app.serverUrl}/test/`, { waitUntil: 'networkidle' });
 
-      const { traceparent, logs } = await page.evaluate(() => {
+      const { logs } = await page.evaluate(() => {
         return {
-          traceparent: document.querySelector('meta[name="traceparent"]')?.getAttribute('content'),
           logs: (window as any).contextExternal.di.get('LOG_STORE') as Array<Record<string, any>>,
         };
       });
 
-      const parsed = traceparent?.split('-');
-      const expectedTraceId = parsed?.[1];
-      const expectedSpanId = parsed?.[2];
-
-      const logsWithTrace = logs.filter((log) => log.traceId === expectedTraceId);
+      const logsWithTrace = logs.filter(
+        (log) => log.traceId !== undefined && log.spanId !== undefined
+      );
 
       test.expect(logsWithTrace.length).toBeGreaterThan(0);
-      test.expect(logsWithTrace[0].traceId).toBe(expectedTraceId);
-      test.expect(logsWithTrace[0].spanId).toBe(expectedSpanId);
+      test.expect(logsWithTrace[0].traceId).toMatch(/^[0-9a-f]{32}$/);
+      test.expect(logsWithTrace[0].spanId).toMatch(/^[0-9a-f]{16}$/);
     });
+
+    // todo http-client instrumentation
   });
 });
