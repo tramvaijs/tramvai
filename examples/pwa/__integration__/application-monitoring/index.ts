@@ -5,11 +5,18 @@ import {
   provide,
   TRAMVAI_HOOKS_TOKEN,
 } from '@tramvai/core';
-import { CommonModule } from '@tramvai/module-common';
+import {
+  ASYNC_LOCAL_STORAGE_TOKEN,
+  COMBINE_REDUCERS,
+  CommonModule,
+  RESPONSE_MANAGER_TOKEN,
+  STORE_TOKEN,
+} from '@tramvai/module-common';
 import { RenderModule } from '@tramvai/module-render';
 import { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
 import { ServerModule } from '@tramvai/module-server';
 import { ROUTER_TOKEN } from '@tramvai/tokens-router';
+import { REACT_SERVER_RENDER_MODE } from '@tramvai/tokens-render';
 import { TramvaiPwaLightModule } from '@tramvai/module-progressive-web-app';
 import { SpaRouterModule } from '@tramvai/module-router';
 
@@ -19,9 +26,11 @@ import {
   TramvaiInlineReporter,
   InlineReporterParameters,
 } from '@tramvai/module-application-monitoring';
-import { COMBINE_REDUCERS } from '@tramvai/module-common';
 
 import Page from './page';
+import { SsrErrorPage } from './ssr-error-page';
+import { SsrRecoverableErrorPage } from './ssr-recoverable-error-page';
+import { ssrHooksStore, addSsrHookEvent } from './ssr-hooks-store';
 
 createApp({
   name: 'app-monitoring',
@@ -53,6 +62,22 @@ createApp({
         path: '/simple/',
         name: 'simple',
       },
+      {
+        config: {
+          bundle: 'mainDefault',
+          pageComponent: 'ssr-error',
+        },
+        path: '/ssr-error/',
+        name: 'ssr-error',
+      },
+      {
+        config: {
+          bundle: 'mainDefault',
+          pageComponent: 'ssr-recoverable-error',
+        },
+        path: '/ssr-recoverable-error/',
+        name: 'ssr-recoverable-error',
+      },
     ]),
   ],
   bundles: {
@@ -62,14 +87,20 @@ createApp({
           name: 'mainDefault',
           components: {
             pageDefault: Page,
+            'ssr-error': SsrErrorPage,
+            'ssr-recoverable-error': SsrRecoverableErrorPage,
           },
         }),
       }),
   },
   providers: [
     provide({
+      provide: REACT_SERVER_RENDER_MODE,
+      useValue: 'blocking',
+    }),
+    provide({
       provide: COMBINE_REDUCERS,
-      useValue: [],
+      useValue: [ssrHooksStore],
       multi: true,
     }),
     provide({
@@ -104,38 +135,63 @@ createApp({
     }),
     provide({
       provide: commandLineListTokens.init,
-      useFactory: ({ hooks }) => {
-        return () => {
-          hooks['app:initialized'].tap('app-init', () => {
-            if (typeof window !== 'undefined') {
-              (window as any).appInit = true;
-            }
-          });
-          hooks['app:initialize-failed'].tap('app-init-failed', () => {
-            if (typeof window !== 'undefined') {
-              (window as any).appInitFailed = true;
-            }
-          });
-          hooks['app:rendered'].tap('app-rendered', () => {
-            if (typeof window !== 'undefined') {
-              (window as any).appRendered = true;
-            }
-          });
-          hooks['app:render-failed'].tap('app-render-failed', () => {
-            if (typeof window !== 'undefined') {
-              (window as any).appRenderFailed = true;
-            }
-          });
+      useFactory: ({ hooks, asyncLocalStorage }) => {
+        const getRequestDi = () => asyncLocalStorage?.getStore()?.tramvaiRequestDi;
 
-          hooks['react:error'].tap('react-error', () => {
-            if (typeof window !== 'undefined') {
-              (window as any).reactError = true;
-            }
+        const trackSsrHook = (hookName: string) => {
+          const di = getRequestDi();
+          di?.get({ token: STORE_TOKEN, optional: true })?.dispatch(addSsrHookEvent(hookName));
+
+          const responseManager = di?.get({
+            token: RESPONSE_MANAGER_TOKEN,
+            optional: true,
           });
+          if (responseManager) {
+            const existing = responseManager.getHeader('x-ssr-hooks');
+            const prev = typeof existing === 'string' && existing ? existing : '';
+            responseManager.setHeader('x-ssr-hooks', prev ? `${prev},${hookName}` : hookName);
+          }
+        };
+
+        return () => {
+          if (typeof window === 'undefined') {
+            hooks['app:rendered'].tap('ssr-hooks-tracking', () => {
+              trackSsrHook('app:rendered');
+            });
+            hooks['app:render-failed'].tap('ssr-hooks-tracking', () => {
+              trackSsrHook('app:render-failed');
+            });
+            hooks['react:render'].tap('ssr-hooks-tracking', () => {
+              trackSsrHook('react:render');
+            });
+            hooks['react:error'].tap('ssr-hooks-tracking', (_, { event }) => {
+              trackSsrHook(`react:error:${event}`);
+            });
+          } else {
+            hooks['app:initialized'].tap('app-init', () => {
+              (window as any).appInit = true;
+            });
+            hooks['app:initialize-failed'].tap('app-init-failed', () => {
+              (window as any).appInitFailed = true;
+            });
+            hooks['app:rendered'].tap('app-rendered', () => {
+              (window as any).appRendered = true;
+            });
+            hooks['app:render-failed'].tap('app-render-failed', () => {
+              (window as any).appRenderFailed = true;
+            });
+            hooks['react:error'].tap('react-error', () => {
+              (window as any).reactError = true;
+            });
+          }
         };
       },
       deps: {
         hooks: TRAMVAI_HOOKS_TOKEN,
+        asyncLocalStorage: {
+          token: ASYNC_LOCAL_STORAGE_TOKEN,
+          optional: true,
+        },
       },
     }),
     provide({

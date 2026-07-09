@@ -45,6 +45,7 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
     runtimeEnv: options.env,
     analyze: options.analyze,
     port: options.port,
+    sourceMap: options.sourceMap,
     host: options.host ?? '0.0.0.0',
     serverHot: options.serverHot,
     rootDir,
@@ -295,9 +296,6 @@ function mapApplicationProjectToNewConfig(
     }
     mappedProject.shared.autoResolveSharedRequiredVersions =
       applicationProject.shared.flexibleTramvaiVersions;
-  }
-  if (applicationProject.sourceMap) {
-    mappedProject.sourceMap = applicationProject.sourceMap;
   }
   if (applicationProject.postcss) {
     mappedProject.postcss = applicationProject.postcss;

@@ -222,7 +222,7 @@ export const BACK_FORWARD_CACHE_ENABLED = createToken<boolean>('back forward cac
 
 export const INLINE_WEBPACK_RUNTIME = createToken<boolean>('inline webpack runtime');
 
-export type ReactServerRenderMode = 'sync' | 'streaming';
+export type ReactServerRenderMode = 'sync' | 'streaming' | 'blocking';
 
 // @todo ReactServerRenderMode or () => ReactServerRenderMode
 export const REACT_SERVER_RENDER_MODE = createToken<ReactServerRenderMode>('reactServerRenderMode');

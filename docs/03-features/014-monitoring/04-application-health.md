@@ -7,27 +7,29 @@ title: Application Health
 
 Tramvai application's health and performance monitoring. It monitors critical lifecycle events from HTML parsing through app initialization and rendering, capturing errors and performance metrics along the way.
 
+The module has separate server and browser implementations with different `react:render` and `react:error` event semantics on each side.
+
 ### Monitored Events
+
+#### Inline reporter events (browser)
 
 | Event | Description | Trigger Point |
 | --- | --- | --- |
 | `html-opened` | HTML document parsed and ready | Document parse complete |
 | `assets-loaded` | All critical assets loaded successfully | Window load event |
 | `assets-load-failed` | One or more critical assets failed to load | Window load event (with errors) |
-| `app:initialized` | Application initialization complete | After 'init' command line |
-| `app:initialize-failed` | Application failed to initialize | App init error |
-| `app:rendered` | Application rendered successfully | After successful app render |
-| `react:render` | React rendered successfully | After successful react render |
-| `react:error` | React rendered with error | The error occure while react hydration, it can be uncaughtError,caughtError or recoverableError |
-| `app:render-failed` | Application rendering failed | Error boundary or renderer callback |
-
 | `unhandled-error` | Unhandled promise rejection | Global unhandledrejection event |
 
-:::info
+#### Tramvai hooks (server and browser)
 
-When a `react:error` occurs, an `app:render-failed` event is also emitted automatically. If you subscribe to both hooks, be aware that you may receive duplicate notifications for the same error.
-
-:::
+| Hook                    | Description                         |
+| ----------------------- | ----------------------------------- |
+| `app:initialized`       | Application initialization complete |
+| `app:initialize-failed` | Application failed to initialize    |
+| `app:rendered`          | Application rendered successfully   |
+| `app:render-failed`     | Application rendering failed        |
+| `react:render`          | React render lifecycle event        |
+| `react:error`           | React error occurred during render  |
 
 ## Installation
 
@@ -59,16 +61,16 @@ createApp({
 
 ### 2. Provide an Inline Reporter Factory
 
-Inline reporter are used to capture lifecycle events and send them to a monitoring service (like an analytics tool or error logger). Inline reporters are injected into the HTML during server-side rendering. This allows to detect errors and performance issues early, even before the app is fully up and running.
+Inline reporter is used to capture lifecycle events and send them to a monitoring service (like an analytics tool or error logger). Inline reporter is injected into the HTML during server-side rendering. This allows detecting errors and performance issues early, even before the app is fully up and running.
 
 Key Events Sent Through Inline Reporters:
 
 - **HTML Opened** (`html-opened`): Tracks when the HTML is parsed and ready.
-- **Assets Loaded** (`assets-loaded`) / Assets Load Failed (`**assets-load-failed**`): Tracks the success/failure of loading assets (JS, CSS, etc.).
+- **Assets Loaded** (`assets-loaded`) / **Assets Load Failed** (`assets-load-failed`): Tracks the success/failure of loading assets (JS, CSS, etc.).
 - **App Start Failed** (`app-start-failed`): Tracks initialization errors.
 - **Unhandled Errors** (`unhandled-error`): Tracks unhandled errors or promise rejections.
 
-The module requires an inline reporter factory to send events to your monitoring service. To do this provide `INLINE_REPORTER_FACTORY_SCRIPT_TOKEN` using inline script
+The module requires an inline reporter factory to send events to your monitoring service. To do this, provide `INLINE_REPORTER_FACTORY_SCRIPT_TOKEN` using an inline script.
 
 ```typescript title="inlineReporter.inline.ts"
 export function inlineReporterFactoryScript() {
@@ -134,48 +136,54 @@ provide({
 });
 ```
 
-### How to configure monitoring for main Tramvai events
+### Monitoring with Tramvai hooks
 
-There is a possibility to monitor the main events that occur while the Tramvai application is being initialized. Here is a list of these events:
+When you are using `ApplicationMonitoringModule`, if you want to monitor application lifecycle events, you can subscribe to hooks directly. Server and browser have different `react:render` and `react:error` events, so subscriptions should be separated.
 
-- `app:initialized`
-- `app:initialize-failed`
-- `app:rendered`
-- `app:render-failed`
-- `react:render`
-- `react:error`
+#### Server-side example
 
-When you are using ApplicationMonitoringModule, these events are sent to your logger by default. But in some cases, you will need custom metrics. Here is an example of how to do this:
+Server-side render monitoring hooks work with `REACT_SERVER_RENDER_MODE` set to `blocking` or `streaming`, because both modes use the [renderToPipeableStream](https://react.dev/reference/react-dom/server/renderToPipeableStream) API.
+
+In `blocking` mode, the full HTML response is still buffered and works like the old `renderToString` API, and it is a much simpler way to move to the streaming rendering API. In `streaming` mode, a lot more changes are present that can be breaking for your application — `async` scripts, different hydration trigger, etc.
+
+:::warning
+
+We recommend paying attention to the following points when using the new `blocking` rendering mode:
+
+- `renderToPipeableStream` can have worse performance than `renderToString`, SSR throughput can be lower by 5-10% - check [server metrics](03-features/014-monitoring/02-metrics.md) after release
+- any unresolved `Suspense` boundaries will delay the response, make sure that you don't use [Deferred Actions](03-features/09-data-fetching/06-streaming-data.md) or features like library-internal `Suspense` integrations (e.g. [@tanstack/query](https://tanstack.com/query/v5/docs/framework/react/guides/suspense)); or switch to [`streaming` rendering mode](03-features/010-rendering/06-streaming.md) with full benefits of streaming rendering; or adjust a reasonable `REACT_STREAMING_RENDER_TIMEOUT` value
+
+:::
 
 ```typescript
-import { provide } from '@tramvai/core';
-import { TRAMVAI_HOOKS_TOKEN, commandLineListTokens } from '@tramvai/core';
+import { provide, commandLineListTokens, TRAMVAI_HOOKS_TOKEN } from '@tramvai/core';
+import { REACT_SERVER_RENDER_MODE } from '@tramvai/tokens-render';
 import { sendMonitoringLogs } from './sendMonitoringLogs';
 
 const providers = [
   provide({
+    provide: REACT_SERVER_RENDER_MODE,
+    useValue: 'blocking',
+  }),
+  provide({
     provide: commandLineListTokens.init,
     useFactory: ({ tramvaiHooks }) => {
-      hooks['app:initialized'].tap('app-init', () => {
-        sendMonitoringLogs({ event: 'app-initialized' });
-      });
-      hooks['app:initialize-failed'].tap('app-init-failed', (_, { error }) => {
-        sendMonitoringLogs({ event: 'app-initialize-failed', level: 'ERROR', error });
-      });
-      hooks['app:rendered'].tap('app-rendered', () => {
-        sendMonitoringLogs({ event: 'app-rendered' });
-      });
-      hooks['app:render-failed'].tap('app-render-failed', (_, { error }) => {
-        sendMonitoringLogs({ event: 'app-render-failed', level: 'ERROR', error });
-      });
+      return () => {
+        tramvaiHooks['react:render'].tap('my-monitoring', (_, payload) => {
+          if (payload.event === 'ssr:on-shell-ready') {
+            sendMonitoringLogs({ event: 'ssr-shell-ready' });
+          }
+        });
 
-      hooks['react:render'].tap('react-render', () => {
-        sendMonitoringLogs({ event: 'react-render' });
-      });
-
-      hooks['react:error'].tap('react-error', (_, { error }) => {
-        sendMonitoringLogs({ event: 'react-error', level: 'ERROR', error });
-      });
+        tramvaiHooks['react:error'].tap('my-monitoring', (_, { event, error }) => {
+          if (event === 'ssr:on-shell-error') {
+            sendMonitoringLogs({ event: 'ssr-fatal-error', error });
+          }
+          if (event === 'ssr:on-error') {
+            sendMonitoringLogs({ event: 'ssr-recoverable-error', error });
+          }
+        });
+      };
     },
     deps: {
       tramvaiHooks: TRAMVAI_HOOKS_TOKEN,
@@ -184,24 +192,102 @@ const providers = [
 ];
 ```
 
+#### Browser-side example
+
+```typescript
+import { provide, commandLineListTokens, TRAMVAI_HOOKS_TOKEN } from '@tramvai/core';
+import { sendMonitoringLogs } from './sendMonitoringLogs';
+
+provide({
+  provide: commandLineListTokens.init,
+  useFactory: ({ tramvaiHooks }) => {
+    return () => {
+      tramvaiHooks['app:initialized'].tap('my-monitoring', () => {
+        sendMonitoringLogs({ event: 'app-initialized' });
+      });
+      tramvaiHooks['app:rendered'].tap('my-monitoring', () => {
+        sendMonitoringLogs({ event: 'app-rendered' });
+      });
+      tramvaiHooks['app:render-failed'].tap('my-monitoring', (_, { error }) => {
+        sendMonitoringLogs({ event: 'app-render-failed', error });
+      });
+
+      tramvaiHooks['react:error'].tap('my-monitoring', (_, { event, error }) => {
+        sendMonitoringLogs({ event: `react-error:${event}`, error });
+      });
+    };
+  },
+  deps: {
+    tramvaiHooks: TRAMVAI_HOOKS_TOKEN,
+  },
+});
+```
+
 ## How It Works
 
-### Server-Side
+### Server-Side (blocking render mode)
 
-1. **Inline Scripts Injection**: The module injects monitoring scripts into the HTML `<head>` during server-side rendering
-2. **Early Monitoring**: Scripts execute immediately to catch early errors and events
-3. **Reporter Initialization**: The inline reporter factory creates a global reporter instance
-4. **Hook Registration**: Server-side hooks are registered to track initialization events
+The server uses `renderToPipeableStream` in blocking mode. React provides four callbacks during rendering, and the module maps them to tramvai hooks:
 
-### Client-Side
+#### `react:render` events
 
-1. **HTML Opened**: First script executes when HTML is parsed
-2. **Asset Monitoring**: Error listeners track script/link loading failures
-3. **App Creation**: Monitors unhandled errors during app bootstrap
-4. **Initialization**: Tracks when app completes initialization
-5. **Rendering**: Integrates with error boundaries and renderer callbacks
+| `payload.event` | React callback | Description |
+| --- | --- | --- |
+| `ssr:on-shell-ready` | `onShellReady` | The shell HTML (everything outside pending `<Suspense>` boundaries) is ready. |
+| `ssr:on-all-ready` | `onAllReady` | All content including Suspense boundaries is ready. HTML is piped to the response after this. Triggers `app:rendered`. |
 
-### Event Flow
+#### `react:error` events
+
+| `payload.event` | React callback | Description |
+| --- | --- | --- |
+| `ssr:on-error` | `onError` | Recoverable error inside a `<Suspense>` boundary. The Suspense fallback is rendered, page still returns 200. Does **not** trigger `app:render-failed`. |
+| `ssr:on-shell-error` | `onShellError` | Fatal error outside any `<Suspense>` boundary. The render is aborted, server returns 500. Triggers `app:render-failed`. |
+
+#### Derived hooks
+
+- `app:rendered` — called automatically when `react:render` fires with `ssr:on-shell-ready`
+- `app:render-failed` — called automatically when `react:error` fires with `ssr:on-shell-error`
+
+#### Event flow
+
+```
+renderToPipeableStream
+  ├─ onShellReady  → react:render (ssr:on-shell-ready) → app:rendered
+  ├─ onAllReady    → react:render (ssr:on-all-ready)
+  ├─ onError       → react:error  (ssr:on-error)          [recoverable, no app:render-failed]
+  └─ onShellError  → react:error  (ssr:on-shell-error)  → app:render-failed → 500
+```
+
+### Client-Side (hydration)
+
+The browser implementation monitors React hydration errors and error boundaries.
+
+#### `react:render` events
+
+The `react:render` hook is called once after successful hydration.
+
+#### `react:error` events
+
+| `payload.event` | Description |
+| --- | --- |
+| `page-error-boundary` | Error caught by the page-level error boundary |
+| `hydrate:on-uncaught-error` | Uncaught error during hydration |
+| `hydrate:on-caught-error` | Error caught by an error boundary during hydration |
+| `hydrate:recover-after-error` | Recoverable hydration error (mismatch), React re-rendered from scratch |
+| `hydrate:failed` | Hydration threw synchronously |
+
+#### Derived hooks
+
+- `app:rendered` — called automatically on the first `react:render` (successful hydration)
+- `app:render-failed` — called automatically when `react:error` fires with `page-error-boundary`, `hydrate:on-uncaught-error`, or `hydrate:failed`
+
+:::info
+
+When a `react:error` triggers `app:render-failed`, subscribing to both hooks will result in duplicate notifications for the same error.
+
+:::
+
+#### Event flow
 
 ```
 HTML Parse → html-opened
@@ -210,9 +296,10 @@ Asset Loading → assets-loaded / assets-load-failed
     ↓
 App Bootstrap → app-start-failed (on error)
     ↓
-App Init → app-initialized
+App Init → app:initialized / app:initialize-failed
     ↓
-App Render → app-rendered / app-render-failed
+Hydration → react:render → app:rendered
+         or react:error  → app:render-failed
     ↓
 Runtime → unhandled-error (if occurs)
 ```

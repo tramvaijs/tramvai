@@ -4,6 +4,7 @@ import {
   DI_TOKEN,
   provide,
   TAPABLE_HOOK_FACTORY_TOKEN,
+  TRAMVAI_HOOKS_TOKEN,
 } from '@tramvai/core';
 import {
   LOGGER_TOKEN,
@@ -284,6 +285,7 @@ Page Error Boundary will be rendered for the client`,
         responseStream: SERVER_RESPONSE_STREAM,
         streamingTimeout: REACT_STREAMING_RENDER_TIMEOUT,
         deferredActions: DEFERRED_ACTIONS_MAP_TOKEN,
+        tramvaiHooks: TRAMVAI_HOOKS_TOKEN,
       },
     }),
     provide({

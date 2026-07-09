@@ -80,7 +80,7 @@ function appProviders(
           ),
           'app:rendered': tapableHookFactory.createSync<{}>('app:rendered'),
           'app:render-failed': tapableHookFactory.createSync<{ error: Error }>('app:render-failed'),
-          'react:render': tapableHookFactory.createSync<{}>('react:render'),
+          'react:render': tapableHookFactory.createSync<{ event: string }>('react:render'),
           'react:error': tapableHookFactory.createSync<{
             event: string;
             error: Error;

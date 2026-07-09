@@ -1,7 +1,7 @@
 import { Writable } from 'stream';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
 import { AbortedDeferredError, AbortedStreamError } from '@tinkoff/errors';
-import type { DI_TOKEN } from '@tramvai/core';
+import { TRAMVAI_HOOKS_TOKEN, type DI_TOKEN } from '@tramvai/core';
 import type {
   CONTEXT_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
@@ -106,6 +106,25 @@ class HtmlWritable extends Writable {
   }
 }
 
+class HtmlBlockingWritable extends Writable {
+  chunks = [];
+  html = '';
+
+  getHtml() {
+    return this.html;
+  }
+
+  _write(chunk, encoding, callback) {
+    this.chunks.push(chunk);
+    callback();
+  }
+
+  _final(callback) {
+    this.html = Buffer.concat(this.chunks).toString();
+    callback();
+  }
+}
+
 const Deferred = () => {
   let resolve;
   let reject;
@@ -138,6 +157,8 @@ export class ReactRenderServer {
 
   streamingTimeout: StreamingTimeout;
 
+  tramvaiHooks: ExtractDependencyType<typeof TRAMVAI_HOOKS_TOKEN>;
+
   renderMode: typeof REACT_SERVER_RENDER_MODE;
 
   // eslint-disable-next-line sort-class-members/sort-class-members
@@ -152,6 +173,7 @@ export class ReactRenderServer {
     responseStream,
     streamingTimeout,
     deferredActions,
+    tramvaiHooks,
   }) {
     this.context = context;
     this.customRender = customRender;
@@ -163,6 +185,7 @@ export class ReactRenderServer {
     this.responseStream = responseStream;
     this.streamingTimeout = streamingTimeout;
     this.deferredActions = deferredActions;
+    this.tramvaiHooks = tramvaiHooks;
   }
 
   render({
@@ -187,7 +210,7 @@ export class ReactRenderServer {
     if (process.env.__TRAMVAI_CONCURRENT_FEATURES && this.renderMode === 'streaming') {
       return new Promise((resolve, reject) => {
         const { renderToPipeableStream } = require('react-dom/server');
-        const { responseTaskManager, responseStream, log } = this;
+        const { responseTaskManager, responseStream, log, tramvaiHooks } = this;
         const htmlWritable = new HtmlWritable({
           responseTaskManager,
           responseStream,
@@ -196,6 +219,8 @@ export class ReactRenderServer {
         });
         const allReadyDeferred = Deferred();
         const start = Date.now();
+        // workaround for https://github.com/react/react/issues/36890
+        let failed = false;
 
         // prevent sent reply before all suspended components are resolved
         responseTaskManager.push(() => {
@@ -220,9 +245,17 @@ export class ReactRenderServer {
           // https://github.com/reactwg/react-18/discussions/114
           bootstrapScriptContent: `typeof window.__TRAMVAI_DEFERRED_HYDRATION === 'function' ? window.__TRAMVAI_DEFERRED_HYDRATION() : window.__TRAMVAI_DEFERRED_HYDRATION = true;`,
           onShellReady() {
+            if (failed) {
+              return;
+            }
+
             log.info({
               event: 'streaming-render:shell-ready',
               duration: Date.now() - start,
+            });
+
+            tramvaiHooks['react:render'].call({
+              event: 'ssr:on-shell-ready',
             });
 
             // here all HTML are ready except suspended components
@@ -232,28 +265,43 @@ export class ReactRenderServer {
             resolve('');
           },
           onAllReady() {
+            if (failed) {
+              return;
+            }
+
             log.info({
               event: 'streaming-render:all-ready',
               duration: Date.now() - start,
             });
+
+            tramvaiHooks['react:render'].call({
+              event: 'ssr:on-all-ready',
+            });
           },
           onError(error) {
-            // error can be inside Suspense boundaries, this is not critical, continue rendering.
-            // also render stream `abort` method calls will trigger this callback.
-            // for criticall errors, this callback will be called with `onShellError`,
-            // so this is a best place to error logging
             log.error({
               event: 'streaming-render:error',
               error,
             });
+
+            tramvaiHooks['react:error'].call({
+              event: 'ssr:on-error',
+              error,
+            });
           },
           onShellError(error) {
+            tramvaiHooks['react:error'].call({
+              event: 'ssr:on-shell-error',
+              error,
+            });
+
+            failed = true;
             // always critical error, abort rendering
             reject(error);
           },
         });
 
-        // global response stream timeo
+        // global response stream timeout
         setTimeout(() => {
           // abort unfinished deferred actions
           this.deferredActions.forEach((action, name) => {
@@ -269,6 +317,94 @@ export class ReactRenderServer {
           const reason = new AbortedStreamError({
             reason: `${timeout}ms timeout exceeded`,
             unfinishedActions,
+          });
+
+          // abort render stream
+          abort(reason);
+
+          reject(reason);
+        }, timeout);
+      });
+    }
+
+    if (this.renderMode === 'blocking') {
+      return new Promise((resolve, reject) => {
+        const { renderToPipeableStream } = require('react-dom/server');
+        const { log, tramvaiHooks } = this;
+        const timeout = this.streamingTimeout;
+        const htmlWritable = new HtmlBlockingWritable();
+        const start = Date.now();
+        // workaround for https://github.com/react/react/issues/36890
+        let failed = false;
+
+        htmlWritable.on('finish', () => {
+          resolve(htmlWritable.getHtml());
+        });
+
+        // TODO: check, if we need a timeout + abort for streaming
+        const { pipe, abort } = renderToPipeableStream(renderResult, {
+          onShellReady() {
+            if (failed) {
+              return;
+            }
+
+            log.info({
+              event: 'blocking-render:shell-ready',
+              duration: Date.now() - start,
+            });
+
+            tramvaiHooks['react:render'].call({
+              event: 'ssr:on-shell-ready',
+            });
+          },
+          onAllReady() {
+            if (failed) {
+              return;
+            }
+
+            log.info({
+              event: 'blocking-render:all-ready',
+              duration: Date.now() - start,
+            });
+
+            tramvaiHooks['react:render'].call({
+              event: 'ssr:on-all-ready',
+            });
+
+            // here all HTML are ready
+            pipe(htmlWritable);
+          },
+          onError(error) {
+            // error can be inside Suspense boundaries, this is not critical, continue rendering.
+            // also render stream `abort` method calls will trigger this callback.
+            // for criticall errors, this callback will be called with `onShellError`,
+            // so this is a best place to error logging
+            log.error({
+              event: 'blocking-render:error',
+              error,
+            });
+
+            tramvaiHooks['react:error'].call({
+              event: 'ssr:on-error',
+              error,
+            });
+          },
+          onShellError(error) {
+            tramvaiHooks['react:error'].call({
+              event: 'ssr:on-shell-error',
+              error,
+            });
+
+            failed = true;
+            // always critical error, abort rendering
+            reject(error);
+          },
+        });
+
+        // global response stream timeout
+        setTimeout(() => {
+          const reason = new AbortedStreamError({
+            reason: `${timeout}ms timeout exceeded`,
           });
 
           // abort render stream
