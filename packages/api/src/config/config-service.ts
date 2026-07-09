@@ -214,6 +214,7 @@ export type InputParameters = {
   httpsCert?: string;
   benchmark?: boolean;
   runtimeEnv?: Record<string, string>;
+  sourceMap?: boolean;
   analyze?: false | 'bundle' | 'whybundled' | 'statoscope' | 'rsdoctor' | 'stats';
   staticPort?: number;
   staticHost?: string;
@@ -956,6 +957,10 @@ export class ConfigService {
   }
 
   private getSourceMap(buildType: 'client' | 'server') {
+    if (this.#parameters.sourceMap) {
+      return this.#parameters.sourceMap;
+    }
+
     if (typeof this.#project.sourceMap === 'boolean') {
       return this.#project.sourceMap;
     }

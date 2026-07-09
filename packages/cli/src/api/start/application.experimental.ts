@@ -37,6 +37,7 @@ async function baseStartApplication(builder: 'webpack' | 'rspack', di: Container
     runtimeEnv: options.env,
     analyze: options.analyze,
     port: options.port,
+    sourceMap: options.sourceMap,
     host: options.host ?? '0.0.0.0',
     serverHot: options.serverHot,
     rootDir,

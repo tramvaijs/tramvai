@@ -142,6 +142,7 @@ export const webAppInitCommand = ({
             url: request.url,
           });
 
+          // eslint-disable-next-line max-statements
           await executionContextManager.withContext(null, 'root', async (rootExecutionContext) => {
             const providers = [
               provide({

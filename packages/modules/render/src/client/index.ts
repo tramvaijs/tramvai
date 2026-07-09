@@ -66,7 +66,9 @@ export function rendering({
       log.debug('App rendering');
       document.querySelector('html').classList.remove('no-js');
       executeRendererCallbacks();
-      hooks['react:render'].call({});
+      hooks['react:render'].call({
+        event: 'hydrate',
+      });
       resolve();
     };
     const params = {

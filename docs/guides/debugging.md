@@ -91,6 +91,8 @@ To connect source maps locally, follow the [instructions](https://developer.chro
 
 When running `tramvai start`, Tramvai launches server-side code in a separate process or worker thread. For debugging, follow any Node.js debugging guide, for example [this one](https://nodejs.org/learn/getting-started/debugging).
 
+Alternatively, you can use the VS Code debugger instead of Chrome DevTools. The Tramvai repository includes recommended debugging configurations in `.vscode/launch.json.recommended`.
+
 To start the inspector inside the worker that executes your code, use the following CLI argument:
 
 `tramvai start app --debug`

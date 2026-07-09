@@ -6,7 +6,7 @@ export type TramvaiHooks = {
   'app:initialize-failed': SyncTapableHookInstance<{ error: Error }>;
   'app:rendered': SyncTapableHookInstance<{}>;
   'app:render-failed': SyncTapableHookInstance<{ error: Error }>;
-  'react:render': SyncTapableHookInstance<{}>;
+  'react:render': SyncTapableHookInstance<{ event: string }>;
   'react:error': SyncTapableHookInstance<{
     event: string;
     error: Error;
