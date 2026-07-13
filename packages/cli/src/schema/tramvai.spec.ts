@@ -129,6 +129,7 @@ describe('JSON schema для tramvai.json', () => {
               },
             },
             "integrity": false,
+            "liveReload": true,
             "name": "test-app",
             "notifications": {},
             "output": {
@@ -200,6 +201,7 @@ describe('JSON schema для tramvai.json', () => {
               },
             },
             "integrity": false,
+            "liveReload": true,
             "name": "test-module",
             "notifications": {},
             "output": "dist/modules",

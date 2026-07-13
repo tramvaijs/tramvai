@@ -367,6 +367,11 @@ export interface CliConfigEntry extends ConfigEntry {
     };
   };
   /**
+   * @title Webpack live reload page after rebuild
+   * @default true
+   */
+  liveReload: boolean;
+  /**
    * @title Controls build notifications settings during development
    * @default {}
    */
