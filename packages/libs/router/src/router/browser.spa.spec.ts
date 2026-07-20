@@ -622,6 +622,43 @@ describe('router/browser-spa', () => {
 
         customRouter.unsubscribe();
       });
+
+      it('should force navigate again on repeated blocked navigation instead of triggering onBlock', async () => {
+        const onBlock = jest.fn();
+        const blockedRouter = new Router({ routes, onBlock });
+
+        window.location.href = 'http://localhost/';
+
+        await blockedRouter.rehydrate({
+          type: 'navigate',
+          to: { name: 'root', path: '/', actualPath: '/', params: {} },
+          url: parse('http://localhost/'),
+        });
+        await blockedRouter.start();
+
+        blockedRouter.registerGuard(async () => false);
+
+        mockHref.mockClear();
+
+        blockedRouter.navigate('/child1/');
+        await new Promise((resolve) => setTimeout(resolve, 30));
+
+        expect(mockHref).toHaveBeenCalledWith('/child1/');
+        expect(onBlock).not.toHaveBeenCalled();
+
+        // emulate the user returning to the original page with the same JS state
+        // (e.g. via bfcache restoration) — the location is back at the original url
+        window.location.href = 'http://localhost/';
+        mockHref.mockClear();
+
+        blockedRouter.navigate('/child1/');
+        await new Promise((resolve) => setTimeout(resolve, 30));
+
+        expect(mockHref).toHaveBeenCalledWith('/child1/');
+        expect(onBlock).not.toHaveBeenCalled();
+
+        blockedRouter.unsubscribe();
+      });
     });
 
     describe('cancel', () => {
