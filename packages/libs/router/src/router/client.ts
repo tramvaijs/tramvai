@@ -173,6 +173,10 @@ export abstract class ClientRouter extends AbstractRouter {
       return;
     }
 
+    // Reset the current navigation to prevent reusing a stale navigation state
+    // if the user returns to the page in the same state (e.g. via bfcache restoration).
+    this.currentNavigation = null;
+
     // prevent routing from any continues navigation returning promise which will be not resolved
     return new Promise<void>(() => {});
   }
