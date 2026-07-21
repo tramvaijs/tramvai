@@ -694,6 +694,9 @@
                           "display": {
                             "type": "string"
                           },
+                          "orientation": {
+                            "type": "string"
+                          },
                           "theme_color": {
                             "title": "prefer to use \"pwa.meta.themeColor\" instead, this field will be generated automatically",
                             "type": "string"
@@ -1428,23 +1431,23 @@
                               "dotAll": {
                                 "type": "boolean"
                               },
-                              "__@match@10335": {
+                              "__@match@10336": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@replace@10337": {
+                              "__@replace@10338": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@search@10340": {
+                              "__@search@10341": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@split@10342": {
+                              "__@split@10343": {
                                 "type": "object",
                                 "additionalProperties": false
                               },
-                              "__@matchAll@10344": {
+                              "__@matchAll@10345": {
                                 "type": "object",
                                 "additionalProperties": false
                               }
@@ -2373,23 +2376,23 @@
                                 "dotAll": {
                                   "type": "boolean"
                                 },
-                                "__@match@10335": {
+                                "__@match@10336": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@replace@10337": {
+                                "__@replace@10338": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@search@10340": {
+                                "__@search@10341": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@split@10342": {
+                                "__@split@10343": {
                                   "type": "object",
                                   "additionalProperties": false
                                 },
-                                "__@matchAll@10344": {
+                                "__@matchAll@10345": {
                                   "type": "object",
                                   "additionalProperties": false
                                 }
@@ -3318,23 +3321,23 @@
                                   "dotAll": {
                                     "type": "boolean"
                                   },
-                                  "__@match@10335": {
+                                  "__@match@10336": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@replace@10337": {
+                                  "__@replace@10338": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@search@10340": {
+                                  "__@search@10341": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@split@10342": {
+                                  "__@split@10343": {
                                     "type": "object",
                                     "additionalProperties": false
                                   },
-                                  "__@matchAll@10344": {
+                                  "__@matchAll@10345": {
                                     "type": "object",
                                     "additionalProperties": false
                                   }
