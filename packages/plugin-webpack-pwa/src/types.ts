@@ -29,6 +29,7 @@ export type WebManifestOptions = {
   // @todo - example or default with `/?standalone=true`?
   start_url?: string;
   display?: string;
+  orientation?: string;
   /**
    * @title prefer to use "pwa.meta.themeColor" instead, this field will be generated automatically
    */
