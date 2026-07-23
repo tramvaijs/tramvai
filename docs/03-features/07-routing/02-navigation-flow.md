@@ -75,6 +75,7 @@ Router provides a set of tapable hooks which can be useful for monitoring:
 - `Router.redirectHook`
 - `Router.notfoundHook`
 - `Router.blockHook`
+- `Router.internalHooks.router:add-route`
 - `Router.internalHooks.router:resolve-route`
 - `Router.internalHooks.router:resolve-url`
 - `Router.internalHooks.router:resolve-view-transition`

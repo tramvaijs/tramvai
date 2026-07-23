@@ -138,7 +138,7 @@ export class I18nComponentObject {
   async hasEnglishContent(): Promise<boolean> {
     const title = await this.getPageTitle();
     // Check for specific English words that shouldn't appear in Russian
-    return /Welcome|Features|Products|About/.test(title);
+    return /Welcome|Features|Products|About|Admin/.test(title);
   }
 
   // URL helpers
