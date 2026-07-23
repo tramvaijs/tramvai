@@ -193,4 +193,32 @@ test.describe('i18n - Default Configuration', () => {
       expect(currentLang).toBe('ru');
     });
   });
+
+  test.describe('Route resolve', () => {
+    test('should resolve the same route for different languages', async ({ app, I18n }) => {
+      await I18n.setLanguageCookie('en', app.domain);
+      const enResponse = await I18n.page.goto(`${app.serverUrl}/en/admin-page/`);
+      expect(enResponse?.status()).toBe(200);
+
+      const hasEnglish = await I18n.hasEnglishContent();
+      expect(hasEnglish).toBe(true);
+
+      await I18n.setLanguageCookie('ru', app.domain);
+      const ruResponse = await I18n.page.goto(`${app.serverUrl}/admin-page/`);
+      expect(ruResponse?.status()).toBe(200);
+
+      const hasRussian = await I18n.hasRussianContent();
+      expect(hasRussian).toBe(true);
+    });
+
+    test('should resolve a statically declared route', async ({ app, I18n }) => {
+      await I18n.setLanguageCookie('en', app.domain);
+      const enResponse = await I18n.page.goto(`${app.serverUrl}/en/acquisition/`);
+      expect(enResponse?.status()).toBe(200);
+
+      await I18n.setLanguageCookie('ru', app.domain);
+      const ruResponse = await I18n.page.goto(`${app.serverUrl}/acquisition/`);
+      expect(ruResponse?.status()).toBe(200);
+    });
+  });
 });

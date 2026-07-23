@@ -374,6 +374,27 @@ export const sharedProviders = [
 
             return next(args);
           });
+
+          router.internalHooks['router:add-route'].wrap((_, route, next) => {
+            // Resolve from DI to avoid circular dependency
+            const i18n = di.get(I18N_TOKEN);
+
+            if (route.path) {
+              const languageFromPath = i18n.getLanguageFromUrl(route.path);
+              const hasLanguagePrefix = typeof languageFromPath === 'string';
+
+              if (hasLanguagePrefix) {
+                // Register route without language prefix, so the same route is resolved for all languages.
+                const { pathname } = i18n.removeLanguageFromUrl(route.path);
+
+                if (pathname !== route.path) {
+                  return next({ ...route, path: pathname });
+                }
+              }
+            }
+
+            return next(route);
+          });
         },
       };
     },

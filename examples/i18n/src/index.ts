@@ -9,6 +9,7 @@ import { ClientHintsModule } from '@tramvai/module-client-hints';
 import { I18N_CONFIGURATION_TOKEN, I18nModule } from '@tramvai/module-i18n';
 import type { I18nRoutingStrategy, I18nLanguageUpdateStrategy } from '@tramvai/module-i18n';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
+import { ROUTE_RESOLVE_TOKEN } from '@tramvai/tokens-router';
 
 const spaCounterAction = declareAction({
   name: 'spaCounter',
@@ -87,6 +88,25 @@ createApp({
           key: 'I18N_UPDATE_STRATEGY',
         },
       ],
+    }),
+    provide({
+      // simulate a page enrichment / admin service that resolves routes dynamically.
+      provide: ROUTE_RESOLVE_TOKEN,
+      useValue: async (navigation) => {
+        const { pathname } = navigation.url!;
+
+        if (!pathname.includes('admin')) {
+          return;
+        }
+
+        return {
+          name: 'admin',
+          path: pathname,
+          config: {
+            pageComponent: '@/pages/admin',
+          },
+        };
+      },
     }),
   ],
 });

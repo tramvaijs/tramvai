@@ -97,6 +97,7 @@ export abstract class AbstractRouter {
   public readonly syncHooks: Map<SyncHookName, SyncTapableHookInstance<{ navigation: Navigation }>>;
 
   public readonly internalHooks: {
+    'router:add-route': SyncTapableHookInstance<Route, void>;
     'router:resolve-route': SyncTapableHookInstance<
       Parameters<AbstractRouter['_resolveRoute']>,
       NavigationRoute | undefined
@@ -242,6 +243,7 @@ export abstract class AbstractRouter {
     });
 
     this.internalHooks = {
+      'router:add-route': this.hooksFactory.createSync('router:add-route'),
       'router:resolve-route': this.hooksFactory.createSync('router:resolve-route'),
       'router:resolve-url': this.hooksFactory.createSync('router:resolve-url'),
       'router:resolve-view-transition': this.hooksFactory.createSync(
@@ -249,6 +251,9 @@ export abstract class AbstractRouter {
       ),
     };
 
+    this.internalHooks['router:add-route'].tap('router', (_, route) => {
+      this._addRoute(route);
+    });
     this.internalHooks['router:resolve-route'].tap('router', (_, args) => {
       return this._resolveRoute(...args);
     });
@@ -518,7 +523,7 @@ export abstract class AbstractRouter {
   unsubscribe(): void {}
 
   addRoute(route: Route) {
-    this.tree?.addRoute(route);
+    this.internalHooks['router:add-route'].call(route);
   }
 
   protected async redirect(navigation: Navigation, target: NavigateOptions): Promise<void> {
@@ -745,6 +750,10 @@ export abstract class AbstractRouter {
         hash: hash ?? resultUrl.hash,
       })
     );
+  }
+
+  protected _addRoute(route: Route) {
+    this.tree?.addRoute(route);
   }
 
   protected _resolveRoute(
