@@ -22,14 +22,17 @@ The module has separate server and browser implementations with different `react
 
 #### Tramvai hooks (server and browser)
 
-| Hook                    | Description                         |
-| ----------------------- | ----------------------------------- |
-| `app:initialized`       | Application initialization complete |
-| `app:initialize-failed` | Application failed to initialize    |
-| `app:rendered`          | Application rendered successfully   |
-| `app:render-failed`     | Application rendering failed        |
-| `react:render`          | React render lifecycle event        |
-| `react:error`           | React error occurred during render  |
+| Hook                     | Description                         |
+| ------------------------ | ----------------------------------- |
+| `app:initialize-started` | Application initialization started  |
+| `app:initialized`        | Application initialization complete |
+| `app:initialize-failed`  | Application failed to initialize    |
+| `app:render-started`     | Application render started          |
+| `app:rendered`           | Application rendered successfully   |
+| `app:render-failed`      | Application rendering failed        |
+| `react:render-started`   | React render started                |
+| `react:render`           | React render lifecycle event        |
+| `react:error`            | React error occurred during render  |
 
 ## Installation
 
@@ -142,7 +145,7 @@ When you are using `ApplicationMonitoringModule`, if you want to monitor applica
 
 #### Server-side example
 
-Server-side render monitoring hooks work with `REACT_SERVER_RENDER_MODE` set to `blocking` or `streaming`, because both modes use the [renderToPipeableStream](https://react.dev/reference/react-dom/server/renderToPipeableStream) API.
+Server-side render monitoring hooks work with all `REACT_SERVER_RENDER_MODE` values, but in `blocking` or `streaming` hook `react:render` will be called twice (for `onShellReady` and `onAllReady` callbacks), because both modes use the [renderToPipeableStream](https://react.dev/reference/react-dom/server/renderToPipeableStream) API. Despite this, the sending of the `app:render` event is deduplicated and called only for `onAllReady` callback.
 
 In `blocking` mode, the full HTML response is still buffered and works like the old `renderToString` API, and it is a much simpler way to move to the streaming rendering API. In `streaming` mode, a lot more changes are present that can be breaking for your application — `async` scripts, different hydration trigger, etc.
 
@@ -225,9 +228,13 @@ provide({
 
 ## How It Works
 
-### Server-Side (blocking render mode)
+### Server-Side
 
-The server uses `renderToPipeableStream` in blocking mode. React provides four callbacks during rendering, and the module maps them to tramvai hooks:
+The server uses `renderToPipeableStream` in blocking and streaming modes, and `renderToString` by default. React provides four callbacks during rendering, and the module maps them to tramvai hooks:
+
+#### `react:render-started` events
+
+The `react:render-started` hook is called just before SSR rendering started.
 
 #### `react:render` events
 
@@ -235,6 +242,7 @@ The server uses `renderToPipeableStream` in blocking mode. React provides four c
 | --- | --- | --- |
 | `ssr:on-shell-ready` | `onShellReady` | The shell HTML (everything outside pending `<Suspense>` boundaries) is ready. |
 | `ssr:on-all-ready` | `onAllReady` | All content including Suspense boundaries is ready. HTML is piped to the response after this. Triggers `app:rendered`. |
+| `ssr:finished` | after sync `renderToString` call | The full HTML is ready. Triggers `app:rendered`. |
 
 #### `react:error` events
 
@@ -245,22 +253,47 @@ The server uses `renderToPipeableStream` in blocking mode. React provides four c
 
 #### Derived hooks
 
-- `app:rendered` — called automatically when `react:render` fires with `ssr:on-shell-ready`
+- `app:render-started` — called automatically when `react:render-started` fires
+- `app:rendered` — called automatically when `react:render` fires with `ssr:on-all-ready` or `ssr:finished`
 - `app:render-failed` — called automatically when `react:error` fires with `ssr:on-shell-error`
 
 #### Event flow
 
+##### Initialization
+
+`app:initialized` always fires before `app:rendered`, once per application lifecycle, after "init" Command line ("init" -> "listen")
+
+##### Rendering
+
+All rendering-related events are fired per every incoming request for HTML pages.
+
+For streaming and blocking render modes:
+
 ```
 renderToPipeableStream
-  ├─ onShellReady  → react:render (ssr:on-shell-ready) → app:rendered
-  ├─ onAllReady    → react:render (ssr:on-all-ready)
-  ├─ onError       → react:error  (ssr:on-error)          [recoverable, no app:render-failed]
+  ├─ before        → react:render-started               → app:render-started
+  ├─ onShellReady  → react:render (ssr:on-shell-ready)
+  ├─ onAllReady    → react:render (ssr:on-all-ready)    → app:rendered
+  ├─ onError       → react:error  (ssr:on-error)        [recoverable, no app:render-failed]
   └─ onShellError  → react:error  (ssr:on-shell-error)  → app:render-failed → 500
+```
+
+And for default mode:
+
+```
+renderToString
+  ├─ before → react:render-started → app:render-started
+  ├─ then   → react:render (ssr:finished) → app:rendered
+  └─ catch  → react:error  (ssr:on-error) → app:render-failed → 500
 ```
 
 ### Client-Side (hydration)
 
 The browser implementation monitors React hydration errors and error boundaries.
+
+#### `react:render-started` events
+
+The `react:render-started` hook is called just before hydration started.
 
 #### `react:render` events
 
@@ -278,6 +311,7 @@ The `react:render` hook is called once after successful hydration.
 
 #### Derived hooks
 
+- `app:render-started` — called automatically when `react:render-started` fires
 - `app:rendered` — called automatically on the first `react:render` (successful hydration)
 - `app:render-failed` — called automatically when `react:error` fires with `page-error-boundary`, `hydrate:on-uncaught-error`, or `hydrate:failed`
 
@@ -289,6 +323,17 @@ When a `react:error` triggers `app:render-failed`, subscribing to both hooks wil
 
 #### Event flow
 
+##### Initialization
+
+`app:initialized` always fires after `app:rendered`, once per application lifecycle, and includes full client initialization cycle:
+
+- "init" and "listen" Command lines
+- "customerStart", "resolveUserDeps", "resolvePageDeps", "generatePage" and "clear" Command lines
+
+##### Rendering
+
+All rendering-related events are fired once per application lifecycle, at "generatePage" Command line stage.
+
 ```
 HTML Parse → html-opened
     ↓
@@ -296,10 +341,17 @@ Asset Loading → assets-loaded / assets-load-failed
     ↓
 App Bootstrap → app-start-failed (on error)
     ↓
-App Init → app:initialized / app:initialize-failed
+App Init → app:initialize-started / app:initialize-failed
     ↓
-Hydration → react:render → app:rendered
+Command line "init"
+    ↓
+Command line "customer"
+    ↓
+Hydration → react:render-started → app:render-started
+         → react:render → app:rendered
          or react:error  → app:render-failed
+    ↓
+App Initialized → app:initialized / app:initialize-failed
     ↓
 Runtime → unhandled-error (if occurs)
 ```

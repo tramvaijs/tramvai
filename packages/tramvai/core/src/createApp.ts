@@ -73,13 +73,18 @@ function appProviders(
       provide: TRAMVAI_HOOKS_TOKEN,
       useFactory: ({ tapableHookFactory }) => {
         return {
-          'app:initialized': tapableHookFactory.createSync<{}>('app:initialized'),
+          'app:initialize-started': tapableHookFactory.createSync<{}>('app:initialize-started'),
+          'app:initialized': tapableHookFactory.createSync<{ duration: number }>('app:initialized'),
           'app:initialize-failed': tapableHookFactory.createSync<{ error: Error }>(
             'app:initialize-failed'
           ),
-          'app:rendered': tapableHookFactory.createSync<{}>('app:rendered'),
+          'app:render-started': tapableHookFactory.createSync<{}>('app:render-started'),
+          'app:rendered': tapableHookFactory.createSync<{ duration: number }>('app:rendered'),
           'app:render-failed': tapableHookFactory.createSync<{ error: Error }>('app:render-failed'),
-          'react:render': tapableHookFactory.createSync<{ event: string }>('react:render'),
+          'react:render-started': tapableHookFactory.createSync<{}>('react:render-started'),
+          'react:render': tapableHookFactory.createSync<{ event: string; duration: number }>(
+            'react:render'
+          ),
           'react:error': tapableHookFactory.createSync<{
             event: string;
             error: Error;
@@ -229,11 +234,16 @@ export function createApp(options: AppOptions) {
   }
 
   const hooks = app.di.get(TRAMVAI_HOOKS_TOKEN);
+  const start = Date.now();
+
+  hooks['app:initialize-started'].call({});
 
   return app
     .initialization(typeof window === 'undefined' ? 'server' : 'client')
     .then(() => {
-      hooks['app:initialized'].call({});
+      hooks['app:initialized'].call({
+        duration: Date.now() - start,
+      });
 
       return app;
     })

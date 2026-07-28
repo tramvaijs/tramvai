@@ -62,13 +62,21 @@ export function rendering({
           console.error(cbError);
         }
       });
+    const started = Date.now();
     const callback = () => {
-      log.debug('App rendering');
       document.querySelector('html').classList.remove('no-js');
       executeRendererCallbacks();
+
+      const duration = Date.now() - started;
       hooks['react:render'].call({
         event: 'hydrate',
+        duration,
       });
+      log.debug({
+        event: 'hydrate:finished',
+        duration,
+      });
+
       resolve();
     };
     const params = {
@@ -81,6 +89,11 @@ export function rendering({
     };
 
     try {
+      hooks['react:render-started'].call({});
+      log.debug({
+        event: 'hydrate:start',
+      });
+
       renderer(params);
     } catch (error) {
       executeRendererCallbacks(error);

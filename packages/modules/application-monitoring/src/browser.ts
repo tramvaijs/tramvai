@@ -28,11 +28,15 @@ export const ApplicationMonitoringModule = declareModule({
           tramvaiHooks['app:rendered'].tap('application-health', () => {
             log.info({ event: 'app:rendered' });
           });
-          tramvaiHooks['react:render'].tap('application-health', () => {
+          tramvaiHooks['react:render-started'].tap('application-health', () => {
+            log.info({ event: 'react:render-started' });
+            tramvaiHooks['app:render-started'].call({});
+          });
+          tramvaiHooks['react:render'].tap('application-health', (_, payload) => {
             log.info({ event: 'react:render' });
             if (!applicationRenderFinished) {
               applicationRenderFinished = true;
-              tramvaiHooks['app:rendered'].call({});
+              tramvaiHooks['app:rendered'].call({ duration: payload.duration });
             }
           });
 
