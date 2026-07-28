@@ -40,10 +40,14 @@ export const ApplicationMonitoringModule = declareModule({
           tramvaiHooks['app:rendered'].tap('application-health', () => {
             log.info({ event: 'app:rendered' });
           });
+          tramvaiHooks['react:render-started'].tap('application-health', () => {
+            log.info({ event: 'react:render-started' });
+            tramvaiHooks['app:render-started'].call({});
+          });
           tramvaiHooks['react:render'].tap('application-health', (_, payload) => {
             log.info({ event: 'react:render' });
-            if (payload.event === 'ssr:on-all-ready') {
-              tramvaiHooks['app:rendered'].call({});
+            if (payload.event === 'ssr:on-all-ready' || payload.event === 'ssr:finished') {
+              tramvaiHooks['app:rendered'].call({ duration: payload.duration });
             }
           });
           tramvaiHooks['app:render-failed'].tap('application-health', (_, { error }) => {

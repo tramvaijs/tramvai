@@ -233,6 +233,7 @@ export class ReactRenderServer {
           allReadyDeferred.resolve();
         });
 
+        tramvaiHooks['react:render-started'].call({});
         log.info({
           event: 'streaming-render:start',
         });
@@ -248,14 +249,15 @@ export class ReactRenderServer {
             if (failed) {
               return;
             }
-
-            log.info({
-              event: 'streaming-render:shell-ready',
-              duration: Date.now() - start,
-            });
+            const duration = Date.now() - start;
 
             tramvaiHooks['react:render'].call({
               event: 'ssr:on-shell-ready',
+              duration,
+            });
+            log.debug({
+              event: 'streaming-render:shell-ready',
+              duration,
             });
 
             // here all HTML are ready except suspended components
@@ -268,14 +270,15 @@ export class ReactRenderServer {
             if (failed) {
               return;
             }
-
-            log.info({
-              event: 'streaming-render:all-ready',
-              duration: Date.now() - start,
-            });
+            const duration = Date.now() - start;
 
             tramvaiHooks['react:render'].call({
               event: 'ssr:on-all-ready',
+              duration,
+            });
+            log.debug({
+              event: 'streaming-render:all-ready',
+              duration,
             });
           },
           onError(error) {
@@ -341,34 +344,41 @@ export class ReactRenderServer {
           resolve(htmlWritable.getHtml());
         });
 
+        tramvaiHooks['react:render-started'].call({});
+        log.info({
+          event: 'blocking-render:start',
+        });
+
         // TODO: check, if we need a timeout + abort for streaming
         const { pipe, abort } = renderToPipeableStream(renderResult, {
           onShellReady() {
             if (failed) {
               return;
             }
-
-            log.info({
-              event: 'blocking-render:shell-ready',
-              duration: Date.now() - start,
-            });
+            const duration = Date.now() - start;
 
             tramvaiHooks['react:render'].call({
               event: 'ssr:on-shell-ready',
+              duration,
+            });
+            log.debug({
+              event: 'blocking-render:shell-ready',
+              duration,
             });
           },
           onAllReady() {
             if (failed) {
               return;
             }
-
-            log.info({
-              event: 'blocking-render:all-ready',
-              duration: Date.now() - start,
-            });
+            const duration = Date.now() - start;
 
             tramvaiHooks['react:render'].call({
               event: 'ssr:on-all-ready',
+              duration,
+            });
+            log.debug({
+              event: 'blocking-render:all-ready',
+              duration,
             });
 
             // here all HTML are ready
@@ -416,6 +426,25 @@ export class ReactRenderServer {
     }
 
     const { renderToString } = require('react-dom/server');
-    return Promise.resolve(renderToString(renderResult));
+    const start = Date.now();
+
+    this.tramvaiHooks['react:render-started'].call({});
+    this.log.debug({
+      event: 'sync-render:start',
+    });
+
+    const result = renderToString(renderResult);
+    const duration = Date.now() - start;
+
+    this.tramvaiHooks['react:render'].call({
+      event: 'ssr:finished',
+      duration,
+    });
+    this.log.debug({
+      event: 'sync-render:finished',
+      duration,
+    });
+
+    return Promise.resolve(result);
   }
 }
