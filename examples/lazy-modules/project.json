@@ -1,0 +1,6 @@
+{
+  "name": "lazy-modules",
+  "sourceRoot": "examples/lazy-modules/src",
+  "projectType": "library",
+  "targets": {}
+}

@@ -1,6 +1,7 @@
 import isArray from '@tinkoff/utils/is/array';
 import isObject from '@tinkoff/utils/is/object';
 import eachObj from '@tinkoff/utils/object/each';
+import type { Container } from '@tinkoff/dippy';
 import type { Route } from '@tinkoff/router';
 import type { PageRegistry as Interface, PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import type {
@@ -12,7 +13,7 @@ import type {
 } from '@tramvai/tokens-common';
 import type { TramvaiComponentDecl } from '@tramvai/react';
 import { resolveLazyComponent } from '@tramvai/react';
-import type { Bundle } from '@tramvai/core';
+import type { Bundle, ROOT_DI_TOKEN } from '@tramvai/core';
 
 interface Deps {
   bundleManager: typeof BUNDLE_MANAGER_TOKEN;
@@ -21,6 +22,7 @@ interface Deps {
   actionRegistry: typeof ACTION_REGISTRY_TOKEN;
   dispatcher: typeof DISPATCHER_TOKEN;
   dispatcherContext: typeof DISPATCHER_CONTEXT_TOKEN;
+  rootDi: typeof ROOT_DI_TOKEN;
 }
 
 export class PageRegistry implements Interface {
@@ -30,6 +32,7 @@ export class PageRegistry implements Interface {
   private actionRegistry: Deps['actionRegistry'];
   private dispatcher: Deps['dispatcher'];
   private dispatcherContext: Deps['dispatcherContext'];
+  private rootDi: Container;
   constructor({
     bundleManager,
     pageService,
@@ -37,6 +40,7 @@ export class PageRegistry implements Interface {
     actionRegistry,
     dispatcher,
     dispatcherContext,
+    rootDi,
   }: Deps) {
     this.bundleManager = bundleManager;
     this.pageService = pageService;
@@ -44,6 +48,7 @@ export class PageRegistry implements Interface {
     this.actionRegistry = actionRegistry;
     this.dispatcher = dispatcher;
     this.dispatcherContext = dispatcherContext;
+    this.rootDi = rootDi;
   }
 
   async resolve(route: Route): Promise<void> {
@@ -85,6 +90,10 @@ export class PageRegistry implements Interface {
     // hoist static properties from inner component to lazy wrapper if any
     if ('load' in componentOrBundle) {
       await resolveLazyComponent(componentOrBundle);
+    }
+
+    if ('modules' in componentOrBundle && isArray(componentOrBundle.modules)) {
+      this.rootDi.registerModules(componentOrBundle.modules);
     }
 
     if ('components' in componentOrBundle && isObject(componentOrBundle.components)) {

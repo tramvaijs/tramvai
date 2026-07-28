@@ -1,0 +1,30 @@
+{
+  "name": "lazy-modules",
+  "version": "0.0.0-stub",
+  "private": true,
+  "scripts": {
+    "start": "tramvai start lazy-modules",
+    "start:prod": "tramvai start-prod lazy-modules",
+    "build": "tramvai build lazy-modules"
+  },
+  "dependencies": {
+    "@tinkoff/dippy": "^1.0.0",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/module-error-interceptor": "0.0.0-stub",
+    "@tramvai/module-render": "0.0.0-stub",
+    "@tramvai/module-router": "0.0.0-stub",
+    "@tramvai/module-server": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/state": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "react": "19.0.1",
+    "react-dom": "19.0.1",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@tramvai/cli": "0.0.0-stub"
+  }
+}

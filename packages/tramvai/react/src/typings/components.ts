@@ -1,5 +1,6 @@
 import type { ComponentType, ReactNode } from 'react';
 import type { PageAction, Reducer } from '@tramvai/types-actions-state-context';
+import type { ModuleType } from '@tinkoff/dippy';
 import type { LoadableComponent } from '@loadable/component';
 import type { UniversalErrorBoundaryFallbackProps } from '../error/UniversalErrorBoundary';
 
@@ -14,6 +15,7 @@ export interface PageComponentOptions {
   actions?: PageAction[];
   reducers?: Reducer<any, any>[];
   components?: Record<string, TramvaiComponent>;
+  modules?: ModuleType[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
