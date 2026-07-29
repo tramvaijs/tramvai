@@ -90,6 +90,9 @@ describe('encodeForURLContext', () => {
       'javascrip%25%35%43tt:alert()',
       'javascrip%25%32%35%25%33%35%25%34%33rt:alert()',
       "javascrip%255Crt:alert('%25xss')",
+      // VULN-10180 + https://owasp.org/www-community/Double_Encoding
+      "jav	ascri\npt:alert('xss')",
+      'jav%2509ascript://x/%25250adocument.domain',
     ];
 
     testCases.forEach((url) => {
