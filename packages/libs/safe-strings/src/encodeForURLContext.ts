@@ -11,10 +11,6 @@ function isRelativeUrlWithoutProtocol(url: string): boolean {
   return relativeFirstCharacters.includes(url[0]);
 }
 
-function decodeControlCharacters(str: string) {
-  return str.replace(ctrlCharactersRegex, '');
-}
-
 function decodeURI(uri: string): string {
   try {
     return decodeURIComponent(uri);
@@ -54,14 +50,18 @@ export function encodeForURLContext(url?: string, blankUrl = 'about:blank') {
   }
 
   let charsToDecode;
-  let decodedUrl = decodeURI(url);
+  let decodedUrl = decodeURI(url.trim());
 
   do {
-    decodedUrl = decodeControlCharacters(decodedUrl).replace(whitespaceEscapeCharsRegex, '').trim();
+    decodedUrl = decodedUrl
+      .replace(ctrlCharactersRegex, '')
+      .replace(whitespaceEscapeCharsRegex, '')
+      .trim();
 
     decodedUrl = decodeURI(decodedUrl);
 
-    charsToDecode = decodedUrl.match(whitespaceEscapeCharsRegex);
+    charsToDecode =
+      decodedUrl.match(ctrlCharactersRegex) || decodedUrl.match(whitespaceEscapeCharsRegex);
   } while (charsToDecode && charsToDecode.length > 0);
 
   const sanitizedUrl = decodedUrl;
