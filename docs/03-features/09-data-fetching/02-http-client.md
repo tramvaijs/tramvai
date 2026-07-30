@@ -371,6 +371,34 @@ provide({
 });
 ```
 
+### Logger Options
+
+While `HTTP_CLIENT_LOGGER_EXTENSION` modifies each log object, `logPluginOptions` configures the logger instance that the log plugin creates. Use it to pass instance-level logger settings.
+
+```ts
+const httpClient = httpClientFactory({
+  name: 'my-api',
+  baseUrl: '...',
+  logPluginOptions: {
+    defaults: { remote: { destination: 'my-api-logs' } },
+  },
+});
+```
+
+To apply it to every HTTP client of the application, provide it via `DEFAULT_HTTP_CLIENT_FACTORY_OPTIONS`:
+
+```ts
+import { provide } from '@tramvai/core';
+import { DEFAULT_HTTP_CLIENT_FACTORY_OPTIONS } from '@tramvai/tokens-http-client';
+
+provide({
+  provide: DEFAULT_HTTP_CLIENT_FACTORY_OPTIONS,
+  useValue: {
+    logPluginOptions: { defaults: { remote: { destination: 'http-logs' } } },
+  },
+});
+```
+
 ### Debug
 
 You can show all the default logs of http clients by providing these env variables:

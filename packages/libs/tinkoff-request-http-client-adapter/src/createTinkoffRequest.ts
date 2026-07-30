@@ -52,6 +52,7 @@ export interface TinkoffRequestOptions extends HttpClientBaseOptions {
   };
   querySerializer?: QuerySerializer;
   logPluginExtensions?: LogExtension[];
+  logPluginOptions?: { [key: string]: any };
 }
 
 export function createTinkoffRequest(options: TinkoffRequestOptions): MakeRequest {
@@ -73,6 +74,7 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     agent,
     querySerializer,
     logPluginExtensions,
+    logPluginOptions,
     retryOptions,
     etagCacheOptions,
     interceptors,
@@ -137,9 +139,14 @@ export function createTinkoffRequest(options: TinkoffRequestOptions): MakeReques
     })
   );
 
+  const loggerWithOptions =
+    logger && logPluginOptions
+      ? (loggerName: string) => logger({ name: loggerName, ...logPluginOptions })
+      : logger;
+
   plugins.push(
     logPlugin({
-      logger,
+      logger: loggerWithOptions,
       name,
       showQueryFields: true,
       showPayloadFields: true,

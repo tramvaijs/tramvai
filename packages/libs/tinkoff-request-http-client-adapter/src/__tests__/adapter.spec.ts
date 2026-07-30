@@ -866,6 +866,32 @@ describe('@tinkoff/request to HttpClient adapter', () => {
         await terminate();
       });
     });
+
+    describe('log plugin', () => {
+      it('passes logPluginOptions to the logger instance created by the log plugin', () => {
+        createAdapter({
+          name: 'api',
+          logger: loggerFactoryMock,
+          logPluginOptions: {
+            defaults: { remote: { destination: 'api-logs' } },
+          },
+        });
+
+        expect(loggerFactoryMock).toHaveBeenCalledWith({
+          name: 'request.api',
+          defaults: { remote: { destination: 'api-logs' } },
+        });
+      });
+
+      it('creates the log plugin logger with a plain name when logPluginOptions is not set', () => {
+        createAdapter({
+          name: 'api',
+          logger: loggerFactoryMock,
+        });
+
+        expect(loggerFactoryMock).toHaveBeenCalledWith('request.api');
+      });
+    });
   });
 
   describe('requests', () => {
