@@ -73,40 +73,18 @@ import { createAssetsRules } from './shared/assets';
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createCacheConfig } from './shared/cache';
 import { createSplitChunksOptions } from './shared/split-chunks';
+import {
+  clientBuildName,
+  clientMainFields,
+  polyfillBuildName,
+  stderrWithWarningFilters,
+} from './shared/const';
 
 import { WebpackConfigurationFactory } from './types/webpack';
-
-const mainFields = ['browser', 'module', 'main'];
-
-const filters = ignoreWarnings.map(
-  ({ message }) =>
-    (text: string) =>
-      message.test(text)
-);
-
-const stderrWithWarningFilters = new Writable({
-  write(chunk, encoding, callback) {
-    const chunkStr = chunk.toString();
-
-    if (filters.some((filter) => filter(chunkStr))) {
-      callback();
-      return;
-    }
-
-    process.stderr.write(chunk, encoding, callback);
-  },
-});
-
-stderrWithWarningFilters.on('error', (error: Error) =>
-  console.error('[infrastructureLogging] stream error', error)
-);
 
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
 const MergeStatsPlugin = getMergeStatsPlugin(Compilation);
 const CollectStatsPlugin = getCollectStatsPlugin(Compilation);
-
-export const clientBuildName = 'client';
-export const polyfillBuildName = 'polyfill';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
@@ -205,7 +183,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
   // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'client' });
-  const resolveOptions = await createResolveOptions({ di, mainFields });
+  const resolveOptions = await createResolveOptions({ di, mainFields: clientMainFields });
 
   const isPolyfillsExists = Boolean(polyfillPath || modernPolyfillPath);
 
@@ -250,7 +228,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     resolve: {
       extensions,
       // TODO: es2017, es2016, es2015 fields support?
-      mainFields,
+      mainFields: clientMainFields,
       symlinks: config.resolveSymlinks,
       fallback: {
         path: 'path-browserify',

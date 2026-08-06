@@ -52,32 +52,8 @@ import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createAssetsRules } from './shared/assets';
 import { createServerInlineRules } from './shared/server-inline';
 import { createCacheConfig } from './shared/cache';
+import { serverBuildName, serverMainFields, stderrWithWarningFilters } from './shared/const';
 import { WebpackConfigurationFactory } from './types/webpack';
-
-const mainFields = ['module', 'main'];
-
-const filters = ignoreWarnings.map(
-  ({ message }) =>
-    (text: string) =>
-      message.test(text)
-);
-
-const stderrWithWarningFilters = new Writable({
-  write(chunk, encoding, callback) {
-    const chunkStr = chunk.toString();
-
-    if (filters.some((filter) => filter(chunkStr))) {
-      callback();
-      return;
-    }
-
-    process.stderr.write(chunk, encoding, callback);
-  },
-});
-
-stderrWithWarningFilters.on('error', (error: Error) =>
-  console.error('[infrastructureLogging] stream error', error)
-);
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
   di,
@@ -158,8 +134,7 @@ export default appConfig;`;
 
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'server' });
 
-  const resolveOptions = await createResolveOptions({ di, mainFields });
-  const serverBuildName = 'server';
+  const resolveOptions = await createResolveOptions({ di, mainFields: serverMainFields });
 
   const entryPath = resolveAbsolutePathForFile({
     file: config.entryFile,
@@ -224,7 +199,7 @@ export default appConfig;`;
     resolve: {
       // support for https://nodejs.org/api/addons.html
       extensions: [...extensions, '.node'],
-      mainFields,
+      mainFields: serverMainFields,
       symlinks: config.resolveSymlinks,
       fallback,
       alias: {

@@ -7,6 +7,7 @@ import { COMMAND_PARAMETERS_TOKEN, CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from
 import type { Builder } from '../../typings/build/Builder';
 import { ConvertToSchema } from '../../schema/ConfigSchema';
 import { ApplicationConfigEntry } from '../../typings/configEntry/application';
+import { ChildAppConfigEntry } from '../../typings/configEntry/child-app';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all';
@@ -21,7 +22,7 @@ export type Params = WithConfig<{
   showBanner?: boolean;
   debug?: boolean;
   // for manual call in tests
-  config?: ConvertToSchema<ApplicationConfigEntry>;
+  config?: ConvertToSchema<ApplicationConfigEntry | ChildAppConfigEntry>;
   trace?: boolean;
   verboseWebpack?: boolean;
   profile?: boolean;
@@ -40,6 +41,7 @@ export type Params = WithConfig<{
   disableServerRunnerWaiting?: boolean;
   noRebuild?: boolean;
   experimentalRspack?: boolean;
+  experimentalWebpackWorkerThreads?: boolean;
   serverHot?: boolean;
 }>;
 
@@ -72,6 +74,17 @@ export default createCommand({
       return startExperimentalApplication(di);
     }
 
+    if (options.experimentalWebpackWorkerThreads) {
+      if (configEntry.type !== 'child-app') {
+        throw new Error(
+          '--experimentalWebpackWorkerThreads option is only available for child-app project'
+        );
+      }
+
+      const { startExperimentalChildApp } = require('./child-app.experimental');
+      return startExperimentalChildApp(di);
+    }
+
     switch (configEntry.type) {
       case 'application':
         // eslint-disable-next-line no-case-declarations
@@ -83,8 +96,8 @@ export default createCommand({
         return startModule(di);
       case 'child-app':
         // eslint-disable-next-line no-case-declarations
-        const { startChildApp } = require('./child-app');
-        return startChildApp(di);
+        const { startExperimentalChildApp } = require('./child-app.experimental');
+        return startExperimentalChildApp(di);
     }
   },
 });

@@ -51,7 +51,7 @@ export const getSharedModules = (config: ConfigService): ModuleFederationSharedO
       if (config.shared?.autoResolveSharedRequiredVersions) {
         const isTramvai = isUnifiedVersion(name) || isDependantLib(name);
         const version: string | undefined =
-          packageJson.dependencies[name] ?? require(`${name}/package.json`)?.version;
+          packageJson?.dependencies[name] ?? require(`${name}/package.json`)?.version;
 
         if (isTramvai && version && version !== '0.0.0-stub') {
           acc[name].requiredVersion = version[0].match(/[0-9]/)

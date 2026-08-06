@@ -1,7 +1,7 @@
 /* eslint-disable complexity, max-statements */
 import path from 'node:path';
 import type { Container } from '@tinkoff/dippy';
-import { StartParameters, start } from '@tramvai/api/lib/api/start';
+import { start } from '@tramvai/api/lib/api/start';
 import { ApplicationProject, Configuration, Project } from '@tramvai/api/lib/config';
 import {
   COMMAND_PARAMETERS_TOKEN,
@@ -16,6 +16,7 @@ import type {
   ApplicationConfigEntry,
   ApplicationExperiments,
 } from '../../typings/configEntry/application';
+import { createDevServerApi, getInputParams, hasSwcTranspiler } from './utils/config';
 
 declare global {
   // eslint-disable-next-line no-var, vars-on-top
@@ -36,21 +37,28 @@ export const APPLICATION_CONFIG_FIELDS = {
   sourceMap: 'mapped',
   integrity: 'mapped',
   experiments: 'mapped',
+  // Deprecated
   excludesPresetEnv: 'skipped',
+  // Deprecated
   threadLoader: 'skipped',
   define: 'mapped',
   generateDataQaTag: 'mapped',
+  // Deprecated
   enableFillActionNamePlugin: 'skipped',
   postcss: 'mapped',
+  // Deprecated
   alias: 'skipped',
   svgo: 'mapped',
   imageOptimization: 'mapped',
   webpack: 'mapped',
   dedupe: 'mapped',
+  // Deprecated
   terser: 'skipped',
+  // Deprecated
   cssMinimize: 'skipped',
   hotRefresh: 'mapped',
   liveReload: 'mapped',
+  // Deprecated
   notifications: 'skipped',
   shared: 'mapped',
 
@@ -61,23 +69,27 @@ export const APPLICATION_CONFIG_FIELDS = {
   output: 'mapped',
   fileSystemPages: 'mapped',
   splitChunks: 'mapped',
+  // Deprecated
   checkAsyncTs: 'skipped',
   externals: 'mapped',
+  // Deprecated
   withModulesStats: 'skipped',
 } as const satisfies Record<keyof ApplicationConfigEntry, 'mapped' | 'skipped'>;
 
 export const APPLICATION_EXPERIMENTS_FIELDS = {
-  // Experiments
+  // Deprecated
   webpack: 'skipped',
+  // Deprecated
   minicss: 'skipped',
   lightningcss: 'mapped',
   transpilation: 'mapped',
+  // TODO: map with build scenario
   minifier: 'skipped',
   autoResolveSharedRequiredVersions: 'mapped',
   enableFillDeclareActionNamePlugin: 'mapped',
   reactCompiler: 'mapped',
 
-  // ApplicationExperiments
+  // Deprecated
   serverRunner: 'skipped',
   pwa: 'mapped',
   viewTransitions: 'mapped',
@@ -98,34 +110,7 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
   const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
   const rootDir = di.get(CONFIG_ROOT_DIR_TOKEN);
 
-  const inputParameters: StartParameters = {
-    name: configEntry.name,
-    mode: 'development',
-    benchmark: options.benchmark,
-    buildType: options.buildType,
-    noRebuild: options.noRebuild,
-    debug: options.debug ? String(options.debug) : false,
-    https: options.https,
-    httpsCert: options.httpsCert,
-    httpsKey: options.httpsKey,
-    runtimeEnv: options.env,
-    analyze: options.analyze,
-    port: options.port,
-    sourceMap: options.sourceMap,
-    host: options.host ?? '0.0.0.0',
-    serverHot: options.serverHot,
-    rootDir,
-    staticPort: options.staticPort,
-    staticHost: options.staticHost,
-    noServerRebuild: options.noServerRebuild,
-    noClientRebuild: options.noClientRebuild,
-    resolveSymlinks: options.resolveSymlinks,
-    fileCache: options.fileCache,
-    disableServerRunnerWaiting: options.disableServerRunnerWaiting,
-    showProgress: options.showProgress ?? true,
-    showBanner: options.showBanner ?? true,
-    verboseLogging: options.verboseWebpack,
-  };
+  const inputParameters = getInputParams(configEntry, options, rootDir);
 
   let content: Config | undefined;
   let projects: Record<string, Project> = {};
@@ -142,22 +127,6 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
     ({ content, projects } = mapTramvaiJsonToNewTsConfig({ rootDir }));
   }
 
-  const hasSwcTranspiler = Object.values(content.projects).some((project) => {
-    if (
-      project.type !== 'application' ||
-      !(project as ApplicationConfigEntry).experiments?.transpilation
-    ) {
-      return false;
-    }
-    const { loader } = (project as ApplicationConfigEntry).experiments.transpilation;
-
-    if (typeof loader === 'string') {
-      // @ts-expect-error
-      return loader === 'swc';
-    }
-    // @ts-expect-error
-    return loader.development === 'swc';
-  });
   const hasPwa = Object.values(content.projects).some((project) => {
     if (project.type !== 'application' || !(project as ApplicationConfigEntry).experiments) {
       return false;
@@ -170,7 +139,9 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
     projects,
     plugins: [
       `@tramvai/plugin-${builder}-builder`,
-      hasSwcTranspiler ? '@tramvai/plugin-swc-transpiler' : '@tramvai/plugin-babel-transpiler',
+      hasSwcTranspiler(content)
+        ? '@tramvai/plugin-swc-transpiler'
+        : '@tramvai/plugin-babel-transpiler',
       hasPwa && '@tramvai/plugin-webpack-pwa',
     ].filter(Boolean),
   };
@@ -194,46 +165,7 @@ async function baseStartApplication(builder: 'rspack' | 'webpack', di: Container
     // TODO: strictErrorHandle parameter? used in `packages/cli/src/library/swc/__integration__/swc.start.test.ts` for old cli
   }
 
-  return {
-    server: devServer.server,
-    staticServer: devServer.staticServer,
-    close: async () => {
-      await devServer.close();
-    },
-    invalidate: async () => {
-      await devServer.invalidate();
-    },
-    getBuildStats: () => {
-      return devServer.getStats();
-    },
-    builder: {
-      name: `@tramvai/plugin-${builder}-builder`,
-      start: async (options) => {
-        return {
-          close: async () => {
-            await devServer.close();
-          },
-          invalidate: async () => {
-            await devServer.invalidate();
-          },
-          getBuildStats: () => {
-            return devServer.getStats();
-          },
-        };
-      },
-      build: async (options) => {
-        return {
-          getBuildStats: () => {
-            return {};
-          },
-        };
-      },
-      analyze: async (options) => {},
-      on: (event, callback) => {
-        // TODO useful events as public new devServer API
-      },
-    },
-  };
+  return createDevServerApi(devServer);
 }
 
 /**

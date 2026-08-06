@@ -4,14 +4,11 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { outputFile } from 'fs-extra';
 import WebSocket from 'ws';
+import { sleep } from '@tramvai/test-integration';
 
 import { ApplicationProject } from '@tramvai/api/lib/config';
 
 import { test } from './test.fixture';
-
-const sleep = (ms: number) => {
-  return new Promise((resolve) => (setTimeout(resolve, ms) as unknown as NodeJS.Timeout).unref());
-};
 
 export function createTestSuite({ key, plugins }: { key: string; plugins: string[] }) {
   const testSuiteFolder = path.resolve(__dirname, '..', key);
@@ -22,9 +19,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-bundle': {
       name: 'app-bundle',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
     },
     'app-mf-host': {
@@ -35,9 +29,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           '@tinkoff/url': './node_modules/@tinkoff/url/index.js',
         },
       },
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
     'app-mf-host-broken': {
@@ -46,9 +37,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       shared: {
         deps: ['@tinkoff/url'],
         autoResolveSharedRequiredVersions: false,
-      },
-      hotRefresh: {
-        enabled: false,
       },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host-broken', 'index.tsx'),
     },
@@ -64,9 +52,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           '@tinkoff/url': './node_modules/@tinkoff/url/index.js',
         },
       },
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
     'app-mf-host-duplicate-tramvai-autoresolve': {
@@ -74,9 +59,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       type: 'application',
       shared: {
         deps: ['@tinkoff/url', '@tinkoff/logger', 'zod'],
-      },
-      hotRefresh: {
-        enabled: false,
       },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host-duplicates', 'index.tsx'),
     },
@@ -86,9 +68,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       shared: {
         deps: ['@tinkoff/url'],
         autoResolveSharedRequiredVersions: false,
-      },
-      hotRefresh: {
-        enabled: false,
       },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host-duplicates', 'index.tsx'),
     },
@@ -103,9 +82,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       shared: {
         criticalChunks: ['data'],
       },
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
     'app-mf-host-deps': {
@@ -118,9 +94,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       shared: {
         deps: ['external-library', '@tinkoff/url'],
-      },
-      hotRefresh: {
-        enabled: false,
       },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
@@ -136,9 +109,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         deps: ['@tinkoff/url', '@tinkoff/logger'],
         autoResolveSharedRequiredVersions: false,
       },
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
     'app-mf-host-auto-resolve-shared': {
@@ -147,18 +117,12 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       shared: {
         deps: ['@tinkoff/url', '@tinkoff/logger', 'zod'],
       },
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'mf-host', 'index.tsx'),
     },
     // TODO: тест на stats purify (PurifyStatsPlugin)
     'app-integrity': {
       name: 'app-integrity',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       integrity: {
         enabled: true,
       },
@@ -168,17 +132,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       name: 'app-bundle-multiple-runtime',
       runtimeChunk: false,
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
     },
     'app-output-relative': {
       name: 'app-bundle',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
       output: {
         server: 'custom/server',
@@ -189,49 +147,31 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-virtual-module-config': {
       name: 'app-virtual-module-config',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'virtual-module-config', 'index.ts'),
     },
     'app-broken': {
       name: 'app-broken',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'broken', 'index.ts'),
     },
     'app-broken-ssr': {
       name: 'app-broken-ssr',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'broken-ssr', 'index.ts'),
     },
     'app-ssr': {
       name: 'app-ssr',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'ssr', 'index.ts'),
     },
     'app-https': {
       name: 'app-https',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'https', 'index.tsx'),
     },
     'app-jsx': {
       name: 'app-jsx',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'jsx', 'index.ts'),
     },
@@ -251,9 +191,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss': {
       name: 'app-postcss',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'postcss'),
       entryFile: 'index.ts',
       postcss: {
@@ -263,9 +200,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-postcss-fn': {
       name: 'app-postcss-fn',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'postcss-fn'),
       entryFile: 'index.ts',
       postcss: {
@@ -275,9 +209,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-lightningcss': {
       name: 'app-lightningcss',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       experiments: {
         lightningcss: true,
       },
@@ -287,9 +218,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-fs-routing': {
       name: 'app-fs-routing',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       fileSystemPages: {
         enabled: true,
       },
@@ -299,9 +227,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-config-to-env': {
       name: 'app-config-to-env',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'config-to-env'),
       entryFile: 'index.ts',
       fileSystemPages: {
@@ -317,9 +242,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-root-error-boundary': {
       name: 'app-root-error-boundary',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'root-error-boundary'),
       entryFile: 'index.ts',
       fileSystemPages: {
@@ -329,27 +251,18 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-browserslist': {
       name: 'app-browserslist',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'browserslist'),
       entryFile: 'index.ts',
     },
     'app-polyfills': {
       name: 'app-polyfills',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
       entryFile: 'index.ts',
     },
     'app-polyfills-custom': {
       name: 'app-polyfills',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       polyfill: path.join(fixturesFolder, 'application', 'polyfills', 'polyfill.ts'),
       modernPolyfill: path.join(fixturesFolder, 'application', 'polyfills', 'modern.polyfill.ts'),
       sourceDir: path.join(fixturesFolder, 'application', 'polyfills'),
@@ -358,17 +271,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-tramvai-vendor': {
       name: 'app-tramvai-vendor',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'tramvai-vendor', 'index.ts'),
     },
     'app-granular-chunks': {
       name: 'app-granular-chunks',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'granular-chunks', 'index.ts'),
       splitChunks: {
         mode: 'granularChunks',
@@ -380,9 +287,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-assets': {
       name: 'app-assets',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
@@ -390,34 +294,22 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       name: 'app-assets',
       type: 'application',
       writeToDisk: true,
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
     'app-cache': {
       name: 'app-cache',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
     'app-externals': {
       name: 'app-externals',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       generateDataQaTag: true,
       entryFile: path.join(fixturesFolder, 'application', 'externals', 'index.ts'),
     },
     'app-papi': {
       name: 'app-papi',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'papi'),
       entryFile: path.join(fixturesFolder, 'application', 'papi', 'index.ts'),
       fileSystemPapiDir: 'papi',
@@ -425,17 +317,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-server-inline': {
       name: 'app-server-inline',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'server-inline', 'index.ts'),
     },
     'app-pwa': {
       name: 'app-pwa',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       pwa: {
         sw: {
           scope: '/',
@@ -452,9 +338,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'custom-pwa': {
       name: 'custom-pwa',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       pwa: {
         sw: {
           src: './custom-sw.ts',
@@ -484,39 +367,45 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-refresh': {
       name: 'app-refresh',
       type: 'application',
+      hotRefresh: {
+        enabled: true,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'refresh', 'index.tsx'),
     },
     'app-server-hot': {
       name: 'app-server-hot',
       type: 'application',
+      hotRefresh: {
+        enabled: true,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'server-hot', 'index.tsx'),
     },
     'app-server-hot-sourcemaps': {
       name: 'app-server-hot-sourcemaps',
       type: 'application',
+      hotRefresh: {
+        enabled: true,
+      },
       sourceMap: true,
       entryFile: path.join(fixturesFolder, 'application', 'server-hot', 'index.tsx'),
     },
     'app-hmr': {
       name: 'app-hmr',
       type: 'application',
+      hotRefresh: {
+        enabled: true,
+      },
       entryFile: path.join(fixturesFolder, 'application', 'assets', 'index.ts'),
     },
     'app-refresh-disabled': {
       name: 'app-refresh-disabled',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       liveReload: true,
       entryFile: path.join(fixturesFolder, 'application', 'refresh-disabled', 'index.tsx'),
     },
     'app-provide': {
       name: 'app-provide',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'provide', 'index.ts'),
       webpack: {
         provide: {
@@ -527,9 +416,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-devtool-inline': {
       name: 'app-devtool-inline',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
       webpack: {
         devtool: 'inline-nosources-cheap-module-source-map',
@@ -538,9 +424,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-devtool-external': {
       name: 'app-provide-external',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
       webpack: {
         devtool: 'nosources-cheap-module-source-map',
@@ -549,18 +432,12 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-sourcemaps': {
       name: 'app-sourcemaps',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'bundle', 'index.ts'),
       sourceMap: true,
     },
     'app-resolve': {
       name: 'app-resolve',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'resolve', 'index.ts'),
       webpack: {
         resolveFallback: {
@@ -574,9 +451,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-tsconfig-paths': {
       name: 'app-tsconfig-paths',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       sourceDir: path.join(fixturesFolder, 'application', 'tsconfig-paths'),
     },
     'app-enable-fill-declare-action-name': {
@@ -628,9 +502,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     'app-lodash': {
       name: 'app-lodash',
       type: 'application',
-      hotRefresh: {
-        enabled: false,
-      },
       entryFile: path.join(fixturesFolder, 'application', 'lodash', 'index.ts'),
     },
   };
