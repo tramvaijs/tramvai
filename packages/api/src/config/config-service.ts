@@ -2,7 +2,6 @@ import fs from 'node:fs';
 
 import type { Config as SvgoConfig } from 'svgo';
 import type { JpegOptions, PngOptions, GifOptions, WebpOptions, AvifOptions } from 'sharp';
-import type { SubresourceIntegrityPluginOptions } from 'webpack-subresource-integrity';
 import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import type { PluginOptions } from 'image-minimizer-webpack-plugin';
@@ -15,7 +14,6 @@ import type { TramvaiPlugin } from '../core/plugin';
 import { typescriptLoader } from './config-loader';
 import { resolveAbsolutePathForFile } from '../utils/path';
 import { packageVersion } from '../utils/package-version';
-import { logger } from '../services/logger';
 
 export interface SharpEncodeOptions {
   encodeOptions?: {
@@ -140,17 +138,7 @@ export type ReactCompilerOptions = {
   panicThreshold?: 'ALL_ERRORS' | 'CRITICAL_ERRORS' | 'NONE';
 };
 
-export type ApplicationExperiments = {
-  /**
-   * @title Enable View Transitions API for SPA navigations
-   * @default false
-   */
-  viewTransitions?: boolean;
-  /**
-   * @title Enable React Transitions for SPA navigations
-   * @default false
-   */
-  reactTransitions?: boolean;
+type BaseExperiments = {
   /**
    * @title Enable Lightningcss for css transpiling as Postcss alternative
    * @default false
@@ -164,6 +152,21 @@ export type ApplicationExperiments = {
    */
   reactCompiler?: boolean | ReactCompilerOptions;
 };
+
+export interface ApplicationExperiments extends BaseExperiments {
+  /**
+   * @title Enable View Transitions API for SPA navigations
+   * @default false
+   */
+  viewTransitions?: boolean;
+  /**
+   * @title Enable React Transitions for SPA navigations
+   * @default false
+   */
+  reactTransitions?: boolean;
+}
+
+export interface ChildAppExperiments extends BaseExperiments {}
 
 export type TranspilationOptions = {
   /**
@@ -482,7 +485,9 @@ export interface ChildAppProject extends BaseProject {
    * @default "index.ts"
    */
   entryFile?: string;
+  experiments?: ChildAppExperiments;
   output?: string;
+  postcss?: PostcssOptions;
   dedupe?: DedupeOptions;
 }
 
@@ -724,7 +729,7 @@ export class ConfigService {
   }
 
   get assetsPrefix() {
-    if (this.#project!.type === 'child-app') {
+    if (this.#project.type === 'child-app') {
       return null;
     }
 
@@ -800,16 +805,13 @@ export class ConfigService {
   }
 
   get fileSystemPapiDir(): string | null {
-    if (this.#project!.type === 'child-app') {
-      return null;
-    }
-    return this.#project!.fileSystemPapiDir ?? 'api';
-  }
-
-  get postcss(): PostcssOptions | null {
     if (this.#project.type === 'child-app') {
       return null;
     }
+    return this.#project.fileSystemPapiDir ?? 'api';
+  }
+
+  get postcss(): PostcssOptions | null {
     return this.#project.postcss ?? {};
   }
 
@@ -864,7 +866,7 @@ export class ConfigService {
 
   get hotRefresh(): BaseProject['hotRefresh'] {
     return {
-      enabled: this.#project.hotRefresh?.enabled ?? true,
+      enabled: this.#project.hotRefresh?.enabled ?? false,
       options: {
         overlay: false,
         ...this.#project.hotRefresh?.options,

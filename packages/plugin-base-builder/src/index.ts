@@ -115,10 +115,6 @@ export const runtimeChunkExtension = {
 
 export const defineExtension = {
   define: ({ project, config }: Parameters<Extension<any>>[0]) => {
-    if (project.type === 'child-app') {
-      return {};
-    }
-
     return { ...project.define?.shared, ...project.define?.[config.mode] };
   },
 };
@@ -142,6 +138,11 @@ declare module '@tramvai/api/lib/config' {
 
   export interface ChildAppProject {
     webpack?: СonfigOptions;
+    define?: {
+      shared: Define;
+      development: Define;
+      production: Define;
+    };
   }
 
   export interface ConfigurationExtensions

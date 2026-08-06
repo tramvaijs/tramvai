@@ -137,6 +137,12 @@ export class StartCommand extends CLICommand<Params> {
       description: 'Enable new experimental @tramvai/api rspack builder',
     },
     {
+      name: '--experimentalWebpackWorkerThreads',
+      value: '[experimentalWebpackWorkerThreads]',
+      transformer: (value: string) => value !== 'false',
+      description: 'Enable new experimental @tramvai/api webpack builder',
+    },
+    {
       name: '--serverHot',
       value: '[serverHot]',
       transformer: (value: string) => value !== 'false',

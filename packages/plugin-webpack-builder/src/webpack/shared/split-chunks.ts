@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import resolve from 'resolve';
 import { Configuration } from 'webpack';
 import type { ConfigService } from '@tramvai/api/lib/config';
+import { ModuleFederationSharedObject } from '../types/webpack';
 
 export type SplitChunksOptions = Required<Required<Configuration>['optimization']>['splitChunks'];
 
@@ -216,6 +217,63 @@ export const createSplitChunksOptions = ({
   return {
     splitChunks: webpackSplitChunks,
     // namedChunks must be enabled so that webpack-flush-chunks can determine the names of the chunks that the chunk bundle depends on after being processed through SplitChunks
+    chunkIds: 'named',
+  };
+};
+
+export const createChildAppSplitChunksOptions = ({
+  config,
+  target,
+  sharedModules,
+}: {
+  config: ConfigService;
+  target: 'client' | 'server';
+  sharedModules: ModuleFederationSharedObject;
+}): { splitChunks: SplitChunksOptions; chunkIds: 'named' } => {
+  const sharedModulesPaths = resolveFrameworksPaths(config.rootDir, Object.keys(sharedModules));
+
+  const webpackSplitChunks: SplitChunksOptions = {
+    cacheGroups: {
+      default: false,
+      defaultVendors: false,
+      styles: {
+        name: config.projectName,
+        type: 'css/mini-extract',
+        chunks: 'async',
+        enforce: true,
+        priority: 50,
+      },
+    },
+  };
+
+  if (target === 'client') {
+    const granular: Record<string, any> = {
+      // we don't want to include MF shared deps
+      test(mod: webpack.Module) {
+        const resource = mod.nameForCondition && mod.nameForCondition();
+
+        if (!resource) {
+          return false;
+        }
+
+        return sharedModulesPaths.every((packagePath) => !resource.startsWith(packagePath));
+      },
+      chunks: 'async',
+      // in some cases this group has priority over styles group, idk why, so decide to specify modules type explicitly
+      type: 'javascript/auto',
+      minChunks: 2,
+      minSize: 20000,
+      reuseExistingChunk: true,
+      maxInitialRequests: 10,
+      maxAsyncRequests: 20,
+      priority: 20,
+    };
+
+    webpackSplitChunks.cacheGroups!.granular = granular;
+  }
+
+  return {
+    splitChunks: webpackSplitChunks,
     chunkIds: 'named',
   };
 };

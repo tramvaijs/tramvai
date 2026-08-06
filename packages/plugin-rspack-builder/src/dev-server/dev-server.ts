@@ -70,6 +70,7 @@ export function createDevServer({
       const proxy = createProxy({
         port: portManager.port!,
         rootDir: config.rootDir,
+        projectType: config.projectType,
         staticPort: portManager.staticPort!,
         staticHost: config.staticHost,
         hostname: config.host,

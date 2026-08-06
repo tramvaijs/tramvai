@@ -39,6 +39,7 @@ export const createProxy = ({
   rootDir,
   staticPort,
   staticHost,
+  projectType,
   serverRunnerPort,
   serverBuildPort,
   selfSignedCertificate,
@@ -50,6 +51,7 @@ export const createProxy = ({
   rootDir: string;
   staticPort: number;
   staticHost: string;
+  projectType: 'application' | 'child-app';
   selfSignedCertificate: SelfSignedCertificate;
   serverRunnerPort: number;
   serverBuildPort: number;
@@ -164,7 +166,14 @@ export const createProxy = ({
   });
 
   const staticServer = createServer(selfSignedCertificate, (req, res) => {
-    if (req.url!.includes('/server.js')) {
+    // For requesting list of compiled server assets in tests
+    if (req.headers['x-build-type'] === 'server') {
+      return devProxy.web(req, res, {
+        target: `http://localhost:${serverBuildPort}`,
+      });
+    }
+
+    if (/server.*\.js/.test(req.url!)) {
       devProxy.web(req, res, {
         target: `http://localhost:${serverBuildPort}`,
       });
@@ -176,21 +185,40 @@ export const createProxy = ({
   });
 
   // WebSockets support for hot reload
-  devServer.on('upgrade', (req, socket, head) => {
-    // prevent uncaughtException when WS is not supported in application server
-    socket.on('error', (err) => {
-      console.error('[dev-server-error] websocket proxy error', err.message);
-    });
+  [devServer, staticServer].forEach((server) =>
+    server.on('upgrade', (req, socket, head) => {
+      // prevent uncaughtException when WS is not supported in application server
+      socket.on('error', (err) => {
+        console.error('[dev-server-error] websocket proxy error', err.message);
+      });
 
-    devProxy.ws(req, socket, head, {
-      target: `ws://localhost:${browserBuildPort}`,
-    });
-  });
+      devProxy.ws(req, socket, head, {
+        target: `ws://localhost:${browserBuildPort}`,
+      });
+    })
+  );
 
   return {
     server: devServer,
     staticServer,
     listen: () => {
+      if (projectType === 'child-app') {
+        return new Promise<void>((resolve, reject) => {
+          staticServer.listen(port, hostname.replace('localhost', '0.0.0.0'), () => {
+            logger.event({
+              type: 'info',
+              event: 'dev-proxy',
+              message: `Static server started at ${port} port`,
+            });
+            resolve();
+          });
+
+          staticServer.on('error', (err: Error) => {
+            reject(err);
+          });
+        });
+      }
+
       return Promise.all([
         new Promise<void>((resolve, reject) => {
           devServer.listen(port, hostname, () => {
@@ -228,7 +256,7 @@ export const createProxy = ({
         // devProxy.listen method is not called so close callback is not required
         devProxy.close(),
         new Promise<void>((resolve) => {
-          devServer.close(() => {
+          devServer?.close(() => {
             resolve();
           });
           setTimeout(() => {

@@ -36,6 +36,6 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
     .rule('child-app-fallback')
     .set('resourceQuery', /fallback/)
     .use('fallback')
-    .loader(path.resolve(__dirname, '../../loaders/childAppFallback'))
+    .loader('@tramvai/plugin-base-builder/lib/loaders/childAppFallback')
     .options({ name: configManager.name });
 };

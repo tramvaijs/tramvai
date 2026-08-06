@@ -7,8 +7,10 @@ import { Configuration } from '../../src/config';
 
 type TestFixture = {
   devServer: DevServer;
+  extraDevServers: DevServer[];
   spawnDevServer: { logs: string[] };
   inputParameters: StartParameters;
+  extraInputParameters: StartParameters[];
   extraConfiguration: Partial<Configuration>;
 };
 
@@ -23,8 +25,22 @@ export const test = base.extend<TestFixture, WorkerFixture>({
     },
     { option: true },
   ],
+  extraInputParameters: [[], { option: true }],
   extraConfiguration: [{}, { option: true }],
-  devServer: async ({ inputParameters, extraConfiguration }, use) => {
+  extraDevServers: async ({ extraInputParameters, extraConfiguration }, use) => {
+    process.env.TRAMVAI_COMPILE_CACHE_DISABLED = 'true';
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+    const devServers = [];
+    for (const inputParameters of extraInputParameters) {
+      const devServer = await start(inputParameters, extraConfiguration);
+      devServers.push(devServer);
+    }
+
+    await use(devServers);
+    await Promise.all(devServers.map((devServer) => devServer.close()));
+  },
+  devServer: async ({ inputParameters, extraConfiguration, extraInputParameters }, use) => {
     process.env.TRAMVAI_COMPILE_CACHE_DISABLED = 'true';
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 

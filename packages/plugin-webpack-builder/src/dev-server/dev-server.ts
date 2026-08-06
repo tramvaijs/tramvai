@@ -60,12 +60,12 @@ export function createDevServer({
         portManager.resolveFreePort(0),
       ]);
 
-      if (!inputParameters.staticPort) {
-        config.updateParam('staticPort', portManager.staticPort!);
-      }
-
       if (!inputParameters.port) {
         config.updateParam('port', portManager.port!);
+      }
+
+      if (!inputParameters.staticPort) {
+        config.updateParam('staticPort', portManager.staticPort!);
       }
 
       const compilationWatcher = new CompilationWatcher();
@@ -74,6 +74,7 @@ export function createDevServer({
         rootDir: config.rootDir,
         hostname: config.host,
         selfSignedCertificate,
+        projectType: config.projectType,
         staticPort: config.staticPort!,
         staticHost: config.staticHost,
         serverBuildPort,
@@ -102,6 +103,7 @@ export function createDevServer({
       const serverRunnerWorkerPath = require.resolve(
         '@tramvai/plugin-base-builder/lib/server-runner/server-runner.js'
       );
+      const needServerRunner = config.projectType !== 'child-app';
       const serverPublicPath = resolvePublicPathDirectory(config.outputServer);
       const progressBar = new ProgressBar();
       let serverStats: BuildStats | undefined;
@@ -110,19 +112,25 @@ export function createDevServer({
       let initialServerBuild = true;
       let initialClientBuild = true;
 
-      const serverRunnerWorker = new ServerRunnerWorkerBridge({
-        config,
-        workerPath: serverRunnerWorkerPath,
-        workerData: {
-          cwd: config.rootDir,
-          hotReload: config.serverHot,
-          sourceMap: config.serverSourceMap,
-          serverPath: path.join(config.rootDir, config.outputServer, config.outputServerFilename),
-          port: serverRunnerPort,
-          proxyPort: config.port!,
-          disableServerRunnerWaiting,
-        },
-      });
+      const serverRunnerWorker = needServerRunner
+        ? new ServerRunnerWorkerBridge({
+            config,
+            workerPath: serverRunnerWorkerPath,
+            workerData: {
+              cwd: config.rootDir,
+              hotReload: config.serverHot,
+              sourceMap: config.serverSourceMap,
+              serverPath: path.join(
+                config.rootDir,
+                config.outputServer,
+                config.outputServerFilename
+              ),
+              port: serverRunnerPort,
+              proxyPort: config.port!,
+              disableServerRunnerWaiting,
+            },
+          })
+        : undefined;
       const serverWebpackWorker = new WebpackWorkerBridge({
         config,
         progressBar,
@@ -154,15 +162,22 @@ export function createDevServer({
 
       async function createServerRunnerWorker() {
         serverRunnerAbortController?.abort();
-        await serverRunnerWorker.destroy();
+        await serverRunnerWorker?.destroy();
 
         serverRunnerAbortController = new AbortController();
-        serverRunnerWorker.create();
+        serverRunnerWorker?.create();
       }
 
       async function compileServerAfterBuild() {
-        const signal = serverRunnerAbortController?.signal;
         compilationWatcher.setCompilationAlive();
+
+        if (!needServerRunner) {
+          compilationWatcher.endCompilation();
+          serverResolve();
+          return;
+        }
+
+        const signal = serverRunnerAbortController?.signal;
 
         try {
           let code: string;
@@ -208,20 +223,20 @@ export function createDevServer({
               if (config.serverHot) {
                 if (initialServerBuild) {
                   initialServerBuild = false;
-                  return serverRunnerWorker.compile({ code });
+                  return serverRunnerWorker?.compile({ code });
                 }
 
                 try {
-                  await serverRunnerWorker.reload({ code });
+                  await serverRunnerWorker?.reload({ code });
                   return;
                 } catch (_err) {
                   // fallback to compile if reload failed
                   await createServerRunnerWorker();
-                  return serverRunnerWorker.compile({ code });
+                  return serverRunnerWorker?.compile({ code });
                 }
               }
 
-              return serverRunnerWorker.compile({ code });
+              return serverRunnerWorker?.compile({ code });
             }
           );
 
@@ -361,7 +376,7 @@ export function createDevServer({
       } catch (err) {
         await Promise.all([
           proxy.close(),
-          serverRunnerWorker.destroy(),
+          serverRunnerWorker?.destroy(),
           serverWebpackWorker.destroy(),
           clientWebpackWorker.destroy(),
           ...closeHandlers.map((handler) => handler()),
@@ -393,7 +408,7 @@ export function createDevServer({
           compilationWatcher.destroyCompilation();
           closedPromise = Promise.all([
             proxy.close(),
-            serverRunnerWorker.destroy(),
+            serverRunnerWorker?.destroy(),
             serverWebpackWorker.destroy(),
             clientWebpackWorker.destroy(),
             ...closeHandlers.map((handler) => handler()),

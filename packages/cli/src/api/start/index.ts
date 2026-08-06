@@ -7,6 +7,7 @@ import { COMMAND_PARAMETERS_TOKEN, CONFIG_ENTRY_TOKEN, PORT_MANAGER_TOKEN } from
 import type { Builder } from '../../typings/build/Builder';
 import { ConvertToSchema } from '../../schema/ConfigSchema';
 import { ApplicationConfigEntry } from '../../typings/configEntry/application';
+import { ChildAppConfigEntry } from '../../typings/configEntry/child-app';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all';
@@ -21,7 +22,7 @@ export type Params = WithConfig<{
   showBanner?: boolean;
   debug?: boolean;
   // for manual call in tests
-  config?: ConvertToSchema<ApplicationConfigEntry>;
+  config?: ConvertToSchema<ApplicationConfigEntry | ChildAppConfigEntry>;
   trace?: boolean;
   verboseWebpack?: boolean;
   profile?: boolean;
@@ -39,8 +40,8 @@ export type Params = WithConfig<{
   fileCache?: boolean;
   disableServerRunnerWaiting?: boolean;
   noRebuild?: boolean;
-  experimentalWebpackWorkerThreads?: boolean;
   experimentalRspack?: boolean;
+  experimentalWebpackWorkerThreads?: boolean;
   serverHot?: boolean;
 }>;
 
@@ -72,14 +73,15 @@ export default createCommand({
     }
 
     if (options.experimentalWebpackWorkerThreads) {
-      if (configEntry.type !== 'application') {
-        throw new Error(
-          '--experimentalWebpackWorkerThreads option is only available for application project'
-        );
+      if (configEntry.type === 'application') {
+        const { startWebpackApplication } = require('./application.experimental');
+        return startWebpackApplication(di);
       }
 
-      const { startWebpackApplication } = require('./application.experimental');
-      return startWebpackApplication(di);
+      if (configEntry.type === 'child-app') {
+        const { startExperimentalChildApp } = require('./child-app.experimental');
+        return startExperimentalChildApp(di);
+      }
     }
 
     await portManager.computeAvailablePorts();
@@ -95,8 +97,8 @@ export default createCommand({
         return startModule(di);
       case 'child-app':
         // eslint-disable-next-line no-case-declarations
-        const { startChildApp } = require('./child-app');
-        return startChildApp(di);
+        const { startExperimentalChildApp } = require('./child-app.experimental');
+        return startExperimentalChildApp(di);
     }
   },
 });

@@ -3,7 +3,11 @@ import '@tramvai/plugin-base-builder/lib/utils/cpu-profile';
 import { parentPort, workerData } from 'node:worker_threads';
 import inspector from 'node:inspector';
 import webpack, { Compiler, MultiCompiler, MultiStats, Stats } from 'webpack';
-import WebpackDevServer, { Configuration as WebpackDevServerConfig } from 'webpack-dev-server';
+import WebpackDevServer, {
+  MiddlewareHandler,
+  RequestHandler,
+  Configuration as WebpackDevServerConfig,
+} from 'webpack-dev-server';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -19,6 +23,8 @@ import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/share
 
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
+import { webpackConfig as webpackChildAppDevelopmentServerConfig } from '../webpack/child-app-development-server';
+import { webpackConfig as webpackChildAppDevelopmentClientConfig } from '../webpack/child-app-development-client';
 import { BUILD_MODE_TOKEN, BUILD_TYPE_TOKEN } from '../index';
 import {
   BUILD_DONE,
@@ -121,6 +127,14 @@ async function runWebpackDevServer() {
       webpackConfig = await webpackApplicationDevelopmentServerConfig({ di });
       break;
     }
+    case 'child-app-client': {
+      webpackConfig = await webpackChildAppDevelopmentClientConfig({ di });
+      break;
+    }
+    case 'child-app-server': {
+      webpackConfig = await webpackChildAppDevelopmentServerConfig({ di });
+      break;
+    }
     default: {
       throw new Error(`Unknown config type: ${type}-${target}`);
     }
@@ -195,6 +209,58 @@ async function runWebpackDevServer() {
         'Cross-Origin-Resource-Policy': 'cross-origin',
       },
     },
+    setupMiddlewares(middlewares, devServer) {
+      middlewares.push({
+        name: 'webpack-dev-server-assets-json',
+        path: '/webpack-dev-server-json',
+        middleware: ((req, res, next) => {
+          if (req.method !== 'GET' && req.method !== 'HEAD') {
+            next();
+            return;
+          }
+
+          if (!devServer!.middleware) {
+            next();
+            return;
+          }
+
+          devServer.middleware!.waitUntilValid((stats) => {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+
+            // HEAD requests should not return body content
+            if (req.method === 'HEAD') {
+              res.end();
+              return;
+            }
+
+            const assetsList = [];
+
+            /**
+             * @type {StatsCompilation[]}
+             */
+            const statsForPrint =
+              stats && 'stats' in stats ? stats.toJson().children : [stats?.toJson()];
+
+            if (statsForPrint) {
+              for (const [_, item] of statsForPrint.entries()) {
+                if (item) {
+                  const assets = item.assets ?? [];
+
+                  for (const asset of assets) {
+                    assetsList.push(asset.name);
+                  }
+                }
+              }
+            }
+
+            res.type('json');
+            res.json(assetsList);
+          });
+        }) satisfies RequestHandler,
+      });
+
+      return middlewares;
+    },
     hot: config.hotRefresh?.enabled,
     // compressing server.js takes longer than request without compression
     compress: false,
@@ -210,6 +276,10 @@ async function runWebpackDevServer() {
     },
     port: buildPort,
   };
+
+  if (config.projectType === 'child-app') {
+    devServerOptions.devMiddleware!.publicPath = `/${config.projectName}/`;
+  }
 
   if (config.disableWebSocketServer || !config.liveReload) {
     devServerOptions.webSocketServer = false;
