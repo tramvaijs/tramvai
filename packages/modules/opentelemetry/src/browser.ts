@@ -8,6 +8,7 @@ import { OPENTELEMETRY_TRACER_TOKEN } from './tokens';
 export * from './tokens';
 export { generateTraceId, generateSpanId } from './generateIds';
 export { BrowserTracer } from './tracer/tracer.browser';
+export { formatTraceparent, parseTraceparent } from './tracer/traceparent';
 
 export const extractTraceparentHeader = once((): string | undefined => {
   if (typeof window !== 'undefined') {

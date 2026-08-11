@@ -218,6 +218,61 @@ In a browser context, `spanId` and `traceId` properties are not added to all cli
 
 However, HTTP client logs are enriched with `traceId` and `spanId` on the client side. `OpenTelemetryModule` registers an `HTTP_CLIENT_LOGGER_EXTENSION` that extracts the `traceparent` header from outgoing HTTP requests and adds parsed `traceId` and `spanId` to the corresponding log entries. This allows correlating specific HTTP client requests with their server-side traces.
 
+#### Enrich your own logs with trace context
+
+The automatic enrichment above only applies to the internal HTTP client log plugin. If you have your own HTTP client interceptor with custom logs, those logs are **not** enriched automatically.
+
+Nevertheless, as described above, `OpenTelemetryModule` already injects a fresh `traceparent` into every outgoing HTTP client request, so use can reuse the `traceparent` that Tramvai already set: read it from `request.headers` in your interceptor, parse out `traceId`/`spanId` with the exported `parseTraceparent` helper, and correlate your own logs with the same identifiers.
+
+The only requirement is **module registration order**: your module must be registered _after_ `OpenTelemetryModule`, so that the built-in interceptor runs first and the `traceparent` header is already present when your interceptor executes.
+
+```ts
+import { createApp } from '@tramvai/core';
+import { OpenTelemetryModule } from '@tramvai/module-opentelemetry';
+import { MyTracingModule } from './my-tracing-module';
+
+createApp({
+  name: 'tincoin',
+  modules: [OpenTelemetryModule, MyTracingModule],
+});
+```
+
+```ts
+import { provide } from '@tramvai/core';
+import { LOGGER_TOKEN } from '@tramvai/tokens-common';
+import { DEFAULT_HTTP_CLIENT_INTERCEPTORS } from '@tramvai/tokens-http-client';
+import { parseTraceparent } from '@tramvai/module-opentelemetry';
+
+const provider = provide({
+  provide: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
+  useFactory: ({ logger }) => {
+    const log = logger('my-http-client');
+
+    return (request, next) => {
+      const traceparent = request.headers?.traceparent;
+      const traceContext = traceparent ? parseTraceparent(traceparent) : undefined;
+
+      if (traceContext) {
+        const { traceId, spanId } = traceContext;
+
+        log.info({ event: 'request', traceId, spanId });
+      }
+
+      return next(request);
+    };
+  },
+  deps: {
+    logger: LOGGER_TOKEN,
+  },
+});
+```
+
+:::tip
+
+If all you need is `traceId`/`spanId` on the standard HTTP client logs, prefer the built-in log plugin instead of a custom interceptor. It already logs request lifecycle events, its logs are automatically enriched with `traceId`/`spanId` and you can attach extra fields via the `HTTP_CLIENT_LOGGER_EXTENSION` token — see [HTTP client log extensions](03-features/09-data-fetching/02-http-client.md#log-extensions). You can also fine-tune the request logger itself: pass [`logPluginOptions`](03-features/09-data-fetching/02-http-client.md#logger-options) in the `httpClientFactory` options to configure the built-in log plugin — for example `defaults: { remote: ... }`.
+
+:::
+
 ## Debug and testing
 
 In `development` mode you can enable [ConsoleSpanExporter](https://open-telemetry.github.io/opentelemetry-js/classes/_opentelemetry_sdk-trace-base.ConsoleSpanExporter.html), which prints all spans to the console, with env variable `TRAMVAI_OPENTELEMETRY_DEBUG=true`.

@@ -5,6 +5,7 @@ import {
   OPENTELEMETRY_HTTP_CLIENT_BROWSER_HEADERS_INCLUDE_TOKEN,
   OPENTELEMETRY_TRACER_TOKEN,
 } from '../tokens';
+import { formatTraceparent } from '../tracer/traceparent';
 
 export const providers = [
   provide({
@@ -29,8 +30,7 @@ export const providers = [
           }
 
           // TODO: Enrich the span with the same attributes as the server tracer once the client SDK is integrated
-          const { traceId, spanId } = span.spanContext();
-          request.headers.traceparent = `00-${traceId}-${spanId}-01`;
+          request.headers.traceparent = formatTraceparent(span.spanContext());
 
           return next(request);
         });
