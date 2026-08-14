@@ -1302,6 +1302,8 @@ export default createPapiMethod({
             for (const { src } of webmanifestContent.icons) {
               const iconSrc = src.replace('4000', devServer.staticPort);
               const iconResponse = await fetch(iconSrc);
+              // body must be consumed
+              await iconResponse.text();
               test.expect(iconResponse.status).toBe(200);
             }
           });
