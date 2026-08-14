@@ -1,27 +1,22 @@
 import monkeypatch from '@tinkoff/monkeypatch';
-import type { ModuleConfig } from '@tramvai/tokens-metrics';
+import type LRUCache from '@tinkoff/lru-cache-nano';
+import type { MetricsInstances, ModuleConfig } from '@tramvai/tokens-metrics';
 import { TRAMVAI_INITED_SYMBOL } from '@tramvai/core';
-import { DEFAULT_BUCKETS } from '../constants';
-import type {
-  MetricsModule,
-  GetServiceName,
-  CreateRequestWithMetrics,
-  MetricsInstances,
-  HttpModule,
-  HttpsModule,
-} from './types';
+import type { GetServiceName, CreateRequestWithMetrics, HttpModule, HttpsModule } from './types';
 import { addMetricsForFetch, initConnectionResolveMetrics } from './createRequestWithMetrics';
 
 export const initRequestsMetrics = ({
-  metrics,
+  requestMetrics,
   getServiceName,
+  cache,
   http,
   https,
   createRequestWithMetrics,
   config,
 }: {
-  metrics: MetricsModule;
+  requestMetrics: MetricsInstances;
   http: HttpModule;
+  cache: LRUCache<string, string>;
   https: HttpsModule;
   createRequestWithMetrics: CreateRequestWithMetrics;
   getServiceName: GetServiceName;
@@ -31,57 +26,20 @@ export const initRequestsMetrics = ({
     return;
   }
 
-  const metricsInstances: MetricsInstances = {
-    requestsTotal: metrics.counter({
-      name: 'http_sent_requests_total',
-      help: 'Number of requests sent',
-      labelNames: ['status', 'method', 'service'],
-    }),
-    requestsErrors: metrics.counter({
-      name: 'http_sent_requests_errors',
-      help: 'Number of requests that failed',
-      labelNames: ['status', 'method', 'service'],
-    }),
-    requestsDuration: metrics.histogram({
-      name: 'http_sent_requests_duration',
-      help: 'Execution time of the sent requests',
-      labelNames: ['status', 'method', 'service'],
-      buckets: DEFAULT_BUCKETS,
-    }),
-    dnsResolveDuration: metrics.histogram({
-      name: 'dns_resolve_duration',
-      help: 'Time for dns resolve of the outhgoing requests',
-      labelNames: ['service'],
-      buckets: DEFAULT_BUCKETS,
-    }),
-    tcpConnectDuration: metrics.histogram({
-      name: 'tcp_connect_duration',
-      help: 'Duration of tcp connect of the outgoing requests',
-      labelNames: ['service'],
-      buckets: DEFAULT_BUCKETS,
-    }),
-    tlsHandshakeDuration: metrics.histogram({
-      name: 'tls_handshake_duration',
-      help: 'Duration of tls handshake of the outgoing requests',
-      labelNames: ['service'],
-      buckets: DEFAULT_BUCKETS,
-    }),
-  };
-
-  addMetricsForFetch({ metricsInstances, getServiceName });
+  addMetricsForFetch({ metricsInstances: requestMetrics, getServiceName, cache });
 
   if (config.enableConnectionResolveMetrics) {
-    initConnectionResolveMetrics({ metricsInstances });
+    initConnectionResolveMetrics({ metricsInstances: requestMetrics, cache });
   }
 
   monkeypatch({
     obj: https,
     method: 'request',
-    handler: createRequestWithMetrics({ metricsInstances, getServiceName }),
+    handler: createRequestWithMetrics({ metricsInstances: requestMetrics, getServiceName }),
   });
   monkeypatch({
     obj: http,
     method: 'request',
-    handler: createRequestWithMetrics({ metricsInstances, getServiceName }),
+    handler: createRequestWithMetrics({ metricsInstances: requestMetrics, getServiceName }),
   });
 };

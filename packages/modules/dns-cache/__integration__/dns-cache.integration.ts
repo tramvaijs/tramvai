@@ -37,10 +37,9 @@ test.describe('packages/modules/dns-cache', () => {
     test.expect(apiServer.getUrls()).toEqual(['/http-request/']);
   });
 
-  // TODO: unskip in TCORE-5509
   // this test MUST be last - it verifies cache sharing with empty caches (dns.lookup call counting),
   // and after all-sequential, the undici connection pool state may affect subsequent individual requests
-  test.skip('httpClient and fetch share undici DNS cache, http.request uses independent cache', async ({
+  test('httpClient and fetch share undici DNS cache, http.request uses independent cache', async ({
     app,
     I,
     apiServer,

@@ -2,21 +2,18 @@ import noop from '@tinkoff/utils/function/noop';
 import http from 'http';
 import https from 'https';
 import dns from 'dns';
-import { interceptors } from 'undici';
-import type Interceptors from 'undici/types/interceptors';
 import type { CacheInstance } from 'cacheable-lookup';
+import { METRICS_IP_HOST_CACHE, REQUEST_METRICS_INSTANCES } from '@tramvai/tokens-metrics';
 import CacheableLookup from 'cacheable-lookup';
-import { declareModule, provide, commandLineListTokens, Scope, createToken } from '@tramvai/core';
-import {
-  DEFAULT_HTTP_CLIENT_INTERCEPTORS,
-  HTTP_CLIENT_AGENT_INTERCEPTORS,
-} from '@tramvai/tokens-http-client';
+import { declareModule, provide, commandLineListTokens, Scope, optional } from '@tramvai/core';
+import { HTTP_CLIENT_AGENT_INTERCEPTORS } from '@tramvai/tokens-http-client';
 import { CREATE_CACHE_TOKEN, ENV_MANAGER_TOKEN, ENV_USED_TOKEN } from '@tramvai/tokens-common';
-
-type UndiciDnsCacheStorage = Required<Interceptors.DNSInterceptorOpts>['storage'];
-
-const DNS_CACHEABLE_LOOKUP_CACHE_TOKEN = createToken<CacheInstance>('dnsCacheableLookupCache');
-const DNS_UNDICI_LOOKUP_CACHE_TOKEN = createToken<UndiciDnsCacheStorage>('dnsUndiciLookupCache');
+import {
+  DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
+  DNS_UNDICI_LOOKUP_CACHE_TOKEN,
+  UndiciDnsCacheStorage,
+  createDnsInterceptor,
+} from './dns-interceptor';
 
 export const TramvaiDnsCacheModule = declareModule({
   name: 'TramvaiDnsCacheModule',
@@ -24,50 +21,28 @@ export const TramvaiDnsCacheModule = declareModule({
   providers: [
     provide({
       provide: HTTP_CLIENT_AGENT_INTERCEPTORS,
-      useFactory: ({ envManager, storage }) => {
+      useFactory: ({ envManager, storage, ipHostCache, requestMetrics }) => {
         const dnsLookupEnabled = envManager.get('DNS_LOOKUP_CACHE_ENABLE') === 'true';
         const maxTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
         const maxItems = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
 
-        return function noopInterceptor(dispatch) {
-          return function noopInterceptorDispatch(opts, handler) {
-            return dispatch(opts, handler);
-          };
-        };
+        const { dnsResolveDuration } = requestMetrics;
 
-        // TODO: enable back in TCORE-5509
-        const dnsInterceptor = interceptors.dns({
+        if (!dnsLookupEnabled) {
+          return function noopInterceptor(dispatch) {
+            return function noopInterceptorDispatch(opts, handler) {
+              return dispatch(opts, handler);
+            };
+          };
+        }
+
+        const dnsInterceptor = createDnsInterceptor({
+          storage,
+          ipHostCache,
+          onLookupEnd: (hostname: string, lookupDuration: number) =>
+            dnsResolveDuration.observe({ service: hostname }, lookupDuration),
           maxTTL,
           maxItems,
-          // https://github.com/nodejs/undici/pull/4589
-          storage,
-          // undici captures dns.lookup at import time via destructuring,
-          // so runtime patches to dns.lookup (e.g. from cacheable-lookup or test mocks) are invisible.
-          // Providing a custom lookup that reads dns.lookup from the module object at call time fixes this.
-          // https://github.com/nodejs/undici/blob/e1f9035d0fdc26db66d8501134ae15e5dab15488/lib/interceptor/dns.js#L241
-          lookup: (origin: URL, opts: any, cb: any) => {
-            dns.lookup(
-              origin.hostname,
-              {
-                all: true,
-                family: opts.dualStack === false ? opts.affinity : 0,
-                order: 'ipv4first',
-              },
-              (err: any, addresses: any) => {
-                if (err) {
-                  return cb(err);
-                }
-
-                const results = new Map();
-
-                for (const addr of addresses) {
-                  results.set(`${addr.address}:${addr.family}`, addr);
-                }
-
-                cb(null, results.values());
-              }
-            );
-          },
         });
 
         (dnsInterceptor as any).__tramvai_dns_interceptor = true;
@@ -77,6 +52,8 @@ export const TramvaiDnsCacheModule = declareModule({
       deps: {
         envManager: ENV_MANAGER_TOKEN,
         storage: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
+        requestMetrics: REQUEST_METRICS_INSTANCES,
+        ipHostCache: optional(METRICS_IP_HOST_CACHE),
       },
     }),
     provide({
@@ -145,39 +122,6 @@ export const TramvaiDnsCacheModule = declareModule({
       deps: {
         envManager: ENV_MANAGER_TOKEN,
         cache: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
-      },
-    }),
-    provide({
-      provide: DEFAULT_HTTP_CLIENT_INTERCEPTORS,
-      useFactory: ({ envManager, cache, cacheHttp }) => {
-        const dnsLookupEnabled = envManager.get('DNS_LOOKUP_CACHE_ENABLE') === 'true';
-
-        return (req, next) => {
-          if (dnsLookupEnabled) {
-            return next(req).catch((e: any) => {
-              // expected HTTP errors - https://github.com/Tinkoff/tinkoff-request/blob/master/packages/plugin-protocol-http/src/errors.ts
-              const isExpectedError =
-                e.code === 'ERR_HTTP_REQUEST_TIMEOUT' || e.code === 'ABORT_ERR';
-
-              if (!isExpectedError) {
-                if (req.baseUrl) {
-                  const key = new URL(req.baseUrl).hostname;
-
-                  // clear DNS lookup cache for all unexpected HTTP errors
-                  cache.delete(key);
-                  cacheHttp.delete(key);
-                }
-              }
-              throw e;
-            });
-          }
-          return next(req);
-        };
-      },
-      deps: {
-        envManager: ENV_MANAGER_TOKEN,
-        cache: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
-        cacheHttp: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
       },
     }),
     provide({
@@ -258,7 +202,7 @@ export const TramvaiDnsCacheModule = declareModule({
         },
         {
           key: 'DNS_LOOKUP_CACHE_TTL',
-          value: '60000',
+          value: '10000',
           dehydrate: false,
           optional: true,
         },

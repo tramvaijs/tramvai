@@ -9,6 +9,7 @@ import type {
   Summary,
   SummaryConfiguration,
 } from 'prom-client';
+import type LRUCache from '@tinkoff/lru-cache-nano';
 
 interface Metrics {
   counter<T extends string = string>(opt: CounterConfiguration<T>): Counter<T>;
@@ -16,6 +17,15 @@ interface Metrics {
   histogram<T extends string = string>(opt: HistogramConfiguration<T>): Histogram<T>;
   summary<T extends string = string>(opt: SummaryConfiguration<T>): Summary<T>;
 }
+
+export type MetricsInstances = {
+  requestsTotal: Counter<'status' | 'method' | 'service'>;
+  requestsErrors: Counter<'status' | 'method' | 'service'>;
+  requestsDuration: Histogram<'status' | 'method' | 'service'>;
+  dnsResolveDuration: Histogram<'service'>;
+  tcpConnectDuration: Histogram<'service'>;
+  tlsHandshakeDuration: Histogram<'service'>;
+};
 
 export type ModuleConfig = {
   enableConnectionResolveMetrics: boolean;
@@ -54,3 +64,7 @@ export const REGISTER_INSTANT_METRIC_TOKEN =
  * Configuration for the metrics
  */
 export const METRICS_MODULE_CONFIG_TOKEN = createToken<ModuleConfig>('metrics-module-config');
+
+export const METRICS_IP_HOST_CACHE = createToken<LRUCache<string, string>>('metricsLRUIpHostCache');
+
+export const REQUEST_METRICS_INSTANCES = createToken<MetricsInstances>('requestMetricsInstances');
