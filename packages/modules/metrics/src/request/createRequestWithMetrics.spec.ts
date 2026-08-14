@@ -3,12 +3,14 @@ import type { Express } from 'express';
 import http from 'node:http';
 import https from 'node:https';
 import { Agent, fetch } from 'undici';
+import type LRUCache from '@tinkoff/lru-cache-nano';
 
 import {
   delayResponseWithFakeTimers,
   startMockServer,
   startHttpsMockServer,
 } from '@tramvai/internal-test-utils/utils/simpleMockServer';
+import { MetricsInstances } from '@tramvai/tokens-metrics';
 import {
   getUrlAndOptions,
   initConnectionResolveMetrics,
@@ -16,7 +18,6 @@ import {
 } from './createRequestWithMetrics';
 import { MetricsServicesRegistry } from './MetricsServicesRegistry';
 import { DEFAULT_BUCKETS } from '../constants';
-import { MetricsInstances } from './types';
 
 const applyResponseHandler = (app: Express) => {
   app.get('/test', async (req, res) => {
@@ -94,9 +95,11 @@ describe('createRequestWithMetrics', () => {
   describe('initConnectionResolveMetrics', () => {
     let metricsInstances: Partial<MetricsInstances>;
     let registry: Registry;
+    let cache: LRUCache<string, string>;
 
     beforeAll(() => {
       registry = new Registry();
+      cache = { get: () => {}, set: () => {} };
 
       metricsInstances = {
         dnsResolveDuration: new Histogram({
@@ -122,7 +125,7 @@ describe('createRequestWithMetrics', () => {
         }),
       };
 
-      initConnectionResolveMetrics({ metricsInstances });
+      initConnectionResolveMetrics({ metricsInstances, cache });
     });
 
     afterEach(() => {

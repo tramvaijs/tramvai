@@ -27,8 +27,12 @@
     "@tramvai/core": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-http-client": "0.0.0-stub",
+    "@tramvai/tokens-metrics": "0.0.0-stub",
     "cacheable-lookup": "^7.0.0",
     "undici": "^7.24.4"
+  },
+  "devDependencies": {
+    "@tramvai/module-metrics": "0.0.0-stub"
   },
   "peerDependencies": {
     "tslib": "^2.4.0"

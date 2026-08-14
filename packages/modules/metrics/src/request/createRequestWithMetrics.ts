@@ -3,12 +3,14 @@ import type { ClientRequest } from 'http';
 import net from 'node:net';
 import tls from 'node:tls';
 import type { DiagnosticsChannel } from 'undici';
+import type LRUCache from '@tinkoff/lru-cache-nano';
 
 // eslint-disable-next-line no-restricted-imports
 import { UndiciError } from 'undici/lib/core/errors';
 
 import { format } from '@tinkoff/url';
-import type { Args, CreateRequestWithMetrics } from './types';
+import { MetricsInstances } from '@tramvai/tokens-metrics';
+import type { Args, CreateRequestWithMetrics, GetServiceName } from './types';
 
 // https://nodejs.org/api/errors.html#nodejs-error-codes - Common system errors possible for net/http/dns
 const POSSIBLE_ERRORS = [
@@ -23,19 +25,29 @@ const POSSIBLE_ERRORS = [
 const kMetricsAttached = Symbol('metricsAttached');
 const UNKNOWN_HOST = 'unknown';
 const isCorrectEmitNet = Number(process.versions.node.split('.')[0]) > 20;
-const removeDefaultPorts = (urlWithPort: string | URL) => {
-  try {
-    const url = new URL(urlWithPort.toString());
-    const currentPort = url.port;
 
-    if (currentPort === '80' || currentPort === '443') {
-      url.port = '';
-    }
+// ip v6 contains [] in address: [::1]
+// remove it for correct isIP check
+const normalizeIpUrl = (url: string) => url.replace(/^\[|\]$/g, '');
 
-    return url.origin;
-  } catch (_err) {}
+const getHost = (request: RequestWithMetrics, cache: LRUCache<string, string>) => {
+  // @ts-expect-error wrong typings
+  const { protocol, servername, origin } = request;
 
-  return urlWithPort;
+  const url = new URL(origin.toString());
+  const { port } = url;
+  const portSuffix = port ? `:${port}` : '';
+
+  if (servername) {
+    return `${protocol}//${servername}${portSuffix}`;
+  }
+  let hostname = normalizeIpUrl(url.hostname);
+
+  if (net.isIP(hostname)) {
+    hostname = cache.get(hostname);
+  }
+
+  return `${protocol}//${hostname}${portSuffix}`;
 };
 
 const originalNetConnect = net.Socket.prototype.connect;
@@ -131,11 +143,18 @@ export const createRequestWithMetrics: CreateRequestWithMetrics = ({
   };
 };
 
-export function initConnectionResolveMetrics({ metricsInstances }) {
+export function initConnectionResolveMetrics({
+  metricsInstances,
+  cache,
+}: {
+  metricsInstances: MetricsInstances;
+  cache: LRUCache<string, string>;
+}) {
   if (isCorrectEmitNet) {
     subscribe('net.client.socket', ({ socket }: { socket: tls.TLSSocket | net.Socket }) => {
       instrumentSocket(socket, {
         metricsInstances,
+        cache,
       });
     });
   } else {
@@ -144,6 +163,7 @@ export function initConnectionResolveMetrics({ metricsInstances }) {
 
       instrumentSocket(socket, {
         metricsInstances,
+        cache,
       });
 
       return socket;
@@ -154,6 +174,7 @@ export function initConnectionResolveMetrics({ metricsInstances }) {
 
       instrumentSocket(socket, {
         metricsInstances,
+        cache,
       });
 
       return socket;
@@ -163,7 +184,10 @@ export function initConnectionResolveMetrics({ metricsInstances }) {
 
 function instrumentSocket(
   socket: net.Socket | tls.TLSSocket,
-  { metricsInstances: { dnsResolveDuration, tcpConnectDuration, tlsHandshakeDuration } }
+  {
+    metricsInstances: { dnsResolveDuration, tcpConnectDuration, tlsHandshakeDuration },
+    cache,
+  }: { metricsInstances: MetricsInstances; cache: LRUCache<string, string> }
 ) {
   // ignore reused sockets
   if (socket[kMetricsAttached]) {
@@ -177,16 +201,20 @@ function instrumentSocket(
     lookupEnd: 0,
     connectEnd: 0,
     secureConnectEnd: 0,
-    host: UNKNOWN_HOST,
+    host: undefined,
   };
   const protocol = socket instanceof tls.TLSSocket ? 'https' : 'http';
 
-  socket.once('lookup', (_err, _address, _family, host) => {
+  socket.once('lookup', (_err, address, _family, host) => {
     socketInfo.lookupEnd = Date.now();
     socketInfo.host = host;
 
+    if (socketInfo.host) {
+      cache.set(address, host);
+    }
+
     dnsResolveDuration.observe(
-      { service: host },
+      { service: host ?? UNKNOWN_HOST },
       getDuration(socketInfo.lookupEnd, socketInfo.start)
     );
   });
@@ -196,8 +224,20 @@ function instrumentSocket(
 
     if (protocol === 'http') {
       // _host is internal field - https://github.com/nodejs/node/blob/main/lib/net.js#L1383
-      const { _host: host } = <net.Socket & { _host: string }>socket;
-      socketInfo.host = `http://${host ?? socketInfo.host}`;
+      const { _host: host, remoteAddress } = <net.Socket & { _host: string }>socket;
+      let finalHost = host;
+
+      // When a DNS cache is used, the lookup phase is skipped
+      // and the host field contains null or ip address
+      // To recover the actual hostname, we maintain an IP-to-hostname mapping and
+      // reuse the result of the previous DNS resolution for that IP
+      if (!finalHost) {
+        finalHost = cache.get(remoteAddress);
+      } else if (net.isIP(finalHost)) {
+        finalHost = cache.get(host);
+      }
+
+      socketInfo.host = `http://${finalHost ?? UNKNOWN_HOST}`;
     } else {
       // connect-options also internal - https://github.com/nodejs/node/blob/main/lib/internal/tls/wrap.js#L1749
       const connectOptionsSymbol = Object.getOwnPropertySymbols(socket).find(
@@ -206,7 +246,7 @@ function instrumentSocket(
       const connectOptions = socket[connectOptionsSymbol];
       const { servername } = connectOptions;
 
-      socketInfo.host = `https://${servername ?? socketInfo.host}`;
+      socketInfo.host = `https://${servername ?? UNKNOWN_HOST}`;
     }
 
     tcpConnectDuration.observe(
@@ -234,10 +274,16 @@ type RequestWithMetrics = DiagnosticsChannel.RequestCreateMessage['request'] & {
 export const addMetricsForFetch = ({
   metricsInstances: { requestsTotal, requestsErrors, requestsDuration },
   getServiceName,
+  cache,
+}: {
+  metricsInstances: MetricsInstances;
+  getServiceName: GetServiceName;
+  cache: LRUCache<string, string>;
 }) => {
   subscribe('undici:request:create', ({ request }: { request: RequestWithMetrics }) => {
-    const { method, origin, path } = request;
-    const host = removeDefaultPorts(origin);
+    const { path, method } = request;
+    const host = getHost(request, cache);
+
     const url = `${host}${path}`;
     const serviceName = getServiceName(url, request);
 
