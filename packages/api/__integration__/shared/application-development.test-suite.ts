@@ -364,6 +364,62 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       },
       sourceDir: path.join(fixturesFolder, 'application', 'app-pwa'),
     },
+    'multiple-pwa': {
+      name: 'multiple-pwa',
+      type: 'application',
+      hotRefresh: {
+        enabled: false,
+      },
+      pwa: [
+        {
+          sw: {
+            src: './swA.ts',
+            scope: '/scope/',
+            dest: 'scope-sw.js',
+          },
+          workbox: {
+            enabled: true,
+            include: ['react\\.([\\w\\d]+?\\.)?js$'],
+          },
+          webmanifest: {
+            enabled: true,
+            name: 'scope manifest',
+            short_name: 'scope manifest',
+            dest: '/scope-manifest.webmanifest',
+            theme_color: '#ffdd2d',
+          },
+          icon: {
+            src: './images/pwa-icon.png',
+            dest: 'images',
+            sizes: [36, 512],
+          },
+        },
+        {
+          sw: {
+            src: './swB.ts',
+            scope: '/bank/',
+            dest: 'bank-sw.js',
+          },
+          workbox: {
+            enabled: true,
+            include: ['react\\.([\\w\\d]+?\\.)?js$'],
+          },
+          webmanifest: {
+            enabled: true,
+            name: 'bank manifest',
+            short_name: 'bank manifest',
+            dest: '/bank-manifest.webmanifest',
+            theme_color: '#ffffff',
+          },
+          icon: {
+            src: './images/pwa-icon.png',
+            dest: 'images',
+            sizes: [128, 256],
+          },
+        },
+      ],
+      sourceDir: path.join(fixturesFolder, 'application', 'app-pwa-multiple'),
+    },
     'app-refresh': {
       name: 'app-refresh',
       type: 'application',
@@ -1305,7 +1361,159 @@ export default createPapiMethod({
             for (const { src } of webmanifestContent.icons) {
               const iconSrc = src.replace('4000', devServer.staticPort);
               const iconResponse = await fetch(iconSrc);
-              // body must be consumed
+              // body of request must be consumed
+              await iconResponse.text();
+              test.expect(iconResponse.status).toBe(200);
+            }
+          });
+        });
+
+        test.describe('multiple pwa', () => {
+          test.use({
+            inputParameters: {
+              name: 'multiple-pwa',
+              rootDir: testSuiteFolder,
+              buildType: 'client',
+              disableServerRunnerWaiting: true,
+              fileCache: false,
+              noRebuild: true,
+            },
+            extraConfiguration: {
+              plugins,
+              projects,
+            },
+          });
+
+          test('scope "scope" service worker', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            const chunks = ['react'].map((chunkname) => {
+              return statsJson.assetsByChunkName[chunkname][0];
+            });
+
+            const swResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/scope-sw.js`
+            );
+            test.expect(swResponse.status).toBe(200);
+
+            const swContent = await swResponse.text();
+
+            chunks.forEach((chunkname) => {
+              test.expect(swContent.includes(chunkname)).toBe(true);
+            });
+          });
+
+          test('scope "bank" service worker', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const statsJson = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/stats.json`)
+            ).json();
+
+            const chunks = ['react'].map((chunkname) => {
+              return statsJson.assetsByChunkName[chunkname][0];
+            });
+
+            const swResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/bank-sw.js`
+            );
+
+            test.expect(swResponse.status).toBe(200);
+
+            const swContent = await swResponse.text();
+
+            chunks.forEach((chunkname) => {
+              test.expect(swContent.includes(chunkname)).toBe(true);
+            });
+          });
+
+          test('scope "scope" webmanifest', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/scope-manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            test.expect(webmanifestResponse.status).toBe(200);
+
+            test.expect(webmanifestContent.theme_color).toBe('#ffdd2d');
+            test.expect(webmanifestContent.name).toBe('scope manifest');
+            test.expect(webmanifestContent.short_name).toBe('scope manifest');
+            test.expect(webmanifestContent.scope).toBe('/scope/');
+          });
+
+          test('scope "bank" webmanifest', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/bank-manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            test.expect(webmanifestResponse.status).toBe(200);
+
+            test.expect(webmanifestContent.theme_color).toBe('#ffffff');
+            test.expect(webmanifestContent.name).toBe('bank manifest');
+            test.expect(webmanifestContent.short_name).toBe('bank manifest');
+            test.expect(webmanifestContent.scope).toBe('/bank/');
+          });
+
+          test('scope "scope" icons', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/scope-manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            const expectedSizes = ['36x36', '512x512'];
+            const actualIconSizes = webmanifestContent.icons.map((icon) => icon.sizes);
+            test.expect(webmanifestContent.icons.length).toBe(2);
+            test
+              .expect(
+                expectedSizes.every((expectedIconSize) =>
+                  actualIconSizes.includes(expectedIconSize)
+                )
+              )
+              .toBeTruthy();
+
+            for (const { src } of webmanifestContent.icons) {
+              const iconSrc = src.replace('4000', devServer.staticPort);
+              const iconResponse = await fetch(iconSrc);
+              // body of request must be consumed
+              await iconResponse.text();
+              test.expect(iconResponse.status).toBe(200);
+            }
+          });
+
+          test('scope "bank" icons', async ({ devServer }) => {
+            await devServer.buildPromise;
+
+            const webmanifestResponse = await fetch(
+              `http://localhost:${devServer.staticPort}/dist/client/bank-manifest.webmanifest`
+            );
+            const webmanifestContent = await webmanifestResponse.json();
+
+            const expectedSizes = ['128x128', '256x256'];
+            const actualIconSizes = webmanifestContent.icons.map((icon) => icon.sizes);
+            test.expect(webmanifestContent.icons.length).toBe(2);
+            test
+              .expect(
+                expectedSizes.every((expectedIconSize) =>
+                  actualIconSizes.includes(expectedIconSize)
+                )
+              )
+              .toBeTruthy();
+
+            for (const { src } of webmanifestContent.icons) {
+              const iconSrc = src.replace('4000', devServer.staticPort);
+              const iconResponse = await fetch(iconSrc);
+              // body of request must be consumed
               await iconResponse.text();
               test.expect(iconResponse.status).toBe(200);
             }
@@ -3358,8 +3566,6 @@ export default Cmp;`,
             spawnDevServer,
           }) => {
             const { logs } = spawnDevServer;
-
-            console.log(logs);
 
             test
               .expect(

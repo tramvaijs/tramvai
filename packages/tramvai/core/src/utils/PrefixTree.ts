@@ -1,6 +1,6 @@
 interface IndexObject<T> {
   [key: string]: IndexObject<T> | T;
-  value?: T;
+  value: T;
 }
 type UpdateFn<T> = (oldValue: T | void) => T;
 
@@ -24,7 +24,7 @@ export class PrefixTree<T> {
     const parts = key.split(this.delimiter);
 
     do {
-      const letter = parts.shift();
+      const letter = parts.shift() as string;
       if (letter === '') continue;
 
       if (!tree[letter]) {
@@ -47,7 +47,7 @@ export class PrefixTree<T> {
     let prevTree: IndexObject<T>;
 
     do {
-      const letter = parts.shift();
+      const letter = parts.shift() as string;
       if (letter === '') continue;
 
       prevTree = tree as IndexObject<T>;
@@ -58,6 +58,7 @@ export class PrefixTree<T> {
       return tree.value;
     }
 
+    // @ts-expect-error
     return prevTree.value;
   }
 }

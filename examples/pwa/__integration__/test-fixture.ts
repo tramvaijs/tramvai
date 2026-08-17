@@ -6,8 +6,8 @@ import { createApp, app, settingApp } from '@tramvai/internal-test-utils/fixture
 import { buildAllureTree } from '@tramvai/internal-test-utils/fixtures/build-allure-tree';
 import type { IAction } from '@tramvai/internal-test-utils/fixtures/overriding';
 import { IFixture } from '@tramvai/internal-test-utils/fixtures/overriding';
-import type { PwaComponentObject } from './pwa-fixture';
-import { PwaFixture } from './pwa-fixture';
+import type { PwaComponentObject } from '@tramvai/internal-test-utils/fixtures/pwa';
+import { PwaFixture } from '@tramvai/internal-test-utils/fixtures/pwa';
 
 type TestFixture = {
   page: Page;

@@ -1,21 +1,30 @@
-import { commandLineListTokens, DI_TOKEN, provide } from '@tramvai/core';
+import { commandLineListTokens, provide } from '@tramvai/core';
 import { ResourceType, ResourceSlot, RESOURCES_REGISTRY } from '@tramvai/tokens-render';
-import { PWA_MANIFEST_INIT_COMMAND_LINE, PWA_MANIFEST_URL_TOKEN } from '../../tokens';
+import noop from '@tinkoff/utils/function/noop';
+import { pwaConfigs } from '@tramvai/cli/lib/external/pwa';
 
-const validateRelativeUrl = (url: string) => {
-  if (!url.startsWith('/')) {
-    throw new Error(`Webmanifest url should start from "/", got ${url}`);
-  }
-  if (!(url.endsWith('.json') || url.endsWith('.webmanifest'))) {
-    throw new Error(`Webmanifest url should has .json or .webmanifest extension, got ${url}`);
-  }
-};
+import { validateRelativeUrl } from './utils/validateUrl';
+import { PWA_MANIFEST_URL_TOKEN } from '../../tokens';
+
+export const validateManifestUrlsProvider = provide({
+  provide: commandLineListTokens.init,
+  useFactory: () =>
+    function validateSwUrlAndScope() {
+      pwaConfigs.forEach((pwaConfig) => {
+        if (pwaConfig.webmanifest) {
+          validateRelativeUrl(pwaConfig.webmanifest.url);
+        }
+      });
+    },
+});
 
 export const validateRelativeUrlProvider = provide({
   provide: commandLineListTokens.init,
   useFactory: ({ manifestUrl }) =>
     function validateSwUrlAndScope() {
-      validateRelativeUrl(manifestUrl);
+      if (manifestUrl) {
+        validateRelativeUrl(manifestUrl);
+      }
     },
   deps: {
     manifestUrl: PWA_MANIFEST_URL_TOKEN,
@@ -23,30 +32,23 @@ export const validateRelativeUrlProvider = provide({
 });
 
 export const registerWebManifestProvider = provide({
-  provide: commandLineListTokens.init,
-  useFactory: ({ manifestCommandLine, di }) =>
-    function registerWebManifestCommandLine() {
-      di.register({
-        provide: manifestCommandLine
-          ? commandLineListTokens[manifestCommandLine]
-          : commandLineListTokens.customerStart,
-        useFactory: ({ resourcesRegistry, manifestUrl }) =>
-          function registerWebManifestAsResource() {
-            resourcesRegistry.register({
-              type: ResourceType.asIs,
-              slot: ResourceSlot.HEAD_META,
-              // @todo what about crossorigin, maybe optional?
-              payload: `<link rel="manifest" href="${manifestUrl}">`,
-            });
-          },
-        deps: {
-          manifestUrl: PWA_MANIFEST_URL_TOKEN,
-          resourcesRegistry: RESOURCES_REGISTRY,
-        },
+  provide: commandLineListTokens.resolvePageDeps,
+  useFactory: ({ resourcesRegistry, manifestUrl }) => {
+    if (!manifestUrl) {
+      return noop;
+    }
+
+    return function registerWebManifestAsResource() {
+      resourcesRegistry.register({
+        type: ResourceType.asIs,
+        slot: ResourceSlot.HEAD_META,
+        // @todo what about crossorigin, maybe optional?
+        payload: `<link rel="manifest" href="${manifestUrl}">`,
       });
-    },
+    };
+  },
   deps: {
-    di: DI_TOKEN,
-    manifestCommandLine: { token: PWA_MANIFEST_INIT_COMMAND_LINE, optional: true },
+    manifestUrl: PWA_MANIFEST_URL_TOKEN,
+    resourcesRegistry: RESOURCES_REGISTRY,
   },
 });

@@ -1,12 +1,23 @@
 import { Scope, commandLineListTokens, optional, provide } from '@tramvai/core';
 import { LOGGER_TOKEN } from '@tramvai/tokens-common';
 import type { Workbox } from 'workbox-window';
-import { PWA_SW_SCOPE_TOKEN, PWA_SW_URL_TOKEN, PWA_WORKBOX_TOKEN } from '../../../tokens';
+import noop from '@tinkoff/utils/function/noop';
+
+import {
+  PWA_SW_PARAMS_TOKEN,
+  PWA_SW_SCOPE_TOKEN,
+  PWA_SW_URL_TOKEN,
+  PWA_WORKBOX_TOKEN,
+} from '../../../tokens';
 
 export const workboxRegisterProvider = provide({
   provide: commandLineListTokens.init,
   useFactory: ({ workbox, logger }) => {
     const log = logger('pwa:workbox');
+
+    if (!workbox) {
+      return noop;
+    }
 
     return function registerWorkbox() {
       // load workbox-window early but in non-blocking way
@@ -47,7 +58,7 @@ export const workboxRegisterProvider = provide({
 export const pwaWorkboxTokenProvider = provide({
   provide: PWA_WORKBOX_TOKEN,
   scope: Scope.SINGLETON,
-  useFactory: ({ swUrl, swScope, logger }) => {
+  useFactory: ({ swUrl, swScope, logger, swParams }) => {
     const log = logger('pwa:workbox');
     let workbox: null | Workbox = null;
 
@@ -57,6 +68,10 @@ export const pwaWorkboxTokenProvider = provide({
         return workbox;
       }
 
+      if (!swUrl || !swScope) {
+        return null;
+      }
+
       if (workbox) {
         return workbox;
       }
@@ -64,6 +79,22 @@ export const pwaWorkboxTokenProvider = provide({
       const { Workbox } = await import(
         /* webpackChunkName: "tramvai-workbox-window" */ 'workbox-window/Workbox'
       );
+
+      if (swParams && swParams.length) {
+        const params = swParams
+          .filter(Boolean)
+          .reduce((acc, p) => {
+            return acc.concat(
+              Object.keys(p).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(p[k])}`)
+            );
+          }, [] as string[])
+          .join('&');
+
+        if (params) {
+          // eslint-disable-next-line no-param-reassign
+          swUrl += `?${params}`;
+        }
+      }
 
       workbox = new Workbox(swUrl, {
         scope: swScope,
@@ -82,6 +113,7 @@ export const pwaWorkboxTokenProvider = provide({
   },
   deps: {
     swUrl: PWA_SW_URL_TOKEN,
+    swParams: optional(PWA_SW_PARAMS_TOKEN),
     swScope: PWA_SW_SCOPE_TOKEN,
     logger: LOGGER_TOKEN,
   },

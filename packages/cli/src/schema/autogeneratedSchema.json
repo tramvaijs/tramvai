@@ -529,254 +529,511 @@
             "pwa": {
               "title": "PWA configuration (works with `TramvaiPwaModule` from `@tramvai/module-progressive-web-app` library)",
               "default": {},
-              "type": "object",
-              "properties": {
-                "sw": {
-                  "title": "Service-Worker configuration",
-                  "default": {},
+              "anyOf": [
+                {
                   "type": "object",
                   "properties": {
-                    "src": {
-                      "title": "Path to sw.ts file (relative to \"root\" directory)",
-                      "default": "sw.ts",
-                      "type": "string"
+                    "sw": {
+                      "title": "Service-Worker configuration",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "src": {
+                          "title": "Path to sw.ts file (relative to \"root\" directory)",
+                          "default": "sw.ts",
+                          "type": "string"
+                        },
+                        "dest": {
+                          "title": "Name of generated SW file (will be placed in \"output.client\" directory)",
+                          "default": "sw.js",
+                          "type": "string"
+                        },
+                        "scope": {
+                          "title": "Scope of SW (see https://developers.google.com/web/ilt/pwa/introduction-to-service-worker#registration_and_scope)",
+                          "default": "/",
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
                     },
-                    "dest": {
-                      "title": "Name of generated SW file (will be placed in \"output.client\" directory)",
-                      "default": "sw.js",
-                      "type": "string"
-                    },
-                    "scope": {
-                      "title": "Scope of SW (see https://developers.google.com/web/ilt/pwa/introduction-to-service-worker#registration_and_scope)",
-                      "default": "/",
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "workbox": {
-                  "title": "Workbox configuration",
-                  "default": {},
-                  "type": "object",
-                  "properties": {
-                    "enabled": {
-                      "cli_overridable": "",
-                      "title": "Connect `InjectManifest` from `workbox-webpack-plugin` library",
-                      "default": false,
-                      "anyOf": [
-                        {
-                          "type": "object",
-                          "properties": {
-                            "development": {
-                              "type": "boolean"
+                    "workbox": {
+                      "title": "Workbox configuration",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "cli_overridable": "",
+                          "title": "Connect `InjectManifest` from `workbox-webpack-plugin` library",
+                          "default": false,
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "development": {
+                                  "type": "boolean"
+                                },
+                                "production": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "additionalProperties": false
                             },
-                            "production": {
+                            {
                               "type": "boolean"
                             }
-                          },
-                          "additionalProperties": false
+                          ]
                         },
-                        {
-                          "type": "boolean"
+                        "exclude": {
+                          "title": "Array of regexp specifiers used to exclude assets from the precache manifest",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "include": {
+                          "title": "Array of regexp specifiers used to include assets in the precache manifest",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "chunks": {
+                          "title": "Array of chunk names used to include in the precache manifest",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "excludeChunks": {
+                          "title": "Array of chunk names used to exclude from the precache manifest",
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalManifestEntries": {
+                          "title": "A list of entries to be included in the precache manifest, in addition to any entries that are generated as part of the build configuration",
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "integrity": {
+                                    "type": "string"
+                                  },
+                                  "revision": {
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "string"
+                              }
+                            ]
+                          }
                         }
-                      ]
+                      },
+                      "additionalProperties": false
                     },
-                    "exclude": {
-                      "title": "Array of regexp specifiers used to exclude assets from the precache manifest",
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "include": {
-                      "title": "Array of regexp specifiers used to include assets in the precache manifest",
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "chunks": {
-                      "title": "Array of chunk names used to include in the precache manifest",
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "excludeChunks": {
-                      "title": "Array of chunk names used to exclude from the precache manifest",
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalManifestEntries": {
-                      "title": "A list of entries to be included in the precache manifest, in addition to any entries that are generated as part of the build configuration",
-                      "type": "array",
-                      "items": {
-                        "anyOf": [
-                          {
+                    "webmanifest": {
+                      "title": "WebManifest content (manifest.json or webmanifest will be generated based on this options)",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "enabled": {
+                          "title": "Create webmanifest file",
+                          "default": false,
+                          "type": "boolean"
+                        },
+                        "dest": {
+                          "title": "Name of generated manifest file (will be placed in \"output.client\" directory). You can use `[hash]` placeholder for manifest cache busting in production mode",
+                          "default": "/manifest.[hash].json",
+                          "type": "string"
+                        },
+                        "scope": {
+                          "title": "prefer to use \"pwa.sw.scope\" instead, this field will be generated automatically",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "short_name": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "start_url": {
+                          "type": "string"
+                        },
+                        "display": {
+                          "type": "string"
+                        },
+                        "orientation": {
+                          "type": "string"
+                        },
+                        "theme_color": {
+                          "title": "prefer to use \"pwa.meta.themeColor\" instead, this field will be generated automatically",
+                          "type": "string"
+                        },
+                        "background_color": {
+                          "type": "string"
+                        },
+                        "icons": {
+                          "title": "prefer to use \"pwa.icon\" instead, this field will be generated automatically",
+                          "type": "array",
+                          "items": {
                             "type": "object",
                             "properties": {
-                              "integrity": {
+                              "src": {
                                 "type": "string"
                               },
-                              "revision": {
+                              "sizes": {
                                 "type": "string"
                               },
-                              "url": {
+                              "type": {
+                                "type": "string"
+                              },
+                              "density": {
+                                "type": "number"
+                              },
+                              "purpose": {
                                 "type": "string"
                               }
                             },
                             "additionalProperties": false
-                          },
-                          {
-                            "type": "string"
                           }
-                        ]
-                      }
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "icon": {
+                      "title": "PWA icons options",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "src": {
+                          "title": "Path to icon file (relative to \"root\" directory)",
+                          "type": "string"
+                        },
+                        "dest": {
+                          "title": "Folder for generated icons (will be placed in \"output.client\" directory)",
+                          "default": "pwa-icons",
+                          "type": "string"
+                        },
+                        "sizes": {
+                          "title": "Icon sizes",
+                          "default": [
+                            36,
+                            48,
+                            72,
+                            96,
+                            144,
+                            192,
+                            512
+                          ],
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "meta": {
+                      "title": "PWA meta options",
+                      "default": {},
+                      "type": "object",
+                      "properties": {
+                        "viewport": {
+                          "title": "\"viewport\" meta tag",
+                          "type": "string"
+                        },
+                        "themeColor": {
+                          "title": "\"theme-color\" meta tag",
+                          "type": "string"
+                        },
+                        "mobileApp": {
+                          "title": "\"mobile-web-app-capable\" meta tag",
+                          "type": "string"
+                        },
+                        "mobileAppIOS": {
+                          "title": "\"apple-mobile-web-app-capable\" meta tag",
+                          "type": "string"
+                        },
+                        "appleTitle": {
+                          "title": "\"apple-mobile-web-app-title\" meta tag",
+                          "type": "string"
+                        },
+                        "appleStatusBarStyle": {
+                          "title": "\"apple-mobile-web-app-status-bar-style\" meta tag",
+                          "type": "string"
+                        }
+                      },
+                      "additionalProperties": false
                     }
                   },
                   "additionalProperties": false
                 },
-                "webmanifest": {
-                  "title": "WebManifest content (manifest.json or webmanifest will be generated based on this options)",
-                  "default": {},
-                  "type": "object",
-                  "properties": {
-                    "enabled": {
-                      "title": "Create webmanifest file",
-                      "default": false,
-                      "type": "boolean"
-                    },
-                    "dest": {
-                      "title": "Name of generated manifest file (will be placed in \"output.client\" directory). You can use `[hash]` placeholder for manifest cache busting in production mode",
-                      "default": "/manifest.[hash].json",
-                      "type": "string"
-                    },
-                    "scope": {
-                      "title": "prefer to use \"pwa.sw.scope\" instead, this field will be generated automatically",
-                      "type": "string"
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "short_name": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "start_url": {
-                      "type": "string"
-                    },
-                    "display": {
-                      "type": "string"
-                    },
-                    "orientation": {
-                      "type": "string"
-                    },
-                    "theme_color": {
-                      "title": "prefer to use \"pwa.meta.themeColor\" instead, this field will be generated automatically",
-                      "type": "string"
-                    },
-                    "background_color": {
-                      "type": "string"
-                    },
-                    "icons": {
-                      "title": "prefer to use \"pwa.icon\" instead, this field will be generated automatically",
-                      "type": "array",
-                      "items": {
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "sw": {
+                        "title": "Service-Worker configuration",
+                        "default": {},
                         "type": "object",
                         "properties": {
                           "src": {
+                            "title": "Path to sw.ts file (relative to \"root\" directory)",
+                            "default": "sw.ts",
+                            "type": "string"
+                          },
+                          "dest": {
+                            "title": "Name of generated SW file (will be placed in \"output.client\" directory)",
+                            "default": "sw.js",
+                            "type": "string"
+                          },
+                          "scope": {
+                            "title": "Scope of SW (see https://developers.google.com/web/ilt/pwa/introduction-to-service-worker#registration_and_scope)",
+                            "default": "/",
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "workbox": {
+                        "title": "Workbox configuration",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "cli_overridable": "",
+                            "title": "Connect `InjectManifest` from `workbox-webpack-plugin` library",
+                            "default": false,
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "development": {
+                                    "type": "boolean"
+                                  },
+                                  "production": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "boolean"
+                              }
+                            ]
+                          },
+                          "exclude": {
+                            "title": "Array of regexp specifiers used to exclude assets from the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "include": {
+                            "title": "Array of regexp specifiers used to include assets in the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "chunks": {
+                            "title": "Array of chunk names used to include in the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "excludeChunks": {
+                            "title": "Array of chunk names used to exclude from the precache manifest",
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "additionalManifestEntries": {
+                            "title": "A list of entries to be included in the precache manifest, in addition to any entries that are generated as part of the build configuration",
+                            "type": "array",
+                            "items": {
+                              "anyOf": [
+                                {
+                                  "type": "object",
+                                  "properties": {
+                                    "integrity": {
+                                      "type": "string"
+                                    },
+                                    "revision": {
+                                      "type": "string"
+                                    },
+                                    "url": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                {
+                                  "type": "string"
+                                }
+                              ]
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "webmanifest": {
+                        "title": "WebManifest content (manifest.json or webmanifest will be generated based on this options)",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "enabled": {
+                            "title": "Create webmanifest file",
+                            "default": false,
+                            "type": "boolean"
+                          },
+                          "dest": {
+                            "title": "Name of generated manifest file (will be placed in \"output.client\" directory). You can use `[hash]` placeholder for manifest cache busting in production mode",
+                            "default": "/manifest.[hash].json",
+                            "type": "string"
+                          },
+                          "scope": {
+                            "title": "prefer to use \"pwa.sw.scope\" instead, this field will be generated automatically",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "short_name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "start_url": {
+                            "type": "string"
+                          },
+                          "display": {
+                            "type": "string"
+                          },
+                          "orientation": {
+                            "type": "string"
+                          },
+                          "theme_color": {
+                            "title": "prefer to use \"pwa.meta.themeColor\" instead, this field will be generated automatically",
+                            "type": "string"
+                          },
+                          "background_color": {
+                            "type": "string"
+                          },
+                          "icons": {
+                            "title": "prefer to use \"pwa.icon\" instead, this field will be generated automatically",
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "src": {
+                                  "type": "string"
+                                },
+                                "sizes": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "density": {
+                                  "type": "number"
+                                },
+                                "purpose": {
+                                  "type": "string"
+                                }
+                              },
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "icon": {
+                        "title": "PWA icons options",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "src": {
+                            "title": "Path to icon file (relative to \"root\" directory)",
+                            "type": "string"
+                          },
+                          "dest": {
+                            "title": "Folder for generated icons (will be placed in \"output.client\" directory)",
+                            "default": "pwa-icons",
                             "type": "string"
                           },
                           "sizes": {
+                            "title": "Icon sizes",
+                            "default": [
+                              36,
+                              48,
+                              72,
+                              96,
+                              144,
+                              192,
+                              512
+                            ],
+                            "type": "array",
+                            "items": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      "meta": {
+                        "title": "PWA meta options",
+                        "default": {},
+                        "type": "object",
+                        "properties": {
+                          "viewport": {
+                            "title": "\"viewport\" meta tag",
                             "type": "string"
                           },
-                          "type": {
+                          "themeColor": {
+                            "title": "\"theme-color\" meta tag",
                             "type": "string"
                           },
-                          "density": {
-                            "type": "number"
+                          "mobileApp": {
+                            "title": "\"mobile-web-app-capable\" meta tag",
+                            "type": "string"
                           },
-                          "purpose": {
+                          "mobileAppIOS": {
+                            "title": "\"apple-mobile-web-app-capable\" meta tag",
+                            "type": "string"
+                          },
+                          "appleTitle": {
+                            "title": "\"apple-mobile-web-app-title\" meta tag",
+                            "type": "string"
+                          },
+                          "appleStatusBarStyle": {
+                            "title": "\"apple-mobile-web-app-status-bar-style\" meta tag",
                             "type": "string"
                           }
                         },
                         "additionalProperties": false
                       }
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "icon": {
-                  "title": "PWA icons options",
-                  "default": {},
-                  "type": "object",
-                  "properties": {
-                    "src": {
-                      "title": "Path to icon file (relative to \"root\" directory)",
-                      "type": "string"
                     },
-                    "dest": {
-                      "title": "Folder for generated icons (will be placed in \"output.client\" directory)",
-                      "default": "pwa-icons",
-                      "type": "string"
-                    },
-                    "sizes": {
-                      "title": "Icon sizes",
-                      "default": [
-                        36,
-                        48,
-                        72,
-                        96,
-                        144,
-                        192,
-                        512
-                      ],
-                      "type": "array",
-                      "items": {
-                        "type": "number"
-                      }
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "meta": {
-                  "title": "PWA meta options",
-                  "default": {},
-                  "type": "object",
-                  "properties": {
-                    "viewport": {
-                      "title": "\"viewport\" meta tag",
-                      "type": "string"
-                    },
-                    "themeColor": {
-                      "title": "\"theme-color\" meta tag",
-                      "type": "string"
-                    },
-                    "mobileApp": {
-                      "title": "\"mobile-web-app-capable\" meta tag",
-                      "type": "string"
-                    },
-                    "mobileAppIOS": {
-                      "title": "\"apple-mobile-web-app-capable\" meta tag",
-                      "type": "string"
-                    },
-                    "appleTitle": {
-                      "title": "\"apple-mobile-web-app-title\" meta tag",
-                      "type": "string"
-                    },
-                    "appleStatusBarStyle": {
-                      "title": "\"apple-mobile-web-app-status-bar-style\" meta tag",
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
+                    "additionalProperties": false
+                  }
                 }
-              },
-              "additionalProperties": false
+              ]
             },
             "viewTransitions": {
               "title": "Enable View Transitions API for SPA navigations",
@@ -1409,23 +1666,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@10338": {
+                        "__@match@10444": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10340": {
+                        "__@replace@10446": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10343": {
+                        "__@search@10449": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10345": {
+                        "__@split@10451": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10347": {
+                        "__@matchAll@10453": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -2345,23 +2602,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@10338": {
+                        "__@match@10444": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10340": {
+                        "__@replace@10446": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10343": {
+                        "__@search@10449": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10345": {
+                        "__@split@10451": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10347": {
+                        "__@matchAll@10453": {
                           "type": "object",
                           "additionalProperties": false
                         }
@@ -3281,23 +3538,23 @@
                         "dotAll": {
                           "type": "boolean"
                         },
-                        "__@match@10338": {
+                        "__@match@10444": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@replace@10340": {
+                        "__@replace@10446": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@search@10343": {
+                        "__@search@10449": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@split@10345": {
+                        "__@split@10451": {
                           "type": "object",
                           "additionalProperties": false
                         },
-                        "__@matchAll@10347": {
+                        "__@matchAll@10453": {
                           "type": "object",
                           "additionalProperties": false
                         }

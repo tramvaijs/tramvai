@@ -270,15 +270,17 @@ describe('mapApplicationProjectToNewConfig', () => {
     });
 
     // experiments.pwa → pwa
-    expect(result.pwa).toEqual({
-      workbox: {
-        enabled: true,
+    expect(result.pwa).toEqual([
+      {
+        workbox: {
+          enabled: true,
+        },
+        sw: { src: 'sw.ts', dest: 'sw.js', scope: '/' },
+        webmanifest: { name: 'Test' },
+        icon: { source: 'icon.png' },
+        meta: {},
       },
-      sw: { src: 'sw.ts', dest: 'sw.js', scope: '/' },
-      webmanifest: { name: 'Test' },
-      icon: { source: 'icon.png' },
-      meta: {},
-    });
+    ]);
 
     // serverApiDir → fileSystemPapiDir (resolved)
     expect(result.fileSystemPapiDir).toBe('/root/src/api');

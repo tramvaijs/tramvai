@@ -1,6 +1,8 @@
 import type { container, Configuration } from 'webpack';
 import type { UniversalFederationPlugin } from '@module-federation/node';
 
+export * from './pwa';
+
 export type ModuleFederationPluginOptions = ConstructorParameters<
   typeof container.ModuleFederationPlugin
 >[0];

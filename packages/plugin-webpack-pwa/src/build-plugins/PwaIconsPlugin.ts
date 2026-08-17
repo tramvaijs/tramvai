@@ -3,7 +3,8 @@ import { createHash } from 'crypto';
 
 import type webpack from 'webpack';
 import type Sharp from 'sharp';
-import { PwaIconOptions } from '../types';
+
+import { PwaIconOptions } from '@tramvai/plugin-base-builder/lib/types';
 
 const pluginName = 'PwaIconsPlugin';
 
@@ -17,6 +18,7 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
 
   constructor(
     private options: PwaIconOptions & {
+      scope: string;
       mode: 'production' | 'development';
     }
   ) {
@@ -81,9 +83,15 @@ export class PwaIconsPlugin implements webpack.WebpackPluginInstance {
               const asset = compilation.getAsset(filename);
 
               if (asset) {
-                compilation.updateAsset(filename, source, { _pwaIconSize: sizes![i] });
+                compilation.updateAsset(filename, source, {
+                  _pwaIconSize: sizes![i],
+                  _pwaScope: this.options.scope,
+                });
               } else {
-                compilation.emitAsset(filename, source, { _pwaIconSize: sizes![i] });
+                compilation.emitAsset(filename, source, {
+                  _pwaIconSize: sizes![i],
+                  _pwaScope: this.options.scope,
+                });
               }
             });
           } catch (e) {

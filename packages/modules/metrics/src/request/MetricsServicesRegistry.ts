@@ -1,6 +1,6 @@
 import type { MetricsServicesRegistryInterface } from '@tramvai/tokens-metrics';
 import isString from '@tinkoff/utils/is/string';
-import { PrefixTree } from './PrefixTree';
+import { PrefixTree } from '@tramvai/core';
 
 const NO_PROTOCOL = 'NO PROTOCOL';
 const PROTOCOL_REGEX = /^([a-z0-9.+-]+:)/i;

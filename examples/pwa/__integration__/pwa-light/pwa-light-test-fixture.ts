@@ -6,8 +6,8 @@ import { buildAllureTree } from '@tramvai/internal-test-utils/fixtures/build-all
 import type { IAction } from '@tramvai/internal-test-utils/fixtures/overriding';
 import { IFixture } from '@tramvai/internal-test-utils/fixtures/overriding';
 import { dirname, resolve } from 'path';
-import type { PwaComponentObject } from '../pwa-fixture';
-import { PwaFixture } from '../pwa-fixture';
+import type { PwaComponentObject } from '@tramvai/internal-test-utils/fixtures/pwa';
+import { PwaFixture } from '@tramvai/internal-test-utils/fixtures/pwa';
 
 type AppFixtures = {
   app: StartCliResult;

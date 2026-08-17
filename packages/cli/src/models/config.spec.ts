@@ -44,33 +44,7 @@ it('should populate defaults for config', () => {
               "useImportModule": true,
             },
             "minifier": "terser",
-            "pwa": {
-              "icon": {
-                "dest": "pwa-icons",
-                "sizes": [
-                  36,
-                  48,
-                  72,
-                  96,
-                  144,
-                  192,
-                  512,
-                ],
-              },
-              "meta": {},
-              "sw": {
-                "dest": "sw.js",
-                "scope": "/",
-                "src": "sw.ts",
-              },
-              "webmanifest": {
-                "dest": "/manifest.[hash].json",
-                "enabled": false,
-              },
-              "workbox": {
-                "enabled": false,
-              },
-            },
+            "pwa": {},
             "reactCompiler": false,
             "reactTransitions": false,
             "runtimeChunk": false,
@@ -301,33 +275,7 @@ it('should populate defaults for overridable options', () => {
               "useImportModule": true,
             },
             "minifier": "terser",
-            "pwa": {
-              "icon": {
-                "dest": "pwa-icons",
-                "sizes": [
-                  36,
-                  48,
-                  72,
-                  96,
-                  144,
-                  192,
-                  512,
-                ],
-              },
-              "meta": {},
-              "sw": {
-                "dest": "sw.js",
-                "scope": "/",
-                "src": "sw.ts",
-              },
-              "webmanifest": {
-                "dest": "/manifest.[hash].json",
-                "enabled": false,
-              },
-              "workbox": {
-                "enabled": false,
-              },
-            },
+            "pwa": {},
             "reactCompiler": false,
             "reactTransitions": false,
             "runtimeChunk": false,

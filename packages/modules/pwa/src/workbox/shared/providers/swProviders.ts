@@ -1,14 +1,15 @@
-import { Scope, provide } from '@tramvai/core';
-import { PWA_SW_SCOPE_TOKEN, PWA_SW_URL_TOKEN } from '../../../tokens';
+import { provide } from '@tramvai/core';
+
+import { PWA_ACTIVE_CONFIG_TOKEN, PWA_SW_SCOPE_TOKEN, PWA_SW_URL_TOKEN } from '../../../tokens';
 
 export const providers = [
   provide({
     provide: PWA_SW_SCOPE_TOKEN,
-    scope: Scope.SINGLETON,
-    useFactory: () => {
-      const swScope = process.env.TRAMVAI_PWA_SW_SCOPE as string;
-
-      return swScope;
+    useFactory: ({ activePwaConfig }) => {
+      return activePwaConfig?.sw?.scope;
+    },
+    deps: {
+      activePwaConfig: PWA_ACTIVE_CONFIG_TOKEN,
     },
   }),
 ];

@@ -17,11 +17,16 @@ import { browserslistConfigResolve } from '../../blocks/browserslistConfig';
 import { configToEnv } from '../../blocks/configToEnv';
 import { commonApplication } from '../common';
 import { extractCssPluginFactory } from '../../blocks/extractCssPlugin';
-import { pwaBlock } from '../../blocks/pwa/server';
+import { isPwaEnabled } from '../../blocks/pwa/shared';
 
 // eslint-disable-next-line import/no-default-export
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
-  const { output, fileSystemPages, disableProdOptimization } = configManager;
+  const {
+    output,
+    fileSystemPages,
+    disableProdOptimization,
+    experiments: { pwa },
+  } = configManager;
 
   config
     .name('server')
@@ -46,8 +51,12 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
       })
     )
     .batch(css(configManager))
-    .batch(pwaBlock(configManager))
     .when(fileSystemPages.enabled, (cfg) => cfg.batch(pagesResolve(configManager)));
+
+  if (isPwaEnabled(configManager)) {
+    const { pwaBlock } = require('../../blocks/pwa/server');
+    config.batch(pwaBlock(configManager));
+  }
 
   config.output
     .path(configManager.buildPath)

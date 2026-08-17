@@ -1,5 +1,5 @@
 import { InjectManifest } from 'workbox-webpack-plugin';
-import { PWAConfig } from './types';
+import type { PWAConfig } from '@tramvai/plugin-base-builder/lib/types';
 
 export function getWorkboxOptions({
   swSrc,
@@ -39,7 +39,7 @@ export function getWorkboxOptions({
             const publicPath = compilation.outputOptions?.publicPath || assetsPrefix;
             const assetInfo = compilation.getAsset(asset.url.replace(publicPath, ''));
 
-            if (assetInfo?._webmanifestFilename) {
+            if (assetInfo?.info._webmanifestFilename) {
               return {
                 ...asset,
                 url: `${scope}${assetName}`,

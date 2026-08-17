@@ -1,3 +1,4 @@
+import { pwaScopes } from '@tramvai/cli/lib/external/pwa';
 import type { ResourcesTypes, WarmStrategyCacheOptions } from './types';
 
 declare let self: ServiceWorkerGlobalScope;
@@ -59,7 +60,7 @@ export function matchResourceType(type: ResourcesTypes, path: string): boolean {
       );
     case 'html':
       return (
-        (path.startsWith(process.env.TRAMVAI_PWA_SW_SCOPE!) &&
+        (pwaScopes.some((pwaScope) => path.startsWith(pwaScope)) &&
           !matchResourceType('manifest', path)) ||
         path.endsWith('.html')
       );

@@ -26,7 +26,7 @@ createApp({
     }),
     provide({
       provide: PWA_SW_SCOPE_TOKEN,
-      useValue: '/test',
+      useValue: '/test/',
     }),
     provide({
       provide: PROXY_CONFIG_TOKEN,

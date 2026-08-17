@@ -10,7 +10,7 @@ test.describe('packages/modules/pwa-light', () => {
     test('should be registered with correct scope', async ({ app, I, Pwa }) => {
       await I.gotoPage(`${app.serverUrl}/test`);
 
-      test.expect(await Pwa.getSWScope()).toBe('/test');
+      test.expect(await Pwa.getSWScope()).toBe('/test/');
     });
   });
 

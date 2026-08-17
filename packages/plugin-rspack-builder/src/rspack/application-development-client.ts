@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 import { Writable } from 'node:stream';
 
-import { Compilation } from '@rspack/core';
+import { Compilation, RuleSetRule } from '@rspack/core';
 import rspack, { Configuration as RspackConfiguration } from '@rspack/core';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 import { optional } from '@tinkoff/dippy';
@@ -49,6 +49,7 @@ import {
 import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/externals';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
+import { RULES_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/rules';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import {
   AssetsIntegritiesPlugin,
@@ -129,6 +130,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
   const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
   const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+  const rules = di.get(optional(RULES_TOKEN)) ?? [];
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
   const rspackConfigExtension = config.extensions.webpack();
 
@@ -378,6 +380,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
             extensions,
           },
         },
+        ...(rules as RuleSetRule[]),
       ],
     },
     plugins: [

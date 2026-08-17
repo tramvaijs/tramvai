@@ -159,3 +159,19 @@ export type PWAConfig = {
    */
   meta?: PwaMetaOptions;
 };
+
+export type SimplifiedPWAConfig = {
+  sw: { scope: string; dest: string; url: string };
+  webmanifest: { scope: string; dest: string; url: string };
+  workbox: {
+    enabled: boolean | undefined;
+  };
+  meta: {
+    viewport?: string;
+    themeColor?: string;
+    mobileApp?: string;
+    mobileAppIOS?: string;
+    appleTitle?: string;
+    appleStatusBarStyle?: string;
+  };
+};
