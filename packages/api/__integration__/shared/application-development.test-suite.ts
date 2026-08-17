@@ -1612,6 +1612,21 @@ export default createPapiMethod({
             test.expect(statsJson.assets).toBeUndefined();
             test.expect(statsJson.integrities).toBeUndefined();
           });
+
+          test('ScriptCriticalAttributePlugin: runtime chunk sets data-critical on dynamically loaded scripts', async ({
+            devServer,
+          }) => {
+            await devServer.buildPromise;
+
+            const runtimeJs = await (
+              await fetch(`http://localhost:${devServer.staticPort}/dist/client/runtime.js`)
+            ).text();
+
+            // ScriptCriticalAttributePlugin hooks into the bundler's createScript waterfall and
+            // appends setAttribute("data-critical", "true") to the script-element construction
+            // block inside __webpack_require__.l, before the tag is appended to document.head.
+            test.expect(runtimeJs).toContain('setAttribute("data-critical", "true")');
+          });
         });
 
         test.describe('app-bundle-multiple-runtime', () => {

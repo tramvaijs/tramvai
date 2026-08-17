@@ -18,6 +18,7 @@ import { CACHE_ADDITIONAL_FLAGS_TOKEN } from '@tramvai/plugin-base-builder/lib/s
 import {
   getPurifyStatsPlugin,
   PatchAutoPublicPathPlugin,
+  ScriptCriticalAttributePlugin,
 } from '@tramvai/plugin-base-builder/lib/plugins';
 import { createSnapshot } from '@tramvai/plugin-base-builder/lib/shared/snapshot';
 import {
@@ -226,6 +227,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       }) as unknown as WebpackPluginInstance,
       new PatchAutoPublicPathPlugin(),
       new PurifyStatsPlugin({ fileName: statsFileName, target: 'child-app' }),
+      new ScriptCriticalAttributePlugin(),
       showProgress && new WorkerProgressPlugin({ name: clientBuildName, color: 'green' }),
       // @ts-expect-error
       new UniversalFederationPlugin({

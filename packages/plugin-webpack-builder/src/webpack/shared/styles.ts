@@ -157,6 +157,7 @@ export const createStylesConfiguration = ({
         ignoreOrder: true,
         // TODO support parameter
         // experimentalUseImportModule: !!config.experiments.minicss?.useImportModule,
+        attributes: { 'data-critical': 'true' },
         ...extractCssPluginOptions,
       }),
     ],

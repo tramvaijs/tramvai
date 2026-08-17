@@ -6,5 +6,6 @@ export * from './AssetsIntegritiesPlugin';
 export * from './polyfill-condition-plugin';
 export * from './virtual-protocol-plugin';
 export * from './AutoPublicPathPlugin';
+export * from './ScriptCriticalAttributePlugin';
 
 export { default as FancyReporter } from './WebpackBar/reporters/fancy';

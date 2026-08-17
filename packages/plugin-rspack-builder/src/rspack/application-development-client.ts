@@ -56,6 +56,7 @@ import {
   FancyReporter,
   PolyfillConditionPlugin,
   RuntimePathPlugin,
+  ScriptCriticalAttributePlugin,
   getPurifyStatsPlugin,
   getCollectStatsPlugin,
   getMergeStatsPlugin,
@@ -419,6 +420,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         new RuntimePathPlugin({
           publicPath: 'window.ap',
         }),
+      new ScriptCriticalAttributePlugin(),
       ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({

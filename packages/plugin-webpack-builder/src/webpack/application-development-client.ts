@@ -55,6 +55,7 @@ import {
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 import {
   RuntimePathPlugin,
+  ScriptCriticalAttributePlugin,
   PolyfillConditionPlugin,
   AssetsIntegritiesPlugin,
   getPurifyStatsPlugin,
@@ -417,6 +418,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
         new RuntimePathPlugin({
           publicPath: 'window.ap',
         }),
+      new ScriptCriticalAttributePlugin(),
       showProgress && new WorkerProgressPlugin({ name: clientBuildName, color: 'green' }),
       isPolyfillsExists &&
         new MergeStatsPlugin({

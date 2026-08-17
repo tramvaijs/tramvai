@@ -2,7 +2,10 @@ import type Config from 'webpack-chain';
 import { Compilation } from 'webpack';
 import { ChunkCorrelationPlugin } from '@module-federation/node';
 import LoadablePlugin from '@loadable/webpack-plugin';
-import { getPurifyStatsPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
+import {
+  getPurifyStatsPlugin,
+  ScriptCriticalAttributePlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 
@@ -61,6 +64,8 @@ export default (configManager: ConfigManager<ChildAppConfigEntry>) => (config: C
   config
     .plugin('assets-purify-plugin')
     .use(PurifyStatsPlugin, [{ fileName: statsFileName, target: 'child-app' }]);
+
+  config.plugin('script-critical').use(ScriptCriticalAttributePlugin);
 
   config.batch(files(configManager)).batch(nodeClient(configManager));
 };
