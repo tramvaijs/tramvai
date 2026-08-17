@@ -20,7 +20,6 @@ import { ChunkExtractor } from '@loadable/server';
 import type { DI_TOKEN, ExtractDependencyType } from '@tinkoff/dippy';
 import { bundleResource } from './blocks/bundleResource/bundleResource';
 import { polyfillResources } from './blocks/polyfill';
-import { addPreloadForCriticalJS } from './blocks/preload/preloadBlock';
 import type { ReactRenderServer } from './ReactRenderServer';
 import { formatAttributes } from './utils';
 
@@ -126,8 +125,6 @@ export class PageBuilder {
       await this.resourcesRegistry.prefetchInlinePageResources();
     }
 
-    this.preloadBlock();
-
     return this.generateHtml();
   }
 
@@ -181,18 +178,6 @@ export class PageBuilder {
         renderMode,
       })
     );
-  }
-
-  preloadBlock() {
-    // looks like we don't need this scripts preload at all, but also it is official recommendation for streaming
-    // https://github.com/reactwg/react-18/discussions/114
-    if (this.renderMode === 'streaming') {
-      return;
-    }
-
-    const preloadResources = addPreloadForCriticalJS(this.resourcesRegistry.getPageResources());
-
-    this.resourcesRegistry.register(preloadResources);
   }
 
   generateHtml() {

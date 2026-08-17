@@ -10,15 +10,14 @@ import type {
 import { ResourceType, ResourceSlot } from '@tramvai/tokens-render';
 import { isFileSystemPageComponent, fileSystemPageToWebpackChunkName } from '@tramvai/experiments';
 import type { ExtractDependencyType } from '@tinkoff/dippy';
-import { PRELOAD_JS } from '../../constants/performance';
 import { flushFiles } from '../utils/flushFiles';
 import { fetchWebpackRuntime } from '../utils/fetchWebpackRuntime';
 
-const asyncScriptAttrs = {
+export const asyncScriptAttrs = {
   defer: null,
   async: 'async',
 };
-const deferScriptAttrs = {
+export const deferScriptAttrs = {
   defer: 'defer',
   async: null,
 };
@@ -30,6 +29,7 @@ try {
   // do nothing
 }
 
+// eslint-disable-next-line max-statements
 export const bundleResource = async ({
   bundle,
   extractor,
@@ -101,15 +101,31 @@ export const bundleResource = async ({
         },
       });
     } else {
+      const webpackRuntimeSrc = genHref(webpackRuntimeScriptName);
+      const webpackRuntimeAttrs = {
+        crossorigin: 'anonymous',
+        fetchpriority: 'high',
+        ...(integrities[webpackRuntimeScriptName]
+          ? { integrity: integrities[webpackRuntimeScriptName] }
+          : {}),
+      };
+
       result.push({
         type: ResourceType.script,
         slot: ResourceSlot.HEAD_WEBPACK_RUNTIME,
-        payload: genHref(webpackRuntimeScriptName),
+        payload: webpackRuntimeSrc,
         attrs: {
           'data-critical': 'true',
-          ...(integrities[webpackRuntimeScriptName]
-            ? { integrity: integrities[webpackRuntimeScriptName], crossorigin: 'anonymous' }
-            : {}),
+          ...webpackRuntimeAttrs,
+        },
+      });
+      result.push({
+        type: ResourceType.preloadLink,
+        slot: ResourceSlot.HEAD_PERFORMANCE,
+        payload: webpackRuntimeSrc,
+        attrs: {
+          ...webpackRuntimeAttrs,
+          as: 'script',
         },
       });
     }
@@ -127,42 +143,39 @@ export const bundleResource = async ({
       attrs: {
         ...(integrities[style] ? { integrity: integrities[style], crossorigin: 'anonymous' } : {}),
         'data-critical': 'true',
-        // looks like we don't need this scripts preload at all, but also it is official recommendation for streaming
-        // https://github.com/reactwg/react-18/discussions/114
-        onload: renderMode === 'streaming' ? null : `${PRELOAD_JS}()`,
+        fetchpriority: 'high',
       },
     })
   );
 
-  baseScripts.forEach((script) =>
-    result.push({
-      type: ResourceType.script,
-      slot: ResourceSlot.HEAD_CORE_SCRIPTS,
-      payload: genHref(script),
-      attrs: {
-        ...(integrities[script]
-          ? { integrity: integrities[script], crossorigin: 'anonymous' }
-          : {}),
-        'data-critical': 'true',
-        ...scriptTypeAttr,
-      },
-    })
-  );
+  baseScripts.concat(scripts).forEach((script) => {
+    const href = genHref(script);
+    const attrs = {
+      crossorigin: 'anonymous',
+      fetchpriority: 'high',
+      ...(integrities[script] ? { integrity: integrities[script] } : {}),
+    };
 
-  scripts.forEach((script) =>
     result.push({
       type: ResourceType.script,
       slot: ResourceSlot.HEAD_CORE_SCRIPTS,
-      payload: genHref(script),
+      payload: href,
       attrs: {
-        ...(integrities[script]
-          ? { integrity: integrities[script], crossorigin: 'anonymous' }
-          : {}),
         'data-critical': 'true',
+        ...attrs,
         ...scriptTypeAttr,
       },
-    })
-  );
+    });
+    result.push({
+      type: ResourceType.preloadLink,
+      slot: ResourceSlot.HEAD_PERFORMANCE,
+      payload: href,
+      attrs: {
+        ...attrs,
+        as: 'script',
+      },
+    });
+  });
 
   return result;
 };

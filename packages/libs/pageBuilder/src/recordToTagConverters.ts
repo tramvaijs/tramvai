@@ -62,8 +62,7 @@ const converters = {
   [StorageRecord.script]: ({ payload, attrs }: PageResource) => ({
     tag: 'script',
     attributes: {
-      defer: 'defer',
-      charset: 'utf-8',
+      defer: attrs?.async ? null : 'defer',
       crossorigin: 'anonymous',
       ...attrs,
       src: payload,
@@ -80,9 +79,16 @@ const converters = {
   [StorageRecord.preloadLink]: ({ payload, attrs }: PageResource) => ({
     tag: 'link',
     attributes: {
-      charset: 'utf-8',
       ...attrs,
       rel: 'preload',
+      href: payload,
+    },
+  }),
+  [StorageRecord.prefetchLink]: ({ payload, attrs }: PageResource) => ({
+    tag: 'link',
+    attributes: {
+      ...attrs,
+      rel: 'prefetch',
       href: payload,
     },
   }),

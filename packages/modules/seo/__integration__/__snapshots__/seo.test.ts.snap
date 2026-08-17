@@ -16,39 +16,40 @@ exports[`seo ssr test common meta 1`] = `
     
 
     
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/runtime.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/root.chunk.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/react.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/tramvai.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/platform.js"
+    >
     <script>
       window.__TRAMVAI_HTML_READY_PROMISE__ = new Promise((resolve) => {
         window.__TRAMVAI_HTML_READY_RESOLVE__ = resolve;
       });
-    </script>
-    <script>
-      window.__preloadJS = (function onload(next) {
-        let called = false;
-        return () => {
-          if (!called) {
-            called = true;
-            const { head } = document;
-            next.forEach((entry) => {
-              const link = document.createElement("link");
-              if (entry.integrity) {
-                link.integrity = entry.integrity;
-              }
-              link.rel = "preload";
-              link.href = entry.url;
-              link.as = "script";
-              link.charset = "utf-8";
-              link.crossOrigin = "anonymous";
-              head.appendChild(link);
-            });
-          }
-        };
-      })([
-        { url: "\${STATIC_URL}/dist/client/runtime.js" },
-        { url: "\${STATIC_URL}/dist/client/root.chunk.js" },
-        { url: "\${STATIC_URL}/dist/client/react.js" },
-        { url: "\${STATIC_URL}/dist/client/tramvai.js" },
-        { url: "\${STATIC_URL}/dist/client/platform.js" },
-      ]);
     </script>
     
 
@@ -60,9 +61,9 @@ exports[`seo ssr test common meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/runtime.js"
     ></script>
     
@@ -77,27 +78,27 @@ exports[`seo ssr test common meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -130,7 +131,36 @@ exports[`seo ssr test default meta pack 1`] = `
     
 
     
-    <script></script>
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/runtime.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/root.chunk.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/react.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/tramvai.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/platform.js"
+    >
     <script></script>
     
 
@@ -142,9 +172,9 @@ exports[`seo ssr test default meta pack 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/runtime.js"
     ></script>
     
@@ -159,27 +189,27 @@ exports[`seo ssr test default meta pack 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -225,7 +255,36 @@ exports[`seo ssr test og meta 1`] = `
     
 
     
-    <script></script>
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/runtime.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/root.chunk.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/react.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/tramvai.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/platform.js"
+    >
     <script></script>
     
 
@@ -237,9 +296,9 @@ exports[`seo ssr test og meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/runtime.js"
     ></script>
     
@@ -254,27 +313,27 @@ exports[`seo ssr test og meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -301,7 +360,36 @@ exports[`seo ssr test robots all meta 1`] = `
     
 
     
-    <script></script>
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/runtime.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/root.chunk.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/react.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/tramvai.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/platform.js"
+    >
     <script></script>
     
 
@@ -313,9 +401,9 @@ exports[`seo ssr test robots all meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/runtime.js"
     ></script>
     
@@ -330,27 +418,27 @@ exports[`seo ssr test robots all meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -374,14 +462,43 @@ exports[`seo ssr test robots skip meta 1`] = `
     
 
     
-    <script></script>
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/runtime.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/root.chunk.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/react.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/tramvai.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/platform.js"
+    >
     <script></script>
     
 
     
     <link crossorigin="anonymous"
       data-critical="true"
-      onload="__preloadJS()"
+      fetchpriority="high"
       rel="stylesheet"
       href="\${STATIC_URL}/dist/client/root.chunk.css"
     >
@@ -389,9 +506,9 @@ exports[`seo ssr test robots skip meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/runtime.js"
     ></script>
     
@@ -406,27 +523,27 @@ exports[`seo ssr test robots skip meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     
@@ -457,7 +574,36 @@ exports[`seo ssr test twitter meta 1`] = `
     
 
     
-    <script></script>
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/runtime.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/root.chunk.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/react.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/tramvai.js"
+    >
+    <link crossorigin="anonymous"
+      fetchpriority="high"
+      as="script"
+      rel="preload"
+      href="\${STATIC_URL}/dist/client/platform.js"
+    >
     <script></script>
     
 
@@ -469,9 +615,9 @@ exports[`seo ssr test twitter meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/runtime.js"
     ></script>
     
@@ -486,27 +632,27 @@ exports[`seo ssr test twitter meta 1`] = `
 
     
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/root.chunk.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/react.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/tramvai.js"
     ></script>
     <script defer="defer"
-      charset="utf-8"
       crossorigin="anonymous"
       data-critical="true"
+      fetchpriority="high"
       src="\${STATIC_URL}/dist/client/platform.js"
     ></script>
     

@@ -116,7 +116,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
     });
 
     describe('loadable stats recovery after initial failure', () => {
-      it('lazy chunks should appear in head scripts after stats_loadable becomes available', async () => {
+      it('lazy chunks should appear in body scripts after stats_loadable becomes available', async () => {
         let statsLoadableRequestCount = 0;
 
         mockerHandlerMock.mockImplementation((req: any) => {
@@ -131,11 +131,11 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
         const { serverUrl } = rootApp;
         const { page } = await getPageWrapper();
 
-        // First navigation - stats_loadable is blocked, no lazy chunks in head
+        // First navigation - stats_loadable is blocked, no lazy chunks in body
         await page.goto(`${serverUrl}/loadable/`);
         expect(
           await page
-            .locator('head script[src*="lazy-cmp_client.chunk"]')
+            .locator('body script[src*="lazy-cmp_client.chunk"]')
             .count()
         ).toBe(0);
 
@@ -143,15 +143,15 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
         await page.goto(`${serverUrl}/loadable/`);
         expect(
           await page
-            .locator('head script[src*="lazy-cmp_client.chunk"]')
+            .locator('body script[src*="lazy-cmp_client.chunk"]')
             .count()
         ).toBe(0);
 
-        // Third navigation - stats_loadable is now available, lazy chunks should be in head
+        // Third navigation - stats_loadable is now available, lazy chunks should be in body
         await page.goto(`${serverUrl}/loadable/`);
         expect(
           await page
-            .locator('head script[src*="lazy-cmp_client.chunk"]')
+            .locator('body script[src*="lazy-cmp_client.chunk"]')
             .count()
         ).toBeGreaterThan(0);
       });

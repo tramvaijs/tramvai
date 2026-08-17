@@ -6,6 +6,7 @@ export enum StorageRecord {
   asIs = 'asIs',
   preconnectLink = 'preconnectLink',
   preloadLink = 'preloadLink',
+  prefetchLink = 'prefetchLink',
   inlineStyle = 'inlineStyle',
   style = 'style',
 }

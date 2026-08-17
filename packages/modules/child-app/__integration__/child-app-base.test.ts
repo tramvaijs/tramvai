@@ -244,6 +244,40 @@ describe(`Cross version test: { rootAppVersion: ${rootAppVersion}, childAppsVers
 
         expect(await hydrationOrClientChunkRace).toBe('client_entry_loaded');
       });
+
+      it('client entry chunk should be preloaded in head and loaded as async script in body', async () => {
+        const { page } = await getPageWrapper();
+
+        await page.goto(`${rootApp.serverUrl}/base/`);
+
+        const preloadLocator = page.locator(
+          'head link[rel="preload"][as="script"][href*="base_client@"]'
+        );
+
+        expect(await preloadLocator.count()).toBe(1);
+        expect(await preloadLocator.getAttribute('crossorigin')).toBe('anonymous');
+        expect(await preloadLocator.getAttribute('fetchpriority')).toBe('low');
+
+        const href = await preloadLocator.getAttribute('href');
+        const scriptLocator = page.locator(`body script[src="${href}"]`);
+
+        // preload-ссылка не должна дублироваться в head как обычный скрипт: только preload + async script в body
+        expect(await page.locator(`head script[src="${href}"]`).count()).toBe(0);
+
+        expect(await scriptLocator.count()).toBe(1);
+        expect(await scriptLocator.getAttribute('async')).toBe('async');
+        expect(await scriptLocator.getAttribute('defer')).toBeNull();
+        expect(await scriptLocator.getAttribute('data-critical')).toBe('true');
+
+        // crossorigin/fetchpriority должны совпадать у preload-ссылки и самого скрипта,
+        // иначе браузер не сможет переиспользовать preload-запрос и скачает скрипт повторно
+        expect(await scriptLocator.getAttribute('crossorigin')).toBe(
+          await preloadLocator.getAttribute('crossorigin')
+        );
+        expect(await scriptLocator.getAttribute('fetchpriority')).toBe(
+          await preloadLocator.getAttribute('fetchpriority')
+        );
+      });
     }
   });
 

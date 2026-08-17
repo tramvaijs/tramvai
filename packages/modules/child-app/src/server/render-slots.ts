@@ -22,14 +22,6 @@ import { getSharedScope } from '../shared/webpack/moduleFederation';
 import { getFlatSharedModulesList, getFlatSharedScopeItemsList } from './module-federation/utils';
 import { resolveBestLoadedSharedModules } from './module-federation/best-loaded-shared-modules';
 
-const asyncScriptAttrs = {
-  defer: null,
-  async: 'async',
-};
-const deferScriptAttrs = {
-  defer: 'defer',
-  async: null,
-};
 // for cases when Child App script was loaded or failed when script was added at server-side,
 // and Child App initialization logic executed after that, we need to get script loading status
 const entryAttrs = {
@@ -49,7 +41,6 @@ export const registerChildAppRenderSlots =
     resolveFullConfig,
     preloadManager,
     loader,
-    renderMode,
     resourcesRegistry,
   }: {
     logger: ExtractDependencyType<typeof LOGGER_TOKEN>;
@@ -57,16 +48,12 @@ export const registerChildAppRenderSlots =
     resolveFullConfig: ExtractDependencyType<typeof CHILD_APP_RESOLVE_CONFIG_TOKEN>;
     preloadManager: ChildAppPreloadManager;
     loader: ChildAppLoader | ServerLoader;
-    renderMode: typeof REACT_SERVER_RENDER_MODE | null;
     resourcesRegistry: ExtractDependencyType<typeof RESOURCES_REGISTRY>;
   }) =>
   // eslint-disable-next-line max-statements
   async () => {
     const log = logger('child-app:render:slots');
     const result: ExtractTokenType<typeof RENDER_SLOTS> = [];
-    // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible
-    // https://github.com/reactwg/react-18/discussions/114
-    const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
 
     const addChunk = (chunk?: string, isEntry = false) => {
       if (!chunk) {
@@ -76,19 +63,36 @@ export const registerChildAppRenderSlots =
       const extension = extname(chunk);
 
       switch (extension) {
-        case '.js':
+        case '.js': {
+          const attrs = {
+            crossorigin: 'anonymous',
+            fetchpriority: 'low',
+          };
+
           result.push({
             type: ResourceType.script,
-            // we need to load Child Apps scripts before main application scripts
-            slot: ResourceSlot.HEAD_DYNAMIC_SCRIPTS,
+            slot: ResourceSlot.BODY_DYNAMIC_SCRIPTS,
             payload: chunk,
             attrs: {
+              ...attrs,
               'data-critical': 'true',
-              ...scriptTypeAttr,
+              async: 'async',
+              defer: null,
               ...(isEntry ? entryAttrs : chunkAttrs),
             },
           });
+
+          result.push({
+            type: ResourceType.preloadLink,
+            slot: ResourceSlot.HEAD_PERFORMANCE,
+            payload: chunk,
+            attrs: {
+              ...attrs,
+              as: 'script',
+            },
+          });
           break;
+        }
         case '.css':
           result.push({
             type: ResourceType.style,
@@ -96,6 +100,8 @@ export const registerChildAppRenderSlots =
             payload: chunk,
             attrs: {
               'data-critical': 'true',
+              crossorigin: 'anonymous',
+              fetchpriority: 'high',
             },
           });
           break;

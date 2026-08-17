@@ -64,7 +64,13 @@ describe('render', () => {
       `${staticUrl}/dist/client/platform.js`,
     ]);
     expect(styles).toEqual(['']);
-    expect(preload).toEqual([]);
+    expect(preload).toEqual([
+      `${staticUrl}/dist/client/runtime.js`,
+      `${staticUrl}/dist/client/root.chunk.js`,
+      `${staticUrl}/dist/client/react.js`,
+      `${staticUrl}/dist/client/tramvai.js`,
+      `${staticUrl}/dist/client/platform.js`,
+    ]);
   });
 
   it('should render image on ssr', async () => {
