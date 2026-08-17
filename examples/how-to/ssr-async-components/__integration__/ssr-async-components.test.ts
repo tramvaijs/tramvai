@@ -22,20 +22,49 @@ describe('ssr-async-components', () => {
           
 
           
-          <script></script>
+          <link crossorigin="anonymous"
+            fetchpriority="high"
+            as="script"
+            rel="preload"
+            href="\${STATIC_URL}/dist/client/pages-page.chunk.js"
+          >
+          <link crossorigin="anonymous"
+            fetchpriority="high"
+            as="script"
+            rel="preload"
+            href="\${STATIC_URL}/dist/client/InnerPageInitial.chunk.js"
+          >
+          <link crossorigin="anonymous"
+            fetchpriority="high"
+            as="script"
+            rel="preload"
+            href="\${STATIC_URL}/dist/client/react.js"
+          >
+          <link crossorigin="anonymous"
+            fetchpriority="high"
+            as="script"
+            rel="preload"
+            href="\${STATIC_URL}/dist/client/hmr.js"
+          >
+          <link crossorigin="anonymous"
+            fetchpriority="high"
+            as="script"
+            rel="preload"
+            href="\${STATIC_URL}/dist/client/platform.js"
+          >
           <script></script>
           
 
           
           <link crossorigin="anonymous"
             data-critical="true"
-            onload="__preloadJS()"
+            fetchpriority="high"
             rel="stylesheet"
             href="\${STATIC_URL}/dist/client/pages-page.chunk.css"
           >
           <link crossorigin="anonymous"
             data-critical="true"
-            onload="__preloadJS()"
+            fetchpriority="high"
             rel="stylesheet"
             href="\${STATIC_URL}/dist/client/InnerPageInitial.chunk.css"
           >
@@ -55,33 +84,33 @@ describe('ssr-async-components', () => {
 
           
           <script defer="defer"
-            charset="utf-8"
             crossorigin="anonymous"
             data-critical="true"
+            fetchpriority="high"
             src="\${STATIC_URL}/dist/client/pages-page.chunk.js"
           ></script>
           <script defer="defer"
-            charset="utf-8"
             crossorigin="anonymous"
             data-critical="true"
+            fetchpriority="high"
             src="\${STATIC_URL}/dist/client/InnerPageInitial.chunk.js"
           ></script>
           <script defer="defer"
-            charset="utf-8"
             crossorigin="anonymous"
             data-critical="true"
+            fetchpriority="high"
             src="\${STATIC_URL}/dist/client/react.js"
           ></script>
           <script defer="defer"
-            charset="utf-8"
             crossorigin="anonymous"
             data-critical="true"
+            fetchpriority="high"
             src="\${STATIC_URL}/dist/client/hmr.js"
           ></script>
           <script defer="defer"
-            charset="utf-8"
             crossorigin="anonymous"
             data-critical="true"
+            fetchpriority="high"
             src="\${STATIC_URL}/dist/client/platform.js"
           ></script>
           

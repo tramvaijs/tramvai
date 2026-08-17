@@ -78,7 +78,7 @@ describe('testPageResources', () => {
 
     expect(render()!.body).toMatchInlineSnapshot(`
       "
-          <script defer="defer" charset="utf-8" crossorigin="anonymous" src="https://scripts.org/script.js"></script>
+          <script defer="defer" crossorigin="anonymous" src="https://scripts.org/script.js"></script>
           <span>I\`m body!!!</span>
         "
     `);
@@ -120,13 +120,8 @@ describe('testPageResources', () => {
 
     expect(render()!.body).toMatchInlineSnapshot(`
       "
-          <script defer="defer"
-            charset="utf-8"
-            crossorigin="anonymous"
-            integrity="foo"
-            src="https://scripts.org/script2.js"
-          ></script>
-          <script defer="defer" charset="utf-8" crossorigin="anonymous" src="https://scripts.org/script1.js"></script>
+          <script defer="defer" crossorigin="anonymous" integrity="foo" src="https://scripts.org/script2.js"></script>
+          <script defer="defer" crossorigin="anonymous" src="https://scripts.org/script1.js"></script>
         "
     `);
   });

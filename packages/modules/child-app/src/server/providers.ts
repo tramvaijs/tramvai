@@ -133,7 +133,6 @@ export const serverProviders: Provider[] = [
       resolveFullConfig: CHILD_APP_RESOLVE_CONFIG_TOKEN,
       loader: CHILD_APP_LOADER_TOKEN,
       preloadManager: CHILD_APP_PRELOAD_MANAGER_TOKEN,
-      renderMode: optional(REACT_SERVER_RENDER_MODE),
     },
   }),
   provide({

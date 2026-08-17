@@ -16,6 +16,7 @@ const {
   BODY_START,
   BODY_END,
   HEAD_ICONS,
+  BODY_DYNAMIC_SCRIPTS,
   BODY_TAIL_ANALYTICS,
   BODY_TAIL,
 } = ResourceSlot;
@@ -44,6 +45,7 @@ export const htmlPageSchemaFactory = ({
     // react app
     dynamicRender(REACT_RENDER),
     dynamicRender(BODY_END),
+    dynamicRender(BODY_DYNAMIC_SCRIPTS),
     dynamicRender(BODY_TAIL_ANALYTICS),
     dynamicRender(BODY_TAIL),
     staticRender('</body>'),

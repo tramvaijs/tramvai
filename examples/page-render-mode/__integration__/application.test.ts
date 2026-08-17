@@ -40,6 +40,10 @@ describe('page-render-mode', () => {
     `);
     expect(getLinks(app, renderResult.parsed)).toMatchInlineSnapshot(`
       [
+        "\${STATIC_URL}/dist/client/@_routes_index.chunk.js",
+        "\${STATIC_URL}/dist/client/react.js",
+        "\${STATIC_URL}/dist/client/hmr.js",
+        "\${STATIC_URL}/dist/client/platform.js",
         "\${STATIC_URL}/dist/client/@_routes_index.chunk.css",
         "\${STATIC_URL}/dist/client/platform.css",
       ]
@@ -72,6 +76,10 @@ describe('page-render-mode', () => {
     `);
     expect(getLinks(app, renderResult.parsed)).toMatchInlineSnapshot(`
       [
+        "\${STATIC_URL}/dist/client/@_routes_second_index.chunk.js",
+        "\${STATIC_URL}/dist/client/react.js",
+        "\${STATIC_URL}/dist/client/hmr.js",
+        "\${STATIC_URL}/dist/client/platform.js",
         "\${STATIC_URL}/dist/client/platform.css",
       ]
     `);

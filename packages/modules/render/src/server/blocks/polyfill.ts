@@ -5,6 +5,7 @@ import type {
 } from '@tramvai/tokens-render';
 import { ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import { flushFiles } from './utils/flushFiles';
+import { asyncScriptAttrs, deferScriptAttrs } from './bundleResource/bundleResource';
 
 export const polyfillResources = async ({
   condition,
@@ -54,18 +55,39 @@ export const polyfillResources = async ({
   if (con) { window.TRAMVAI_POLLYFILL_LOADED = true;
   document.write('<script${
     renderMode === 'streaming' ? '' : ' defer="defer"'
-  } charset="utf-8" data-critical="true" crossorigin="anonymous" src="${href}"><\\/script>')}
+  } charset="utf-8" data-critical="true" crossorigin="anonymous" fetchpriority="high" src="${href}"><\\/script>')}
 })()`,
     });
   });
 
+  // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible
+  // https://github.com/reactwg/react-18/discussions/114
+  const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
+
   modernPolyfillScripts.forEach((script) => {
+    const href = genHref(script);
+    const attrs = {
+      crossorigin: 'anonymous',
+      fetchpriority: 'high',
+    };
+
     result.push({
       type: ResourceType.script,
-      payload: genHref(script),
+      slot: ResourceSlot.HEAD_POLYFILLS,
+      payload: href,
       attrs: {
         'data-critical': 'true',
         id: 'modern-polyfills',
+        ...attrs,
+        ...scriptTypeAttr,
+      },
+    });
+    result.push({
+      type: ResourceType.preloadLink,
+      payload: href,
+      attrs: {
+        ...attrs,
+        as: 'script',
       },
       slot: ResourceSlot.HEAD_POLYFILLS,
     });
