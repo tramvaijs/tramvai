@@ -62,9 +62,15 @@ import {
 } from '@tramvai/plugin-base-builder/lib/plugins';
 import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import {
+  clientBuildName,
+  clientMainFields,
+  polyfillBuildName,
+  stderrWithWarningFilters,
+} from '@tramvai/plugin-base-builder/lib/shared/const';
+import { createSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
 
 import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
-import { createSplitChunksOptions } from './shared/split-chunks';
 import { getResolveTsConfig } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
@@ -73,37 +79,9 @@ import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache'
 import { RspackConfigurationFactory } from './types/rspack';
 import { initDi } from '../utils/initDi';
 
-const mainFields = ['browser', 'module', 'main'];
-
-const filters = ignoreWarnings.map(
-  ({ message }) =>
-    (text: string) =>
-      message.test(text)
-);
-
-const stderrWithWarningFilters = new Writable({
-  write(chunk, encoding, callback) {
-    const chunkStr = chunk.toString();
-
-    if (filters.some((filter) => filter(chunkStr))) {
-      callback();
-      return;
-    }
-
-    process.stderr.write(chunk, encoding, callback);
-  },
-});
-
-stderrWithWarningFilters.on('error', (error: Error) =>
-  console.error('[infrastructureLogging] stream error', error)
-);
-
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
 const CollectStatsPlugin = getCollectStatsPlugin(Compilation);
 const MergeStatsPlugin = getMergeStatsPlugin(Compilation);
-
-export const clientBuildName = 'client';
-export const polyfillBuildName = 'polyfill';
 
 export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const di = await initDi(config, {
@@ -122,7 +100,10 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     verboseLogging,
     projectType,
     clientSourceMap,
+    noClientRebuild,
   } = config;
+
+  const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
 
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
@@ -244,7 +225,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     resolve: {
       extensions,
       // TODO: es2017, es2016, es2015 fields support?
-      mainFields,
+      mainFields: clientMainFields,
       ...getResolveTsConfig(config),
       symlinks: config.resolveSymlinks,
       fallback: {
@@ -324,7 +305,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     },
     optimization: {
       emitOnErrors: false,
-      ...createSplitChunksOptions({ config }),
+      ...createSplitChunksOptions({ config, builder: 'rspack' }),
       ...createOptimizeOptions<'rspack'>({ config, target: 'client' }),
     },
     experiments: {
@@ -438,7 +419,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         new RuntimePathPlugin({
           publicPath: 'window.ap',
         }),
-      ...(hotRefresh?.enabled
+      ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({
               ...hotRefresh.options,

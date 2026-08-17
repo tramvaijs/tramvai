@@ -1,10 +1,11 @@
 /* eslint-disable max-statements */
 import path from 'node:path';
-import { UniversalFederationPlugin } from '@module-federation/node';
+import { NodeFederationPlugin } from '@module-federation/node';
 import { optional } from '@tinkoff/dippy';
-import webpack from 'webpack';
+import rspack, { Configuration } from '@rspack/core';
+// eslint-disable-next-line import/extensions
+import WebpackBar from 'webpackbar/rspack';
 
-import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
@@ -21,12 +22,12 @@ import {
   RESOLVE_FALLBACK_TOKEN,
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
-import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { normalizeBrowserslistConfig } from '@tramvai/plugin-base-builder/lib/shared/browserslist';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
 import { configToEnv } from '@tramvai/plugin-base-builder/lib/shared/config-to-env';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
-import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
 import { RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 import {
   serverBuildName,
@@ -34,19 +35,23 @@ import {
   stderrWithWarningFilters,
   transformMultiToken,
 } from '@tramvai/plugin-base-builder/lib/shared/const';
+import { FancyReporter } from '@tramvai/plugin-base-builder/lib/plugins';
 import { createChildAppSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
 
-import { WebpackConfigurationFactory } from './types/webpack';
-import { WorkerProgressPlugin } from './plugins/progress-plugin';
+import { RspackConfigurationFactory } from './types/rspack';
 import { createCacheConfig } from './shared/cache';
-import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
-import { createResolveOptions } from './shared/resolve';
-import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
+import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
+import { getResolveTsConfig } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
+import { initDi } from '../utils/initDi';
 
-export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
-  const config = di.get(CONFIG_SERVICE_TOKEN);
+export const rspackConfig: RspackConfigurationFactory = async (config): Promise<Configuration> => {
+  const di = await initDi(config, {
+    type: 'child-app',
+    target: 'server',
+  });
+
   const {
     rootDir,
     sourceDir,
@@ -55,42 +60,38 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     projectVersion,
     showProgress,
     verboseLogging,
-    noServerRebuild,
-    hotRefresh,
     serverSourceMap,
   } = config;
 
-  const isHotEnabled = hotRefresh?.enabled && !noServerRebuild;
-
-  const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
-  const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
+  const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
+  const plugins = di.get(optional(RSPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
   const fallback = transformMultiToken(di.get(optional(RESOLVE_FALLBACK_TOKEN))) ?? {};
   const alias = transformMultiToken(di.get(optional(RESOLVE_ALIAS_TOKEN))) ?? {};
   const provideList = transformMultiToken(di.get(optional(PROVIDE_TOKEN))) ?? {};
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
 
-  const webpackConfigExtension = config.extensions.webpack();
-  Object.assign(fallback, webpackConfigExtension.resolveFallback);
-  Object.assign(alias, webpackConfigExtension.resolveAlias);
-  Object.assign(provideList, webpackConfigExtension.provide);
+  const rspackConfigExtension = config.extensions.webpack();
+  Object.assign(fallback, rspackConfigExtension.resolveFallback);
+  Object.assign(alias, rspackConfigExtension.resolveAlias);
+  Object.assign(provideList, rspackConfigExtension.provide);
 
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   defineOptions.push(config.extensions.define());
 
-  const transpilerParameters = resolveWebpackTranspilerParameters({
+  const transpilerParameters = resolveRspackTranspilerParameters({
     di,
-    hot: Boolean(isHotEnabled),
+    buildTarget: 'server',
   });
-  const workerPoolConfig = createWorkerPoolConfig({ di });
-  const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'server' });
+  const sourceMapsConfiguration = createSourceMaps<'rspack'>({ config, target: 'server' });
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
 
   const stylesConfiguration = createStylesConfiguration({
     di,
-    emitCssChunks: false,
+    emitCssChunks: true,
     sourceMap: serverSourceMap,
     browserslistConfig: normalizedBrowserslistConfig.defaults,
+    buildTarget: 'server',
     extractCssPluginOptions: {
       filename: `[name]@${projectVersion}.css`,
       chunkFilename: `[name]@${projectVersion}.css`,
@@ -106,18 +107,13 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     sourceDir,
     rootDir,
   });
-  const resolveOptions = await createResolveOptions({ di, mainFields: serverMainFields });
-
-  if (transpiler.warmupThreadLoader) {
-    warmupThreadLoader(workerPoolConfig);
-  }
 
   return {
     name: serverBuildName,
     context: rootDir,
     // settings false is required by the UniversalModuleFederationPlugin
     // https://github.com/module-federation/universe/blob/02221527aa684d2a37773c913bf341748fd34ecf/packages/node/src/plugins/StreamingTargetPlugin.ts#L24
-    target: false,
+    target: 'node',
     // use empty module instead of original one as I haven't figured out how to prevent webpack from initializing entry module on loading
     // it should be initialized only as remote in ModuleFederation and not as standalone module
     entry: {
@@ -126,13 +122,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       },
     },
     mode: 'development',
-    devtool: serverSourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
-    cache: createCacheConfig({
-      config,
-      additionalCacheFlags,
-      transpilerParameters,
-      target: serverBuildName,
-    }),
+    devtool: serverSourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
     output: {
       path: resolveAbsolutePathForFolder({
         folder: config.outputServer,
@@ -152,8 +142,8 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       mainFields: serverMainFields,
       symlinks: config.resolveSymlinks,
       fallback,
+      ...getResolveTsConfig(config),
       alias,
-      plugins: [...resolveOptions.plugins],
     },
     module: {
       rules: [
@@ -161,7 +151,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
         ...createTranspilerRules({
           transpiler,
           transpilerParameters,
-          workerPoolConfig,
         }),
         {
           resourceQuery: /fallback/,
@@ -169,16 +158,23 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
           loader: require.resolve('@tramvai/plugin-base-builder/lib/loaders/childAppFallback'),
         },
         ...stylesConfiguration.rules,
-        ...createAssetsRules({ di }),
+        ...createAssetsRules({ di, buildTarget: 'server' }),
       ],
     },
     optimization: {
-      ...createChildAppSplitChunksOptions({ config, target: 'server', sharedModules }),
+      ...createChildAppSplitChunksOptions<'rspack'>({ config, target: 'server', sharedModules }),
     },
     experiments: {
       futureDefaults: true,
+      cache: createCacheConfig({
+        config,
+        additionalCacheFlags,
+        transpilerParameters,
+        target: serverBuildName,
+      }),
     },
     stats: {
+      // @ts-expect-error
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
       warningsCount: false,
@@ -193,30 +189,37 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     snapshot: createSnapshot({ config }),
     plugins: [
-      showProgress && new WorkerProgressPlugin({ name: serverBuildName, color: 'orange' }),
-      // @ts-expect-error
-      new UniversalFederationPlugin({
-        isServer: true,
-        name: projectName,
-        library: {
-          type: 'commonjs2',
+      showProgress &&
+        new WebpackBar({
+          name: serverBuildName,
+          color: 'orange',
+          // @ts-expect-error
+          reporters: [new FancyReporter()],
+        }),
+      new NodeFederationPlugin(
+        {
+          name: projectName,
+          library: {
+            type: 'commonjs2',
+          },
+          exposes: {
+            // path.relative should use the posix separator because
+            // @module-federation/node is parsing relative path incorrectly
+            // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
+            entry: entry.split(path.win32.sep).join(path.posix.sep),
+          },
+          shared: sharedModules,
         },
-        exposes: {
-          // path.relative should use the posix separator because
-          // @module-federation/node is parsing relative path incorrectly
-          // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
-          entry: entry.split(path.win32.sep).join(path.posix.sep),
-        },
-        shared: sharedModules,
-      }),
-      new webpack.ProvidePlugin({
+        {}
+      ),
+      new rspack.ProvidePlugin({
         process: 'process',
         ...provideList,
       }),
       new RuntimePathPlugin({
         publicPath: 'ASSETS_PREFIX',
       }),
-      new webpack.DefinePlugin({
+      new rspack.DefinePlugin({
         'process.env.BROWSER': false,
         'process.env.SERVER': true,
         'process.env.NODE_ENV': JSON.stringify('development'),

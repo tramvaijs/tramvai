@@ -44,6 +44,12 @@ import { RULES_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/rules';
 import { RuntimePathPlugin, VirtualProtocolPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import {
+  serverBuildName,
+  serverMainFields,
+  stderrWithWarningFilters,
+  transformMultiToken,
+} from '@tramvai/plugin-base-builder/lib/shared/const';
 
 import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
@@ -53,12 +59,6 @@ import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createAssetsRules } from './shared/assets';
 import { createServerInlineRules } from './shared/server-inline';
 import { createCacheConfig } from './shared/cache';
-import {
-  serverBuildName,
-  serverMainFields,
-  stderrWithWarningFilters,
-  transformMultiToken,
-} from './shared/const';
 import { WebpackConfigurationFactory } from './types/webpack';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({

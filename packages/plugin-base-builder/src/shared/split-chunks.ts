@@ -1,10 +1,60 @@
 import path from 'path';
 import crypto from 'crypto';
 import resolve from 'resolve';
-import { Configuration, Module, Chunk, NormalModule } from '@rspack/core';
+import { Configuration, Module, Chunk, NormalModule } from 'webpack';
+import { Configuration as RspackConfiguration } from '@rspack/core';
 import type { ConfigService } from '@tramvai/api/lib/config';
+import { ModuleFederationSharedObject } from '../types';
 
 export type SplitChunksOptions = Required<Required<Configuration>['optimization']>['splitChunks'];
+type CacheGroup = Exclude<Required<SplitChunksOptions>, boolean>['cacheGroups'][string];
+
+const tramvaiScopes = ['@tramvai/', '@tramvai-tinkoff/'];
+const tinkoffPackages = [
+  '@tinkoff/router',
+  '@tinkoff/logger',
+  '@tinkoff/dippy',
+  '@tinkoff/user-agent',
+  '@tinkoff/module-loader-client',
+  '@tinkoff/meta-tags-generate',
+  '@tinkoff/browser-cookies',
+  '@tinkoff/errors',
+  '@tinkoff/layout-factory',
+  '@tinkoff/url',
+  '@tinkoff/roles',
+  '@tinkoff/hook-runner',
+  '@tinkoff/pubsub',
+  '@tinkoff/browser-timings',
+];
+const tinkoffPackagesSet = new Set(tinkoffPackages);
+
+function isTramvaiPackage(packageName: string | undefined) {
+  if (!packageName) return false;
+
+  // exclude from tramvai chunk for virtual modules imports and fixtures in @tramvai/api integration tests
+  if (packageName.startsWith('@tramvai/api')) {
+    return;
+  }
+
+  return (
+    tramvaiScopes.some((scope) => packageName.startsWith(scope)) ||
+    tinkoffPackagesSet.has(packageName)
+  );
+}
+
+function normalizePath(packagePath: string) {
+  return packagePath.endsWith('/') ? packagePath : `${packagePath}/`;
+}
+
+const tramvaiPackagesPaths = [...tramvaiScopes, ...tinkoffPackages].map((packageName) =>
+  normalizePath(`/node_modules/${packageName}`)
+);
+
+function isTramvaiResource(resource: string | undefined) {
+  if (!resource) return false;
+
+  return tramvaiPackagesPaths.some((tramvaiPackagePath) => resource.includes(tramvaiPackagePath));
+}
 
 // based on [nextjs code](https://github.com/vercel/next.js/blob/aaeb349ce3e8c4c3435a43a29af4379266818e7b/packages/next/build/webpack-config.ts#L707)
 export const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]) => {
@@ -62,61 +112,19 @@ export const resolveFrameworksPaths = (rootDir: string, frameworksList: string[]
   return topLevelFrameworkPaths;
 };
 
-const tramvaiScopes = ['@tramvai/', '@tramvai-tinkoff/'];
-const tinkoffPackages = [
-  '@tinkoff/router',
-  '@tinkoff/logger',
-  '@tinkoff/dippy',
-  '@tinkoff/user-agent',
-  '@tinkoff/module-loader-client',
-  '@tinkoff/meta-tags-generate',
-  '@tinkoff/browser-cookies',
-  '@tinkoff/errors',
-  '@tinkoff/layout-factory',
-  '@tinkoff/url',
-  '@tinkoff/roles',
-  '@tinkoff/hook-runner',
-  '@tinkoff/pubsub',
-  '@tinkoff/browser-timings',
-];
-const tinkoffPackagesSet = new Set(tinkoffPackages);
-
-function isTramvaiPackage(packageName: string | undefined) {
-  if (!packageName) return false;
-
-  // exclude from tramvai chunk for virtual modules imports and fixtures in @tramvai/api integration tests
-  if (packageName.startsWith('@tramvai/api')) {
-    return;
-  }
-
-  return (
-    tramvaiScopes.some((scope) => packageName.startsWith(scope)) ||
-    tinkoffPackagesSet.has(packageName)
-  );
-}
-
-function normalizePath(packagePath: string) {
-  return packagePath.endsWith('/') ? packagePath : `${packagePath}/`;
-}
-
-const tramvaiPackagesPaths = [...tramvaiScopes, ...tinkoffPackages].map((packageName) =>
-  normalizePath(`/node_modules/${packageName}`)
-);
-
-function isTramvaiResource(resource: string | undefined) {
-  if (!resource) return false;
-
-  return tramvaiPackagesPaths.some((tramvaiPackagePath) => resource.includes(tramvaiPackagePath));
-}
-
-type CacheGroup = Exclude<Required<SplitChunksOptions>, boolean>['cacheGroups'][string];
+type OptimizationMap = {
+  webpack: Configuration['optimization'];
+  rspack: RspackConfiguration['optimization'];
+};
 
 // eslint-disable-next-line max-statements
-export const createSplitChunksOptions = ({
+export const createSplitChunksOptions = <T extends keyof OptimizationMap>({
   config,
+  builder,
 }: {
   config: ConfigService;
-}): { splitChunks: SplitChunksOptions; chunkIds: 'named' } => {
+  builder: T;
+}) => {
   const splitChunks = config.extensions.splitChunks()!;
 
   const topLevelFrameworkPaths = resolveFrameworksPaths(config.rootDir, ['react', 'react-dom']);
@@ -124,10 +132,9 @@ export const createSplitChunksOptions = ({
   const reactCacheGroup: CacheGroup = {
     chunks: 'all',
     name: 'react',
-    filename: '[name].js',
     // This regex ignores nested copies of framework libraries so they're bundled with their issuer.
     // test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|prop-types|use-subscription)[\\/]/,
-    test(module) {
+    test(module: Module) {
       const resource = module.nameForCondition?.();
 
       if (!resource) {
@@ -140,7 +147,7 @@ export const createSplitChunksOptions = ({
       );
     },
     priority: 40,
-    // Don't let rspack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
+    // Don't let webpack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
     enforce: true,
   };
 
@@ -148,27 +155,20 @@ export const createSplitChunksOptions = ({
     ? {
         chunks: 'initial',
         name: 'tramvai',
-        test(module) {
+        test(module: Module) {
           const resource = module.nameForCondition?.();
+          const packageName = (module as NormalModule).resourceResolveData?.descriptionFileData
+            ?.name as string | undefined;
 
-          // TODO: rsdoctor issue, reading of resourceResolveData throw error from rust
-          // Error: ResourceData has been dropped by Rust
-          try {
-            const packageName = (module as NormalModule).resourceResolveData?.descriptionFileData
-              ?.name as string | undefined;
-
-            return isTramvaiPackage(packageName) || isTramvaiResource(resource ?? undefined);
-          } catch (_error) {
-            return false;
-          }
+          return isTramvaiPackage(packageName) || isTramvaiResource(resource ?? undefined);
         },
         priority: 35,
-        // Don't let rspack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
+        // Don't let webpack eliminate this chunk (prevents this chunk from becoming a part of the commons chunk)
         enforce: true,
       }
     : false;
 
-  let rspackSplitChunks: SplitChunksOptions = false;
+  let webpackSplitChunks: SplitChunksOptions = false;
 
   if (splitChunks.mode === 'granularChunks') {
     const shared: any = {
@@ -183,7 +183,7 @@ export const createSplitChunksOptions = ({
     // we can find shared chunk filenames only in `chunks` stats property, not in `assetsByChunkName`
     // https://github.com/webpack/webpack/issues/14433#issuecomment-938468513
     if (config.mode === 'production') {
-      shared.name = (_module: Module, chunks: Chunk[] = []) => {
+      shared.name = (module: Module, chunks: Chunk[] = []) => {
         return crypto
           .createHash('sha1')
           .update(
@@ -196,7 +196,7 @@ export const createSplitChunksOptions = ({
       };
     }
 
-    rspackSplitChunks = {
+    webpackSplitChunks = {
       chunks: 'all',
       maxInitialRequests: 10,
       maxAsyncRequests: 20,
@@ -210,19 +210,80 @@ export const createSplitChunksOptions = ({
     };
   }
 
-  if (config.hotRefresh?.enabled && rspackSplitChunks) {
-    rspackSplitChunks.cacheGroups!.hmr = {
+  if (config.hotRefresh?.enabled && webpackSplitChunks) {
+    const hmrRegExp =
+      builder === 'webpack'
+        ? /[\\/]node_modules[\\/](react-refresh|webpack-hot-middleware|@pmmmwh[\\/]react-refresh-webpack-plugin)[\\/]/
+        : /[\\/]node_modules[\\/](react-refresh|@rspack[\\/]plugin-react-refresh|@rspack[\\/]core[\\/]hot|@rspack[\\/]hot|@rspack[\\/]dev-server)[\\/]/;
+    webpackSplitChunks.cacheGroups!.hmr = {
       name: 'hmr',
       enforce: true,
-      test: /[\\/]node_modules[\\/](react-refresh|@rspack[\\/]plugin-react-refresh|@rspack[\\/]core[\\/]hot|@rspack[\\/]hot|@rspack[\\/]dev-server)[\\/]/,
+      test: hmrRegExp,
       chunks: 'all',
       priority: 20,
     };
   }
 
   return {
-    splitChunks: rspackSplitChunks,
+    splitChunks: webpackSplitChunks,
     // namedChunks must be enabled so that webpack-flush-chunks can determine the names of the chunks that the chunk bundle depends on after being processed through SplitChunks
     chunkIds: 'named',
+  } as OptimizationMap[T];
+};
+
+export const createChildAppSplitChunksOptions = <T extends keyof OptimizationMap>({
+  config,
+  target,
+  sharedModules,
+}: {
+  config: ConfigService;
+  target: 'client' | 'server';
+  sharedModules: ModuleFederationSharedObject;
+}) => {
+  const sharedModulesPaths = resolveFrameworksPaths(config.rootDir, Object.keys(sharedModules));
+
+  const webpackSplitChunks: SplitChunksOptions = {
+    cacheGroups: {
+      default: false,
+      defaultVendors: false,
+      styles: {
+        name: config.projectName,
+        type: 'css/mini-extract',
+        chunks: 'async',
+        enforce: true,
+        priority: 50,
+      },
+    },
   };
+
+  if (target === 'client') {
+    const granular: Record<string, any> = {
+      // we don't want to include MF shared deps
+      test(mod: Module) {
+        const resource = mod.nameForCondition && mod.nameForCondition();
+
+        if (!resource) {
+          return false;
+        }
+
+        return sharedModulesPaths.every((packagePath) => !resource.startsWith(packagePath));
+      },
+      chunks: 'async',
+      // in some cases this group has priority over styles group, idk why, so decide to specify modules type explicitly
+      type: 'javascript/auto',
+      minChunks: 2,
+      minSize: 20000,
+      reuseExistingChunk: true,
+      maxInitialRequests: 10,
+      maxAsyncRequests: 20,
+      priority: 20,
+    };
+
+    webpackSplitChunks.cacheGroups!.granular = granular;
+  }
+
+  return {
+    splitChunks: webpackSplitChunks,
+    chunkIds: 'named',
+  } as OptimizationMap[T];
 };

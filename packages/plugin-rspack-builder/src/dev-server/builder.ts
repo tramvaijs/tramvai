@@ -1,5 +1,5 @@
 /* eslint-disable max-statements */
-import { Compiler, Configuration, DevServer, RspackOptions, rspack } from '@rspack/core';
+import { Compiler, Configuration, RspackOptions, rspack } from '@rspack/core';
 import { RspackDevServer } from '@rspack/dev-server';
 
 import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
@@ -8,9 +8,12 @@ import { logger } from '@tramvai/api/lib/services/logger';
 import { TRACER_TOKEN } from '@tramvai/api/lib/tokens';
 import { DevServer as TramvaiDevServer } from '@tramvai/api/src/builder/dev-server';
 import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-base-builder/lib/utils';
+import { createDevServerOptions } from '@tramvai/plugin-base-builder/lib/shared/dev-server';
 
 import { rspackConfig as rspackApplicationDevelopmentServerConfig } from '../rspack/application-development-server';
 import { rspackConfig as rspackApplicationDevelopmentClientConfig } from '../rspack/application-development-client';
+import { rspackConfig as rspackChildAppDevelopmentServerConfig } from '../rspack/child-app-development-server';
+import { rspackConfig as rspackChildAppDevelopmentClientConfig } from '../rspack/child-app-development-client';
 
 export async function runBuild(
   config: ExtractDependencyType<typeof CONFIG_SERVICE_TOKEN>,
@@ -37,12 +40,22 @@ export async function runBuild(
   }
 ): Promise<{ buildServer: RspackDevServer; getBuildStats: TramvaiDevServer['getStats'] }> {
   let rspackConfig: Configuration[];
+
   switch (`${config.projectType}`) {
     case 'application': {
       rspackConfig = await Promise.all(
         [
           isClientBuildNeeded && rspackApplicationDevelopmentClientConfig(config),
           isServerBuildNeeded && rspackApplicationDevelopmentServerConfig(config),
+        ].filter(Boolean) as RspackOptions[]
+      );
+      break;
+    }
+    case 'child-app': {
+      rspackConfig = await Promise.all(
+        [
+          isClientBuildNeeded && rspackChildAppDevelopmentClientConfig(config),
+          isServerBuildNeeded && rspackChildAppDevelopmentServerConfig(config),
         ].filter(Boolean) as RspackOptions[]
       );
       break;
@@ -130,33 +143,7 @@ export async function runBuild(
     serverCompiler.hooks.watchRun.tap('rspack-builder', () => hooks.onWatchRun());
   }
 
-  const devServerOptions: DevServer = {
-    devMiddleware: {
-      writeToDisk: config.writeToDisk,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Timing-Allow-Origin': '*',
-        'Cross-Origin-Resource-Policy': 'cross-origin',
-      },
-    },
-    hot: config.hotRefresh?.enabled,
-    client: {
-      webSocketURL: {
-        port: devServerPort,
-      },
-      overlay: {
-        errors: true,
-        warnings: false,
-        runtimeErrors: true,
-      },
-    },
-    port: buildPort,
-  };
-
-  if (config.disableWebSocketServer) {
-    devServerOptions.webSocketServer = false;
-  }
-
+  const devServerOptions = createDevServerOptions<'rspack'>({ config, devServerPort, buildPort });
   const buildServer = new RspackDevServer(devServerOptions, multiCompiler);
 
   await buildServer.start();

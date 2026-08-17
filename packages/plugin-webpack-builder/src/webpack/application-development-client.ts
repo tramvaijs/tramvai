@@ -64,6 +64,14 @@ import {
 } from '@tramvai/plugin-base-builder/lib/plugins';
 import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import {
+  clientBuildName,
+  clientMainFields,
+  polyfillBuildName,
+  stderrWithWarningFilters,
+  transformMultiToken,
+} from '@tramvai/plugin-base-builder/lib/shared/const';
+import { createSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
 
 import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
 import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
@@ -73,14 +81,6 @@ import { createAssetsRules } from './shared/assets';
 
 import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createCacheConfig } from './shared/cache';
-import { createSplitChunksOptions } from './shared/split-chunks';
-import {
-  clientBuildName,
-  clientMainFields,
-  polyfillBuildName,
-  stderrWithWarningFilters,
-  transformMultiToken,
-} from './shared/const';
 
 import { WebpackConfigurationFactory } from './types/webpack';
 
@@ -332,7 +332,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     },
     optimization: {
       emitOnErrors: false,
-      ...createSplitChunksOptions({ config }),
+      ...createSplitChunksOptions({ config, builder: 'webpack' }),
       ...createOptimizeOptions<'webpack'>({ config, target: 'client' }),
     },
     module: {

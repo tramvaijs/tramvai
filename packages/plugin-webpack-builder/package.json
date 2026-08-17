@@ -36,7 +36,6 @@
     "lightningcss-loader": "^3.0.0",
     "mini-css-extract-plugin": "2.7.6",
     "postcss-modules-values-replace": "^4.0.0",
-    "resolve": "^1.22.4",
     "spark-md5": "^3.0.2",
     "svgo": "^3.0.2",
     "thread-loader": "^3.0.4",

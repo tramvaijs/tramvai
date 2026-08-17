@@ -1,6 +1,6 @@
 import { Writable } from 'node:stream';
 
-import { ignoreWarnings } from '@tramvai/plugin-base-builder/lib/utils';
+import { ignoreWarnings } from '../utils';
 
 export const clientBuildName = 'client';
 export const serverBuildName = 'server';

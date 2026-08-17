@@ -65,30 +65,15 @@ export default createCommand({
 
     await portManager.computeAvailablePorts();
 
-    if (options.experimentalRspack) {
-      if (configEntry.type !== 'application') {
-        throw new Error('--experimentalRspack option is only available for application project');
-      }
-
-      const { startExperimentalApplication } = require('./application');
-      return startExperimentalApplication(di);
-    }
-
-    if (options.experimentalWebpackWorkerThreads) {
-      if (configEntry.type !== 'child-app') {
-        throw new Error(
-          '--experimentalWebpackWorkerThreads option is only available for child-app project'
-        );
-      }
-
-      const { startExperimentalChildApp } = require('./child-app.experimental');
-      return startExperimentalChildApp(di);
-    }
-
     switch (configEntry.type) {
       case 'application':
         // eslint-disable-next-line no-case-declarations
-        const { startApplication } = require('./application');
+        const { startApplication, startExperimentalApplication } = require('./application');
+
+        if (options.experimentalRspack) {
+          return startExperimentalApplication(di);
+        }
+
         return startApplication(di);
       case 'module':
         // eslint-disable-next-line no-case-declarations
@@ -96,8 +81,13 @@ export default createCommand({
         return startModule(di);
       case 'child-app':
         // eslint-disable-next-line no-case-declarations
-        const { startExperimentalChildApp } = require('./child-app.experimental');
-        return startExperimentalChildApp(di);
+        const { startExperimentalChildApp, startChildApp } = require('./child-app');
+
+        if (options.experimentalRspack) {
+          return startExperimentalChildApp(di);
+        }
+
+        return startChildApp(di);
     }
   },
 });
