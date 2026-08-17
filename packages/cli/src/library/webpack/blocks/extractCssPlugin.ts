@@ -17,6 +17,7 @@ export const extractCssPluginFactory =
     const pluginOptions: PluginOptions = {
       ignoreOrder: true,
       experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
+      attributes: { 'data-critical': 'true' },
     };
 
     if (filename !== null) {

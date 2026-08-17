@@ -1,4 +1,5 @@
 import Config from 'webpack-chain';
+import { ScriptCriticalAttributePlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 import type { ConfigManager } from '../../../../config/configManager';
 import common from './common';
 import optimize from '../../blocks/optimize';
@@ -19,6 +20,8 @@ export const webpackClientConfig = ({
   if (configManager.sourceMap) {
     config.batch(sourcemaps(configManager, 'client'));
   }
+
+  config.plugin('script-critical').use(ScriptCriticalAttributePlugin);
 
   config.batch(optimize(configManager));
 

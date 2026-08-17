@@ -103,13 +103,11 @@ A large number of resource files creates problems when loading the page, because
 
 #### Solution
 
-To optimize page loading, we've added the ability to include some resources directly in the incoming HTML from the server.
-To avoid inlining everything at all, we've added the ability to set an upper limit for file size.
+To optimize page loading, we've added the ability to include some resources directly in the incoming HTML from the server. To avoid inlining everything at all, we've added the ability to set an upper limit for file size.
 
 #### Connection and configuration
 
-Since version `0.60.7` inlining for styles is enabled by default, CSS files smaller than 40kb before gzip (+-10kb after gzip) are inlined.
-To override these settings, add a provider specifying types of resources to be inlined (styles and/or scripts) and an upper limit for file size (in bytes, before gzip):
+Since version `0.60.7` inlining for styles is enabled by default, CSS files smaller than 40kb before gzip (+-10kb after gzip) are inlined. To override these settings, add a provider specifying types of resources to be inlined (styles and/or scripts) and an upper limit for file size (in bytes, before gzip):
 
 ```js
 import { RESOURCE_INLINE_OPTIONS } from '@tramvai/tokens-render';
@@ -128,6 +126,7 @@ provide({
 Under the hood resource inliner cached all fetched resources.
 
 By default cache size are:
+
 - 300 - for fetched content
 - 300 - for content sizes
 - 300 - for disabled urls of unavailable resources
@@ -153,18 +152,13 @@ provide({
 }),
 ```
 
-Be aware of memory consumption of resources - they are uncompressed. So with 5kb threshold and 1000 entities in cache
-you will get +5Mb on the heap.
+Be aware of memory consumption of resources - they are uncompressed. So with 5kb threshold and 1000 entities in cache you will get +5Mb on the heap.
 
 #### Peculiarities
 
 All scripts and styles (depending on the settings) registered through the `ResourcesRegistry` are inlined.
 
-File uploading to the server occurs in lazy mode, asynchronously.
-This means that there will be no inlining when the page first loads.
-It also means that there is no extra waiting for resources to load on the server side.
-Once the file is in the cache it will be inline.
-The cache has a TTL of 30 minutes and there is no resetting of the cache.
+File uploading to the server occurs in lazy mode, asynchronously. This means that there will be no inlining when the page first loads. It also means that there is no extra waiting for resources to load on the server side. Once the file is in the cache it will be inline. The cache has a TTL of 30 minutes and there is no resetting of the cache.
 
 ### Automatic resource preloading
 
@@ -173,6 +167,30 @@ To speed up data loading, we've added a preloading system for resources and asyn
 - After rendering the application, we get information about all the CSS, JS bundles and asynchronous chunks used in the application
 - Next we add all the CSS to the **preload** tag and add onload event on them. We need to load the blocking resources as quickly as possible.
 - When loading any CSS file, onload event will be fired (only once time) and add all **preload** tags to the necessary JS files
+
+### Retry assets (TramvaiRetryAssetsModule)
+
+`TramvaiRetryAssetsModule` automatically retries failed script and stylesheet loads. When a critical asset fails to load — for example due to a CDN outage — it is re-requested from a fallback host, keeping the page functional without user intervention.
+
+The module works out of the box for all tramvai-managed assets: SSR scripts and styles and lazy-loaded JS and CSS chunks. No manual `data-critical` markup is needed, except for custom critical assets (e.g. microfrontends).
+
+#### Configuring the fallback host
+
+Provide a hostname map via `RETRY_HOSTNAME_MAP` to redirect retries to a backup CDN:
+
+```typescript
+import { provide } from '@tramvai/core';
+import { RETRY_HOSTNAME_MAP } from '@tramvai/tokens-render';
+
+const provider = provide({
+  provide: RETRY_HOSTNAME_MAP,
+  useValue: {
+    'cdn.example.com': 'fallback-cdn.example.com',
+  },
+});
+```
+
+When the map is empty, or when an asset's host is not listed, the asset is re-requested from the same URL.
 
 ### Layouts
 
@@ -202,16 +220,14 @@ Example:
 
 `tramvai` will automatically detect React version, and use hydrateRoot API on the client for 18+ version.
 
-Before switch to React 18, we recommended to activate [Strict Mode](https://reactjs.org/docs/strict-mode.html) in your application.
-In Strict Mode which React warns about using the legacy API.
+Before switch to React 18, we recommended to activate [Strict Mode](https://reactjs.org/docs/strict-mode.html) in your application. In Strict Mode which React warns about using the legacy API.
 
 To connect, you must configure the `RenderModule`:
 
 ```js
-modules: [
-  RenderModule.forRoot({ useStrictMode: true })
-]
+modules: [RenderModule.forRoot({ useStrictMode: true })];
 ```
+
 ### Testing
 
 #### Testing render extensions via RENDER_SLOTS or RESOURCES_REGISTRY tokens

@@ -51,6 +51,7 @@ import { LayoutModule } from './shared/LayoutModule';
 import { providers as sharedProviders } from './shared/providers';
 import { fetchWebpackStats } from './server/blocks/utils/fetchWebpackStats';
 
+export { TramvaiRetryAssetsModule } from './retry-assets/server';
 export { PageErrorStore, setPageErrorEvent };
 export * from '@tramvai/tokens-render';
 

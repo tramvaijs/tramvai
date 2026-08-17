@@ -6,7 +6,6 @@ import type { JSX } from 'react';
 import * as ResourceSlot from './slots';
 
 /**
- * @deprecated use `TRAMVAI_HOOKS_TOKEN['react:render']` and `TRAMVAI_HOOKS_TOKEN['react:error']` instead
  * @description
  * Token adding resources to specific render slots.
  * Used only on server and it is equivalent to usage of RESOURCES_REGISTRY.
@@ -41,6 +40,8 @@ export const RENDER_SLOTS = createToken<PageResource | PageResource[]>('RENDER_S
 export const HTML_ATTRS = createToken<HtmlAttrs>('HTML_ATTRS', { multi: true });
 
 /**
+ * @deprecated use `TRAMVAI_HOOKS_TOKEN['react:render']` and `TRAMVAI_HOOKS_TOKEN['react:error']` instead
+ *
  * @description
  * Add node-style callback on render event in browser.
  * Passes error instance as first argument if there was an error
@@ -252,3 +253,8 @@ export const DEFAULT_ASSETS_PREFIX_TOKEN = createToken<string | null>(
   'tramvai default assets prefix',
   { scope: Scope.SINGLETON }
 );
+export const RETRY_HOSTNAME_MAP = createToken<Record<string, string>>(
+  'tramvai retry assets hostname map'
+);
+
+export const GET_RETRY_URL = createToken<(url: string) => string>('tramvai get asset retry url');

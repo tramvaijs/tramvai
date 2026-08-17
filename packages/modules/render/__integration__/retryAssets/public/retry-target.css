@@ -1,0 +1,4 @@
+/* critical stylesheet used to test the `retryLink` branch of the retry script */
+.retry-target {
+  color: rgb(1, 2, 3);
+}

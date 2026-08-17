@@ -4,7 +4,10 @@ import path from 'path';
 
 import isObject from '@tinkoff/utils/is/object';
 import isUndefined from '@tinkoff/utils/is/undefined';
-import { RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
+import {
+  RuntimePathPlugin,
+  ScriptCriticalAttributePlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 // eslint-disable-next-line no-restricted-imports
 import type { ForkTsCheckerWebpackPluginOptions } from 'fork-ts-checker-webpack-plugin/lib/plugin-options';
@@ -72,6 +75,8 @@ export const webpackClientConfig = ({
       publicPath: 'window.ap',
     },
   ]);
+
+  config.plugin('script-critical').use(ScriptCriticalAttributePlugin);
 
   config.plugin('loader-options').use(webpack.LoaderOptionsPlugin, [
     {

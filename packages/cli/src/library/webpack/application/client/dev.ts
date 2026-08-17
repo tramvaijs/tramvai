@@ -9,7 +9,11 @@ import type { ForkTsCheckerWebpackPluginOptions } from 'fork-ts-checker-webpack-
 
 import isObject from '@tinkoff/utils/is/object';
 import isUndefined from '@tinkoff/utils/is/undefined';
-import { FancyReporter, RuntimePathPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
+import {
+  FancyReporter,
+  RuntimePathPlugin,
+  ScriptCriticalAttributePlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ApplicationConfigEntry } from '../../../../typings/configEntry/application';
 import type { ConfigManager } from '../../../../config/configManager';
@@ -135,6 +139,8 @@ export const webpackClientConfig = ({
       },
     ]);
   }
+
+  config.plugin('script-critical').use(ScriptCriticalAttributePlugin);
 
   config.plugin('define').tap((args) => [
     {

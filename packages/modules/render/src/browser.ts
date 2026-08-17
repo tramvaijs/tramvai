@@ -26,6 +26,7 @@ import type { RenderModuleConfig } from './shared/types';
 import { LayoutModule } from './shared/LayoutModule';
 import { providers as sharedProviders } from './shared/providers';
 
+export { TramvaiRetryAssetsModule } from './retry-assets/browser';
 export { PageErrorStore, setPageErrorEvent };
 export * from '@tramvai/tokens-render';
 
@@ -33,7 +34,7 @@ export const DEFAULT_POLYFILL_CONDITION = '';
 
 const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
   if (process.env.NODE_ENV === 'development') {
-    logger.error(`${RESOURCES_REGISTRY} следует использовать только при SSR`);
+    logger.error(`${RESOURCES_REGISTRY} should be used only during SSR`);
   }
 };
 

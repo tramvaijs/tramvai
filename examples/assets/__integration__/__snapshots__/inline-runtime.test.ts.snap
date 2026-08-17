@@ -172,6 +172,7 @@ exports[`assets runtime chunk snapshot 1`] = `
 /******/ 				if (script.src.indexOf(window.location.origin + '/') !== 0) {
 /******/ 					script.crossOrigin = "anonymous";
 /******/ 				}
+/******/ 				script.setAttribute("data-critical", "true");
 /******/ 			}
 /******/ 			inProgress[url] = [done];
 /******/ 			var onScriptComplete = function(prev, event) {

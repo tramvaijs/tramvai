@@ -16,9 +16,12 @@ The module has separate server and browser implementations with different `react
 | Event | Description | Trigger Point |
 | --- | --- | --- |
 | `html-opened` | HTML document parsed and ready | Document parse complete |
-| `assets-loaded` | All critical assets loaded successfully | Window load event |
-| `assets-load-failed` | One or more critical assets failed to load | Window load event (with errors) |
-| `unhandled-error` | Unhandled promise rejection | Global unhandledrejection event |
+| `critical-assets-loaded` | All critical assets loaded successfully | Window load event |
+| `critical-assets-load-failed` | One or more critical assets failed to load | Window load event |
+| `app-start-failed` | Application failed to start | Window error event |
+| `asset-load-failed` | Any critical JS or CSS asset failed to load | Window error event |
+| `unhandled-error` | Unhandled error | Window error event |
+| `unhandled-rejection` | Unhandled promise rejection | Window unhandledrejection event |
 
 #### Tramvai hooks (server and browser)
 
@@ -54,29 +57,134 @@ Add the module to your Tramvai application:
 
 ```typescript
 import { createApp } from '@tramvai/core';
+import { TramvaiRetryAssetsModule } from '@tramvai/module-render';
 import { ApplicationMonitoringModule } from '@tramvai/module-application-monitoring';
 
 createApp({
   name: 'my-app',
-  modules: [ApplicationMonitoringModule],
+  modules: [
+    // this module and assets retry script is essential for monitoring failed critical assets events
+    TramvaiRetryAssetsModule,
+    ApplicationMonitoringModule,
+  ],
 });
 ```
 
-### 2. Provide an Inline Reporter Factory
+### 2. Extend the Inline Reporter
 
-Inline reporter is used to capture lifecycle events and send them to a monitoring service (like an analytics tool or error logger). Inline reporter is injected into the HTML during server-side rendering. This allows detecting errors and performance issues early, even before the app is fully up and running.
+The inline reporter is `window.__TRAMVAI_INLINE_REPORTER` — a small dispatcher injected into the HTML during server-side rendering, before the app's DI container or hydration even start. This allows detecting errors and performance issues early, even before the app is fully up and running. It exposes:
 
-Key Events Sent Through Inline Reporters:
+- `send(eventName, payload)` — called internally by this module (and other tramvai modules) whenever a monitored event happens (see the event table above).
+- `registerTransport(transportFactory)` — plug in your own transport: a function that receives every event and does something with it (e.g. send it to your monitoring backend).
+- `registerExtension(extensionFactory)` — plug in a function that enriches every event's payload before it reaches transports (e.g. add a device id).
+
+`registerTransport`/`registerExtension` are the recommended way to receive events. Each is its own small, independent `<script>` tag that registers itself as a side effect — unrelated modules or teams can each add their own without knowing about each other or touching a shared factory.
+
+Key Events Sent Through the Inline Reporter:
 
 - **HTML Opened** (`html-opened`): Tracks when the HTML is parsed and ready.
-- **Assets Loaded** (`assets-loaded`) / **Assets Load Failed** (`assets-load-failed`): Tracks the success/failure of loading assets (JS, CSS, etc.).
+- **Critical Assets Loaded** (`critical-assets-loaded`) / **Critical Assets Load Failed** (`critical-assets-load-failed`): Tracks the success/failure of loading critical assets (JS, CSS) on page loading, one event per page session.
 - **App Start Failed** (`app-start-failed`): Tracks initialization errors.
-- **Unhandled Errors** (`unhandled-error`): Tracks unhandled errors or promise rejections.
+- **Asset Load Failed** (`asset-load-failed`): Tracks all failed critical assets (JS, CSS), one event per asset.
+- **Unhandled Errors** (`unhandled-error`): Tracks unhandled errors.
+- **Unhandled Promise Rejections** (`unhandled-rejection`): Tracks unhandled promise rejections.
 
-The module requires an inline reporter factory to send events to your monitoring service. To do this, provide `INLINE_REPORTER_FACTORY_SCRIPT_TOKEN` using an inline script.
+#### Transports
+
+Provide `INLINE_REPORTER_TRANSPORTS_TOKEN` (`multi: true`) with a **factory function** — it receives `InlineReporterParameters` (see below) and must return the actual transport, `(eventName, payload) => void`:
+
+```typescript title="myTransport.inline.ts"
+export function myTransportFactory(parameters) {
+  return function myTransport(eventName, payload) {
+    fetch('/api/monitoring', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: eventName, ...parameters, ...payload }),
+    });
+  };
+}
+```
+
+```typescript
+import { provide } from '@tramvai/core';
+import { INLINE_REPORTER_TRANSPORTS_TOKEN } from '@tramvai/module-application-monitoring';
+import { myTransportFactory } from './myTransport.inline';
+
+provide({
+  provide: INLINE_REPORTER_TRANSPORTS_TOKEN,
+  multi: true,
+  useValue: myTransportFactory,
+});
+```
+
+`.inline.ts` files are transpiled separately and serialized via `Function.prototype.toString()` straight into a `<script>` tag — they cannot use imports or close over anything outside their own function body.
+
+If two events both end up going to the same backend (e.g. the same analytics project), keep them as **one** transport rather than splitting artificially — one file, one HTTP client setup, one place to reason about that backend's contract. Split into separate transports only when the _destinations_ are genuinely different (e.g. one team's analytics service vs. another team's error tracker).
+
+#### Extensions
+
+Provide `INLINE_REPORTER_EXTENSIONS_TOKEN` (`multi: true`) the same way — a factory returning `(eventName, payload) => payload`. Extensions run in registration order, each receiving the payload the previous one produced; their result is what every transport ultimately gets:
+
+```typescript title="myExtension.inline.ts"
+export function myExtensionFactory() {
+  return function myExtension(eventName, payload) {
+    if (eventName !== 'html-opened') {
+      // not relevant to this extension - return the payload unchanged
+      return payload;
+    }
+
+    return { ...payload, deviceId: getDeviceId() };
+  };
+}
+```
+
+```typescript
+import { provide } from '@tramvai/core';
+import { INLINE_REPORTER_EXTENSIONS_TOKEN } from '@tramvai/module-application-monitoring';
+import { myExtensionFactory } from './myExtension.inline';
+
+provide({
+  provide: INLINE_REPORTER_EXTENSIONS_TOKEN,
+  multi: true,
+  useValue: myExtensionFactory,
+});
+```
+
+Use an extension when the same enrichment is needed by two or more independent transports (e.g. a device id that both your analytics transport and your error-tracking transport want). If only one transport ever needs a piece of data, compute it as a private helper inside that transport instead — promoting it to an extension is unnecessary indirection until a second consumer actually shows up.
+
+#### Two transport-authoring styles
+
+- **Allow-list `switch`** — for backends with a strict event schema, list only the events you actually forward and ignore the rest:
+
+  ```typescript
+  function myTransport(eventName, payload) {
+    switch (eventName) {
+      case 'html-opened':
+        sendToBackend('page-view', payload);
+        break;
+      case 'unhandled-error':
+        sendToBackend('js-error', payload);
+        break;
+    }
+  };
+  ```
+
+- **Forward by default** — for free-form sinks (e.g. a generic log collector) that don't need an explicit mapping per event:
+
+  ```typescript
+  function myTransport(eventName, payload) {
+    sendToBackend({ event: eventName, ...payload });
+  };
+  ```
+
+Pick whichever matches your backend — there's no need for the two-step "call `send()`, then remember to add a `case` for it" friction if your backend accepts arbitrary event names.
+
+#### Escape hatch: fully replace the reporter
+
+If you need full control over `send()`/registration behavior, or aren't using transports/extensions at all, override `INLINE_REPORTER_FACTORY_SCRIPT_TOKEN` (**not** `multi`) — whichever factory is provided here entirely replaces the built-in dispatcher, including its `registerTransport`/`registerExtension` methods. Implement those yourself if you still want other modules' transports/extensions to keep working:
 
 ```typescript title="inlineReporter.inline.ts"
-export function inlineReporterFactoryScript() {
+export function inlineReporterFactoryScript(parameters) {
   return {
     send(eventName, payload) {
       fetch('/api/monitoring', {
@@ -102,9 +210,7 @@ import { inlineReporterFactoryScript } from './inlineReporter.inline';
 const providers = [
   provide({
     provide: INLINE_REPORTER_FACTORY_SCRIPT_TOKEN,
-    useFactory: () => {
-      return inlineReporterFactoryScript;
-    },
+    useValue: inlineReporterFactoryScript,
   }),
 ];
 ```
@@ -115,7 +221,7 @@ const providers = [
 
 #### INLINE_REPORTER_PARAMETERS_TOKEN
 
-**Example: Adding Custom Parameters**
+`multi: true` — the module already provides one default entry (`appName`/`appRelease`/`appVersion`), and every other entry contributed by any module gets shallow-merged with it (`Object.assign({}, ...entries)`) into a single object passed to every transport/extension factory. Add your **own** entry with the fields you own, rather than overriding the whole object:
 
 ```typescript
 import { provide } from '@tramvai/core';
@@ -123,18 +229,15 @@ import { INLINE_REPORTER_PARAMETERS_TOKEN } from '@tramvai/module-application-mo
 
 provide({
   provide: INLINE_REPORTER_PARAMETERS_TOKEN,
-  useFactory: ({ appInfo, envManager }) => {
+  multi: true,
+  useFactory: ({ envManager }) => {
     return {
-      appName: appInfo.appName,
-      appRelease: envManager.get('APP_RELEASE'),
-      appVersion: envManager.get('APP_VERSION'),
       environment: envManager.get('NODE_ENV'),
       region: envManager.get('DEPLOY_REGION'),
     };
   },
   deps: {
     envManager: ENV_MANAGER_TOKEN,
-    appInfo: APP_INFO_TOKEN,
   },
 });
 ```
@@ -337,7 +440,7 @@ All rendering-related events are fired once per application lifecycle, at "gener
 ```
 HTML Parse → html-opened
     ↓
-Asset Loading → assets-loaded / assets-load-failed
+Asset Loading → asset-load-failed / (critical-assets-loaded | critical-assets-load-failed)
     ↓
 App Bootstrap → app-start-failed (on error)
     ↓
@@ -353,5 +456,5 @@ Hydration → react:render-started → app:render-started
     ↓
 App Initialized → app:initialized / app:initialize-failed
     ↓
-Runtime → unhandled-error (if occurs)
+Runtime → unhandled-error / unhandled-rejection (if occurs)
 ```

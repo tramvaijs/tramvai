@@ -2,7 +2,10 @@ import Config from 'webpack-chain';
 import WebpackBar from 'webpackbar';
 import webpack from 'webpack';
 import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
-import { FancyReporter } from '@tramvai/plugin-base-builder/lib/plugins';
+import {
+  FancyReporter,
+  ScriptCriticalAttributePlugin,
+} from '@tramvai/plugin-base-builder/lib/plugins';
 
 import type { ConfigManager } from '../../../../config/configManager';
 import common from './common';
@@ -46,6 +49,8 @@ export const webpackClientConfig = ({
       'process.env.NODE_ENV': '"development"',
     },
   ]);
+
+  config.plugin('script-critical').use(ScriptCriticalAttributePlugin);
 
   const { hotRefresh } = configManager;
 
