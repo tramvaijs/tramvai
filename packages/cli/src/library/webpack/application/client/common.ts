@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 import path from 'path';
 import fs from 'fs';
 import type Config from 'webpack-chain';
@@ -34,6 +35,7 @@ import {
   WEBPACK_DEBUG_STATS_FIELDS,
 } from '../../constants/stats';
 import type { IntegrityOptions } from '../../../../typings/configEntry/cli';
+import { isPwaEnabled } from '../../blocks/pwa/shared';
 
 export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config: Config) => {
   const {
@@ -76,7 +78,8 @@ export default (configManager: ConfigManager<ApplicationConfigEntry>) => (config
 
   config.optimization.set('runtimeChunk', runtimeChunk);
   // move require of pwa build part under if for performance
-  if (pwa.workbox?.enabled || pwa.webmanifest?.enabled) {
+
+  if (isPwaEnabled(configManager)) {
     const { pwaBlock } = require('../../blocks/pwa/client');
     config.batch(pwaBlock(configManager));
   }

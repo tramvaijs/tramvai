@@ -105,6 +105,17 @@ export type ConfigManager<
 
 export const DEFAULT_STATIC_HOST = 'localhost';
 
+const DEFAULT_PWA_CONFIG = {
+  sw: { src: 'sw.ts', dest: 'sw.js', scope: '/' },
+  workbox: { enabled: false },
+  webmanifest: { enabled: false, dest: '/manifest.[hash].json' },
+  icon: {
+    dest: 'pwa-icons',
+    sizes: [36, 48, 72, 96, 144, 192, 512],
+  },
+  meta: {},
+};
+
 // eslint-disable-next-line max-statements, complexity
 export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E extends Env = Env>(
   configEntry: C,
@@ -215,29 +226,51 @@ export const createConfigManager = <C extends ConfigEntry = ConfigEntry, E exten
         ? resolve(rootDir, config.output.static, config.buildId)
         : resolve(rootDir, config.output.static);
 
-    const pwa = config.experiments?.pwa;
-    if (pwa.webmanifest?.enabled) {
-      pwa.webmanifest = {
-        ...pwa.webmanifest,
-        scope: pwa.webmanifest.scope ?? pwa.sw?.scope,
-        name: pwa.webmanifest.name ?? config.name,
-        short_name: pwa.webmanifest.short_name ?? config.name,
-        theme_color: pwa.webmanifest.theme_color ?? pwa.meta.themeColor,
+    const pwaOption = config.experiments?.pwa;
+    const pwaConfigs = Array.isArray(pwaOption) ? pwaOption : [pwaOption];
+
+    config.experiments.pwa = pwaConfigs.map((rawPwaConfig) => {
+      const pwaConfig = {
+        sw: { ...DEFAULT_PWA_CONFIG.sw, ...rawPwaConfig.sw },
+        webmanifest: { ...DEFAULT_PWA_CONFIG.webmanifest, ...rawPwaConfig.webmanifest },
+        workbox: { ...DEFAULT_PWA_CONFIG.workbox, ...rawPwaConfig.workbox },
+        icon: {
+          ...DEFAULT_PWA_CONFIG.icon,
+          ...rawPwaConfig.icon,
+        },
+        meta: { ...DEFAULT_PWA_CONFIG.meta, ...rawPwaConfig.meta },
       };
 
-      if (pwa.webmanifest.dest.includes('[hash]')) {
-        if (env === 'production') {
-          const crypto = require('crypto');
-          const hashSum = crypto.createHash('sha256');
-          hashSum.update(JSON.stringify(pwa.webmanifest));
-          const currentHash = hashSum.digest('hex');
+      if (pwaConfig.webmanifest?.enabled) {
+        pwaConfig.webmanifest = {
+          ...pwaConfig.webmanifest,
+          scope: pwaConfig.webmanifest.scope ?? pwaConfig.sw?.scope,
+          name: pwaConfig.webmanifest.name ?? config.name,
+          short_name: pwaConfig.webmanifest.short_name ?? config.name,
+          theme_color: pwaConfig.webmanifest.theme_color ?? pwaConfig.meta.themeColor,
+        };
 
-          pwa.webmanifest.dest = pwa.webmanifest.dest.replace('[hash]', currentHash.substr(0, 8));
-        } else {
-          pwa.webmanifest.dest = pwa.webmanifest.dest.replace('.[hash]', '').replace('[hash].', '');
+        if (pwaConfig.webmanifest.dest.includes('[hash]')) {
+          if (env === 'production') {
+            const crypto = require('crypto');
+            const hashSum = crypto.createHash('sha256');
+            hashSum.update(JSON.stringify(pwaConfig.webmanifest));
+            const currentHash = hashSum.digest('hex');
+
+            pwaConfig.webmanifest.dest = pwaConfig.webmanifest.dest.replace(
+              '[hash]',
+              currentHash.substr(0, 8)
+            );
+          } else {
+            pwaConfig.webmanifest.dest = pwaConfig.webmanifest.dest
+              .replace('.[hash]', '')
+              .replace('[hash].', '');
+          }
         }
       }
-    }
+
+      return pwaConfig;
+    });
 
     const rootErrorBoundaryPath = resolve(
       config.rootDir,

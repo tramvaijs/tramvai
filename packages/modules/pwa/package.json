@@ -23,19 +23,21 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "@tinkoff/utils": "^2.2.1",
+    "@tramvai/module-router": "0.0.0-stub",
     "@tramvai/tokens-common": "0.0.0-stub",
     "@tramvai/tokens-render": "0.0.0-stub",
     "@tramvai/tokens-server": "0.0.0-stub",
     "workbox-window": "^6.6.1"
   },
   "devDependencies": {
-    "@tramvai/plugin-webpack-pwa": "0.0.0-stub"
+    "@tramvai/plugin-base-builder": "0.0.0-stub"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "^1.0.0",
     "@tramvai/cli": "0.0.0-stub",
     "@tramvai/core": "0.0.0-stub",
-    "@tramvai/plugin-webpack-pwa": "0.0.0-stub",
+    "@tramvai/plugin-base-builder": "0.0.0-stub",
     "tslib": "^2.4.0"
   }
 }

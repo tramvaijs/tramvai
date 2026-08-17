@@ -40,6 +40,7 @@ import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/e
 import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
+import { RULES_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/rules';
 import { RuntimePathPlugin, VirtualProtocolPlugin } from '@tramvai/plugin-base-builder/lib/plugins';
 import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
@@ -52,7 +53,12 @@ import { WorkerProgressPlugin } from './plugins/progress-plugin';
 import { createAssetsRules } from './shared/assets';
 import { createServerInlineRules } from './shared/server-inline';
 import { createCacheConfig } from './shared/cache';
-import { serverBuildName, serverMainFields, stderrWithWarningFilters } from './shared/const';
+import {
+  serverBuildName,
+  serverMainFields,
+  stderrWithWarningFilters,
+  transformMultiToken,
+} from './shared/const';
 import { WebpackConfigurationFactory } from './types/webpack';
 
 export const webpackConfig: WebpackConfigurationFactory = async ({
@@ -68,10 +74,11 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
-  const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
-  const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
-  const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+  const alias = transformMultiToken(di.get(optional(RESOLVE_ALIAS_TOKEN))) ?? {};
+  const fallback = transformMultiToken(di.get(optional(RESOLVE_FALLBACK_TOKEN))) ?? {};
+  const provideList = transformMultiToken(di.get(optional(PROVIDE_TOKEN))) ?? {};
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
+  const rules = di.get(optional(RULES_TOKEN)) ?? [];
   const webpackConfigExtension = config.extensions.webpack();
 
   Object.assign(fallback, webpackConfigExtension.resolveFallback);
@@ -315,6 +322,7 @@ export default appConfig;`;
               },
             ]
           : []),
+        ...rules,
       ],
     },
     plugins: [

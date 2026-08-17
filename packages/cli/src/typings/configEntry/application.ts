@@ -5,13 +5,84 @@ import type {
   PwaIconOptions,
   PwaMetaOptions,
   WebManifestOptions,
-} from '@tramvai/plugin-webpack-pwa';
+} from '@tramvai/plugin-base-builder/lib/types';
 
 // for @tramvai/api/lib/config type extension
 import '@tramvai/plugin-base-builder';
 
 import type { CliConfigEntry, Experiments } from './cli';
 import type { OverridableOption } from './common';
+
+type PwaConfig = {
+  /**
+   * @title Service-Worker configuration
+   * @default {}
+   */
+  sw?: {
+    /**
+     * @title Path to sw.ts file (relative to "root" directory)
+     * @default "sw.ts"
+     */
+    src?: string;
+    /**
+     * @title Name of generated SW file (will be placed in "output.client" directory)
+     * @default "sw.js"
+     */
+    dest?: string;
+    /**
+     * @title Scope of SW (see https://developers.google.com/web/ilt/pwa/introduction-to-service-worker#registration_and_scope)
+     * @default "/"
+     */
+    scope?: string;
+  };
+  // @todo optional workbox-window?
+  /**
+   * @title Workbox configuration
+   * @default {}
+   */
+  workbox?: {
+    /**
+     * @title Connect `InjectManifest` from `workbox-webpack-plugin` library
+     * @default false
+     */
+    enabled?: OverridableOption<boolean>;
+    /**
+     * @title Array of regexp specifiers used to exclude assets from the precache manifest
+     */
+    exclude?: string[];
+    /**
+     * @title Array of regexp specifiers used to include assets in the precache manifest
+     */
+    include?: string[];
+    /**
+     * @title Array of chunk names used to include in the precache manifest
+     */
+    chunks?: string[];
+    /**
+     * @title Array of chunk names used to exclude from the precache manifest
+     */
+    excludeChunks?: string[];
+    /**
+     * @title A list of entries to be included in the precache manifest, in addition to any entries that are generated as part of the build configuration
+     */
+    additionalManifestEntries?: Array<string | ManifestEntry>;
+  };
+  /**
+   * @title WebManifest content (manifest.json or webmanifest will be generated based on this options)
+   * @default {}
+   */
+  webmanifest?: WebManifestOptions;
+  /**
+   * @title PWA icons options
+   * @default {}
+   */
+  icon?: PwaIconOptions;
+  /**
+   * @title PWA meta options
+   * @default {}
+   */
+  meta?: PwaMetaOptions;
+};
 
 export interface CheckAsyncTsConfig {
   /**
@@ -36,76 +107,7 @@ export interface ApplicationExperiments extends Experiments {
    * @title PWA configuration (works with `TramvaiPwaModule` from `@tramvai/module-progressive-web-app` library)
    * @default {}
    */
-  pwa: {
-    /**
-     * @title Service-Worker configuration
-     * @default {}
-     */
-    sw?: {
-      /**
-       * @title Path to sw.ts file (relative to "root" directory)
-       * @default "sw.ts"
-       */
-      src?: string;
-      /**
-       * @title Name of generated SW file (will be placed in "output.client" directory)
-       * @default "sw.js"
-       */
-      dest?: string;
-      /**
-       * @title Scope of SW (see https://developers.google.com/web/ilt/pwa/introduction-to-service-worker#registration_and_scope)
-       * @default "/"
-       */
-      scope?: string;
-    };
-    // @todo optional workbox-window?
-    /**
-     * @title Workbox configuration
-     * @default {}
-     */
-    workbox?: {
-      /**
-       * @title Connect `InjectManifest` from `workbox-webpack-plugin` library
-       * @default false
-       */
-      enabled?: OverridableOption<boolean>;
-      /**
-       * @title Array of regexp specifiers used to exclude assets from the precache manifest
-       */
-      exclude?: string[];
-      /**
-       * @title Array of regexp specifiers used to include assets in the precache manifest
-       */
-      include?: string[];
-      /**
-       * @title Array of chunk names used to include in the precache manifest
-       */
-      chunks?: string[];
-      /**
-       * @title Array of chunk names used to exclude from the precache manifest
-       */
-      excludeChunks?: string[];
-      /**
-       * @title A list of entries to be included in the precache manifest, in addition to any entries that are generated as part of the build configuration
-       */
-      additionalManifestEntries?: Array<string | ManifestEntry>;
-    };
-    /**
-     * @title WebManifest content (manifest.json or webmanifest will be generated based on this options)
-     * @default {}
-     */
-    webmanifest?: WebManifestOptions;
-    /**
-     * @title PWA icons options
-     * @default {}
-     */
-    icon?: PwaIconOptions;
-    /**
-     * @title PWA meta options
-     * @default {}
-     */
-    meta?: PwaMetaOptions;
-  };
+  pwa: PwaConfig | PwaConfig[];
 
   /**
    * @title Enable View Transitions API for SPA navigations

@@ -27,3 +27,4 @@ export {
 
 export { Deferred } from './utils/deferred.inline';
 export { DoubleLinkedList, ListNode } from './utils/doubleLinkedList';
+export { PrefixTree } from './utils/PrefixTree';

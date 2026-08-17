@@ -449,19 +449,21 @@ function mapExperimentFields(src: ApplicationExperiments, result: ApplicationPro
 
       case 'pwa':
         if (src.pwa) {
-          result.pwa = {
+          const pwaToMap = Array.isArray(src.pwa) ? src.pwa : [src.pwa];
+
+          result.pwa = pwaToMap.map((pwaConfig) => ({
             workbox: {
-              ...src.pwa.workbox,
+              ...pwaConfig.workbox,
               enabled:
-                typeof src.pwa.workbox?.enabled === 'boolean'
-                  ? src.pwa.workbox.enabled
-                  : src.pwa.workbox?.enabled.development,
+                typeof pwaConfig.workbox?.enabled === 'boolean'
+                  ? pwaConfig.workbox.enabled
+                  : pwaConfig.workbox?.enabled.development,
             },
-            sw: src.pwa.sw,
-            webmanifest: src.pwa.webmanifest,
-            icon: src.pwa.icon,
-            meta: src.pwa.meta,
-          };
+            sw: pwaConfig.sw,
+            webmanifest: pwaConfig.webmanifest,
+            icon: pwaConfig.icon,
+            meta: pwaConfig.meta,
+          }));
         }
         break;
 

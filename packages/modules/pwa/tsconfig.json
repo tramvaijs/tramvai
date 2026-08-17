@@ -25,7 +25,10 @@
             "path": "../../tokens/common"
         },
         {
-            "path": "../../plugin-webpack-pwa"
+            "path": "../router"
+        },
+        {
+            "path": "../../plugin-base-builder"
         }
     ]
 }

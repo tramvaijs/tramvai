@@ -2,7 +2,7 @@
 /* eslint-disable max-statements */
 import { Writable } from 'node:stream';
 
-import rspack, { Configuration } from '@rspack/core';
+import rspack, { Configuration, RuleSetRule } from '@rspack/core';
 import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
@@ -33,6 +33,7 @@ import { createSnapshot } from '@tramvai/plugin-base-builder/lib/shared/snapshot
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
+import { RULES_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/rules';
 import {
   RESOLVE_ALIAS_TOKEN,
   RESOLVE_EXTENSIONS_TOKEN,
@@ -88,6 +89,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(RSPACK_PLUGINS_TOKEN)) ?? [];
+  const rules = di.get(optional(RULES_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
   const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
   const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
@@ -268,6 +270,7 @@ export default appConfig;`;
               },
             ]
           : []),
+        ...(rules as RuleSetRule[]),
       ],
     },
     watchOptions: config.noServerRebuild

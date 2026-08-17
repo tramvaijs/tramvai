@@ -46,6 +46,7 @@ import { BUILD_EXTERNALS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/e
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
 import { createOptimizeOptions } from '@tramvai/plugin-base-builder/lib/shared/optimization';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
+import { RULES_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/rules';
 import {
   RESOLVE_ALIAS_TOKEN,
   RESOLVE_EXTENSIONS_TOKEN,
@@ -78,6 +79,7 @@ import {
   clientMainFields,
   polyfillBuildName,
   stderrWithWarningFilters,
+  transformMultiToken,
 } from './shared/const';
 
 import { WebpackConfigurationFactory } from './types/webpack';
@@ -109,9 +111,10 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
   const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
-  const fallback = di.get(optional(RESOLVE_FALLBACK_TOKEN)) ?? {};
-  const alias = di.get(optional(RESOLVE_ALIAS_TOKEN)) ?? {};
-  const provideList = di.get(optional(PROVIDE_TOKEN)) ?? {};
+  const alias = transformMultiToken(di.get(optional(RESOLVE_ALIAS_TOKEN))) ?? {};
+  const fallback = transformMultiToken(di.get(optional(RESOLVE_FALLBACK_TOKEN))) ?? {};
+  const provideList = transformMultiToken(di.get(optional(PROVIDE_TOKEN))) ?? {};
+  const rules = di.get(optional(RULES_TOKEN)) ?? [];
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
 
   const webpackConfigExtension = config.extensions.webpack();
@@ -376,6 +379,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
               },
             ]
           : []),
+        ...rules,
       ],
     },
     plugins: [

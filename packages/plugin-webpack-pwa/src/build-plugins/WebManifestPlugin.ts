@@ -1,12 +1,18 @@
 import type webpack from 'webpack';
 import type { Compiler } from 'webpack';
-import { PwaIconOptions, WebManifestOptions } from '../types';
+
+import type { PwaIconOptions, WebManifestOptions } from '@tramvai/plugin-base-builder/lib/types';
 
 const pluginName = 'WebManifestPlugin';
 
 export class WebManifestPlugin implements webpack.WebpackPluginInstance {
   constructor(
-    private options: { manifest: WebManifestOptions; icon: PwaIconOptions; assetsPrefix: string }
+    private options: {
+      manifest: WebManifestOptions;
+      icon: PwaIconOptions;
+      assetsPrefix: string;
+      scope: string;
+    }
   ) {
     this.options = options;
   }
@@ -35,8 +41,9 @@ export class WebManifestPlugin implements webpack.WebpackPluginInstance {
               const assetInfo = compilation.getAsset(asset);
               // asset info `_pwaIconSize` added in PwaIconsPlugin
               const size = assetInfo?.info?._pwaIconSize;
+              const iconScope = assetInfo?.info?._pwaScope;
 
-              if (size) {
+              if (iconScope === this.options.scope && size) {
                 if (!content.icons) {
                   content.icons = [];
                 }

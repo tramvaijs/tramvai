@@ -1,0 +1,6 @@
+{
+  "name": "pwa-multi",
+  "sourceRoot": "examples/pwa-multi/src",
+  "projectType": "library",
+  "targets": {}
+}

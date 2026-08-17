@@ -1,7 +1,7 @@
 import { declareModule, provide } from '@tramvai/core';
 import { RENDER_SLOTS, ResourceType, ResourceSlot } from '@tramvai/tokens-render';
-import type { PwaMetaOptions } from '@tramvai/plugin-webpack-pwa';
-import { PWA_META_TOKEN } from '../tokens';
+import type { PwaMetaOptions } from '@tramvai/plugin-base-builder/lib/types';
+import { PWA_ACTIVE_CONFIG_TOKEN } from '../tokens';
 
 const metaMap: Record<keyof PwaMetaOptions, string> = {
   viewport: 'viewport',
@@ -16,21 +16,9 @@ export const TramvaiPwaMetaModule = declareModule({
   name: 'TramvaiPwaMetaModule',
   providers: [
     provide({
-      provide: PWA_META_TOKEN,
-      useFactory: () => {
-        let meta = {};
-        try {
-          if (process.env.TRAMVAI_PWA_META) {
-            meta = JSON.parse(process.env.TRAMVAI_PWA_META);
-          }
-        } catch (e) {}
-        return meta;
-      },
-    }),
-    provide({
       provide: RENDER_SLOTS,
-      useFactory: ({ meta }) => {
-        const finalMeta = meta ?? {};
+      useFactory: ({ activeConfig }) => {
+        const finalMeta = activeConfig?.meta ?? {};
         const keys = Object.keys(finalMeta) as Array<keyof PwaMetaOptions>;
 
         return keys.map((key) => {
@@ -45,7 +33,7 @@ export const TramvaiPwaMetaModule = declareModule({
         });
       },
       deps: {
-        meta: PWA_META_TOKEN,
+        activeConfig: PWA_ACTIVE_CONFIG_TOKEN,
       },
     }),
   ],
