@@ -100,4 +100,17 @@ describe('render', () => {
 
     expect(image).toMatch(`${getApp().staticUrl}/`);
   });
+
+  it('should skip render on head request', async () => {
+    const pageUrl = getApp().serverUrl;
+
+    const getResponse = await fetch(pageUrl);
+    expect(getResponse.body).toBeDefined();
+    expect(getResponse.headers.get('cache-control')).toBeDefined();
+
+    const headResponse = await fetch(pageUrl, { method: 'HEAD' });
+    expect(headResponse.body).toBeNull();
+    // cache control header is installed on server side render
+    expect(headResponse.headers.get('cache-control')).toBeNull();
+  });
 });
