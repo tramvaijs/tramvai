@@ -144,6 +144,11 @@ export const DEFAULT_POLYFILL_CONDITION = 'false';
 
         // eslint-disable-next-line max-statements
         return async function render() {
+          // skip render for HEAD requests
+          if (requestManager.getMethod() === 'HEAD') {
+            return;
+          }
+
           const pageErrorBoundary = pageService.resolveComponentFromConfig('errorBoundary');
           let html: string;
 
