@@ -10,7 +10,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/tramvaijs/tramvai.git"
+    "url": "git+https://github.com/tramvaijs/tramvai.git"
   },
   "scripts": {
     "build": "tsc",
