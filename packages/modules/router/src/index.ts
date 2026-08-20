@@ -21,6 +21,7 @@ export {
   routeTransformToken,
   ROUTER_VIEW_TRANSITIONS_ENABLED,
 } from './modules/tokens';
+export { resetDeferredAction } from './modules/hooks/runActions';
 export * from '@tinkoff/router';
 
 declare module '@tinkoff/router' {

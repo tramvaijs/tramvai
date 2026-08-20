@@ -12,7 +12,7 @@ import {
   RESPONSE_MANAGER_TOKEN,
   CONTEXT_TOKEN,
   CREATE_CACHE_TOKEN,
-  DEFERRED_ACTIONS_MAP_TOKEN,
+  DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
 } from '@tramvai/tokens-common';
 import { PAGE_SERVICE_TOKEN } from '@tramvai/tokens-router';
 import { ClientHintsModule } from '@tramvai/module-client-hints';
@@ -290,7 +290,7 @@ Page Error Boundary will be rendered for the client`,
         responseTaskManager: SERVER_RESPONSE_TASK_MANAGER,
         responseStream: SERVER_RESPONSE_STREAM,
         streamingTimeout: REACT_STREAMING_RENDER_TIMEOUT,
-        deferredActions: DEFERRED_ACTIONS_MAP_TOKEN,
+        deferredActions: DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
         tramvaiHooks: TRAMVAI_HOOKS_TOKEN,
       },
     }),

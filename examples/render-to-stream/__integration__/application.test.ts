@@ -40,8 +40,8 @@ describe('render-to-stream', () => {
       const initialChunksContent = [
         '<!DOCTYPE html>',
         // actions, resolved before response
-        `window.__TRAMVAI_DEFERRED_ACTIONS['fastDeferred'].resolve({"data":"ok"});</script>`,
-        `window.__TRAMVAI_DEFERRED_ACTIONS['failedFastDeferred'].reject({"message":"Failed Fast Deferred"`,
+        `window.__TRAMVAI_DEFERRED_ACTIONS['host__fastDeferred'].resolve({"data":"ok"});</script>`,
+        `window.__TRAMVAI_DEFERRED_ACTIONS['host__failedFastDeferred'].reject({"message":"Failed Fast Deferred"`,
         '<div class="application">',
         // lazy component outside Suspense
         'Deferred Page',
@@ -49,8 +49,8 @@ describe('render-to-stream', () => {
       ];
       const deferredChunksContent = [
         // deferred actions promises teleportation
-        `<script>window.__TRAMVAI_DEFERRED_ACTIONS['longDeferred'].resolve({"data":"ok"});</script>`,
-        `<script>window.__TRAMVAI_DEFERRED_ACTIONS['failedDeferred'].reject({"message":"Failed Deferred"`,
+        `<script>window.__TRAMVAI_DEFERRED_ACTIONS['host__longDeferred'].resolve({"data":"ok"});</script>`,
+        `<script>window.__TRAMVAI_DEFERRED_ACTIONS['host__failedDeferred'].reject({"message":"Failed Deferred"`,
         // lazy component inside Suspense, blocking assets
         'components-features-Data-Data.chunk.css',
         'components-features-Data-Data.chunk.js',

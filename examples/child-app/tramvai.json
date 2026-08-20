@@ -13,10 +13,7 @@
       },
       "shared": {
         "criticalChunks": ["bootstrap"],
-        "deps": [
-          "@tramvai/react-query",
-          "@tramvai/module-react-query"
-        ]
+        "deps": ["@tramvai/react-query", "@tramvai/module-react-query"]
       },
       "sourceMap": {
         "development": false,
@@ -69,10 +66,7 @@
       "root": "child-apps/react-query",
       "type": "child-app",
       "shared": {
-        "deps": [
-          "@tramvai/react-query",
-          "@tramvai/module-react-query"
-        ]
+        "deps": ["@tramvai/react-query", "@tramvai/module-react-query"]
       }
     },
     "router": {
@@ -93,6 +87,11 @@
     "contracts": {
       "name": "contracts",
       "root": "child-apps/contracts",
+      "type": "child-app"
+    },
+    "deferred": {
+      "name": "deferred",
+      "root": "child-apps/deferred",
       "type": "child-app"
     },
     "redirect": {

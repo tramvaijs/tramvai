@@ -4,7 +4,7 @@ import { AbortedDeferredError, AbortedStreamError } from '@tinkoff/errors';
 import { TRAMVAI_HOOKS_TOKEN, type DI_TOKEN } from '@tramvai/core';
 import type {
   CONTEXT_TOKEN,
-  DEFERRED_ACTIONS_MAP_TOKEN,
+  DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
   LOGGER_TOKEN,
 } from '@tramvai/module-common';
 import type {
@@ -24,7 +24,7 @@ import { renderReact } from '../react';
 import { flushFiles } from './blocks/utils/flushFiles';
 
 type StreamingTimeout = ExtractDependencyType<typeof REACT_STREAMING_RENDER_TIMEOUT>;
-type DeferredActions = ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
+type DeferredActions = ExtractDependencyType<typeof DEFERRED_ACTIONS_ROOT_MAP_TOKEN>;
 
 class HtmlWritable extends Writable {
   responseTaskManager: typeof SERVER_RESPONSE_TASK_MANAGER;
