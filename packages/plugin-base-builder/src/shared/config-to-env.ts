@@ -2,7 +2,7 @@ import { ConfigService } from '@tramvai/api/lib/config';
 import { shouldUseReactRoot } from '../utils/react';
 
 export const configToEnv = ({ config }: { config: ConfigService }) => {
-  const { fileSystemPages, experiments, outputStatic } = config;
+  const { fileSystemPages, experiments, outputStatic, shared } = config;
 
   return {
     'process.env.__TRAMVAI_EXPERIMENTAL_ENABLE_FILE_SYSTEM_PAGES': JSON.stringify(
@@ -15,6 +15,7 @@ export const configToEnv = ({ config }: { config: ConfigService }) => {
       fileSystemPages?.pagesDir
     ),
     'process.env.__TRAMVAI_CONCURRENT_FEATURES': JSON.stringify(shouldUseReactRoot()),
+    'process.env.__TRAMVAI_CRITICAL_CHUNKS': `'${JSON.stringify(shared?.criticalChunks ?? [])}'`,
     'process.env.__TRAMVAI_VIEW_TRANSITIONS': `'${JSON.stringify(experiments?.viewTransitions)}'`,
     'process.env.__TRAMVAI_REACT_TRANSITIONS': `'${JSON.stringify(experiments?.reactTransitions)}'`,
     'process.env.__TRAMVAI_OUTPUT_STATIC': `${JSON.stringify(outputStatic)}`,

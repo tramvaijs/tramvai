@@ -238,6 +238,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
         viewTransitions: true,
         reactTransitions: true,
       },
+      shared: {
+        criticalChunks: ['custom-critical-chunk'],
+      },
     },
     'app-root-error-boundary': {
       name: 'app-root-error-boundary',
@@ -2566,6 +2569,7 @@ export default Cmp;`,
             test.expect(platformJs).toContain('enableConcurrentFeatures ${true}');
             test.expect(platformJs).toContain("enableViewTransitions ${'true'}");
             test.expect(platformJs).toContain("enableReactTransitions ${'true'}");
+            test.expect(platformJs).toContain('criticalChunks ${\'["custom-critical-chunk"]\'}');
             test.expect(platformJs).toContain('development');
             test.expect(platformJs).toContain('app-config-to-env');
 
@@ -2576,6 +2580,7 @@ export default Cmp;`,
             test.expect(serverJs).toContain('enableConcurrentFeatures ${true}');
             test.expect(serverJs).toContain("enableViewTransitions ${'true'}");
             test.expect(serverJs).toContain("enableReactTransitions ${'true'}");
+            test.expect(serverJs).toContain('criticalChunks ${\'["custom-critical-chunk"]\'}');
             test.expect(serverJs).toContain('development');
             test.expect(serverJs).toContain('app-config-to-env');
           });
