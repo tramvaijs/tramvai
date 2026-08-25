@@ -6,6 +6,7 @@ console.log(
   `enableConcurrentFeatures ${process.env.__TRAMVAI_CONCURRENT_FEATURES}`,
   `enableViewTransitions ${process.env.__TRAMVAI_VIEW_TRANSITIONS}`,
   `enableReactTransitions ${process.env.__TRAMVAI_REACT_TRANSITIONS}`,
+  `criticalChunks ${process.env.__TRAMVAI_CRITICAL_CHUNKS}`,
   process.env.NODE_ENV,
   process.env.APP_ID,
   `isBrowser ${process.env.BROWSER}`,
