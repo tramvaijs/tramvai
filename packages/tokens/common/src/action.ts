@@ -145,3 +145,7 @@ export interface DeferredActionsMap {
 export const DEFERRED_ACTIONS_MAP_TOKEN = createToken<DeferredActionsMap>(
   'tramvai deferred actions map'
 );
+
+export const DEFERRED_ACTIONS_ROOT_MAP_TOKEN = createToken<DeferredActionsMap>(
+  'tramvai deferred actions root map'
+);

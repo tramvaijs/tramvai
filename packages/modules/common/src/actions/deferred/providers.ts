@@ -5,19 +5,33 @@ import {
   ResourceSlot,
   ResourceType,
 } from '@tramvai/tokens-render';
-import { DEFERRED_ACTIONS_MAP_TOKEN } from '@tramvai/tokens-common';
-import type { Deferred as IDeferred } from '@tramvai/tokens-common';
+import {
+  DEFERRED_ACTIONS_MAP_TOKEN,
+  DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
+} from '@tramvai/tokens-common';
+import type { Deferred as IDeferred, DeferredActionsMap } from '@tramvai/tokens-common';
+import { CHILD_APP_INTERNAL_CONFIG_TOKEN } from '@tramvai/tokens-child-app';
 import { generateDeferredReject, generateDeferredResolve } from './clientScriptsUtils';
+import { createDeferredMap, getPrefix } from './deferredMap';
 
 export const providers = [
   provide({
+    provide: DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
+    useFactory: (): DeferredActionsMap => {
+      return new Map<string, IDeferred>();
+    },
+  }),
+  provide({
     provide: DEFERRED_ACTIONS_MAP_TOKEN,
-    useFactory: () => new Map<string, IDeferred>(),
+    useFactory: ({ store, childAppConfig }) => createDeferredMap(store, getPrefix(childAppConfig)),
+    deps: {
+      store: DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
+      childAppConfig: optional(CHILD_APP_INTERNAL_CONFIG_TOKEN),
+    },
   }),
   provide({
     provide: commandLineListTokens.generatePage,
     useFactory: ({ resourcesRegistry, deferredMap, renderMode }) => {
-      // eslint-disable-next-line max-statements
       return async function render() {
         if (renderMode === 'streaming') {
           resourcesRegistry.register({
@@ -61,7 +75,7 @@ window.__TRAMVAI_DEFERRED_ACTIONS = {};`,
     },
     deps: {
       resourcesRegistry: RESOURCES_REGISTRY,
-      deferredMap: DEFERRED_ACTIONS_MAP_TOKEN,
+      deferredMap: DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
       renderMode: optional(REACT_SERVER_RENDER_MODE),
     },
   }),

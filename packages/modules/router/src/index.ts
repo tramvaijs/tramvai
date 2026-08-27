@@ -22,6 +22,7 @@ export {
   ROUTER_VIEW_TRANSITIONS_ENABLED,
   PRERENDER_HOOKS_TOKEN,
 } from './modules/tokens';
+export { resetDeferredAction } from './modules/hooks/runActions';
 export * from '@tinkoff/router';
 
 declare module '@tinkoff/router' {

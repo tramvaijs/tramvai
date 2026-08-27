@@ -95,6 +95,7 @@ createApp({
     redirect: () => import(/* webpackChunkName: "redirect" */ './bundles/redirect'),
     'not-found': () => import(/* webpackChunkName: "not-found" */ './bundles/not-found'),
     logging: () => import(/* webpackChunkName: "logging" */ './bundles/logging'),
+    deferred: () => import(/* webpackChunkName: "deferred" */ './bundles/deferred'),
   },
   modules: [
     CommonModule,
@@ -169,6 +170,10 @@ createApp({
           value: 'sync',
         },
         {
+          key: 'REACT_STREAMING_RENDER_TIMEOUT',
+          value: '5000',
+        },
+        {
           key: 'CHILD_APP_TEST_ISOLATE_DI',
           optional: true,
         },
@@ -194,6 +199,22 @@ createApp({
       },
       deps: {
         envManager: ENV_MANAGER_TOKEN,
+      },
+    }),
+    provide({
+      provide: 'react streaming render timeout',
+      useFactory: ({ envManager, pageService }) => {
+        const queryTimeout = pageService.getCurrentUrl()?.query?.streamingTimeout;
+
+        if (queryTimeout != null) {
+          return Number(queryTimeout);
+        }
+
+        return Number(envManager.get('REACT_STREAMING_RENDER_TIMEOUT'));
+      },
+      deps: {
+        envManager: ENV_MANAGER_TOKEN,
+        pageService: PAGE_SERVICE_TOKEN,
       },
     }),
     provide({
@@ -499,6 +520,15 @@ createApp({
         },
         {
           name: 'logging',
+          byTag: {
+            latest: {
+              version: '0.0.0-stub',
+              withoutCss: true,
+            },
+          },
+        },
+        {
+          name: 'deferred',
           byTag: {
             latest: {
               version: '0.0.0-stub',

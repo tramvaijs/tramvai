@@ -105,6 +105,20 @@ export const routes: ExtractTokenType<typeof ROUTES_TOKEN> & any[] = [
     },
   },
   {
+    name: 'deferred',
+    path: '/deferred',
+    config: {
+      bundle: 'deferred',
+    },
+  },
+  {
+    name: 'deferred-2',
+    path: '/deferred-2',
+    config: {
+      bundle: 'deferred',
+    },
+  },
+  {
     name: 'redirect',
     path: '/redirect',
     config: {

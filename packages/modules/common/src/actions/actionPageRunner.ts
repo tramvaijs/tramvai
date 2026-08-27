@@ -10,6 +10,7 @@ import type {
   ACTION_EXECUTION_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
 } from '@tramvai/tokens-common';
+import { CHILD_APP_INTERNAL_CONFIG_TOKEN } from '@tramvai/tokens-child-app';
 import {
   ExecutionAbortError,
   isPageActionsAbortError,
@@ -23,6 +24,7 @@ import type {
 } from '@tramvai/tokens-server-private';
 import { actionServerStateEvent } from './actionTramvaiReducer';
 import { generateDeferredReject, generateDeferredResolve } from './deferred/clientScriptsUtils';
+import { getDeferredKey } from './deferred/deferredMap';
 
 const DEFAULT_PAYLOAD = {};
 
@@ -37,7 +39,7 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
   private deferredMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
   private responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
   private serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
-  private isChildAppRunner: boolean;
+  private childAppConfig: ExtractDependencyType<typeof CHILD_APP_INTERNAL_CONFIG_TOKEN> | null;
 
   constructor(
     private deps: {
@@ -52,14 +54,14 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
       deferredMap: ExtractDependencyType<typeof DEFERRED_ACTIONS_MAP_TOKEN>;
       responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
       serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
-      isChildAppRunner: boolean | null;
+      childAppConfig: ExtractDependencyType<typeof CHILD_APP_INTERNAL_CONFIG_TOKEN> | null;
     }
   ) {
     this.log = deps.logger('action:action-page-runner');
     this.deferredMap = deps.deferredMap;
     this.responseTaskManager = deps.responseTaskManager;
     this.serverResponseStream = deps.serverResponseStream;
-    this.isChildAppRunner = deps.isChildAppRunner ?? false;
+    this.childAppConfig = deps.childAppConfig;
   }
 
   // TODO stopRunAtError нужен только для редиректов на стороне сервера в экшенах. И нужно пересмотреть реализацию редиректов
@@ -142,13 +144,15 @@ You can find more detailed information from "action-execution-error" logs, and f
                       return;
                     }
 
+                    const key = getDeferredKey(action.name, this.childAppConfig);
+
                     // eslint-disable-next-line promise/no-nesting
                     await deferred.promise
                       .then((data: any) => {
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         this.serverResponseStream!.push(
                           `<script>${generateDeferredResolve({
-                            key: action.name,
+                            key,
                             data,
                           })}</script>`
                         );
@@ -157,7 +161,7 @@ You can find more detailed information from "action-execution-error" logs, and f
                         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         this.serverResponseStream!.push(
                           `<script>${generateDeferredReject({
-                            key: action.name,
+                            key,
                             error: reason,
                           })}</script>`
                         );

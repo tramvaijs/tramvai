@@ -10,7 +10,7 @@ import type {
 } from '@tramvai/tokens-common';
 
 import type { ROUTER_TOKEN } from '@tramvai/tokens-router';
-import { ACTION_PARAMETERS } from '@tramvai/core';
+import { ACTION_PARAMETERS, type PageAction } from '@tramvai/core';
 import { stopRunAtError } from '../utils/stopRunAtError';
 
 export const getActions = ({
@@ -61,6 +61,21 @@ export const runActionsFactory = (deps: {
   };
 };
 
+export const resetDeferredAction = (
+  action: PageAction,
+  deferredActionsMap: typeof DEFERRED_ACTIONS_MAP_TOKEN,
+  actionExecution: typeof ACTION_EXECUTION_TOKEN
+) => {
+  const parameters = action[ACTION_PARAMETERS];
+  const isDeferredAction = parameters?.deferred;
+  const deferred = deferredActionsMap.get(parameters?.name);
+
+  // here only deferred actions with always or dynamic conditions will be refreshed
+  if (isDeferredAction && deferred && actionExecution.canExecute(action as any)) {
+    deferred.reset();
+  }
+};
+
 export const resetDeferredActions = (deps: {
   store: typeof STORE_TOKEN;
   router: typeof ROUTER_TOKEN;
@@ -71,14 +86,7 @@ export const resetDeferredActions = (deps: {
 }) => {
   const actions = getActions(deps);
 
-  actions.forEach((action) => {
-    const parameters = action[ACTION_PARAMETERS];
-    const isDeferredAction = parameters?.deferred;
-    const deferred = deps.deferredActionsMap.get(parameters?.name);
-
-    // here only deferred actions with always or dynamic conditions will be refreshed
-    if (isDeferredAction && deferred && deps.actionExecution.canExecute(action as any)) {
-      deferred.reset();
-    }
-  });
+  actions.forEach((action) =>
+    resetDeferredAction(action, deps.deferredActionsMap, deps.actionExecution)
+  );
 };
