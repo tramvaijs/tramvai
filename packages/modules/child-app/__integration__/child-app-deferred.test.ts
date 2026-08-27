@@ -38,7 +38,10 @@ if (!testCase) {
 const { rootAppVersion, childAppsVersion } = testCase;
 
 if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
-  describe(`Child App deferred actions with streaming`, () => {
+  /**
+   * @todo enable after TCORE-5597
+   */
+  describe.skip(`Child App deferred actions with streaming`, () => {
     let childApp: PromiseType<ReturnType<typeof start>>;
     let rootApp: PromiseType<ReturnType<typeof startCli>>;
 

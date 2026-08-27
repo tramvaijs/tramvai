@@ -84,6 +84,10 @@ export const bundleResource = async ({
     });
   }
 
+  // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible
+  // https://github.com/reactwg/react-18/discussions/114
+  const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
+
   const { scripts: webpackRuntimeScript } = flushFiles(['runtime'], webpackStats);
   // If webpack runtime is presented is always single chunk
   const webpackRuntimeScriptName = webpackRuntimeScript[0];
@@ -117,6 +121,7 @@ export const bundleResource = async ({
         attrs: {
           'data-critical': 'true',
           ...webpackRuntimeAttrs,
+          ...scriptTypeAttr,
         },
       });
       result.push({
@@ -130,10 +135,6 @@ export const bundleResource = async ({
       });
     }
   }
-
-  // defer scripts is not suitable for React streaming, we need to ability to run them as early as possible
-  // https://github.com/reactwg/react-18/discussions/114
-  const scriptTypeAttr = renderMode === 'streaming' ? asyncScriptAttrs : deferScriptAttrs;
 
   styles.forEach((style) =>
     result.push({

@@ -62,7 +62,10 @@ describe('render-to-stream', () => {
         const initialHTML = stream.getChunks().join('\n');
 
         // all critical scripts async for streaming
-        expect(initialHTML.match(/data-critical="true"[^>]*async="async"/g)?.length).toBe(5);
+        expect(initialHTML.match(/data-critical="true"[^>]*async="async"/g)?.length).toBe(6);
+
+        // no script should use `defer` in streaming,
+        expect(initialHTML).not.toMatch(/<script[^>]*\bdefer\b/);
 
         initialChunksContent.forEach((chunk) => {
           expect(initialHTML).toContain(chunk);
@@ -89,7 +92,7 @@ describe('render-to-stream', () => {
             expect(finalHTML).toContain(chunk);
           });
 
-          expect.assertions(19);
+          expect.assertions(20);
 
           done();
         });
