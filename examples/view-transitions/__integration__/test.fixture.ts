@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { test as base } from '@playwright/test';
+import { test as base, Page, TestFixture as PwTestFixture } from '@playwright/test';
 import type { CreateApp } from '@tramvai/internal-test-utils/fixtures/create-app';
 import { createApp, app, settingApp } from '@tramvai/internal-test-utils/fixtures/create-app';
 import { buildAllureTree } from '@tramvai/internal-test-utils/fixtures/build-allure-tree';
@@ -14,6 +14,7 @@ type TestFixture = {
   buildAllureTree: void;
   I: IAction;
   ViewTransitions: ViewTransitionsComponentObject;
+  mockAssetsFixture: void;
 };
 
 type WorkerFixture = {
@@ -40,6 +41,17 @@ const targetApp: CreateApp.TargetApp = {
   },
 };
 
+// Abort all image requests for correct loading of page in ci without network access
+const mockAssetsFixture: PwTestFixture<void, { page: Page }> = async ({ page }, use) => {
+  const url = 'https://avatars.yandex.net/**';
+
+  await page.route(url, (route) => route.abort());
+
+  await use();
+
+  await page.unroute(url);
+};
+
 export const test = base.extend<TestFixture, WorkerFixture>({
   optionsApp: [undefined, { scope: 'worker', auto: true }],
   targetApp: [targetApp, { scope: 'worker', auto: true }],
@@ -49,4 +61,5 @@ export const test = base.extend<TestFixture, WorkerFixture>({
   app,
   I: IFixture,
   ViewTransitions: ViewTransitionsFixture,
+  mockAssetsFixture: [mockAssetsFixture, { auto: true }],
 });

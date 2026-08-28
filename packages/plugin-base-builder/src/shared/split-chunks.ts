@@ -213,8 +213,8 @@ export const createSplitChunksOptions = <T extends keyof OptimizationMap>({
   if (config.hotRefresh?.enabled && webpackSplitChunks) {
     const hmrRegExp =
       builder === 'webpack'
-        ? /[\\/]node_modules[\\/](react-refresh|webpack-hot-middleware|@pmmmwh[\\/]react-refresh-webpack-plugin)[\\/]/
-        : /[\\/]node_modules[\\/](react-refresh|@rspack[\\/]plugin-react-refresh|@rspack[\\/]core[\\/]hot|@rspack[\\/]hot|@rspack[\\/]dev-server)[\\/]/;
+        ? /[\\/]node_modules[\\/](react-refresh|webpack-hot-middleware|webpack[\\/]hot|webpack-dev-server|@pmmmwh[\\/]react-refresh-webpack-plugin)[\\/]/
+        : /[\\/]node_modules[\\/](react-refresh|@rspack[\\/]plugin-react-refresh|webpack-dev-server|webpack[\\/]hot|@rspack[\\/]core[\\/]hot|@rspack[\\/]hot|@rspack[\\/]dev-server)[\\/]/;
     webpackSplitChunks.cacheGroups!.hmr = {
       name: 'hmr',
       enforce: true,

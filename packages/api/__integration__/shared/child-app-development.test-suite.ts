@@ -72,6 +72,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     refresh: {
       name: 'refresh',
       type: 'child-app',
+      hotRefresh: {
+        enabled: true,
+      },
       sourceDir: path.join(fixturesFolder, 'child-app', 'refresh'),
     },
     assets: {
@@ -300,18 +303,17 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             await fetch(`http://localhost:${devServer.port}/base/base_server@${version}.js`)
           ).text();
 
-          const expectedString =
-            builder === 'rspack'
-              ? 'global.__remote_scope__ = global.__remote_scope__ || {'
-              : '__webpack_require__.g.__remote_scope__ = __webpack_require__.g.__remote_scope__ || {';
+          test
+            .expect(serverJs)
+            .toContain(
+              '__webpack_require__.g.__remote_scope__ = __webpack_require__.g.__remote_scope__ || {'
+            );
 
-          test.expect(serverJs).toContain(expectedString);
-
-          const expectedRuntimeScript =
-            builder === 'rspack'
-              ? `global.__remote_scope__._config["base"] = global.__remote_scope__._config["base"] || ASSETS_PREFIX + 'server.js';`
-              : `__webpack_require__.g.__remote_scope__._config["base"] = __webpack_require__.g.__remote_scope__._config["base"] || ASSETS_PREFIX + 'server.js';`;
-          test.expect(serverJs).toContain(expectedRuntimeScript);
+          test
+            .expect(serverJs)
+            .toContain(
+              `__webpack_require__.g.__remote_scope__._config["base"] = __webpack_require__.g.__remote_scope__._config["base"] || ASSETS_PREFIX + 'server.js';`
+            );
         });
       });
 
@@ -423,7 +425,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           };
 
           expected.assets = expected.assets.sort();
-          loadableStats.assets.sort();
+          loadableStats.assets = loadableStats.assets.sort();
 
           // slightly different fields in rspack for chunks
           if (builder === 'rspack') {
@@ -1232,6 +1234,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
 
           await page.goto(`http://localhost:${applicationServer.port}?port=${devServer.port}`);
 
+          let loadCounter = 0;
+          page.on('load', () => loadCounter++);
+
           test.expect(await page.locator('#root').textContent()).toEqual('hello world');
 
           await sleep(1000);
@@ -1239,6 +1244,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           await sleep(1000);
 
           test.expect(await page.locator('#root').textContent()).toEqual('super hello world');
+          test.expect(loadCounter).toEqual(0);
         });
       });
 

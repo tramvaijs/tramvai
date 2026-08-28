@@ -143,7 +143,15 @@ export async function runBuild(
     serverCompiler.hooks.watchRun.tap('rspack-builder', () => hooks.onWatchRun());
   }
 
-  const devServerOptions = createDevServerOptions<'rspack'>({ config, devServerPort, buildPort });
+  const devServerOptions = createDevServerOptions<'rspack'>({
+    config,
+    devServerPort,
+    buildPort,
+    // disable hot reload, it breaks mf runtime on server
+    // instead manually enable hmr in build config for client
+    client: false,
+    hot: false,
+  });
   const buildServer = new RspackDevServer(devServerOptions, multiCompiler);
 
   await buildServer.start();

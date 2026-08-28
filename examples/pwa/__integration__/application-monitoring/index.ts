@@ -194,7 +194,7 @@ createApp({
             resourcesRegistry.register({
               type: ResourceType.script,
               slot: ResourceSlot.HEAD_CORE_SCRIPTS,
-              payload: 'https://example.com/non-existent.js',
+              payload: 'http://localhost/non-existent.js',
               attrs: { 'data-critical': 'true' },
             });
           }
@@ -203,7 +203,7 @@ createApp({
             resourcesRegistry.register({
               type: ResourceType.style,
               slot: ResourceSlot.HEAD_CORE_STYLES,
-              payload: 'https://example.com/non-existent.css',
+              payload: 'http://localhost/non-existent.css',
               attrs: { 'data-critical': 'true' },
             });
           }
@@ -212,7 +212,7 @@ createApp({
             resourcesRegistry.register({
               type: ResourceType.script,
               slot: ResourceSlot.HEAD_CORE_SCRIPTS,
-              payload: 'https://example.com/non-existent-non-critical.js',
+              payload: 'http://localhost/non-existent-non-critical.js',
               attrs: {},
             });
           }

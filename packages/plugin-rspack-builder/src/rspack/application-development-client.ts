@@ -1,8 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
-import { Writable } from 'node:stream';
-
-import { Compilation, RuleSetRule } from '@rspack/core';
+import { Compilation, RuleSetRule, HotModuleReplacementPlugin } from '@rspack/core';
 import rspack, { Configuration as RspackConfiguration } from '@rspack/core';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 import { optional } from '@tinkoff/dippy';
@@ -102,6 +100,8 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     projectType,
     clientSourceMap,
     noClientRebuild,
+    liveReload,
+    port,
   } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
@@ -172,6 +172,12 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const sourceMapsConfiguration = createSourceMaps<'rspack'>({ config, target: 'client' });
 
   const isPolyfillsExists = Boolean(polyfillPath || modernPolyfillPath);
+
+  const hotEntry = [
+    liveReload &&
+      `${require.resolve('@rspack/dev-server/client/index')}?protocol=ws%3A&hostname=0.0.0.0&pathname=%2Fws&logging=warn&reconnect=10&hot=${isHotEnabled}&live-reload=${liveReload}`,
+    isHotEnabled && require.resolve('@rspack/core/hot/dev-server'),
+  ].filter(Boolean);
 
   const buildRspackConfig: RspackConfiguration = {
     // https://webpack.js.org/configuration/target/#browserslist
@@ -261,6 +267,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         process: 'process',
         ...provideList,
       }),
+      isHotEnabled && new HotModuleReplacementPlugin(),
       new rspack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
@@ -290,11 +297,14 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     entry: {
       // TODO: more missed files watchers with absolute path?
       platform: {
-        import: resolveAbsolutePathForFile({
-          file: config.entryFile,
-          sourceDir: config.sourceDir,
-          rootDir: config.rootDir,
-        }),
+        import: [
+          resolveAbsolutePathForFile({
+            file: config.entryFile,
+            sourceDir: config.sourceDir,
+            rootDir: config.rootDir,
+          }),
+          ...hotEntry,
+        ].filter((val): val is string => Boolean(val)),
       },
       ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
     },
@@ -524,6 +534,15 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       ...plugins.flat(),
     ].filter(Boolean),
   };
+
+  if (isPolyfillsExists && isHotEnabled) {
+    const entryName = Object.keys(polyfillBuildRspackConfig.entry!)[0];
+    // @ts-expect-error
+    polyfillBuildRspackConfig.entry[entryName] = {
+      // @ts-expect-error
+      import: [polyfillBuildRspackConfig.entry![entryName], ...hotEntry],
+    };
+  }
 
   return [clientBuildRspackConfig].concat(isPolyfillsExists ? polyfillBuildRspackConfig : []);
 };

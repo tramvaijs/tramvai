@@ -63,22 +63,36 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
       
       this Footer in render-to-stream
       
-      
-      
-      
-      
-      Response: ok
-      
-      
-        
-          Error:
-          Failed Deferred
-        
-      
-      
-      
-      
     "
+`;
+
+exports[`render-to-stream server-side rendering deferred page full body (streamed content outside .application) 1`] = `
+[
+  "&lt;/script&gt;&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;",
+  "Deferred",
+  "Deferred Bar",
+  "Deferred Baz",
+  "Deferred Foo",
+  "Deferred Page",
+  "Deferred State",
+  "Error:",
+  "Error:",
+  "Failed Deferred",
+  "Failed Fast Deferred",
+  "Loading aborted error...",
+  "Loading long error...",
+  "Loading long...",
+  "Main",
+  "Non-deferred",
+  "Response:",
+  "Response: ok",
+  "Second",
+  "Tramvai",
+  "XSS safe:",
+  "ok",
+  "this Footer in render-to-stream",
+  "🥳",
+]
 `;
 
 exports[`render-to-stream server-side rendering main page 1`] = `
@@ -134,4 +148,14 @@ exports[`render-to-stream server-side rendering non-deferred page 1`] = `
       this Footer in render-to-stream
       
     "
+`;
+
+exports[`render-to-stream streaming response streams landmarks in a stable order (snapshot) 1`] = `
+[
+  "window.__TRAMVAI_HTML_READY_PROMISE__ = new Promise",
+  "<script id="__TRAMVAI_STATE__" type="application/json">",
+  "<script>window.__TRAMVAI_HTML_READY__ = true; window.__TRAMVAI_HTML_READY_RESOLVE__();</script>",
+  "components-features-Data-Data.chunk.js",
+  "</body></html>",
+]
 `;

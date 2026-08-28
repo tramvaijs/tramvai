@@ -62,7 +62,7 @@ describe('render-to-stream', () => {
         const initialHTML = stream.getChunks().join('\n');
 
         // all critical scripts async for streaming
-        expect(initialHTML.match(/data-critical="true"[^>]*async="async"/g)?.length).toBe(6);
+        expect(initialHTML.match(/data-critical="true"[^>]*async="async"/g)?.length).toBe(7);
 
         // no script should use `defer` in streaming,
         expect(initialHTML).not.toMatch(/<script[^>]*\bdefer\b/);
@@ -124,6 +124,38 @@ describe('render-to-stream', () => {
           done();
         });
     });
+
+    // eslint-disable-next-line jest/no-done-callback
+    it('streams landmarks in a stable order (snapshot)', (done) => {
+      const stream = new WritableBuffer();
+
+      const landmarks = [
+        'window\\.__TRAMVAI_HTML_READY_PROMISE__ = new Promise',
+        '<script id="__TRAMVAI_STATE__" type="application/json">',
+        '<script>window\\.__TRAMVAI_HTML_READY__ = true; window\\.__TRAMVAI_HTML_READY_RESOLVE__\\(\\);</script>',
+        'components-features-Data-Data\\.chunk\\.js',
+        '</body></html>',
+      ];
+
+      const landmarksRegExp = new RegExp(landmarks.join('|'), 'g');
+
+      app
+        .request('/deferred/')
+        .expect(200)
+        .expect('Transfer-Encoding', 'chunked')
+        .pipe(stream)
+        .on('finish', (error) => {
+          if (error) {
+            return done(error);
+          }
+
+          const finalHTML = stream.getChunks().join('');
+
+          expect(finalHTML.match(landmarksRegExp)).toMatchSnapshot();
+
+          done();
+        });
+    });
   });
 
   describe('server-side rendering', () => {
@@ -137,6 +169,21 @@ describe('render-to-stream', () => {
       const { parsed } = await app.render('/deferred/');
 
       expect(parsed.querySelector('.application').innerText).toMatchSnapshot();
+    });
+
+    it('deferred page full body (streamed content outside .application)', async () => {
+      const { parsed } = await app.render('/deferred/');
+
+      // Lines are sorted,
+      // because streamed boundaries land in their non-deterministic resolution order
+      const bodyLines = parsed
+        .querySelector('body')
+        .innerText.split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .sort();
+
+      expect(bodyLines).toMatchSnapshot();
     });
 
     it('non-deferred page', async () => {

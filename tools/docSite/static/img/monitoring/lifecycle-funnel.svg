@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1030 395" width="1030" height="395" font-family="Arial, Helvetica, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333333"/>
+    </marker>
+  </defs>
+
+  <!-- lane labels -->
+  <text x="20" y="35" font-size="14" font-weight="bold" fill="#555555">Server</text>
+  <text x="20" y="232" font-size="14" font-weight="bold" fill="#555555">Browser</text>
+
+  <!-- server boxes -->
+  <g>
+    <rect x="200" y="50" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <text x="285" y="100" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Входящий запрос</text>
+  </g>
+  <g>
+    <rect x="430" y="50" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <rect x="434" y="54" width="6" height="82" rx="3" fill="#4a76c9"/>
+    <text x="515" y="78" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">SSR рендер</text>
+    <text x="515" y="102" font-size="11" text-anchor="middle" fill="#2e7d32">✓ успех</text>
+    <text x="515" y="122" font-size="11" text-anchor="middle" fill="#c62828">✗ ошибка</text>
+  </g>
+  <g>
+    <rect x="660" y="50" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <text x="745" y="100" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Ответ клиенту</text>
+  </g>
+
+  <!-- server row arrows -->
+  <line x1="370" y1="95" x2="430" y2="95" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="95" x2="660" y2="95" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- connector server -> browser -->
+  <path d="M745,140 L745,178 L125,178 L125,245" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="435" y="170" font-size="11" text-anchor="middle" fill="#555555">HTTP-ответ → HTML</text>
+
+  <!-- browser boxes -->
+  <g>
+    <rect x="40" y="245" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <rect x="44" y="249" width="6" height="82" rx="3" fill="#e8871e"/>
+    <text x="125" y="295" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">HTML открыта</text>
+  </g>
+  <g>
+    <rect x="235" y="245" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <rect x="239" y="249" width="6" height="82" rx="3" fill="#e8871e"/>
+    <text x="320" y="273" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Загрузка ассетов</text>
+    <text x="320" y="297" font-size="11" text-anchor="middle" fill="#2e7d32">✓ успех</text>
+    <text x="320" y="317" font-size="11" text-anchor="middle" fill="#c62828">✗ ошибка</text>
+  </g>
+  <g>
+    <rect x="430" y="245" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <rect x="434" y="249" width="6" height="82" rx="3" fill="#4a76c9"/>
+    <text x="515" y="273" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Инициализация tramvai</text>
+    <text x="515" y="297" font-size="11" text-anchor="middle" fill="#2e7d32">✓ успех</text>
+    <text x="515" y="317" font-size="11" text-anchor="middle" fill="#c62828">✗ ошибка</text>
+  </g>
+  <g>
+    <rect x="625" y="245" width="170" height="90" rx="10" ry="10" fill="#dae8fc" stroke="#333333" stroke-width="1.5"/>
+    <rect x="629" y="249" width="6" height="82" rx="3" fill="#4a76c9"/>
+    <text x="710" y="273" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Гидрация</text>
+    <text x="710" y="297" font-size="11" text-anchor="middle" fill="#2e7d32">✓ успех</text>
+    <text x="710" y="317" font-size="11" text-anchor="middle" fill="#c62828">✗ ошибка</text>
+  </g>
+  <g>
+    <rect x="820" y="245" width="170" height="90" rx="10" ry="10" fill="#fff2cc" stroke="#333333" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <rect x="824" y="249" width="6" height="82" rx="3" fill="#e8871e"/>
+    <text x="905" y="265" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">Пользовательская</text>
+    <text x="905" y="282" font-size="13" font-weight="bold" text-anchor="middle" fill="#1a1a1a">сессия</text>
+    <text x="905" y="307" font-size="11" text-anchor="middle" fill="#c62828">✗ ошибки в рантайме</text>
+  </g>
+
+  <!-- legend -->
+  <rect x="300" y="358" width="14" height="14" rx="3" fill="#e8871e"/>
+  <text x="322" y="369" font-size="12" fill="#333333">Inline Reporter (браузер, до инициализации DI)</text>
+  <rect x="610" y="358" width="14" height="14" rx="3" fill="#4a76c9"/>
+  <text x="632" y="369" font-size="12" fill="#333333">tapable-хуки (TRAMVAI_HOOKS_TOKEN)</text>
+
+  <!-- browser row arrows -->
+  <line x1="210" y1="290" x2="235" y2="290" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="405" y1="290" x2="430" y2="290" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="600" y1="290" x2="625" y2="290" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="795" y1="290" x2="820" y2="290" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+</svg>

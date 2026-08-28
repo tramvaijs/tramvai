@@ -51,7 +51,7 @@ export function hasSwcTranspiler(config: Config) {
       return loader === 'swc';
     }
     // @ts-expect-error
-    return loader.development === 'swc';
+    return loader?.development === 'swc';
   });
 }
 

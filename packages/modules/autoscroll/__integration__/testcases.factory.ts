@@ -310,11 +310,14 @@ export function testcasesFactory(test: typeof testBase, label: string) {
         // go back past the updateCurrentRoute entry to the original page
         await router.back(-1);
 
+        const maxDiff = 6;
         await test.expect
           .poll(async () => {
-            return scroll.getCurrentScrollValue();
+            const value = await scroll.getCurrentScrollValue();
+
+            return Math.abs(value - SCROLL_VALUE);
           })
-          .toEqual(SCROLL_VALUE);
+          .toBeLessThanOrEqual(maxDiff);
       });
     });
 

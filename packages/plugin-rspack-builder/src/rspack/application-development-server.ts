@@ -1,6 +1,5 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-import { Writable } from 'node:stream';
 
 import rspack, { Configuration, RuleSetRule } from '@rspack/core';
 import {

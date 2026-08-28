@@ -8,11 +8,17 @@ const label = (name: string) => chalk.bold.cyan(`▸ ${name}:`);
 const link = (url: string) => chalk.underline.blue(url);
 
 // eslint-disable-next-line max-statements
-export function showBanner(config: ConfigService, options: { transpiler: { name: string } }) {
+export function showBanner(
+  config: ConfigService,
+  options: { transpiler: { name: string }; bundler: 'rspack' | 'webpack' }
+) {
   const titleLines = [];
   const messageLines = [];
 
   titleLines.push(`${chalk.yellow.bold('tramvai cli')}\n`);
+
+  titleLines.push(`${label('Bundler')}          ${options.transpiler.name}`);
+  titleLines.push(`${label('Transpiler')}       ${options.bundler}`);
 
   // Features
   if (config.projectType !== 'application') {

@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   plugins: [
     require('postcss-modules-values-replace'),
@@ -8,6 +10,6 @@ module.exports = {
       preserve: false,
     }),
     require('tailwindcss/nesting'),
-    require('tailwindcss'),
+    require('tailwindcss')(path.join(__dirname, './tailwind.config.js')),
   ],
 };

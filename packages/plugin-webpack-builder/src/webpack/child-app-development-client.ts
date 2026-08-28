@@ -229,22 +229,24 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       new PurifyStatsPlugin({ fileName: statsFileName, target: 'child-app' }),
       new ScriptCriticalAttributePlugin(),
       showProgress && new WorkerProgressPlugin({ name: clientBuildName, color: 'green' }),
-      // @ts-expect-error
-      new UniversalFederationPlugin({
-        isServer: false,
-        name: projectName,
-        library: {
-          name: 'window["child-app__" + (document.currentScript.src || document.currentScript.dataset.src)]',
-          type: 'assign',
+      new UniversalFederationPlugin(
+        {
+          isServer: false,
+          name: projectName,
+          library: {
+            name: 'window["child-app__" + (document.currentScript.src || document.currentScript.dataset.src)]',
+            type: 'assign',
+          },
+          exposes: {
+            // path.relative should use the posix separator because
+            // @module-federation/node is parsing relative path incorrectly
+            // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
+            entry: entry.split(path.win32.sep).join(path.posix.sep),
+          },
+          shared: sharedModules,
         },
-        exposes: {
-          // path.relative should use the posix separator because
-          // @module-federation/node is parsing relative path incorrectly
-          // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
-          entry: entry.split(path.win32.sep).join(path.posix.sep),
-        },
-        shared: sharedModules,
-      }),
+        {}
+      ),
       ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({

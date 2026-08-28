@@ -95,6 +95,81 @@ createApp({
 
 [How to add assets loading to a page](#How-to-add-assets-loading-to-a-page)
 
+### Writing client code in `*.inline.ts` files
+
+> Not to be confused with [Automatic resource inlining](#automatic-resource-inlining) below — that feature inlines existing built asset _files_ (CSS/JS) into HTML by size. This section is about _authoring_ browser code inside the server bundle.
+
+#### Concept
+
+Some client-side code — early error interceptors, monitoring beacons, asset retry logic — must run as an inline `<script>` in the initial HTML, before any other bundle loads. That code is naturally defined next to the server-side module that registers it (via `RENDER_SLOTS`), but the server bundle is compiled for Node.js, not for the browsers your app targets. If you just write browser code inline in a server file and call `.toString()` on a function, you ship whatever syntax you wrote — potentially incompatible with the browserslist config for your app.
+
+#### Solution
+
+Any file named `*.inline.ts`, `*.inline.js`, `*.inline.es.ts` or `*.inline.es.js` is transpiled by the **server** webpack config using the **client's** babel/swc target instead of the server's. It's still just a regular module imported into your server code — the trick is that its compiled output is client-safe JS, so calling `.toString()` on its exported function gives you code that runs correctly in the browser.
+
+Rules:
+
+- The code must live in its own file, matching `*.inline(.es)?.[tj]s`.
+- The file must not contain imports — there's no webpack module runtime available once the code is serialized into a plain `<script>` tag on the client.
+- Export a **function** (not a class or top-level side effect) — only a function's body survives `fn.toString()`.
+- The function can only use its own arguments — it can't close over outer variables, since only the function body is serialized, not its surrounding scope.
+- At the call site, build the inline script payload as an IIFE string: `` `(${fn})(${arg})` ``. Wrap string/object arguments with `JSON.stringify` (or quotes) since they're being spliced into source text, not passed as real values.
+
+#### Example
+
+`retryAssets.inline.ts` — exported function, no imports, only uses its arguments:
+
+```typescript
+export function retryAssets(
+  retryMap: Record<string, string>,
+  getRetryUrl: (url: string, retryMap: Record<string, string>) => string,
+  assetsPrefix: string | null
+) {
+  window.addEventListener('error', (event) => {
+    // ...retry logic using only retryMap, getRetryUrl, assetsPrefix
+  });
+}
+```
+
+The consuming module imports it like any other function and turns it into an inline script via `RENDER_SLOTS`:
+
+```typescript
+import { declareModule, provide } from '@tramvai/core';
+import { RENDER_SLOTS, ResourceSlot, ResourceType } from '@tramvai/tokens-render';
+import { retryAssets } from './retryAssets.inline';
+
+export const CustomModule = declareModule({
+  name: 'CustomModule',
+  providers: [
+    provide({
+      provide: RENDER_SLOTS,
+      useFactory: () => {
+        const retryMap = { 'cdn.example.com': 'fallback-cdn.example.com' };
+
+        return {
+          slot: ResourceSlot.HEAD_PERFORMANCE,
+          type: ResourceType.inlineScript,
+          // `retryAssets` here is already client-transpiled source, not a live function reference
+          payload: `(${retryAssets})(${JSON.stringify(retryMap)})`,
+        };
+      },
+    }),
+  ],
+});
+```
+
+After building, the browser receives the already down-leveled source as a plain inline script, e.g.:
+
+```html
+<script>
+  (function retryAssets(retryMap) {
+    window.addEventListener('error', function (event) {
+      /* ...retry logic... */
+    });
+  })({ 'cdn.example.com': 'fallback-cdn.example.com' });
+</script>
+```
+
 ### Automatic resource inlining
 
 #### Concept

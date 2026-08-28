@@ -197,7 +197,12 @@ async function runWebpackDevServer() {
     } as WebpackWorkerOutgoingEventsPayload['watch-run']);
   });
 
-  const devServerOptions = createDevServerOptions<'webpack'>({ config, buildPort, devServerPort });
+  const devServerOptions = createDevServerOptions<'webpack'>({
+    config,
+    buildPort,
+    devServerPort,
+    hot: config.hotRefresh?.enabled,
+  });
   const devServer = new WebpackDevServer(devServerOptions, compiler);
 
   devServer.startCallback((err) => {

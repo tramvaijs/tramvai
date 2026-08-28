@@ -1,6 +1,11 @@
 /* eslint-disable max-statements */
 import path from 'node:path';
-import rspack, { WebpackPluginInstance, Compilation, Configuration } from '@rspack/core';
+import rspack, {
+  WebpackPluginInstance,
+  Compilation,
+  Configuration,
+  HotModuleReplacementPlugin,
+} from '@rspack/core';
 import { UniversalFederationPlugin } from '@module-federation/node';
 import LoadablePlugin from '@loadable/webpack-plugin';
 import { optional } from '@tinkoff/dippy';
@@ -80,8 +85,10 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
     showProgress,
     verboseLogging,
     hotRefresh,
+    liveReload,
     noClientRebuild,
     clientSourceMap,
+    port,
   } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
@@ -139,7 +146,14 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
     // it should be initialized only as remote in ModuleFederation and not as standalone module
     entry: {
       [projectName]: {
-        import: path.resolve(__dirname, 'fakeModule.js?fallback'),
+        import: [
+          path.resolve(__dirname, 'fakeModule.js?fallback'),
+          ...[
+            liveReload &&
+              `${require.resolve('@rspack/dev-server/client/index')}?protocol=ws%3A&hostname=0.0.0.0&port=${port}&pathname=%2Fws&logging=warn&reconnect=10&hot=${isHotEnabled}&live-reload=${liveReload}`,
+            isHotEnabled && require.resolve('@rspack/core/hot/dev-server'),
+          ].filter(Boolean),
+        ].filter((val): val is string => Boolean(val)),
       },
     },
     context: rootDir,
@@ -230,22 +244,25 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
       showProgress &&
         // @ts-expect-error
         new WebpackBar({ name: clientBuildName, color: 'green', reporters: [new FancyReporter()] }),
-      // @ts-expect-error
-      new UniversalFederationPlugin({
-        isServer: false,
-        name: projectName,
-        library: {
-          name: 'window["child-app__" + (document.currentScript.src || document.currentScript.dataset.src)]',
-          type: 'assign',
+      new UniversalFederationPlugin(
+        {
+          name: projectName,
+          // @ts-expect-error option used in ModuleFederationPluginV1, disable enhanced mf runtime
+          enhanced: false,
+          library: {
+            name: 'window["child-app__" + (document.currentScript.src || document.currentScript.dataset.src)]',
+            type: 'assign',
+          },
+          exposes: {
+            // path.relative should use the posix separator because
+            // @module-federation/node is parsing relative path incorrectly
+            // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
+            entry: entry.split(path.win32.sep).join(path.posix.sep),
+          },
+          shared: sharedModules,
         },
-        exposes: {
-          // path.relative should use the posix separator because
-          // @module-federation/node is parsing relative path incorrectly
-          // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
-          entry: entry.split(path.win32.sep).join(path.posix.sep),
-        },
-        shared: sharedModules,
-      }),
+        { ModuleFederationPlugin: rspack.container.ModuleFederationPluginV1 }
+      ),
       ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({
@@ -265,6 +282,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
         process: 'process',
         ...provideList,
       }),
+      isHotEnabled && new HotModuleReplacementPlugin(),
       new rspack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,

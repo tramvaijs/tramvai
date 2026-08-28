@@ -194,21 +194,23 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     snapshot: createSnapshot({ config }),
     plugins: [
       showProgress && new WorkerProgressPlugin({ name: serverBuildName, color: 'orange' }),
-      // @ts-expect-error
-      new UniversalFederationPlugin({
-        isServer: true,
-        name: projectName,
-        library: {
-          type: 'commonjs2',
+      new UniversalFederationPlugin(
+        {
+          isServer: true,
+          name: projectName,
+          library: {
+            type: 'commonjs2',
+          },
+          exposes: {
+            // path.relative should use the posix separator because
+            // @module-federation/node is parsing relative path incorrectly
+            // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
+            entry: entry.split(path.win32.sep).join(path.posix.sep),
+          },
+          shared: sharedModules,
         },
-        exposes: {
-          // path.relative should use the posix separator because
-          // @module-federation/node is parsing relative path incorrectly
-          // Debug notes: there is problem in webpack/ModuleFederation or enhanced-resolve
-          entry: entry.split(path.win32.sep).join(path.posix.sep),
-        },
-        shared: sharedModules,
-      }),
+        {}
+      ),
       new webpack.ProvidePlugin({
         process: 'process',
         ...provideList,

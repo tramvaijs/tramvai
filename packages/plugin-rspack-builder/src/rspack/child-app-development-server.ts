@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 import path from 'node:path';
-import { NodeFederationPlugin } from '@module-federation/node';
+import { UniversalFederationPlugin } from '@module-federation/node';
 import { optional } from '@tinkoff/dippy';
 import rspack, { Configuration } from '@rspack/core';
 // eslint-disable-next-line import/extensions
@@ -45,6 +45,7 @@ import { getResolveTsConfig } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
 import { initDi } from '../utils/initDi';
+import { PatchChunkGraphPlugin } from './plugins/ChunkGraphCompat';
 
 export const rspackConfig: RspackConfigurationFactory = async (config): Promise<Configuration> => {
   const di = await initDi(config, {
@@ -113,7 +114,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
     context: rootDir,
     // settings false is required by the UniversalModuleFederationPlugin
     // https://github.com/module-federation/universe/blob/02221527aa684d2a37773c913bf341748fd34ecf/packages/node/src/plugins/StreamingTargetPlugin.ts#L24
-    target: 'node',
+    target: false,
     // use empty module instead of original one as I haven't figured out how to prevent webpack from initializing entry module on loading
     // it should be initialized only as remote in ModuleFederation and not as standalone module
     entry: {
@@ -196,8 +197,12 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
           // @ts-expect-error
           reporters: [new FancyReporter()],
         }),
-      new NodeFederationPlugin(
+      new PatchChunkGraphPlugin(),
+      new UniversalFederationPlugin(
         {
+          isServer: true,
+          // @ts-expect-error option used in ModuleFederationPluginV1, disable enhanced mf runtime
+          enhanced: false,
           name: projectName,
           library: {
             type: 'commonjs2',
@@ -210,7 +215,9 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
           },
           shared: sharedModules,
         },
-        {}
+        {
+          ModuleFederationPlugin: rspack.container.ModuleFederationPluginV1,
+        }
       ),
       new rspack.ProvidePlugin({
         process: 'process',

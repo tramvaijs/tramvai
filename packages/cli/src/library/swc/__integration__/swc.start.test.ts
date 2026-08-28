@@ -31,6 +31,8 @@ beforeAll(async () => {
     rootDir: __dirname,
     disableServerRunnerWaiting: true,
     strictErrorHandle: true,
+    showBanner: false,
+    showProgress: false,
     config: {
       name: 'swc-app',
       hotRefresh: {

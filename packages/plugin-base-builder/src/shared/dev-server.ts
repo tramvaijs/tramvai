@@ -11,10 +11,14 @@ export const createDevServerOptions = <T extends keyof devServerMap>({
   config,
   buildPort,
   devServerPort,
+  client = true,
+  hot,
 }: {
   config: ConfigService;
   buildPort: number;
   devServerPort: number;
+  client?: boolean;
+  hot: boolean | undefined;
 }) => {
   const devServerOptions: WebpackDevServerConfig = {
     devMiddleware: {
@@ -77,19 +81,21 @@ export const createDevServerOptions = <T extends keyof devServerMap>({
 
       return middlewares;
     },
-    hot: config.hotRefresh?.enabled,
+    hot,
     // compressing server.js takes longer than request without compression
     compress: false,
-    client: {
-      webSocketURL: {
-        port: devServerPort,
-      },
-      overlay: {
-        errors: true,
-        warnings: false,
-        runtimeErrors: true,
-      },
-    },
+    client: client
+      ? {
+          webSocketURL: {
+            port: devServerPort,
+          },
+          overlay: {
+            errors: true,
+            warnings: false,
+            runtimeErrors: true,
+          },
+        }
+      : false,
     port: buildPort,
   };
 
