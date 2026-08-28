@@ -129,11 +129,6 @@ export class PageBuilder {
   }
 
   dehydrateState() {
-    // for streaming we need to have initial state before application scripts,
-    // body end will be sent after suspended components will be resolved, but hydration will starl earlier
-    const slot =
-      this.renderMode === 'streaming' ? ResourceSlot.HEAD_DYNAMIC_SCRIPTS : ResourceSlot.BODY_END;
-
     this.resourcesRegistry.register({
       type: ResourceType.asIs,
       slot: ResourceSlot.HEAD_PERFORMANCE,
@@ -142,7 +137,7 @@ export class PageBuilder {
 
     this.resourcesRegistry.register({
       type: ResourceType.asIs,
-      slot,
+      slot: ResourceSlot.BODY_END,
       // String much better than big object, source https://v8.dev/blog/cost-of-javascript-2019#json
       payload: `<script id="__TRAMVAI_STATE__" type="application/json">${safeStringify(
         this.context.dehydrate().dispatcher
@@ -151,7 +146,7 @@ export class PageBuilder {
 
     this.resourcesRegistry.register({
       type: ResourceType.asIs,
-      slot,
+      slot: ResourceSlot.BODY_END,
       payload: `<script>window.__TRAMVAI_HTML_READY__ = true; window.__TRAMVAI_HTML_READY_RESOLVE__();</script>`,
     });
   }

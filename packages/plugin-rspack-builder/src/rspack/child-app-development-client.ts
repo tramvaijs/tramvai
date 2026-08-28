@@ -1,12 +1,18 @@
 /* eslint-disable max-statements */
 import path from 'node:path';
-import webpack, { WebpackPluginInstance, Compilation } from 'webpack';
-import { ChunkCorrelationPlugin, UniversalFederationPlugin } from '@module-federation/node';
+import rspack, {
+  WebpackPluginInstance,
+  Compilation,
+  Configuration,
+  HotModuleReplacementPlugin,
+} from '@rspack/core';
+import { UniversalFederationPlugin } from '@module-federation/node';
 import LoadablePlugin from '@loadable/webpack-plugin';
 import { optional } from '@tinkoff/dippy';
-import ReactRefreshPlugin from '@pmmmwh/react-refresh-webpack-plugin';
+import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
+// eslint-disable-next-line import/extensions
+import WebpackBar from 'webpackbar/rspack';
 
-import { CONFIG_SERVICE_TOKEN } from '@tramvai/api/lib/config';
 import {
   resolveAbsolutePathForFile,
   resolveAbsolutePathForFolder,
@@ -28,28 +34,29 @@ import {
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 import { configToEnv } from '@tramvai/plugin-base-builder/lib/shared/config-to-env';
 import { createSourceMaps } from '@tramvai/plugin-base-builder/lib/shared/sourcemaps';
-import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { normalizeBrowserslistConfig } from '@tramvai/plugin-base-builder/lib/shared/browserslist';
 import { PROVIDE_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/provide';
 import { DEFINE_PLUGIN_OPTIONS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/define';
-import { WEBPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import { FancyReporter } from '@tramvai/plugin-base-builder/lib/plugins';
+import { createChildAppSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
+
 import {
   clientBuildName,
   clientMainFields,
   stderrWithWarningFilters,
   transformMultiToken,
 } from '@tramvai/plugin-base-builder/lib/shared/const';
-import { createChildAppSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
-
 import { createCacheConfig } from './shared/cache';
-import { createTranspilerRules, resolveWebpackTranspilerParameters } from './shared/transpiler';
-import { createResolveOptions } from './shared/resolve';
-import { createWorkerPoolConfig, warmupThreadLoader } from './shared/thread-loader';
+import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
+import { getResolveTsConfig } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
 
-import { WorkerProgressPlugin } from './plugins/progress-plugin';
-import { WebpackConfigurationFactory } from './types/webpack';
+import { RspackConfigurationFactory } from './types/rspack';
+import { initDi } from '../utils/initDi';
+import ChunkCorrelationPlugin from './plugins/ChunkCorrelationPlugin';
 
 const IDENTIFIER_NAME_REPLACE_REGEX = /^([^a-zA-Z$_])/;
 const IDENTIFIER_ALPHA_NUMERIC_NAME_REPLACE_REGEX = /[^a-zA-Z0-9$]+/g;
@@ -63,8 +70,11 @@ function toIdentifier(str: string) {
 
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
 
-export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
-  const config = di.get(CONFIG_SERVICE_TOKEN);
+export const rspackConfig: RspackConfigurationFactory = async (config): Promise<Configuration> => {
+  const di = await initDi(config, {
+    type: 'child-app',
+    target: 'client',
+  });
 
   const {
     rootDir,
@@ -75,34 +85,35 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     showProgress,
     verboseLogging,
     hotRefresh,
+    liveReload,
     noClientRebuild,
     clientSourceMap,
+    port,
   } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
 
-  const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
-  const plugins = di.get(optional(WEBPACK_PLUGINS_TOKEN)) ?? [];
+  const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
+  const plugins = di.get(optional(RSPACK_PLUGINS_TOKEN)) ?? [];
   const extensions = di.get(optional(RESOLVE_EXTENSIONS_TOKEN)) ?? defaultExtensions;
   const fallback = transformMultiToken(di.get(optional(RESOLVE_FALLBACK_TOKEN))) ?? {};
   const alias = transformMultiToken(di.get(optional(RESOLVE_ALIAS_TOKEN))) ?? {};
   const provideList = transformMultiToken(di.get(optional(PROVIDE_TOKEN))) ?? {};
   const additionalCacheFlags = di.get(optional(CACHE_ADDITIONAL_FLAGS_TOKEN)) ?? [];
 
-  const webpackConfigExtension = config.extensions.webpack();
-  Object.assign(fallback, webpackConfigExtension.resolveFallback);
-  Object.assign(alias, webpackConfigExtension.resolveAlias);
-  Object.assign(provideList, webpackConfigExtension.provide);
+  const rspackConfigExtension = config.extensions.webpack();
+  Object.assign(fallback, rspackConfigExtension.resolveFallback);
+  Object.assign(alias, rspackConfigExtension.resolveAlias);
+  Object.assign(provideList, rspackConfigExtension.provide);
 
   const defineOptions = di.get(optional(DEFINE_PLUGIN_OPTIONS_TOKEN)) ?? [];
   defineOptions.push(config.extensions.define());
 
-  const transpilerParameters = resolveWebpackTranspilerParameters({
+  const transpilerParameters = resolveRspackTranspilerParameters({
     di,
-    hot: Boolean(isHotEnabled),
+    buildTarget: 'client',
   });
-  const workerPoolConfig = createWorkerPoolConfig({ di });
-  const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'client' });
+  const sourceMapsConfiguration = createSourceMaps<'rspack'>({ config, target: 'client' });
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
 
   const stylesConfiguration = createStylesConfiguration({
@@ -110,6 +121,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     emitCssChunks: true,
     sourceMap: clientSourceMap,
     browserslistConfig: normalizedBrowserslistConfig.defaults,
+    buildTarget: 'client',
     extractCssPluginOptions: {
       filename: `[name]@${projectVersion}.css`,
       chunkFilename: `[name]@${projectVersion}.css`,
@@ -125,11 +137,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     sourceDir,
     rootDir,
   });
-  const resolveOptions = await createResolveOptions({ di, mainFields: clientMainFields });
-
-  if (transpiler.warmupThreadLoader) {
-    warmupThreadLoader(workerPoolConfig);
-  }
 
   const statsFileName = `${projectName}_stats_loadable@${projectVersion}.json`;
 
@@ -139,19 +146,20 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     // it should be initialized only as remote in ModuleFederation and not as standalone module
     entry: {
       [projectName]: {
-        import: path.resolve(__dirname, 'fakeModule.js?fallback'),
+        import: [
+          path.resolve(__dirname, 'fakeModule.js?fallback'),
+          ...[
+            liveReload &&
+              `${require.resolve('@rspack/dev-server/client/index')}?protocol=ws%3A&hostname=0.0.0.0&port=${port}&pathname=%2Fws&logging=warn&reconnect=10&hot=${isHotEnabled}&live-reload=${liveReload}`,
+            isHotEnabled && require.resolve('@rspack/core/hot/dev-server'),
+          ].filter(Boolean),
+        ].filter((val): val is string => Boolean(val)),
       },
     },
     context: rootDir,
     target: 'web',
     mode: 'development',
-    devtool: clientSourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
-    cache: createCacheConfig({
-      config,
-      additionalCacheFlags,
-      transpilerParameters,
-      target: clientBuildName,
-    }),
+    devtool: clientSourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
     output: {
       path: resolveAbsolutePathForFolder({
         folder: config.outputClient,
@@ -171,13 +179,13 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     resolve: {
       extensions,
       mainFields: clientMainFields,
+      ...getResolveTsConfig(config),
       symlinks: config.resolveSymlinks,
       fallback: {
         path: 'path-browserify',
         ...fallback,
       },
       alias,
-      plugins: [...resolveOptions.plugins],
     },
     module: {
       rules: [
@@ -185,16 +193,16 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
         ...createTranspilerRules({
           transpiler,
           transpilerParameters,
-          workerPoolConfig,
         }),
         ...stylesConfiguration.rules,
-        ...createAssetsRules({ di }),
+        ...createAssetsRules({ di, buildTarget: 'client' }),
       ],
     },
     optimization: {
-      ...createChildAppSplitChunksOptions({ config, target: 'client', sharedModules }),
+      ...createChildAppSplitChunksOptions<'rspack'>({ config, target: 'client', sharedModules }),
     },
     stats: {
+      // @ts-expect-error
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
       warningsCount: false,
@@ -208,12 +216,19 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     },
     experiments: {
       futureDefaults: true,
+      cache: createCacheConfig({
+        config,
+        additionalCacheFlags,
+        transpilerParameters,
+        target: clientBuildName,
+      }),
     },
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
     snapshot: createSnapshot({ config }),
     plugins: [
       new ChunkCorrelationPlugin({
         filename: `${projectName}_stats@${projectVersion}.json`,
+        shared: sharedModules,
       }),
       new LoadablePlugin({
         filename: statsFileName,
@@ -226,11 +241,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       }) as unknown as WebpackPluginInstance,
       new PatchAutoPublicPathPlugin(),
       new PurifyStatsPlugin({ fileName: statsFileName, target: 'child-app' }),
-      showProgress && new WorkerProgressPlugin({ name: clientBuildName, color: 'green' }),
+      showProgress &&
+        // @ts-expect-error
+        new WebpackBar({ name: clientBuildName, color: 'green', reporters: [new FancyReporter()] }),
       new UniversalFederationPlugin(
         {
-          isServer: false,
           name: projectName,
+          // @ts-expect-error option used in ModuleFederationPluginV1, disable enhanced mf runtime
+          enhanced: false,
           library: {
             name: 'window["child-app__" + (document.currentScript.src || document.currentScript.dataset.src)]',
             type: 'assign',
@@ -243,12 +261,14 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
           },
           shared: sharedModules,
         },
-        {}
+        { ModuleFederationPlugin: rspack.container.ModuleFederationPluginV1 }
       ),
       ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({
               ...hotRefresh.options,
+              // @ts-expect-error
+              // Types of webpack react refresh and Rspack react refresh differs
               overlay:
                 typeof hotRefresh.options?.overlay === 'boolean'
                   ? hotRefresh.options.overlay
@@ -258,11 +278,12 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
             }),
           ]
         : []),
-      new webpack.ProvidePlugin({
+      new rspack.ProvidePlugin({
         process: 'process',
         ...provideList,
       }),
-      new webpack.DefinePlugin({
+      isHotEnabled && new HotModuleReplacementPlugin(),
+      new rspack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
         'process.env.NODE_ENV': JSON.stringify('development'),

@@ -32,12 +32,12 @@
     "playwright-core": "*"
   },
   "devDependencies": {
-    "@playwright/test": "1.54.1",
+    "@playwright/test": "1.55.0",
     "@tramvai/cli": "0.0.0-stub",
     "@types/env-ci": "^3.1.0",
     "@types/supports-color": "^8.1.1",
     "@types/wait-on": "^5.2.0",
-    "playwright-core": "1.54.1"
+    "playwright-core": "1.55.0"
   },
   "license": "Apache-2.0",
   "module": "lib/index.es.js"

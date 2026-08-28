@@ -63,33 +63,17 @@ export default createCommand({
     const configEntry = di.get(CONFIG_ENTRY_TOKEN);
     const portManager = di.get(PORT_MANAGER_TOKEN);
 
-    if (options.experimentalRspack) {
-      if (configEntry.type !== 'application') {
-        throw new Error('--experimentalRspack option is only available for application project');
-      }
-
-      const { startRspackApplication } = require('./application.experimental');
-      return startRspackApplication(di);
-    }
-
-    if (options.experimentalWebpackWorkerThreads) {
-      if (configEntry.type === 'application') {
-        const { startWebpackApplication } = require('./application.experimental');
-        return startWebpackApplication(di);
-      }
-
-      if (configEntry.type === 'child-app') {
-        const { startExperimentalChildApp } = require('./child-app.experimental');
-        return startExperimentalChildApp(di);
-      }
-    }
-
     await portManager.computeAvailablePorts();
 
     switch (configEntry.type) {
       case 'application':
         // eslint-disable-next-line no-case-declarations
-        const { startApplication } = require('./application');
+        const { startApplication, startExperimentalApplication } = require('./application');
+
+        if (options.experimentalRspack) {
+          return startExperimentalApplication(di);
+        }
+
         return startApplication(di);
       case 'module':
         // eslint-disable-next-line no-case-declarations
@@ -97,8 +81,13 @@ export default createCommand({
         return startModule(di);
       case 'child-app':
         // eslint-disable-next-line no-case-declarations
-        const { startExperimentalChildApp } = require('./child-app.experimental');
-        return startExperimentalChildApp(di);
+        const { startExperimentalChildApp, startChildApp } = require('./child-app');
+
+        if (options.experimentalRspack) {
+          return startExperimentalChildApp(di);
+        }
+
+        return startChildApp(di);
     }
   },
 });

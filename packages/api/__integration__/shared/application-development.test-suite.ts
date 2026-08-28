@@ -1720,8 +1720,8 @@ export default createPapiMethod({
             await devServer.buildPromise;
             const integrities = {
               rspack: {
-                babel: 'sha256-ZCGUKj00neHHbqBBAYn5gXF2VlGlV/k9+H4CrxkGwwY=',
-                swc: 'sha256-7R06YYKSa2zdvkYkzFjWy8zjYkRyP3a0U9tONlWonq0=',
+                babel: 'sha256-I+yhFnV+EGsnzhBV6TaozwBdjxjXK4EYRotLK+I002s=',
+                swc: 'sha256-vf2soIQ0XCDSQgoPjMLy5MZfMrveVtchSvG7aUNqoIw=',
               },
               webpack: {
                 babel: 'sha256-xgUGFHOD5oQy77yphzIeLVtuKp7ob7p9TEIZD5m/QFw=',

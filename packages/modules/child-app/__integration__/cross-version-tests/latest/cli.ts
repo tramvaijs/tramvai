@@ -39,6 +39,8 @@ export const startRootApp = ({
     },
     {
       rootDir: EXAMPLE_DIR,
+      showBanner: false,
+      showProgress: false,
       env: {
         LOG_ENABLE: 'warn:*',
         LOG_LEVEL: 'warn',
@@ -82,6 +84,8 @@ export const startChildApp = async (
         },
       },
     },
+    showBanner: false,
+    showProgress: false,
     port,
     staticPort,
     rootDir: EXAMPLE_DIR,

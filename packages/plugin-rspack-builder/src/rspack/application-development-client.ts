@@ -1,8 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
-import { Writable } from 'node:stream';
-
-import { Compilation, RuleSetRule } from '@rspack/core';
+import { Compilation, RuleSetRule, HotModuleReplacementPlugin } from '@rspack/core';
 import rspack, { Configuration as RspackConfiguration } from '@rspack/core';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
 import { optional } from '@tinkoff/dippy';
@@ -63,9 +61,15 @@ import {
 } from '@tramvai/plugin-base-builder/lib/plugins';
 import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import {
+  clientBuildName,
+  clientMainFields,
+  polyfillBuildName,
+  stderrWithWarningFilters,
+} from '@tramvai/plugin-base-builder/lib/shared/const';
+import { createSplitChunksOptions } from '@tramvai/plugin-base-builder/lib/shared/split-chunks';
 
 import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
-import { createSplitChunksOptions } from './shared/split-chunks';
 import { getResolveTsConfig } from './shared/resolve';
 import { createAssetsRules } from './shared/assets';
 import { createStylesConfiguration } from './shared/styles';
@@ -74,37 +78,9 @@ import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache'
 import { RspackConfigurationFactory } from './types/rspack';
 import { initDi } from '../utils/initDi';
 
-const mainFields = ['browser', 'module', 'main'];
-
-const filters = ignoreWarnings.map(
-  ({ message }) =>
-    (text: string) =>
-      message.test(text)
-);
-
-const stderrWithWarningFilters = new Writable({
-  write(chunk, encoding, callback) {
-    const chunkStr = chunk.toString();
-
-    if (filters.some((filter) => filter(chunkStr))) {
-      callback();
-      return;
-    }
-
-    process.stderr.write(chunk, encoding, callback);
-  },
-});
-
-stderrWithWarningFilters.on('error', (error: Error) =>
-  console.error('[infrastructureLogging] stream error', error)
-);
-
 const PurifyStatsPlugin = getPurifyStatsPlugin(Compilation);
 const CollectStatsPlugin = getCollectStatsPlugin(Compilation);
 const MergeStatsPlugin = getMergeStatsPlugin(Compilation);
-
-export const clientBuildName = 'client';
-export const polyfillBuildName = 'polyfill';
 
 export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const di = await initDi(config, {
@@ -123,7 +99,12 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     verboseLogging,
     projectType,
     clientSourceMap,
+    noClientRebuild,
+    liveReload,
+    port,
   } = config;
+
+  const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
 
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
   const externals = di.get(optional(BUILD_EXTERNALS_TOKEN)) ?? ([] as string[]);
@@ -192,6 +173,12 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
 
   const isPolyfillsExists = Boolean(polyfillPath || modernPolyfillPath);
 
+  const hotEntry = [
+    liveReload &&
+      `${require.resolve('@rspack/dev-server/client/index')}?protocol=ws%3A&hostname=0.0.0.0&pathname=%2Fws&logging=warn&reconnect=10&hot=${isHotEnabled}&live-reload=${liveReload}`,
+    isHotEnabled && require.resolve('@rspack/core/hot/dev-server'),
+  ].filter(Boolean);
+
   const buildRspackConfig: RspackConfiguration = {
     // https://webpack.js.org/configuration/target/#browserslist
     target: normalizedBrowserslistConfig.defaults
@@ -245,7 +232,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     resolve: {
       extensions,
       // TODO: es2017, es2016, es2015 fields support?
-      mainFields,
+      mainFields: clientMainFields,
       ...getResolveTsConfig(config),
       symlinks: config.resolveSymlinks,
       fallback: {
@@ -280,6 +267,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         process: 'process',
         ...provideList,
       }),
+      isHotEnabled && new HotModuleReplacementPlugin(),
       new rspack.DefinePlugin({
         'process.env.BROWSER': true,
         'process.env.SERVER': false,
@@ -309,11 +297,14 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     entry: {
       // TODO: more missed files watchers with absolute path?
       platform: {
-        import: resolveAbsolutePathForFile({
-          file: config.entryFile,
-          sourceDir: config.sourceDir,
-          rootDir: config.rootDir,
-        }),
+        import: [
+          resolveAbsolutePathForFile({
+            file: config.entryFile,
+            sourceDir: config.sourceDir,
+            rootDir: config.rootDir,
+          }),
+          ...hotEntry,
+        ].filter((val): val is string => Boolean(val)),
       },
       ...(isRootErrorBoundaryEnabled ? { rootErrorBoundary: virtualRootErrorBoundary } : {}),
     },
@@ -327,7 +318,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       // TODO: in rspack@1 breaks hot-reload
       // fixed in rspack@2
       // emitOnErrors: false,
-      ...createSplitChunksOptions({ config }),
+      ...createSplitChunksOptions({ config, builder: 'rspack' }),
       ...createOptimizeOptions<'rspack'>({ config, target: 'client' }),
     },
     experiments: {
@@ -441,7 +432,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
           publicPath: 'window.ap',
         }),
       new ScriptCriticalAttributePlugin(),
-      ...(hotRefresh?.enabled
+      ...(isHotEnabled
         ? [
             new ReactRefreshPlugin({
               ...hotRefresh.options,
@@ -546,6 +537,15 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       ...plugins.flat(),
     ].filter(Boolean),
   };
+
+  if (isPolyfillsExists && isHotEnabled) {
+    const entryName = Object.keys(polyfillBuildRspackConfig.entry!)[0];
+    // @ts-expect-error
+    polyfillBuildRspackConfig.entry[entryName] = {
+      // @ts-expect-error
+      import: [polyfillBuildRspackConfig.entry![entryName], ...hotEntry],
+    };
+  }
 
   return [clientBuildRspackConfig].concat(isPolyfillsExists ? polyfillBuildRspackConfig : []);
 };

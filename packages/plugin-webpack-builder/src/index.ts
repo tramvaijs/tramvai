@@ -61,7 +61,7 @@ export const WebpackBuilderPlugin = declareModule({
     provide({
       provide: SHOW_BANNER_TOKEN,
       useFactory: ({ config, transpiler }) => {
-        return () => showBanner(config, { transpiler });
+        return () => showBanner(config, { transpiler, bundler: 'webpack' });
       },
       deps: {
         config: CONFIG_SERVICE_TOKEN,

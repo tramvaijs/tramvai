@@ -114,7 +114,7 @@ export const createTranspilerRules = ({
     },
     {
       test: /\.[cm]?js[x]?$/,
-      exclude: /node_modules/,
+      exclude: [/node_modules/, ...virtualList],
       use: [
         {
           loader: transpiler.loader,

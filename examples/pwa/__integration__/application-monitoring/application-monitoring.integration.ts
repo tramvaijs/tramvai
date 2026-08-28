@@ -30,7 +30,7 @@ test.describe('tinkoff-examples/simple-app-pwa/monitoring', () => {
           .expect(event.urls)
           .toEqual(
             test.expect.arrayContaining([
-              test.expect.stringContaining('https://example.com/non-existent.js'),
+              test.expect.stringContaining('http://localhost/non-existent.js'),
             ])
           );
       });
@@ -42,7 +42,7 @@ test.describe('tinkoff-examples/simple-app-pwa/monitoring', () => {
 
         test.expect(events.length).toBeGreaterThan(0);
         test.expect(events[0].error.code).toBe('ASSET_LOAD_FAIL');
-        test.expect(events[0].error.originalUrl).toContain('https://example.com/non-existent.js');
+        test.expect(events[0].error.originalUrl).toContain('http://localhost/non-existent.js');
       });
     });
 
@@ -70,7 +70,7 @@ test.describe('tinkoff-examples/simple-app-pwa/monitoring', () => {
           .expect(event.urls)
           .toEqual(
             test.expect.arrayContaining([
-              test.expect.stringContaining('https://example.com/non-existent.css'),
+              test.expect.stringContaining('http://localhost/non-existent.css'),
             ])
           );
       });

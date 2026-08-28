@@ -72,6 +72,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
     refresh: {
       name: 'refresh',
       type: 'child-app',
+      hotRefresh: {
+        enabled: true,
+      },
       sourceDir: path.join(fixturesFolder, 'child-app', 'refresh'),
     },
     assets: {
@@ -210,7 +213,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           );
 
           test
-            .expect(assetPaths)
+            .expect(assetPaths.filter((assetName) => !/server/.test(assetName)))
             .toEqual([
               'base_client@0.0.0-stub.js',
               'node_modules_tinkoff_dippy_lib_di_es_js_client.chunk.js',
@@ -230,11 +233,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           );
 
           test
-            .expect(assetPaths)
+            .expect(assetPaths.filter((assetName) => /server/.test(assetName)).sort())
             .toEqual([
-              'node_modules_tinkoff_dippy_lib_di_es_js_server.chunk.js',
               'base_server@0.0.0-stub.js',
               'fixtures_child-app_base_index_ts_server.chunk.js',
+              'node_modules_tinkoff_dippy_lib_di_es_js_server.chunk.js',
             ]);
         });
       });
@@ -263,7 +266,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           test
             .expect(clientJs)
             .toContain(
-              'return __webpack_require__.e("fixtures_child-app_base_index_ts").then(() => (() => ((__webpack_require__("../fixtures/child-app/base/index.ts")))));'
+              'return __webpack_require__.e("fixtures_child-app_base_index_ts").then(() => (() => ('
             );
         });
 
@@ -290,9 +293,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
 
           test
             .expect(serverJs)
-            .toContain(
-              'return __webpack_require__.e("fixtures_child-app_base_index_ts").then(function() { return function() { return (__webpack_require__("../fixtures/child-app/base/index.ts")); }; });'
-            );
+            .toContain('return __webpack_require__.e("fixtures_child-app_base_index_ts").then(');
         });
 
         test('server runtime should contain custom entrypoint', async ({ devServer }) => {
@@ -305,7 +306,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           test
             .expect(serverJs)
             .toContain(
-              `__webpack_require__.g.__remote_scope__ = __webpack_require__.g.__remote_scope__ || {`
+              '__webpack_require__.g.__remote_scope__ = __webpack_require__.g.__remote_scope__ || {'
             );
 
           test
@@ -330,6 +331,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           },
         });
 
+        // TODO: more stats cases for rspack with different shared configs
         test('stats should contain all client assets', async ({ devServer }) => {
           await devServer.buildPromise;
 
@@ -375,7 +377,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             )
           ).json();
 
-          test.expect(loadableStats).toEqual({
+          const expected = {
             name: 'client',
             publicPath: 'auto',
             outputPath: test.expect.any(String),
@@ -420,7 +422,21 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               { id: 'fixtures_child-app_base_index_ts', files: test.expect.any(Array) },
               { id: 'node_modules_tinkoff_dippy_lib_di_es_js', files: test.expect.any(Array) },
             ],
-          });
+          };
+
+          expected.assets = expected.assets.sort();
+          loadableStats.assets = loadableStats.assets.sort();
+
+          // slightly different fields in rspack for chunks
+          if (builder === 'rspack') {
+            const baseChunk = expected.namedChunkGroups.base;
+            delete baseChunk.assetsSize;
+            delete baseChunk.auxiliaryAssetsSize;
+            delete baseChunk.filteredAuxiliaryAssets;
+            baseChunk.assetsSize = test.expect.any(Number);
+          }
+
+          test.expect(loadableStats).toEqual(expected);
         });
       });
 
@@ -429,6 +445,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           inputParameters: {
             name: 'base',
             rootDir: testSuiteFolder,
+            fileCache: false,
             verboseLogging: true,
             noRebuild: true,
           },
@@ -438,7 +455,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           },
         });
 
-        test('verbose logging: should print all information in process output', async ({
+        test('verbose logging: should print all information in process output', ({
           spawnDevServer,
         }) => {
           const { logs } = spawnDevServer;
@@ -511,7 +528,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               path.resolve(__dirname, `../${builder}-${transpiler}/node_modules/.cache/${builder}`)
             );
 
-            test.expect(cacheFiles.length).toBe(2);
+            test.expect(cacheFiles.length).toBe(builder === 'rspack' ? 3 : 2);
           });
 
           test('should resuse build cache', async ({ devServer }) => {
@@ -522,7 +539,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
               path.resolve(__dirname, `../${builder}-${transpiler}/node_modules/.cache/${builder}`)
             );
 
-            test.expect(cacheFiles.length).toBe(2);
+            test.expect(cacheFiles.length).toBe(builder === 'rspack' ? 3 : 2);
           });
         });
       });
@@ -1102,14 +1119,21 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             await fetch(`http://localhost:${devServer.port}/hot/hot_client@${version}.js`)
           ).text();
 
+          const hmrRuntimeModule =
+            builder === 'webpack'
+              ? 'node_modules/webpack/hot/dev-server.js'
+              : 'node_modules/@rspack/core/hot/';
+
           // HMR runtime
-          test.expect(clientJs).toContain(`node_modules/webpack/hot/dev-server.js`);
+          test.expect(clientJs).toContain(hmrRuntimeModule);
+
+          const reactRefreshModule =
+            builder === 'webpack'
+              ? 'node_modules/@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js'
+              : 'node_modules/@rspack/plugin-react-refresh/client/reactRefreshEntry.js';
+
           // ReactRefresh
-          test
-            .expect(clientJs)
-            .toContain(
-              `node_modules/@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js`
-            );
+          test.expect(clientJs).toContain(reactRefreshModule);
         });
 
         test('should apply change without reload', async ({ page, devServer }) => {
@@ -1142,12 +1166,11 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
             );
           });
 
-          const port = 3000;
-
-          await new Promise<void>((resolve) => {
-            server.listen(port, () => {
+          const port = await new Promise<void>((resolve) => {
+            server.listen(0, () => {
+              const { port } = server.address();
               console.log(`SSR server running at http://localhost:${port}/`);
-              resolve();
+              resolve(port);
             });
           });
 
@@ -1211,6 +1234,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
 
           await page.goto(`http://localhost:${applicationServer.port}?port=${devServer.port}`);
 
+          let loadCounter = 0;
+          page.on('load', () => loadCounter++);
+
           test.expect(await page.locator('#root').textContent()).toEqual('hello world');
 
           await sleep(1000);
@@ -1218,6 +1244,7 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           await sleep(1000);
 
           test.expect(await page.locator('#root').textContent()).toEqual('super hello world');
+          test.expect(loadCounter).toEqual(0);
         });
       });
 

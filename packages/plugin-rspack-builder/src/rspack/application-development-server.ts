@@ -1,6 +1,5 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
-import { Writable } from 'node:stream';
 
 import rspack, { Configuration, RuleSetRule } from '@rspack/core';
 import {
@@ -42,6 +41,11 @@ import {
 } from '@tramvai/plugin-base-builder/lib/shared/resolve';
 import { RSPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 import { RSPACK_PLUGINS_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/plugins';
+import {
+  serverBuildName,
+  serverMainFields,
+  stderrWithWarningFilters,
+} from '@tramvai/plugin-base-builder/lib/shared/const';
 
 import { createTranspilerRules, resolveRspackTranspilerParameters } from './shared/transpiler';
 
@@ -53,31 +57,6 @@ import { CACHE_ADDITIONAL_FLAGS_TOKEN, createCacheConfig } from './shared/cache'
 
 import { RspackConfigurationFactory } from './types/rspack';
 import { initDi } from '../utils/initDi';
-
-const mainFields = ['module', 'main'];
-
-const filters = ignoreWarnings.map(
-  ({ message }) =>
-    (text: string) =>
-      message.test(text)
-);
-
-const stderrWithWarningFilters = new Writable({
-  write(chunk, encoding, callback) {
-    const chunkStr = chunk.toString();
-
-    if (filters.some((filter) => filter(chunkStr))) {
-      callback();
-      return;
-    }
-
-    process.stderr.write(chunk, encoding, callback);
-  },
-});
-
-stderrWithWarningFilters.on('error', (error: Error) =>
-  console.error('[infrastructureLogging] stream error', error)
-);
 
 export const rspackConfig: RspackConfigurationFactory = async (config): Promise<Configuration> => {
   const di = await initDi(config, {
@@ -144,7 +123,7 @@ export default appConfig;`;
   });
 
   return {
-    name: 'server',
+    name: serverBuildName,
     target: normalizedBrowserslistConfig.node
       ? `browserslist:${normalizedBrowserslistConfig.node}`
       : 'node',
@@ -199,7 +178,7 @@ export default appConfig;`;
     resolve: {
       // support for https://nodejs.org/api/addons.html
       extensions: [...extensions, '.node'],
-      mainFields,
+      mainFields: serverMainFields,
       symlinks: config.resolveSymlinks,
       fallback,
       ...getResolveTsConfig(config),

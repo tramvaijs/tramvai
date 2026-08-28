@@ -30,6 +30,8 @@ beforeAll(async () => {
   app = await start({
     rootDir: __dirname,
     strictErrorHandle: true,
+    showBanner: false,
+    showProgress: false,
     config: {
       name: 'swc-app',
       webpack: {

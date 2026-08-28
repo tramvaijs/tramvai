@@ -50,6 +50,7 @@ export function createDevServer({
       const { buildType } = config;
       const isServerBuildNeeded = buildType === 'server' || buildType === 'all';
       const isClientBuildNeeded = buildType === 'client' || buildType === 'all';
+      const needServerRunner = config.projectType !== 'child-app';
 
       await portManager.computeAvailablePorts();
 
@@ -96,30 +97,42 @@ export function createDevServer({
       let serverRunnerAbortController: AbortController | undefined;
       let initialServerBuild = true;
 
-      const serverRunnerWorker = new ServerRunnerWorkerBridge({
-        config,
-        workerPath: serverRunnerWorkerPath,
-        workerData: {
-          sourceMap: config.serverSourceMap,
-          serverPath: path.join(config.rootDir, config.outputServer, config.outputServerFilename),
-          port: serverRunnerPort,
-          hotReload: config.serverHot,
-          cwd: config.rootDir,
-          proxyPort: portManager.port!,
-          disableServerRunnerWaiting: config.disableServerRunnerWaiting,
-        },
-      });
+      const serverRunnerWorker = needServerRunner
+        ? new ServerRunnerWorkerBridge({
+            config,
+            workerPath: serverRunnerWorkerPath,
+            workerData: {
+              sourceMap: config.serverSourceMap,
+              serverPath: path.join(
+                config.rootDir,
+                config.outputServer,
+                config.outputServerFilename
+              ),
+              port: serverRunnerPort,
+              hotReload: config.serverHot,
+              cwd: config.rootDir,
+              proxyPort: portManager.port!,
+              disableServerRunnerWaiting: config.disableServerRunnerWaiting,
+            },
+          })
+        : undefined;
       async function createServerRunnerWorker() {
         serverRunnerAbortController?.abort();
-        await serverRunnerWorker.destroy();
+        await serverRunnerWorker?.destroy();
 
         serverRunnerAbortController = new AbortController();
-        serverRunnerWorker.create();
+        serverRunnerWorker?.create();
       }
 
       async function compileServerAfterBuild() {
         const signal = serverRunnerAbortController?.signal;
         compilationWatcher.setCompilationAlive();
+
+        if (!needServerRunner) {
+          compilationWatcher.endCompilation();
+          // in childApp compilation we need buildEnd on all build, not server only
+          return;
+        }
 
         try {
           let code: string;
@@ -165,20 +178,20 @@ export function createDevServer({
               if (config.serverHot) {
                 if (initialServerBuild) {
                   initialServerBuild = false;
-                  return serverRunnerWorker.compile({ code });
+                  return serverRunnerWorker?.compile({ code });
                 }
 
                 try {
-                  await serverRunnerWorker.reload({ code });
+                  await serverRunnerWorker?.reload({ code });
                   return;
                 } catch (_err) {
                   // fallback to compile if reload failed
                   await createServerRunnerWorker();
-                  return serverRunnerWorker.compile({ code });
+                  return serverRunnerWorker?.compile({ code });
                 }
               }
 
-              return serverRunnerWorker.compile({ code });
+              return serverRunnerWorker?.compile({ code });
             }
           );
 
@@ -216,12 +229,13 @@ export function createDevServer({
           isInitialBuild: () => initialServerBuild,
         },
         {
-          onBuildEnd: isServerBuildNeeded
-            ? () => {}
-            : () => {
-                buildResolve();
-                compilationWatcher.endCompilation();
-              },
+          onBuildEnd:
+            isServerBuildNeeded && needServerRunner
+              ? () => {}
+              : () => {
+                  buildResolve();
+                  compilationWatcher.endCompilation();
+                },
           onServerBuildEnd: compileServerAfterBuild,
           onBuildFail: buildReject!,
           onWatchRun: compilationWatcher.startCompilation,
@@ -254,7 +268,7 @@ export function createDevServer({
           compilationWatcher.destroyCompilation();
           closedPromise = Promise.all([
             proxy.close(),
-            serverRunnerWorker.destroy(),
+            serverRunnerWorker?.destroy(),
             buildServer.stop(),
             ...closeHandlers.map((handler) => handler()),
           ]);
@@ -266,7 +280,10 @@ export function createDevServer({
         },
         // need to wait for all builds to finish, because if we close compilation right after first build (e.g. in tests),
         // file-system caches will not be flushed for the other build
-        buildPromise: Promise.allSettled([buildPromise]).then(() => {}),
+        buildPromise: Promise.allSettled([
+          buildPromise,
+          // new Promise((resolve) => setTimeout(resolve, 5000)),
+        ]).then(() => {}),
       };
     },
   };

@@ -3,11 +3,7 @@ import '@tramvai/plugin-base-builder/lib/utils/cpu-profile';
 import { parentPort, workerData } from 'node:worker_threads';
 import inspector from 'node:inspector';
 import webpack, { Compiler, MultiCompiler, MultiStats, Stats } from 'webpack';
-import WebpackDevServer, {
-  MiddlewareHandler,
-  RequestHandler,
-  Configuration as WebpackDevServerConfig,
-} from 'webpack-dev-server';
+import WebpackDevServer from 'webpack-dev-server';
 import {
   CONFIGURATION_EXTENSION_TOKEN,
   CONFIG_SERVICE_TOKEN,
@@ -20,6 +16,7 @@ import { logger } from '@tramvai/api/lib/services/logger';
 import { calculateBuildTime, maxMemoryRss } from '@tramvai/plugin-base-builder/lib/utils';
 import { BUILD_TARGET_TOKEN } from '@tramvai/plugin-base-builder/lib/build-config';
 import { WEBPACK_TRANSPILER_TOKEN } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+import { createDevServerOptions } from '@tramvai/plugin-base-builder/lib/shared/dev-server';
 
 import { webpackConfig as webpackApplicationDevelopmentServerConfig } from '../webpack/application-development-server';
 import { webpackConfig as webpackApplicationDevelopmentClientConfig } from '../webpack/application-development-client';
@@ -200,91 +197,12 @@ async function runWebpackDevServer() {
     } as WebpackWorkerOutgoingEventsPayload['watch-run']);
   });
 
-  const devServerOptions: WebpackDevServerConfig = {
-    devMiddleware: {
-      writeToDisk: config.writeToDisk,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Timing-Allow-Origin': '*',
-        'Cross-Origin-Resource-Policy': 'cross-origin',
-      },
-    },
-    setupMiddlewares(middlewares, devServer) {
-      middlewares.push({
-        name: 'webpack-dev-server-assets-json',
-        path: '/webpack-dev-server-json',
-        middleware: ((req, res, next) => {
-          if (req.method !== 'GET' && req.method !== 'HEAD') {
-            next();
-            return;
-          }
-
-          if (!devServer!.middleware) {
-            next();
-            return;
-          }
-
-          devServer.middleware!.waitUntilValid((stats) => {
-            res.setHeader('Content-Type', 'text/html; charset=utf-8');
-
-            // HEAD requests should not return body content
-            if (req.method === 'HEAD') {
-              res.end();
-              return;
-            }
-
-            const assetsList = [];
-
-            /**
-             * @type {StatsCompilation[]}
-             */
-            const statsForPrint =
-              stats && 'stats' in stats ? stats.toJson().children : [stats?.toJson()];
-
-            if (statsForPrint) {
-              for (const [_, item] of statsForPrint.entries()) {
-                if (item) {
-                  const assets = item.assets ?? [];
-
-                  for (const asset of assets) {
-                    assetsList.push(asset.name);
-                  }
-                }
-              }
-            }
-
-            res.type('json');
-            res.json(assetsList);
-          });
-        }) satisfies RequestHandler,
-      });
-
-      return middlewares;
-    },
+  const devServerOptions = createDevServerOptions<'webpack'>({
+    config,
+    buildPort,
+    devServerPort,
     hot: config.hotRefresh?.enabled,
-    // compressing server.js takes longer than request without compression
-    compress: false,
-    client: {
-      webSocketURL: {
-        port: devServerPort,
-      },
-      overlay: {
-        errors: true,
-        warnings: false,
-        runtimeErrors: true,
-      },
-    },
-    port: buildPort,
-  };
-
-  if (config.projectType === 'child-app') {
-    devServerOptions.devMiddleware!.publicPath = `/${config.projectName}/`;
-  }
-
-  if (config.disableWebSocketServer || !config.liveReload) {
-    devServerOptions.webSocketServer = false;
-  }
-
+  });
   const devServer = new WebpackDevServer(devServerOptions, compiler);
 
   devServer.startCallback((err) => {

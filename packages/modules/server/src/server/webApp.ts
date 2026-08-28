@@ -195,9 +195,10 @@ export const webAppInitCommand = ({
               if (renderMode === 'streaming') {
                 const appHtmlsAttrs = di.get('tramvai app html attributes');
                 // split HTML for sequential React HTML chunks streaming inside .application tag
-                const [headAndBodyStart, bodyEnd] = (responseManager.getBody() as string).split(
+                const [headAndBodyStart, rest] = (responseManager.getBody() as string).split(
                   `<div ${appHtmlsAttrs}></div>`
                 );
+                const [bodyEnd, htmlEnd] = rest.split('</body>');
 
                 // https://fastify.dev/docs/latest/Reference/Reply/#streams
                 reply.send(serverResponseStream);
@@ -209,11 +210,12 @@ export const webAppInitCommand = ({
                 // in future, it can be done earlier, e.g. as Early Hints module
                 serverResponseTaskManager.processQueue();
 
+                serverResponseStream.push(`</div>${bodyEnd}`);
+
                 // wait all tasks
                 await serverResponseTaskManager.closeQueue();
 
-                // writing the end of body
-                serverResponseStream.push(`</div>${bodyEnd}`);
+                serverResponseStream.push(`</body>${htmlEnd}`);
 
                 // end response
                 serverResponseStream.push(null);

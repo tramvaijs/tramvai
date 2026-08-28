@@ -62,7 +62,7 @@ export const RspackBuilderPlugin = declareModule({
     provide({
       provide: SHOW_BANNER_TOKEN,
       useFactory: ({ config, transpiler }) => {
-        return () => showBanner(config, { transpiler });
+        return () => showBanner(config, { transpiler, bundler: 'rspack' });
       },
       deps: {
         config: CONFIG_SERVICE_TOKEN,

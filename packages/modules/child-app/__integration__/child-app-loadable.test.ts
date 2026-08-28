@@ -31,9 +31,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
     let rootApp: PromiseType<ReturnType<typeof startCli>>;
 
     beforeAll(async () => {
-      const { startChildApp } = await import(
-        `./cross-version-tests/${childAppsVersion}/cli`
-      );
+      const { startChildApp } = await import(`./cross-version-tests/${childAppsVersion}/cli`);
 
       [childAppBase, childAppLoadable] = await Promise.all([
         startChildApp('base'),
@@ -58,9 +56,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
       mockerApp.addHook('onRequest', async (req, reply) => {
         reply.header('Access-Control-Allow-Origin', '*');
       });
-      mockerApp.addHook('preHandler', async (...args) =>
-        mockerHandlerMock(...args)
-      );
+      mockerApp.addHook('preHandler', async (...args) => mockerHandlerMock(...args));
 
       mockerApp.get('/*', async (request, reply) => {
         const [_, childAppName, filename] = request.url.split('/');
@@ -83,9 +79,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
     });
 
     beforeAll(async () => {
-      const { startRootApp } = await import(
-        `./cross-version-tests/${rootAppVersion}/cli`
-      );
+      const { startRootApp } = await import(`./cross-version-tests/${rootAppVersion}/cli`);
 
       rootApp = await startRootApp({
         define: {
@@ -133,26 +127,16 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
 
         // First navigation - stats_loadable is blocked, no lazy chunks in body
         await page.goto(`${serverUrl}/loadable/`);
-        expect(
-          await page
-            .locator('body script[src*="lazy-cmp_client.chunk"]')
-            .count()
-        ).toBe(0);
+        expect(await page.locator('body script[src*="lazy-cmp_client.chunk"]').count()).toBe(0);
 
         // Second navigation - stats_loadable is still blocked
         await page.goto(`${serverUrl}/loadable/`);
-        expect(
-          await page
-            .locator('body script[src*="lazy-cmp_client.chunk"]')
-            .count()
-        ).toBe(0);
+        expect(await page.locator('body script[src*="lazy-cmp_client.chunk"]').count()).toBe(0);
 
         // Third navigation - stats_loadable is now available, lazy chunks should be in body
         await page.goto(`${serverUrl}/loadable/`);
         expect(
-          await page
-            .locator('body script[src*="lazy-cmp_client.chunk"]')
-            .count()
+          await page.locator('body script[src*="lazy-cmp_client.chunk"]').count()
         ).toBeGreaterThan(0);
       });
     });
@@ -191,12 +175,12 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
           })
         ).toBeTruthy();
 
-        expect(
-          await page.locator('#loadable').innerHTML()
-        ).toMatchInlineSnapshot(`"Child App: <!-- -->I'm little child app"`);
-        expect(
-          await page.locator('#loadable-actions-list').innerHTML()
-        ).toMatchInlineSnapshot(`"<li>global-server</li><li>lazy-server</li>"`);
+        expect(await page.locator('#loadable').innerHTML()).toMatchInlineSnapshot(
+          `"Child App: <!-- -->I'm little child app"`
+        );
+        expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
+          `"<li>global-server</li><li>lazy-server</li>"`
+        );
       });
 
       it('loadable page is loaded after SPA-navigation from another Child App', async () => {
@@ -234,12 +218,12 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
           })
         ).toBeTruthy();
 
-        expect(
-          await page.locator('#loadable').innerHTML()
-        ).toMatchInlineSnapshot(`"Child App: I'm little child app"`);
-        expect(
-          await page.locator('#loadable-actions-list').innerHTML()
-        ).toMatchInlineSnapshot(`"<li>global-client</li><li>lazy-client</li>"`);
+        expect(await page.locator('#loadable').innerHTML()).toMatchInlineSnapshot(
+          `"Child App: I'm little child app"`
+        );
+        expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
+          `"<li>global-client</li><li>lazy-client</li>"`
+        );
       });
 
       it('another loadable page is loaded after SPA-navigation from the same Child App', async () => {
@@ -265,16 +249,12 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
         await router.navigate('/loadable/bar/');
 
         // assets for rendered on client-side components
-        expect(
-          loadableAssets[0].includes('lazy-cmp-unused_client.chunk')
-        ).toBeTruthy();
+        expect(loadableAssets[0].includes('lazy-cmp-unused_client.chunk')).toBeTruthy();
 
         expect(
           (await page.locator('#loadable').innerHTML()).replace('<!-- -->', '')
         ).toMatchInlineSnapshot(`"Child App: I'm little child app"`);
-        expect(
-          await page.locator('#loadable-actions-list').innerHTML()
-        ).toMatchInlineSnapshot(
+        expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
           `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li>"`
         );
       });
@@ -289,9 +269,7 @@ if (rootAppVersion === 'latest' && childAppsVersion === 'latest') {
 
         await router.navigate('/loadable/foo/');
 
-        expect(
-          await page.locator('#loadable-actions-list').innerHTML()
-        ).toMatchInlineSnapshot(
+        expect(await page.locator('#loadable-actions-list').innerHTML()).toMatchInlineSnapshot(
           `"<li>global-server</li><li>lazy-server</li><li>global-client</li><li>lazy-unused-client</li><li>global-client</li><li>lazy-client</li>"`
         );
       });
