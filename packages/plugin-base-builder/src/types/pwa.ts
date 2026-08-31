@@ -26,7 +26,6 @@ export type WebManifestOptions = {
   name?: string;
   short_name?: string;
   description?: string;
-  // @todo - example or default with `/?standalone=true`?
   start_url?: string;
   display?: string;
   orientation?: string;
@@ -111,7 +110,6 @@ export type PWAConfig = {
      */
     scope?: string;
   };
-  // @todo optional workbox-window?
   /**
    * @title Workbox configuration
    * @default {}

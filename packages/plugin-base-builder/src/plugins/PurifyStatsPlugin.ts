@@ -5,7 +5,6 @@ import type {
 } from 'webpack';
 
 const targetStatsWriters = {
-  // TODO: rspack other loadable plugin
   'child-app': '@loadable/webpack-plugin',
   application: 'stats-writer-plugin',
 } as const;

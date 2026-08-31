@@ -16,7 +16,6 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
   const transpiler = di.get(optional(WEBPACK_TRANSPILER_TOKEN))!;
   const transpilerParameters = resolveWebpackTranspilerParameters({ di });
 
-  // TODO: integration test for custom plugins
   const svgoOptions = getSvgoOptions(config);
   const rules: webpack.RuleSetRule[] = [];
 
@@ -67,7 +66,6 @@ export const createAssetsRules = ({ di }: { di: Container }): webpack.RuleSetRul
   // based on https://github.com/facebook/create-react-app/issues/11213#issuecomment-883466601
   rules.push({
     test: /\.svg$/,
-    // TODO: `issuer: /\.tsx?$/` need or not?
     resourceQuery: /react/,
     use: [
       {

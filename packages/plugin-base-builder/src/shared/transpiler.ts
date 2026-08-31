@@ -2,14 +2,14 @@ import { createToken } from '@tinkoff/dippy';
 import { ReactCompilerOptions, TranspilationOptions } from '@tramvai/api/lib/config';
 
 export type TranspilerInputParameters = {
-  // TODO: rename to "mode"
+  // @deprecated
   env: 'development' | 'production';
-  // TODO: useless
-  target: 'node' | 'defaults';
+  mode: 'development' | 'production';
   actualTarget: 'node' | 'defaults';
   isServer: boolean;
   generateDataQaTag: boolean;
-  enableFillActionNamePlugin: boolean;
+  // deprecated
+  enableFillActionNamePlugin?: boolean;
   enableFillDeclareActionNamePlugin: boolean;
   typescript: boolean;
   modules: 'es6' | 'commonjs' | false;
@@ -17,9 +17,7 @@ export type TranspilerInputParameters = {
   removeTypeofWindow: boolean;
   tramvai: boolean;
   hot: boolean;
-  excludesPresetEnv: string[];
   rootDir: string;
-  sourceDir: string;
   browsersListTargets: string[];
   reactCompiler: boolean | ReactCompilerOptions;
   include: TranspilationOptions['include'];

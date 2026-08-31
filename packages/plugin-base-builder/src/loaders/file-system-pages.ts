@@ -54,8 +54,6 @@ export const fileSystemPagesLoader: webpack.LoaderDefinitionFunction<FileSystemP
         rootDir,
       });
 
-      // TODO: too many watchers, slow build?
-      // TODO: unnecessary rebuild after initial compilation if folder is not exists
       this.addContextDependency(pagesDir);
       this.addMissingDependency(pagesDir);
 

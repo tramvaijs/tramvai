@@ -145,7 +145,7 @@ export const createProxy = ({
             projectUuid = uuidv5(rootDir, STABLE_UUID);
           }
 
-          res.end(
+          return res.end(
             JSON.stringify({
               workspace: {
                 root: rootDir,
@@ -159,7 +159,6 @@ export const createProxy = ({
       } catch (_err) {}
     }
 
-    // TODO: HTML
     devProxy.web(req, res, {
       target: `http://localhost:${serverRunnerPort}`,
     });
@@ -223,7 +222,7 @@ export const createProxy = ({
         new Promise<void>((resolve, reject) => {
           devServer.listen(port, hostname, () => {
             logger.event({
-              type: 'info',
+              type: 'debug',
               event: 'dev-proxy',
               message: `Development server started at ${port} port`,
             });
@@ -238,7 +237,7 @@ export const createProxy = ({
         new Promise<void>((resolve, reject) => {
           staticServer.listen(staticPort, staticHost.replace('localhost', '0.0.0.0'), () => {
             logger.event({
-              type: 'info',
+              type: 'debug',
               event: 'dev-proxy',
               message: `Static server started at ${staticPort} port`,
             });

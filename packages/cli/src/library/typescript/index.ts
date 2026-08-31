@@ -24,7 +24,7 @@ export default (options: Options) => {
     babelOptions: omit(
       ['cacheDirectory', 'cacheIdentifier'],
       babelConfigFactory({
-        env,
+        mode: env,
         isServer,
         tramvai,
       })

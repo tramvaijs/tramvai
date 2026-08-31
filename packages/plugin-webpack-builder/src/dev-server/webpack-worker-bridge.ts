@@ -45,6 +45,8 @@ export class WebpackWorkerBridge {
       WATCHPACK_WATCHER_LIMIT: '20',
       // force color output for worker - https://github.com/chalk/supports-color#info
       FORCE_COLOR: '1',
+      // disable browserslist warning log
+      BROWSERSLIST_IGNORE_OLD_DATA: 'true',
       PATH: process.env.PATH!,
     };
 

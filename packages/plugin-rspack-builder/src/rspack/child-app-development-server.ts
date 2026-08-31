@@ -97,8 +97,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
       filename: `[name]@${projectVersion}.css`,
       chunkFilename: `[name]@${projectVersion}.css`,
       ignoreOrder: true,
-      // TODO useImportModule
-      // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
     },
   });
 
@@ -181,7 +179,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
       warningsCount: false,
       ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
-    // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),

@@ -1,47 +1,16 @@
 import type Config from 'webpack-chain';
 import { sync as resolve } from 'resolve';
+
+import { TranspilerInputParameters } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
+
 import type { ConfigManager } from '../../../config/configManager';
 import { swcConfigFactory } from '../../swc';
 import { babelConfigFactory } from '../../babel';
-import type { Env } from '../../../typings/Env';
-import type { Target } from '../../../typings/target';
 import type { CliConfigEntry, ReactCompilerOptions } from '../../../typings/configEntry/cli';
 import { getActualTarget, getBrowserslistTargets } from './browserslist';
 
-export type TranspilerConfig = {
-  env: Env;
-  target: Target;
-  actualTarget: Target;
-  isServer: boolean;
-  generateDataQaTag: boolean;
-  enableFillActionNamePlugin: boolean;
-  enableFillDeclareActionNamePlugin: boolean;
-  typescript: boolean;
-  modules: 'es6' | 'commonjs' | false;
-  loader: boolean;
-  removeTypeofWindow: boolean;
-  tramvai: boolean;
-  hot: boolean;
-  excludesPresetEnv: string[];
-  rootDir: string;
-  browsersListTargets: string[];
-  reactCompiler: boolean | ReactCompilerOptions;
-  /**
-   * Enable or disable `loose` transformations:
-   * with swc loader - https://swc.rs/docs/configuration/compilation#jscloose
-   * with babel loader - https://babeljs.io/docs/babel-preset-env#loose
-   */
-  loose?: boolean;
-  /**
-   * Enable or disable external transpiler runtime helpers:
-   * with swc loader, pass value directly to `jsc.externalHelpers` option - https://swc.rs/docs/configuration/compilation#jscexternalhelpers
-   * with babel loader, when `false`, disable `@babel/plugin-transform-runtime` - https://babeljs.io/docs/babel-plugin-transform-runtime
-   */
-  externalHelpers?: boolean;
-};
-
 export const addTranspilerLoader =
-  (configManager: ConfigManager<CliConfigEntry>, transpilerConfig: TranspilerConfig) =>
+  (configManager: ConfigManager<CliConfigEntry>, transpilerConfig: TranspilerInputParameters) =>
   (rule: Config.Use) => {
     const { loader } = configManager.experiments.transpilation;
 
@@ -64,16 +33,15 @@ Please run "npx tramvai add --dev @tramvai/swc-integration" to fix the problem
 
 export const getTranspilerConfig = (
   configManager: ConfigManager<CliConfigEntry>,
-  overrideOptions: Partial<TranspilerConfig> = {}
-): TranspilerConfig => {
+  overrideOptions: Partial<TranspilerInputParameters> = {}
+): TranspilerInputParameters => {
   const {
     generateDataQaTag,
     alias,
     target,
     rootDir,
     enableFillActionNamePlugin,
-    excludesPresetEnv,
-    experiments: { enableFillDeclareActionNamePlugin, reactCompiler },
+    experiments: { enableFillDeclareActionNamePlugin, reactCompiler, transpilation },
   } = configManager;
   const { env } = configManager;
   const isServer = configManager.buildType === 'server';
@@ -88,21 +56,21 @@ Just check or add configuration to your tsconfig file and remove alias from tram
 
   return {
     isServer,
-    env,
+    mode: env,
+    // @ts-expect-error option only for new cli
+    include: transpilation.include,
     generateDataQaTag,
     tramvai: true,
     removeTypeofWindow: true,
     hot: !!configManager.hotRefresh.enabled,
-    excludesPresetEnv,
     enableFillActionNamePlugin,
+    enableFillDeclareActionNamePlugin,
     rootDir: configManager.rootDir,
-    target,
     actualTarget,
     browsersListTargets,
     loader: true,
     modules: false,
     typescript: false,
-    enableFillDeclareActionNamePlugin,
     reactCompiler,
     ...overrideOptions,
   };

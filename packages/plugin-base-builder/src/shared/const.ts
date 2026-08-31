@@ -6,7 +6,6 @@ export const clientBuildName = 'client';
 export const serverBuildName = 'server';
 export const polyfillBuildName = 'polyfill';
 
-// TODO: es2017, es2016, es2015 fields support?
 export const clientMainFields = ['browser', 'module', 'main'];
 export const serverMainFields = ['module', 'main'];
 

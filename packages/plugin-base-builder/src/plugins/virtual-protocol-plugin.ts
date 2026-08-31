@@ -2,7 +2,7 @@ import path from 'node:path';
 import type { WebpackPluginInstance, Compiler } from 'webpack';
 import { NormalModule } from 'webpack';
 
-// TODO: migrate to new webpack virtual plugin - https://github.com/webpack/webpack/pull/19508
+// TODO: TCORE-5228 migrate to new webpack virtual plugin - https://github.com/webpack/webpack/pull/19508
 /**
  * Plugin to resolve imports with `virtual:*` protocol
  * Naming conventions inspired by https://vite.dev/guide/api-plugin#virtual-modules-convention
@@ -25,7 +25,6 @@ export class VirtualProtocolPlugin implements WebpackPluginInstance {
           // also, to prevent immediate rebuild after initial compilation, mark file as missing
           loaderContext.addMissingDependency(filePath);
 
-          // TODO: processing as JS/TS source code?
           loaderContext.fs.readFile(filePath, callback);
         });
     });

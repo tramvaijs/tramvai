@@ -11,55 +11,43 @@ import {
   TranspilerInputParameters,
 } from '@tramvai/plugin-base-builder/lib/shared/transpiler';
 
-export const resolveRspackTranspilerParameters = (
-  {
-    di,
-    buildTarget,
-    buildEnv = di.get(BUILD_MODE_TOKEN),
-  }: {
-    di: Container;
-    buildTarget: 'server' | 'client';
-    buildEnv?: 'development' | 'production';
-  }
-  // overrideOptions: Partial<WebpackTranspilerInputParameters> = {}
-): TranspilerInputParameters => {
+export const resolveRspackTranspilerParameters = ({
+  di,
+  buildTarget,
+  buildEnv = di.get(BUILD_MODE_TOKEN),
+}: {
+  di: Container;
+  buildTarget: 'server' | 'client';
+  buildEnv?: 'development' | 'production';
+}): TranspilerInputParameters => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
   const {
     generateDataQaTag,
     enableFillDeclareActionNamePlugin,
-    //   target,
-    sourceDir,
     rootDir,
-    //   enableFillActionNamePlugin,
-    //   excludesPresetEnv,
     experiments: { reactCompiler },
   } = config;
-  // const { env, modern } = configManager;
   const isServer = buildTarget === 'server';
   const actualTarget = isServer ? 'node' : 'defaults';
 
-  // @ts-expect-error TODO
   return {
     isServer,
     env: buildEnv,
+    mode: buildEnv,
     generateDataQaTag,
     tramvai: true,
+    rootDir,
     removeTypeofWindow: true,
     include: config.transpilation.include,
     hot: !!config.hotRefresh?.enabled,
-    // excludesPresetEnv,
-    // enableFillActionNamePlugin,
-    rootDir,
-    sourceDir,
+    enableFillDeclareActionNamePlugin,
     actualTarget,
     browsersListTargets: getBrowserslistConfig(config.rootDir, actualTarget),
     loader: true,
     modules: false,
     typescript: false,
-    enableFillDeclareActionNamePlugin,
     reactCompiler: reactCompiler ?? false,
-    // ...overrideOptions,
   };
 };
 
@@ -84,9 +72,9 @@ export const createTranspilerRules = ({
   transpiler: Transpiler;
   transpilerParameters: TranspilerInputParameters;
 }): RuleSetRule[] => {
-  const { env } = transpilerParameters;
+  const { mode } = transpilerParameters;
   const include =
-    env === 'production'
+    mode === 'production'
       ? transpilerParameters.include?.production
       : transpilerParameters.include?.development;
   const shouldSkipTranspile = include === 'none';

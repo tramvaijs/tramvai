@@ -104,6 +104,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     projectType,
     verboseLogging,
     clientSourceMap,
+    experiments,
   } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noClientRebuild;
@@ -144,8 +145,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       filename: '[name].css',
       chunkFilename: '[name].chunk.css',
       ignoreOrder: true,
-      // TODO useImportModule
-      // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
+      experimentalUseImportModule: true,
     },
   });
 
@@ -181,10 +181,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     }),
     typeof modernPolyfill === 'undefined'
   );
-
-  // TODO: test cacheUnaffected, lazyCompilation
-
-  // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
 
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'client' });
   const resolveOptions = await createResolveOptions({ di, mainFields: clientMainFields });
@@ -231,7 +227,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     },
     resolve: {
       extensions,
-      // TODO: es2017, es2016, es2015 fields support?
       mainFields: clientMainFields,
       symlinks: config.resolveSymlinks,
       fallback: {
@@ -257,14 +252,13 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
           ignored: config.debugBuild ? ['**/.git/**'] : ['**/node_modules/**', '**/.git/**'],
         }),
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
-    // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),
       ...(verboseLogging ? {} : { stream: stderrWithWarningFilters }),
     },
-    // TODO: pass as experiments.webpack parameter for fast researches
     experiments: {
+      ...experiments.webpack,
       futureDefaults: true,
     },
     snapshot: createSnapshot({ config }),
@@ -312,7 +306,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       target: clientBuildName,
     }),
     entry: {
-      // TODO: more missed files watchers with absolute path?
       platform: {
         import: [
           resolveAbsolutePathForFile({

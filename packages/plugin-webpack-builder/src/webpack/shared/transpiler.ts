@@ -15,57 +15,45 @@ import {
 
 import { WorkerPoolConfig } from './thread-loader';
 
-export const resolveWebpackTranspilerParameters = (
-  {
-    di,
-    buildTarget = di.get(BUILD_TARGET_TOKEN),
-    buildEnv = di.get(BUILD_MODE_TOKEN),
-    hot = false,
-  }: {
-    di: Container;
-    buildTarget?: 'server' | 'client';
-    buildEnv?: 'development' | 'production';
-    hot?: boolean;
-  }
-  // overrideOptions: Partial<WebpackTranspilerInputParameters> = {}
-): TranspilerInputParameters => {
+export const resolveWebpackTranspilerParameters = ({
+  di,
+  buildTarget = di.get(BUILD_TARGET_TOKEN),
+  buildEnv = di.get(BUILD_MODE_TOKEN),
+  hot = false,
+}: {
+  di: Container;
+  buildTarget?: 'server' | 'client';
+  buildEnv?: 'development' | 'production';
+  hot?: boolean;
+}): TranspilerInputParameters => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
   const {
     generateDataQaTag,
     enableFillDeclareActionNamePlugin,
-    //   target,
-    sourceDir,
     rootDir,
-    //   enableFillActionNamePlugin,
-    //   excludesPresetEnv,
-    //   experiments: { reactCompiler },
+    experiments: { reactCompiler },
   } = config;
-  // const { env, modern } = configManager;
   const isServer = buildTarget === 'server';
   const actualTarget = isServer ? 'node' : 'defaults';
 
-  // @ts-expect-error TODO
   return {
     isServer,
     env: buildEnv,
+    mode: buildEnv,
     generateDataQaTag,
     tramvai: true,
     removeTypeofWindow: true,
     include: config.transpilation.include,
     hot,
-    // excludesPresetEnv,
-    // enableFillActionNamePlugin,
     rootDir,
-    sourceDir,
     actualTarget,
     browsersListTargets: getBrowserslistConfig(config.rootDir, actualTarget),
     loader: true,
     modules: false,
     typescript: false,
     enableFillDeclareActionNamePlugin,
-    // reactCompiler,
-    // ...overrideOptions,
+    reactCompiler: reactCompiler!,
   };
 };
 
@@ -92,9 +80,9 @@ export const createTranspilerRules = ({
   transpilerParameters: TranspilerInputParameters;
   workerPoolConfig: WorkerPoolConfig;
 }): webpack.RuleSetRule[] => {
-  const { env } = transpilerParameters;
+  const { mode } = transpilerParameters;
   const include =
-    env === 'production'
+    mode === 'production'
       ? transpilerParameters.include?.production
       : transpilerParameters.include?.development;
   const shouldSkipTranspile = include === 'none';

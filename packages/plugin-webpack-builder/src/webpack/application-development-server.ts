@@ -66,7 +66,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 }): Promise<Configuration> => {
   const config = di.get(CONFIG_SERVICE_TOKEN);
 
-  const { verboseLogging, hotRefresh, noServerRebuild, serverSourceMap } = config;
+  const { verboseLogging, hotRefresh, noServerRebuild, serverSourceMap, experiments } = config;
 
   const isHotEnabled = hotRefresh?.enabled && !noServerRebuild;
 
@@ -106,8 +106,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
     extractCssPluginOptions: {
       filename: 'server.css',
       ignoreOrder: true,
-      // TODO useImportModule
-      // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
+      experimentalUseImportModule: true,
     },
   });
 
@@ -135,10 +134,6 @@ export default appConfig;`;
   const isRootErrorBoundaryEnabled =
     typeof config.fileSystemPages!.rootErrorBoundaryPath === 'string';
 
-  // TODO: test cacheUnaffected, lazyCompilation
-
-  // TODO: output.strictModuleExceptionHandling, module.strictExportPresence - do we really need it?
-
   const sourceMapsConfiguration = createSourceMaps<'webpack'>({ config, target: 'server' });
 
   const resolveOptions = await createResolveOptions({ di, mainFields: serverMainFields });
@@ -157,7 +152,6 @@ export default appConfig;`;
       : 'node',
     context: config.rootDir,
     entry: {
-      // TODO: more missed files watchers with absolute path?
       server: entryPath,
       // server: './src/index.ts',
     },
@@ -198,8 +192,6 @@ export default appConfig;`;
     mode: 'development',
     devtool: serverSourceMap ? sourceMapsConfiguration.devtool : webpackConfigExtension.devtool,
     node: {
-      // TODO https://github.com/tramvaijs/tramvai/-/commit/c3f3db838fd711ee7a53a84f5bd832cdeebc293a
-      // __dirname: false
       // "warn" with `futureDefaults`
       global: true,
     },
@@ -238,7 +230,6 @@ export default appConfig;`;
       emitOnErrors: false,
       ...createOptimizeOptions<'webpack'>({ config, target: 'server' }),
     },
-    // TODO: check is it configuration optimal?
     stats: {
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
@@ -246,24 +237,17 @@ export default appConfig;`;
       ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
-    // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),
       ...(verboseLogging ? {} : { stream: stderrWithWarningFilters }),
     },
-    // TODO: pass as experiments.webpack parameter for fast researches
     experiments: {
+      ...experiments.webpack,
       futureDefaults: true,
     },
     snapshot: createSnapshot({ config }),
-    // TODO: research why this list?
     externals: [
-      'react$',
-      'react-dom',
-      'prop-types',
-      'fastify',
-      'core-js',
       ...flatten<RegExp>(externals),
       ...(Array.isArray(webpackConfigExtension.externals)
         ? webpackConfigExtension.externals
