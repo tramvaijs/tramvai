@@ -102,11 +102,14 @@ export class ServerRunnerWorkerBridge {
     this.#worker.on('exit', (code) => {
       if (code !== 0) {
         logger.event({
-          type: 'info',
+          type: 'debug',
           event: 'server-runner-worker-bridge',
           message: `Worker exit`,
           payload: { code },
         });
+
+        // need to remove worker if it exit unexpectedly
+        this.#worker = null;
       }
     });
   }

@@ -11,6 +11,8 @@ import autoprefixer from 'autoprefixer';
 import { safeRequire } from '@tramvai/api/lib/utils/require';
 import { CONFIG_SERVICE_TOKEN, ConfigService } from '@tramvai/api/lib/config';
 import { resolveAbsolutePathForFile } from '@tramvai/api/lib/utils/path';
+// @ts-expect-error no typings
+import PostcssAssetsPlugin from 'postcss-assets-webpack-plugin';
 
 const mediaVars = {
   PHONE: 599,
@@ -23,7 +25,15 @@ type PostcssConfig = Config & { config: boolean };
 
 export const getPostcssConfigPath = (config: ConfigService) => {
   return resolveAbsolutePathForFile({
-    file: config.postcss!.config ?? 'postcss.config.js',
+    file: config.postcss?.config ?? 'postcss.config.js',
+    sourceDir: config.sourceDir,
+    rootDir: config.rootDir,
+  });
+};
+
+export const getAssetsPostcssConfigPath = (config: ConfigService) => {
+  return resolveAbsolutePathForFile({
+    file: config.postcss?.assetsConfig ?? 'postcss.config.js',
     sourceDir: config.sourceDir,
     rootDir: config.rootDir,
   });
@@ -71,6 +81,12 @@ export const createStylesConfiguration = ({
   if (cssModulePattern) {
     cssModulesOptions.auto = new RegExp(cssModulePattern);
   }
+
+  const postcssAssetsConfigPath = config.postcss?.assetsConfig;
+
+  const postcssAssetsConfig = postcssAssetsConfigPath
+    ? safeRequire(getAssetsPostcssConfigPath(config))
+    : { plugins: [] };
 
   return {
     rules: [
@@ -160,18 +176,20 @@ export const createStylesConfiguration = ({
     plugins: [
       new rspack.CssExtractRspackPlugin({
         ignoreOrder: true,
-        // TODO support parameter
-        // experimentalUseImportModule: !!config.experiments.minicss?.useImportModule,
         attributes: { 'data-critical': 'true' },
         ...extractCssPluginOptions,
       }),
+      postcssAssetsConfig?.plugins.length &&
+        new PostcssAssetsPlugin({
+          test: /\.css$/,
+          log: false,
+          plugins: postcssAssetsConfig.plugins,
+        }),
     ],
   };
 };
 
 function getPostCssOptions(config: ConfigService) {
-  // TODO: PostcssAssetsPlugin integration from packages/cli/src/library/webpack/blocks/postcssAssets.ts?
-
   const postcssConfig: Config | ((loaderContext: any) => Config) =
     safeRequire(
       getPostcssConfigPath(config),
@@ -183,7 +201,6 @@ function getPostCssOptions(config: ConfigService) {
   // https://github.com/webpack-contrib/postcss-loader/blob/master/src/config.d.ts
   const postcssOptionsFn = (loaderContext: any) => {
     const isFnConfig = typeof postcssConfig === 'function';
-    // TODO: async config fn support?
     const defaultConfig = isFnConfig ? postcssConfig(loaderContext) : postcssConfig;
     // eslint-disable-next-line no-nested-ternary
     const defaultPlugins = defaultConfig.plugins ? defaultConfig.plugins : [];
@@ -191,19 +208,14 @@ function getPostCssOptions(config: ConfigService) {
     return {
       config: false,
       ...defaultConfig,
-      // TODO: make it simple
       plugins: Array.isArray(defaultPlugins)
         ? [
-            // TODO: do we really need it?
-            // require('postcss-modules-tilda'),
             require('postcss-modules-values-replace')({
               importsAsModuleRequests: true,
             }),
             ...defaultPlugins,
           ]
         : {
-            // TODO: do we really need it?
-            // 'postcss-modules-tilda': {},
             'postcss-modules-values-replace': { importsAsModuleRequests: true },
             ...defaultPlugins,
           },

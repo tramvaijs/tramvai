@@ -7,6 +7,7 @@ import type { ReactRefreshPlugin } from '@pmmmwh/react-refresh-webpack-plugin';
 import type { DeduplicateStrategy } from '@tinkoff/webpack-dedupe-plugin';
 import type { PluginOptions } from 'image-minimizer-webpack-plugin';
 import { nanoid } from 'nanoid';
+import type { Configuration as WebpackConfiguration } from 'webpack';
 
 import { cosmiconfig } from 'cosmiconfig';
 import mergeDeep from '@tinkoff/utils/object/mergeDeep';
@@ -54,7 +55,6 @@ export type PostcssOptions = {
    * @title Enable CSS modules for all files matching /RegExp/i.test(filename) regexp.
    */
   cssModulePattern?: string;
-  // TODO: do we really need it?
   /**
    * @title Path to postcss config file for assets
    */
@@ -153,6 +153,13 @@ type BaseExperiments = {
    * @default false
    */
   reactCompiler?: boolean | ReactCompilerOptions;
+  /**
+   *
+   * https://webpack.js.org/configuration/experiments
+   *
+   * @title Webpack experiments
+   */
+  webpack?: WebpackConfiguration['experiments'];
 };
 
 export interface ApplicationExperiments extends BaseExperiments {
@@ -677,7 +684,6 @@ export class ConfigService {
   }
 
   get resolveSymlinks() {
-    // TODO: slower build with resolveSymlinks because a lot of watched files
     return this.#parameters.resolveSymlinks ?? true;
   }
 
@@ -737,7 +743,7 @@ export class ConfigService {
   }
 
   get assetsPrefix() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return null;
     }
 
@@ -749,7 +755,7 @@ export class ConfigService {
   }
 
   get polyfill() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return null;
     }
 
@@ -757,7 +763,7 @@ export class ConfigService {
   }
 
   get modernPolyfill() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return null;
     }
 
@@ -765,7 +771,7 @@ export class ConfigService {
   }
 
   get outputServer() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return this.#project.output ?? 'dist/child-app';
     }
     return this.#project.output?.server ?? 'dist/server';
@@ -776,14 +782,14 @@ export class ConfigService {
   }
 
   get outputClient() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return this.#project.output ?? 'dist/child-app';
     }
     return this.#project.output?.client ?? 'dist/client';
   }
 
   get outputStatic() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return this.#project.output ?? 'dist/child-app';
     }
 
@@ -798,7 +804,7 @@ export class ConfigService {
   }
 
   get fileSystemPages(): FileSystemPagesOptions | null {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return null;
     }
     const fileSystemPages = this.#project.fileSystemPages ?? ({} as FileSystemPagesOptions);
@@ -821,7 +827,7 @@ export class ConfigService {
   }
 
   get fileSystemPapiDir(): string | null {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return null;
     }
     return this.#project.fileSystemPapiDir ?? 'api';
@@ -831,17 +837,25 @@ export class ConfigService {
     return this.#project.postcss ?? {};
   }
 
-  get experiments(): ApplicationExperiments {
-    if (this.#project.type === 'child-app') {
-      return {};
+  get experiments(): ApplicationExperiments | ChildAppExperiments {
+    if (this.isChildAppProject(this.#project)) {
+      const experiments = this.#project.experiments ?? {};
+
+      return {
+        reactCompiler: experiments.reactCompiler ?? false,
+        webpack: experiments.webpack ?? {},
+        lightningcss: experiments.lightningcss ?? false,
+      };
     }
 
     const experiments = this.#project.experiments ?? {};
+
     return {
       reactCompiler: experiments.reactCompiler ?? false,
+      webpack: experiments.webpack ?? {},
+      lightningcss: experiments.lightningcss ?? false,
       viewTransitions: experiments.viewTransitions ?? false,
       reactTransitions: experiments.reactTransitions ?? false,
-      lightningcss: experiments.lightningcss ?? false,
     };
   }
 
@@ -861,7 +875,7 @@ export class ConfigService {
   }
 
   get integrity() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return null;
     }
 
@@ -959,7 +973,7 @@ export class ConfigService {
   }
 
   get buildPath() {
-    if (this.#project.type === 'child-app') {
+    if (this.isChildAppProject(this.#project)) {
       return resolveAbsolutePathForFile({
         rootDir: this.rootDir,
         sourceDir: this.sourceDir,
@@ -972,6 +986,10 @@ export class ConfigService {
       sourceDir: this.sourceDir,
       file: this.buildType === 'server' ? this.outputServer : this.outputClient,
     });
+  }
+
+  private isChildAppProject(project: Project): project is ChildAppProject {
+    return project.type === 'child-app';
   }
 
   private getSourceMap(buildType: 'client' | 'server') {

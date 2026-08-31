@@ -38,14 +38,6 @@ export const createWorkerPoolConfig = ({ di }: { di: Container }): WorkerPoolCon
 
   const config: WorkerPoolConfig = {
     poolTimeout: mode === 'development' ? Infinity : undefined,
-    // TODO is it really necessary?
-    // poolRespawn need to be true to allow cli benchmarks use pool across runs
-    // as thread-loader has shared global state
-    // poolRespawn: mode === 'development',
-
-    // TODO add thread-loader options to ConfigService
-    // ...getCustomConfig(config),
-
     name: `tramvai-worker-pool-for-${target}`,
     workers: calculateNumberOfWorkers(),
   };
@@ -61,7 +53,6 @@ export const createWorkerPoolConfig = ({ di }: { di: Container }): WorkerPoolCon
 };
 
 export const warmupThreadLoader = (workerPoolConfig: WorkerPoolConfig) => {
-  // TODO: kill workers on close
   threadLoader.warmup(workerPoolConfig, [
     'babel-loader',
     '@babel/preset-env',

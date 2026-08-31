@@ -2,6 +2,8 @@ import { ConfigService } from '@tramvai/api/lib/config';
 import type { RequestHandler, Configuration as WebpackDevServerConfig } from 'webpack-dev-server';
 import type { DevServer } from '@rspack/core';
 
+import { BuildTarget } from '../types';
+
 type devServerMap = {
   webpack: WebpackDevServerConfig;
   rspack: DevServer;

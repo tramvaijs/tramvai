@@ -275,7 +275,6 @@ export function createDevServer({
 
         serverWebpackWorker.create();
 
-        // TODO: DEV_SERVER_STARTED
         serverWebpackWorker.subscribe(BUILD_DONE, ({ stats }) => {
           serverStats = stats;
           compileServerAfterBuild();
@@ -326,7 +325,6 @@ export function createDevServer({
 
         clientWebpackWorker.create();
 
-        // TODO: DEV_SERVER_STARTED
         clientWebpackWorker.subscribe(BUILD_DONE, ({ stats }) => {
           clientStats = stats;
           clientResolve();

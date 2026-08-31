@@ -12,8 +12,5 @@ export const createSnapshot = ({
         // allow to debug node_modules
         managedPaths: [],
       }
-    : {
-        // TODO: check it is necessary for tramvai-debug or defaults will work properly
-        managedPaths: [path.resolve(config.rootDir, 'node_modules')],
-      };
+    : {};
 };

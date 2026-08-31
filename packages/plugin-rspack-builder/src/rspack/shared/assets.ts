@@ -22,7 +22,6 @@ export const createAssetsRules = ({
   const transpiler = di.get(optional(RSPACK_TRANSPILER_TOKEN))!;
   const transpilerParameters = resolveRspackTranspilerParameters({ di, buildTarget });
 
-  // TODO: integration test for custom plugins
   const svgoOptions = getSvgoOptions(config);
   const rules: RuleSetRule[] = [];
 
@@ -77,7 +76,6 @@ export const createAssetsRules = ({
   // based on https://github.com/facebook/create-react-app/issues/11213#issuecomment-883466601
   rules.push({
     test: /\.svg$/,
-    // TODO: `issuer: /\.tsx?$/` need or not?
     resourceQuery: /react/,
     use: [
       {

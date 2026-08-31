@@ -44,7 +44,6 @@ patchedPluginTester(__dirname, {
     typescript: true,
     generateDataQaTag: false,
     loader: false,
-    excludesPresetEnv: ['transform-function-name'],
   }),
   tests: {
     'check function naming': {

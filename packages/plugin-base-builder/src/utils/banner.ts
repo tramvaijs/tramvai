@@ -30,7 +30,6 @@ export function showBanner(
     titleLines.push(`${label('FileSystemPages')}  true`);
   }
 
-  // TODO: add information about hosted url !
   const baseServerUrl = `${config.httpProtocol}://${config.host.replace('0.0.0.0', 'localhost')}`;
   const server = `${baseServerUrl}:${config.port}`;
 

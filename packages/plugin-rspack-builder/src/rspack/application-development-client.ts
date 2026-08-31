@@ -143,8 +143,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
       filename: '[name].css',
       chunkFilename: '[name].chunk.css',
       ignoreOrder: true,
-      // TODO useImportModule
-      // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
     },
   });
 
@@ -208,9 +206,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     },
     mode: 'development',
     devtool: clientSourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
-    // TODO: check is it configuration optimal?
     stats: {
-      // TODO: missmatch types with webpack
       // @ts-expect-error
       preset: 'errors-warnings',
       // disables the compilation success notification, the webpackbar already displays it
@@ -231,7 +227,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         }),
     resolve: {
       extensions,
-      // TODO: es2017, es2016, es2015 fields support?
       mainFields: clientMainFields,
       ...getResolveTsConfig(config),
       symlinks: config.resolveSymlinks,
@@ -255,7 +250,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         ? rspackConfigExtension.externals
         : (rspackConfigExtension.externals?.development ?? [])),
     ].map((s) => new RegExp(`^${s}`)),
-    // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),
@@ -295,7 +289,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     name: clientBuildName,
     dependencies: isPolyfillsExists ? [polyfillBuildName] : [],
     entry: {
-      // TODO: more missed files watchers with absolute path?
       platform: {
         import: [
           resolveAbsolutePathForFile({

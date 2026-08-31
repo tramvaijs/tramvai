@@ -223,19 +223,17 @@ exports[`client: server.inline.ts 1`] = `
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ForBrowser: () => (/* binding */ ForBrowser)
 /* harmony export */ });
-/* harmony import */ var _swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("../../../../../../node_modules/@swc/helpers/esm/_define_property.js");
-
 class ForBrowser {
     test() {
         console.log('Ok');
     }
     constructor(){
-        (0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__._)(this, "property", ()=>{
+        this.property = ()=>{
             console.log('Ok');
-        });
+        };
     }
 }
-(0,_swc_helpers_define_property__WEBPACK_IMPORTED_MODULE_0__._)(ForBrowser, "prop", 'static');
+ForBrowser.prop = 'static';
 
 
 "
@@ -280,7 +278,7 @@ exports[`server: images/logo.svg\\?react 1`] = `
 /* harmony export */ });
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("webpack/sharing/consume/default/react/jsx-dev-runtime/react/jsx-dev-runtime");
 /* harmony import */ var react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react_jsx_dev_runtime__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__("webpack/sharing/consume/default/react/react");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 
 

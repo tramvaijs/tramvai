@@ -9,15 +9,16 @@ import type { Options as SwcOptions } from '@swc/core';
 
 const TRAMVAI_SWC_TARGET_PATH = '@tramvai/swc-integration/target/wasm32-wasip1';
 
-const NOT_SUPPORTED_FIELDS: (keyof TranspilerInputParameters)[] = ['enableFillActionNamePlugin'];
+const NOT_SUPPORTED_FIELDS: (keyof TranspilerInputParameters)[] = [
+  'enableFillDeclareActionNamePlugin',
+];
 let warningWasShown = false;
 
-export const configFactory = (config: Partial<TranspilerInputParameters>): SwcOptions => {
+export const configFactory = (config: TranspilerInputParameters): SwcOptions => {
   const {
-    env = 'development',
+    mode = 'development',
     isServer = false,
     modules = false,
-    excludesPresetEnv,
     browsersListTargets,
     typescript = false,
     hot = false,
@@ -25,10 +26,7 @@ export const configFactory = (config: Partial<TranspilerInputParameters>): SwcOp
     tramvai = false,
     rootDir = process.cwd(),
     generateDataQaTag = false,
-    // disabled because `arrayLikeIsIterable` and `iterableIsArray` assumtions is not supported yet in swc,
-    // this can leads to incorrect code generation e.g. when Set with spread is used - `[...new Set()] => [].concat(new Set())`
-    // TCORE-4904
-    loose = false,
+    loose = true,
     externalHelpers = true,
   } = config;
 
@@ -36,7 +34,7 @@ export const configFactory = (config: Partial<TranspilerInputParameters>): SwcOp
     for (const field of NOT_SUPPORTED_FIELDS) {
       if (config[field] && !isEmpty(config[field])) {
         console.warn(
-          `@tramvai/swc-integration do not support "${field}" configuration. Consider removing it from tramvai.json`
+          `@tramvai/swc-integration do not support "${field}" configuration. Consider removing it from tramvai.json or use babel`
         );
 
         warningWasShown = true;
@@ -87,11 +85,6 @@ Having swc config may conflict with @tramvai/cli configuration`
       // Use relevant core-js version, because it affects which polyfills are included
       // https://github.com/swc-project/swc/blob/main/crates/swc_ecma_preset_env/data/core-js-compat/modules-by-versions.json
       coreJs: require('core-js/package.json').version,
-      // disabled because `arrayLikeIsIterable` and `iterableIsArray` assumtions is not supported yet in swc,
-      // this can leads to incorrect code generation e.g. when Set with spread is used - `[...new Set()] => [].concat(new Set())`
-      // TCORE-4904
-      loose,
-      exclude: excludesPresetEnv,
       mode: 'entry',
     },
     module: {
@@ -100,6 +93,7 @@ Having swc config may conflict with @tramvai/cli configuration`
     isModule: 'unknown',
     jsc: {
       externalHelpers,
+      loose,
       parser: {
         syntax: typescript ? 'typescript' : 'ecmascript',
         decorators: true,
@@ -111,8 +105,8 @@ Having swc config may conflict with @tramvai/cli configuration`
         legacyDecorator: true,
         react: {
           runtime: hasJsxRuntime() ? 'automatic' : 'classic',
-          development: env === 'development',
-          refresh: hot && env === 'development' && !isServer,
+          development: mode === 'development',
+          refresh: hot && mode === 'development' && !isServer,
         },
         optimizer: {
           globals: {
@@ -132,7 +126,7 @@ Having swc config may conflict with @tramvai/cli configuration`
           [resolveTramvaiSwcPlugin('create_token_pure'), {}],
           [resolveTramvaiSwcPlugin('lazy_component'), {}],
           isServer && [resolveTramvaiSwcPlugin('dynamic_import_to_require'), {}],
-          tramvai && env === 'development' && [resolveTramvaiSwcPlugin('provider_stack'), {}],
+          tramvai && mode === 'development' && [resolveTramvaiSwcPlugin('provider_stack'), {}],
           generateDataQaTag && [resolveTramvaiSwcPlugin('react_element_info_unique'), {}],
           [
             '@swc/plugin-transform-imports',

@@ -115,8 +115,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       filename: `[name]@${projectVersion}.css`,
       chunkFilename: `[name]@${projectVersion}.css`,
       ignoreOrder: true,
-      // TODO useImportModule
-      // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
+      experimentalUseImportModule: true,
     },
   });
 
@@ -201,7 +200,6 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
       warningsCount: false,
       ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
-    // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),

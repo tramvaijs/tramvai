@@ -27,6 +27,12 @@ export const SKIPPED_NOT_SERIALIZABLE_CACHE = /Skipped not serializable cache it
 // https://github.com/zloirock/core-js/blob/master/packages/core-js/internals/global-this.js#L13
 export const GLOBAL_CHECK = /"global" has been used, it will be undefined in next major version/;
 
+// Root package.json request for real projects, disables warning in tramvai monorepo
+export const UNRESOLVED_PACKAGE_JSON = /Can't resolve '\.\.\/\.\.\/\.\.\/\.\.\/package\.json'/;
+
+// Disables warning of error boundary require if option is disabled
+export const UNRESOLVED_ERROR_BOUNDARY = /Can't resolve '@\/__private__\/error'/;
+
 export const ignoreWarnings = [
   { message: REQUIRE_EXPRESSION },
   { message: REQUEST_DYNAMIC },
@@ -35,4 +41,6 @@ export const ignoreWarnings = [
   { message: ASSETS_TOO_BIG },
   { message: SKIPPED_NOT_SERIALIZABLE_CACHE },
   { message: GLOBAL_CHECK },
+  { message: UNRESOLVED_PACKAGE_JSON },
+  { message: UNRESOLVED_ERROR_BOUNDARY },
 ];

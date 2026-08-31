@@ -324,7 +324,7 @@ export const serverRunner = ({
       }
     }
 
-    // отключаем watch за при выключенном rebuild
+    // отключаем watch при выключенном rebuild
     if (!configManager.noServerRebuild) {
       const watchedFileName = 'env.development.js';
       try {

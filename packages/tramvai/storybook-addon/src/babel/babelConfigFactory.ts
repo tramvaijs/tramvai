@@ -5,7 +5,7 @@ type Env = 'development' | 'production';
 export const babelConfigFactory = ({ typescript = true }: { typescript?: boolean } = {}) =>
   tramvaiBabelConfigFactory({
     typescript,
-    env: process.env.NODE_ENV as Env,
+    mode: process.env.NODE_ENV as Env,
     generateDataQaTag: false,
     removeTypeofWindow: true,
   });

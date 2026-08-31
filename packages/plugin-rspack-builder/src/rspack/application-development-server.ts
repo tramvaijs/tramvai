@@ -100,8 +100,6 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
     extractCssPluginOptions: {
       filename: 'server.css',
       ignoreOrder: true,
-      // TODO useImportModule
-      // experimentalUseImportModule: !!configManager.experiments.minicss?.useImportModule,
     },
   });
 
@@ -137,8 +135,6 @@ export default appConfig;`;
     ...((serverSourceMap ? { devServer: false } : {}) as Configuration['devServer']),
     devtool: serverSourceMap ? sourceMapsConfiguration.devtool : rspackConfigExtension.devtool,
     node: {
-      // TODO https://github.com/tramvaijs/tramvai/-/commit/c3f3db838fd711ee7a53a84f5bd832cdeebc293a
-      // __dirname: false
       // "warn" with `futureDefaults`
       global: true,
     },
@@ -163,13 +159,7 @@ export default appConfig;`;
       pathinfo: Boolean(config.debugBuild),
     },
     mode: 'development',
-    // TODO: research why this list?
     externals: [
-      'react$',
-      'react-dom',
-      'prop-types',
-      'fastify',
-      'core-js',
       ...flatten<RegExp>(externals),
       ...(Array.isArray(rspackConfigExtension.externals)
         ? rspackConfigExtension.externals
@@ -270,7 +260,6 @@ export default appConfig;`;
       ...(verboseLogging ? DEBUG_STATS_OPTIONS : {}),
     },
     ignoreWarnings: verboseLogging ? [] : ignoreWarnings,
-    // TODO: check is it configuration optimal?
     infrastructureLogging: {
       level: 'warn',
       ...(verboseLogging ? { level: 'verbose', debug: true } : {}),

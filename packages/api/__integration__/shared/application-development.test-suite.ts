@@ -3365,6 +3365,20 @@ export default Cmp;`,
                 loaded: 1,
               },
             },
+            react: {
+              '19.0.1': {
+                eager: true,
+                from: 'application:app-mf-host:0.0.0-stub',
+                loaded: 1,
+              },
+            },
+            'react-dom': {
+              '19.0.1': {
+                eager: true,
+                from: 'application:app-mf-host:0.0.0-stub',
+                loaded: 1,
+              },
+            },
             'react/jsx-dev-runtime': {
               '19.0.1': { eager: true, from: 'application:app-mf-host:0.0.0-stub', loaded: 1 },
             },
@@ -3418,6 +3432,20 @@ export default Cmp;`,
               },
             },
             'react/jsx-dev-runtime': {
+              '19.0.1': {
+                eager: true,
+                from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
+                loaded: 1,
+              },
+            },
+            react: {
+              '19.0.1': {
+                eager: true,
+                from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
+                loaded: 1,
+              },
+            },
+            'react-dom': {
               '19.0.1': {
                 eager: true,
                 from: 'application:app-mf-host-disabled-tramvai-dependencies:0.0.0-stub',
