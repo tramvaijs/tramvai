@@ -1,6 +1,5 @@
 # @tramvai/module-dns-cache
 
-
 DNS lookup cache for Node.js - [cacheable-lookup](https://github.com/szmarczak/cacheable-lookup) library integration.
 
 ## Explanation
@@ -37,7 +36,28 @@ createApp({
 
 ## Configuration
 
-### Enable/disable
+### Options
+
+To override default options, you can provide token `DNS_INTERCEPTOR_OPTIONS_TOKEN`:
+
+```ts
+import { DNS_INTERCEPTOR_OPTIONS_TOKEN } from '@tramvai/module-dns-cache';
+
+const provider = provide({
+  provide: DNS_INTERCEPTOR_OPTIONS_TOKEN,
+  useValue: {
+    enabled: true,
+    maxTTL: 10000,
+    maxItems: 200,
+    dualStack: true,
+    affinity: 4,
+  },
+});
+```
+
+Also, you can override a few options via environment variables:
+
+#### Enable/disable
 
 By default, DNS lookup cache is **enabled**.
 
@@ -47,7 +67,7 @@ To disable it, you need to provide `DNS_LOOKUP_CACHE_ENABLE` environment variabl
 DNS_LOOKUP_CACHE_ENABLE=false
 ```
 
-### Cache TTL
+#### Cache TTL
 
 Default TTL for DNS lookup cache is 60 seconds. You can change it by providing `DNS_LOOKUP_CACHE_TTL` environment variable:
 
@@ -55,7 +75,7 @@ Default TTL for DNS lookup cache is 60 seconds. You can change it by providing `
 DNS_LOOKUP_CACHE_TTL=120000
 ```
 
-### Cache size
+#### Cache size
 
 Default cache size is 200 entries. You can change it by providing `DNS_LOOKUP_CACHE_LIMIT` environment variable:
 

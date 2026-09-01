@@ -14,6 +14,9 @@ import {
   UndiciDnsCacheStorage,
   createDnsInterceptor,
 } from './dns-interceptor';
+import { DNS_INTERCEPTOR_OPTIONS_TOKEN } from './tokens';
+
+export * from './tokens';
 
 export const TramvaiDnsCacheModule = declareModule({
   name: 'TramvaiDnsCacheModule',
@@ -21,10 +24,17 @@ export const TramvaiDnsCacheModule = declareModule({
   providers: [
     provide({
       provide: HTTP_CLIENT_AGENT_INTERCEPTORS,
-      useFactory: ({ envManager, storage, ipHostCache, requestMetrics }) => {
-        const dnsLookupEnabled = envManager.get('DNS_LOOKUP_CACHE_ENABLE') === 'true';
-        const maxTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
-        const maxItems = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
+      useFactory: ({ envManager, storage, ipHostCache, requestMetrics, dnsInterceptorOptions }) => {
+        const enabledFromEnv = envManager.get('DNS_LOOKUP_CACHE_ENABLE');
+        const maxTTLFromEnv = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+        const maxItemsFromEnv = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
+
+        const dnsLookupEnabled =
+          enabledFromEnv === 'true' ? enabledFromEnv : dnsInterceptorOptions.enabled;
+        const maxTTL = !Number.isNaN(maxTTLFromEnv) ? maxTTLFromEnv : dnsInterceptorOptions.maxTTL;
+        const maxItems = !Number.isNaN(maxItemsFromEnv)
+          ? maxItemsFromEnv
+          : dnsInterceptorOptions.maxItems;
 
         const { dnsResolveDuration } = requestMetrics;
 
@@ -43,6 +53,8 @@ export const TramvaiDnsCacheModule = declareModule({
             dnsResolveDuration.observe({ service: hostname }, lookupDuration),
           maxTTL,
           maxItems,
+          dualStack: dnsInterceptorOptions.dualStack,
+          affinity: dnsInterceptorOptions.affinity,
         });
 
         (dnsInterceptor as any).__tramvai_dns_interceptor = true;
@@ -54,6 +66,7 @@ export const TramvaiDnsCacheModule = declareModule({
         storage: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
         requestMetrics: REQUEST_METRICS_INSTANCES,
         ipHostCache: optional(METRICS_IP_HOST_CACHE),
+        dnsInterceptorOptions: DNS_INTERCEPTOR_OPTIONS_TOKEN,
       },
     }),
     provide({
@@ -190,19 +203,27 @@ export const TramvaiDnsCacheModule = declareModule({
       },
     }),
     provide({
+      provide: DNS_INTERCEPTOR_OPTIONS_TOKEN,
+      useValue: {
+        enabled: true,
+        maxTTL: 10000,
+        maxItems: 200,
+        dualStack: true,
+        affinity: 4,
+      },
+    }),
+    provide({
       provide: ENV_USED_TOKEN,
       multi: true,
       useValue: [
-        { key: 'DNS_LOOKUP_CACHE_ENABLE', dehydrate: false, optional: true, value: 'true' },
+        { key: 'DNS_LOOKUP_CACHE_ENABLE', dehydrate: false, optional: true },
         {
           key: 'DNS_LOOKUP_CACHE_LIMIT',
-          value: '200',
           dehydrate: false,
           optional: true,
         },
         {
           key: 'DNS_LOOKUP_CACHE_TTL',
-          value: '10000',
           dehydrate: false,
           optional: true,
         },

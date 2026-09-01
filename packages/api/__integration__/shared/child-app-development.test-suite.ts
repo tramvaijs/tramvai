@@ -61,6 +61,26 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
       type: 'child-app',
       sourceDir: path.join(fixturesFolder, 'child-app', 'base'),
     },
+    'shared-configs': {
+      name: 'shared-configs',
+      type: 'child-app',
+      sourceDir: path.join(fixturesFolder, 'child-app', 'shared-configs'),
+      shared: {
+        // disable the default tramvai deps so that only the explicitly listed
+        // dependencies below end up as shared modules — makes the stats deterministic
+        defaultTramvaiDependencies: false,
+        deps: [
+          // scoped package, default (non-singleton) config -> strictVersion
+          '@tinkoff/dippy',
+          // scoped package, singleton config -> generates a different rspack module name
+          // (`(singleton)` flag instead of `(strict)`) and strictVersion must become false
+          { name: '@tinkoff/url', singleton: true },
+          // unscoped package -> exercises the `shareKey` parsing edge case where the
+          // package name itself contains no `@` before the version separator
+          'tslib',
+        ],
+      },
+    },
     hot: {
       name: 'hot',
       type: 'child-app',
@@ -331,7 +351,6 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           },
         });
 
-        // TODO: more stats cases for rspack with different shared configs
         test('stats should contain all client assets', async ({ devServer }) => {
           await devServer.buildPromise;
 
@@ -437,6 +456,91 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           }
 
           test.expect(loadableStats).toEqual(expected);
+        });
+      });
+
+      test.describe('stats - shared configs', () => {
+        test.use({
+          inputParameters: {
+            name: 'shared-configs',
+            rootDir: testSuiteFolder,
+            fileCache: false,
+            noRebuild: true,
+          },
+          extraConfiguration: {
+            plugins,
+            projects,
+          },
+        });
+
+        // The `shared-configs` child-app shares three dependencies with different configs
+        // (see the project definition above). This test verifies that the ChunkCorrelationPlugin
+        // correctly parses the builder-specific shared module names into the normalized
+        // shared object regardless of scoped/unscoped name, singleton flag or version format.
+        test('stats should correctly parse shared object for different shared configs', async ({
+          devServer,
+        }) => {
+          await devServer.buildPromise;
+
+          const stats = await (
+            await fetch(
+              `http://localhost:${devServer.port}/shared-configs/shared-configs_stats@${version}.json`
+            )
+          ).json();
+
+          // main entry has no shared modules for a child-app build
+          test.expect(stats.sharedModules).toEqual([]);
+          test.expect(stats.federatedModules).toHaveLength(1);
+
+          const [federatedModule] = stats.federatedModules;
+          const { sharedModules } = federatedModule;
+
+          // every shared module chunk must reference at least one emitted file
+          for (const sharedModule of sharedModules) {
+            test.expect(sharedModule.chunks.length).toBeGreaterThan(0);
+            for (const chunk of sharedModule.chunks) {
+              test.expect(typeof chunk).toBe('string');
+            }
+          }
+
+          const provides = sharedModules.flatMap(
+            (sharedModule: { provides: unknown[] }) => sharedModule.provides
+          );
+
+          test.expect(provides).toHaveLength(3);
+          test.expect(provides).toEqual(
+            test.expect.arrayContaining([
+              // scoped package, non-singleton -> strictVersion is true
+              {
+                shareScope: 'default',
+                shareKey: '@tinkoff/dippy',
+                requiredVersion: '^1.0.0',
+                strictVersion: true,
+                singleton: false,
+                eager: false,
+              },
+              // scoped package, singleton -> strictVersion becomes false, singleton is true
+              {
+                shareScope: 'default',
+                shareKey: '@tinkoff/url',
+                requiredVersion: '^2.0.0',
+                strictVersion: false,
+                singleton: true,
+                eager: false,
+              },
+              // unscoped package -> shareKey must not swallow the version part.
+              // requiredVersion range prefix differs between builders (rspack: `2.8.1`,
+              // webpack: `=2.8.1`), so match the version part regardless of the prefix.
+              {
+                shareScope: 'default',
+                shareKey: 'tslib',
+                requiredVersion: test.expect.stringMatching(/^[=^~]?\d+\.\d+\.\d+/),
+                strictVersion: true,
+                singleton: false,
+                eager: false,
+              },
+            ])
+          );
         });
       });
 

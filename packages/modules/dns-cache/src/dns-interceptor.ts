@@ -22,12 +22,16 @@ export const DNS_UNDICI_LOOKUP_CACHE_TOKEN =
 export const createDnsInterceptor = ({
   maxTTL,
   maxItems,
+  dualStack,
+  affinity,
   storage,
   ipHostCache,
   onLookupEnd,
 }: {
   maxTTL: number;
   maxItems: number;
+  dualStack?: boolean;
+  affinity?: 4 | 6;
   storage: UndiciDnsCacheStorage;
   ipHostCache: LRUCache<string, string> | null;
   onLookupEnd: (hostname: string, lookupDuration: number) => void;
@@ -35,6 +39,8 @@ export const createDnsInterceptor = ({
   interceptors.dns({
     maxTTL,
     maxItems,
+    dualStack,
+    affinity,
     // https://github.com/nodejs/undici/pull/4589
     storage,
     // undici captures dns.lookup at import time via destructuring,
