@@ -21,7 +21,10 @@ export const mapHostsToLocalIP = (hosts: string[]) => {
       dnsLookupCalls[hostname] = (dnsLookupCalls[hostname] || 0) + 1;
 
       if (options && options.all) {
-        callback(null, [{ address: '127.0.0.1', family: 4 }]);
+        callback(null, [
+          { address: '127.0.0.1', family: 4 },
+          { address: '::1', family: 6 },
+        ]);
       } else {
         callback(null, '127.0.0.1', 4);
       }

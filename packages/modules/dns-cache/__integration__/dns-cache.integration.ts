@@ -18,13 +18,13 @@ test.describe('packages/modules/dns-cache', () => {
   test('httpClient request resolves through DNS cache', async ({ app, I, apiServer }) => {
     await I.gotoPage(app.serverUrl, '?request=http-client');
 
-    test.expect(apiServer.getUrls()).toEqual(['/http-client/']);
+    test.expect(apiServer.getUrls()).toEqual([[4, '/http-client/']]);
   });
 
   test('global fetch request resolves through DNS cache', async ({ app, I, apiServer }) => {
     await I.gotoPage(app.serverUrl, '?request=fetch');
 
-    test.expect(apiServer.getUrls()).toEqual(['/fetch/']);
+    test.expect(apiServer.getUrls()).toEqual([[4, '/fetch/']]);
   });
 
   test('http.request resolves through DNS cache (cacheable-lookup path)', async ({
@@ -34,7 +34,7 @@ test.describe('packages/modules/dns-cache', () => {
   }) => {
     await I.gotoPage(app.serverUrl, '?request=http-request');
 
-    test.expect(apiServer.getUrls()).toEqual(['/http-request/']);
+    test.expect(apiServer.getUrls()).toEqual([[4, '/http-request/']]);
   });
 
   // this test MUST be last - it verifies cache sharing with empty caches (dns.lookup call counting),
@@ -48,17 +48,17 @@ test.describe('packages/modules/dns-cache', () => {
 
     const urls = apiServer.getUrls();
 
-    test.expect(urls).toContain('/http-client/');
-    test.expect(urls).toContain('/fetch/');
-    test.expect(urls).toContain('/http-request/');
+    test.expect(urls).toContainEqual([4, '/http-client/']);
+    test.expect(urls).toContainEqual([4, '/fetch/']);
+    test.expect(urls).toContainEqual([4, '/http-request/']);
 
     // dns-seq-test.invalid is a separate hostname not cached by individual tests above,
     // so dns.lookup calls accurately reflect fresh cache behavior
     //
     // undici-lookup-count/1/ means dns.lookup was called once for both httpClient and fetch (shared undici cache)
-    test.expect(urls).toContain('/dns-stats/undici-lookup-count/1/');
+    test.expect(urls).toContainEqual([4, '/dns-stats/undici-lookup-count/1/']);
     // total-lookup-count/3/ means http.request triggered 2 more dns.lookup calls via cacheable-lookup
     // (independent cache; cacheable-lookup calls dns.lookup twice - once for IPv4 and once for IPv6 fallback)
-    test.expect(urls).toContain('/dns-stats/total-lookup-count/3/');
+    test.expect(urls).toContainEqual([4, '/dns-stats/total-lookup-count/3/']);
   });
 });

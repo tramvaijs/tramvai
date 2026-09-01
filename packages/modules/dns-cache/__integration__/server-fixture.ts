@@ -4,7 +4,7 @@ import { getPort } from '@tramvai/internal-test-utils/utils/getPort';
 
 export interface ApiServer {
   getPort: () => number;
-  getUrls: () => string[];
+  getUrls: () => [number, string][];
   clearUrls: () => void;
 }
 
@@ -15,16 +15,16 @@ export const apiServerFixture: [
   // eslint-disable-next-line no-empty-pattern
   async ({}, use) => {
     const port = await getPort();
-    let urls: string[] = [];
+    let urls: [number, string][] = [];
 
-    const handler = (req: http.IncomingMessage, res: http.ServerResponse) => {
-      urls.push(req.url!);
+    const handler = (family: 4 | 6) => (req: http.IncomingMessage, res: http.ServerResponse) => {
+      urls.push([family, req.url!]);
       res.write('Ok');
       res.end();
     };
 
-    const server = http.createServer(handler);
-    const server6 = http.createServer(handler);
+    const server = http.createServer(handler(4));
+    const server6 = http.createServer(handler(6));
 
     await new Promise<void>((resolve) => server.listen(port, '0.0.0.0', resolve));
     await new Promise<void>((resolve) => server6.listen(port, '::1', resolve));
