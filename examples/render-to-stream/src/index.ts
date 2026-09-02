@@ -1,6 +1,10 @@
 import { createApp, provide } from '@tramvai/core';
 import { CommonModule } from '@tramvai/module-common';
-import { ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN, SpaRouterModule } from '@tramvai/module-router';
+import {
+  PAGE_SERVICE_TOKEN,
+  ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
+  SpaRouterModule,
+} from '@tramvai/module-router';
 import { RenderModule } from '@tramvai/module-render';
 import { ServerModule } from '@tramvai/module-server';
 import { ErrorInterceptorModule } from '@tramvai/module-error-interceptor';
@@ -70,7 +74,18 @@ createApp({
     }),
     provide({
       provide: REACT_STREAMING_RENDER_TIMEOUT,
-      useValue: 1100,
+      useFactory: ({ pageService }) => {
+        const queryTimeout = pageService.getCurrentUrl()?.query?.streamingTimeout;
+
+        if (queryTimeout != null) {
+          return Number(queryTimeout);
+        }
+
+        return 1100;
+      },
+      deps: {
+        pageService: PAGE_SERVICE_TOKEN,
+      },
     }),
   ],
   // регистрируем экшены, которые будут выполняться для всех страниц приложения

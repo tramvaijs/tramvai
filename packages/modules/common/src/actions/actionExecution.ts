@@ -178,6 +178,7 @@ export class ActionExecution implements Interface {
           .then(() => {
             if (isTramvaiAction(action)) {
               const result = action.fn.apply(context, params);
+
               // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               const deferred = this.deferredActionsMap.get(action.name)!;
 

@@ -9,6 +9,7 @@ import type {
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   ACTION_EXECUTION_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
+  ASYNC_LOCAL_STORAGE_TOKEN,
 } from '@tramvai/tokens-common';
 import { CHILD_APP_INTERNAL_CONFIG_TOKEN } from '@tramvai/tokens-child-app';
 import {
@@ -32,6 +33,9 @@ declare module '@tramvai/tokens-common' {
   interface ExecutionContextValues {
     pageActions?: boolean;
   }
+  interface AsyncLocalStorageState {
+    isDeferredExecution?: boolean;
+  }
 }
 
 export class ActionPageRunner implements ActionPageRunnerInterface {
@@ -40,6 +44,7 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
   private responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
   private serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
   private childAppConfig: ExtractDependencyType<typeof CHILD_APP_INTERNAL_CONFIG_TOKEN> | null;
+  private storage: ExtractDependencyType<typeof ASYNC_LOCAL_STORAGE_TOKEN> | null;
 
   constructor(
     private deps: {
@@ -55,6 +60,7 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
       responseTaskManager: ExtractDependencyType<typeof SERVER_RESPONSE_TASK_MANAGER> | null;
       serverResponseStream: ExtractDependencyType<typeof SERVER_RESPONSE_STREAM> | null;
       childAppConfig: ExtractDependencyType<typeof CHILD_APP_INTERNAL_CONFIG_TOKEN> | null;
+      storage: ExtractDependencyType<typeof ASYNC_LOCAL_STORAGE_TOKEN> | null;
     }
   ) {
     this.log = deps.logger('action:action-page-runner');
@@ -62,6 +68,7 @@ export class ActionPageRunner implements ActionPageRunnerInterface {
     this.responseTaskManager = deps.responseTaskManager;
     this.serverResponseStream = deps.serverResponseStream;
     this.childAppConfig = deps.childAppConfig;
+    this.storage = deps.storage;
   }
 
   // TODO stopRunAtError нужен только для редиректов на стороне сервера в экшенах. И нужно пересмотреть реализацию редиректов
@@ -128,11 +135,20 @@ You can find more detailed information from "action-execution-error" logs, and f
 
             return Promise.resolve()
               .then(() => {
-                const promise = this.deps.actionExecution.runInContext(
-                  executionContext,
-                  action as TramvaiAction<any[], any, any>,
-                  DEFAULT_PAYLOAD
-                );
+                const runInContext = () =>
+                  this.deps.actionExecution.runInContext(
+                    executionContext,
+                    action as TramvaiAction<any[], any, any>,
+                    DEFAULT_PAYLOAD
+                  );
+
+                const promise =
+                  isDeferredAction && this.storage
+                    ? this.storage.run(
+                        { isDeferredExecution: true, ...this.storage.getStore() },
+                        runInContext
+                      )
+                    : runInContext();
 
                 if (isDeferredAction) {
                   this.responseTaskManager?.push(async () => {

@@ -8,7 +8,7 @@ import {
   Scope,
   TRAMVAI_HOOKS_TOKEN,
 } from '@tramvai/core';
-import { LOGGER_TOKEN, CONTEXT_TOKEN, STORE_TOKEN } from '@tramvai/tokens-common';
+import { LOGGER_TOKEN, CONTEXT_TOKEN, STORE_TOKEN, DISPATCHER_TOKEN } from '@tramvai/tokens-common';
 import {
   EXTEND_RENDER,
   CUSTOM_RENDER,
@@ -22,6 +22,7 @@ import {
 import { PageErrorStore, setPageErrorEvent, beforeResolveHooksToken } from '@tramvai/module-router';
 import { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
 import { rendering as renderInBrowser } from './client';
+import { processStreamedEvents } from './client/streamingState/processStreamedEvents';
 import type { RenderModuleConfig } from './shared/types';
 import { LayoutModule } from './shared/LayoutModule';
 import { providers as sharedProviders } from './shared/providers';
@@ -42,6 +43,24 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
   imports: [LayoutModule],
   providers: [
     ...sharedProviders,
+    provide({
+      provide: commandLineListTokens.clear,
+      multi: true,
+      useFactory: ({ store, dispatcher, renderMode }) => {
+        return function processStoreSyncEvents() {
+          if (renderMode !== 'streaming') {
+            return;
+          }
+
+          processStreamedEvents({ store, dispatcher });
+        };
+      },
+      deps: {
+        store: STORE_TOKEN,
+        dispatcher: DISPATCHER_TOKEN,
+        renderMode: optional(REACT_SERVER_RENDER_MODE),
+      },
+    }),
     provide({
       provide: beforeResolveHooksToken,
       multi: true,

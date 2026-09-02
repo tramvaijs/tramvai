@@ -13,6 +13,7 @@ import type {
   REACT_SERVER_RENDER_MODE,
   WebpackStats,
   ASSETS_PREFIX_TOKEN,
+  STORE_SYNC_EVENTS_TOKEN,
 } from '@tramvai/tokens-render';
 import { ResourceSlot, ResourceType } from '@tramvai/tokens-render';
 import { safeStringify } from '@tramvai/safe-strings';
@@ -67,6 +68,8 @@ export class PageBuilder {
 
   private assetsPrefixFactory: ExtractDependencyType<typeof ASSETS_PREFIX_TOKEN>;
 
+  private storeSyncEventsMiddleware: typeof STORE_SYNC_EVENTS_TOKEN;
+
   constructor({
     renderSlots,
     pageService,
@@ -83,6 +86,7 @@ export class PageBuilder {
     di,
     renderMode,
     assetsPrefixFactory,
+    storeSyncEventsMiddleware,
   }) {
     this.htmlAttrs = htmlAttrs;
     this.renderSlots = flatten(renderSlots || []);
@@ -99,6 +103,7 @@ export class PageBuilder {
     this.di = di;
     this.renderMode = renderMode;
     this.assetsPrefixFactory = assetsPrefixFactory;
+    this.storeSyncEventsMiddleware = storeSyncEventsMiddleware;
   }
 
   async flow(): Promise<string> {
@@ -120,6 +125,10 @@ export class PageBuilder {
     );
 
     this.dehydrateState();
+
+    if (this.renderMode === 'streaming') {
+      this.storeSyncEventsMiddleware.startStreaming();
+    }
 
     if (process.env.TRAMVAI_CLI_COMMAND === 'static') {
       await this.resourcesRegistry.prefetchInlinePageResources();

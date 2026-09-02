@@ -33,6 +33,7 @@ import {
   ASSETS_PREFIX_TOKEN,
   DEFAULT_ASSETS_PREFIX_TOKEN,
   INLINE_WEBPACK_RUNTIME,
+  STORE_SYNC_EVENTS_TOKEN,
 } from '@tramvai/tokens-render';
 import { Scope, optional } from '@tinkoff/dippy';
 import { isRedirectFoundError } from '@tinkoff/errors';
@@ -50,6 +51,7 @@ import type { RenderModuleConfig } from './shared/types';
 import { LayoutModule } from './shared/LayoutModule';
 import { providers as sharedProviders } from './shared/providers';
 import { fetchWebpackStats } from './server/blocks/utils/fetchWebpackStats';
+import { streamedStateSyncProviders } from './server/streamingState/providers';
 
 export { TramvaiRetryAssetsModule } from './retry-assets/server';
 export { PageErrorStore, setPageErrorEvent };
@@ -74,6 +76,7 @@ export const DEFAULT_POLYFILL_CONDITION = 'false';
   imports: [ClientHintsModule, LayoutModule],
   providers: [
     ...sharedProviders,
+    ...streamedStateSyncProviders,
     provide({
       provide: RESOURCES_REGISTRY,
       useClass: ResourcesRegistry,
@@ -275,6 +278,7 @@ Page Error Boundary will be rendered for the client`,
         di: DI_TOKEN,
         renderMode: optional(REACT_SERVER_RENDER_MODE),
         assetsPrefixFactory: ASSETS_PREFIX_TOKEN,
+        storeSyncEventsMiddleware: STORE_SYNC_EVENTS_TOKEN,
       },
     }),
     provide({

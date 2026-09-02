@@ -10,6 +10,7 @@ Non-deferred
 Deferred Foo
 Deferred Bar
 Deferred Baz
+Deferred State Sync
 Deferred Page
 Response: ok
 Response: ok
@@ -36,6 +37,7 @@ exports[`render-to-stream server-side rendering deferred page 1`] = `
           Deferred Foo
           Deferred Bar
           Deferred Baz
+          Deferred State Sync
         
       
       Deferred Page
@@ -75,6 +77,7 @@ exports[`render-to-stream server-side rendering deferred page full body (streame
   "Deferred Foo",
   "Deferred Page",
   "Deferred State",
+  "Deferred State Sync",
   "Error:",
   "Error:",
   "Failed Deferred",
@@ -111,6 +114,7 @@ exports[`render-to-stream server-side rendering main page 1`] = `
           Deferred Foo
           Deferred Bar
           Deferred Baz
+          Deferred State Sync
         
       
       
@@ -142,6 +146,7 @@ exports[`render-to-stream server-side rendering non-deferred page 1`] = `
           Deferred Foo
           Deferred Bar
           Deferred Baz
+          Deferred State Sync
         
       
       Loading...
