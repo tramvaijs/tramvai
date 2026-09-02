@@ -446,6 +446,9 @@ export function createTestSuite({ key, plugins }: { key: string; plugins: string
           expected.assets = expected.assets.sort();
           loadableStats.assets = loadableStats.assets.sort();
 
+          expected.chunks = expected.chunks.sort();
+          loadableStats.chunks = loadableStats.chunks.sort();
+
           // slightly different fields in rspack for chunks
           if (builder === 'rspack') {
             const baseChunk = expected.namedChunkGroups.base;
