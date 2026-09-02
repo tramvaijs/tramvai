@@ -232,9 +232,15 @@ Starting from version 7 enabled for development build by default
 
 ### Rspack
 
-Starting from Tramvai 6, it is possible to use Rspack as a replacement for Webpack. At the moment, only local builds for applications are supported:
+Starting from Tramvai 6, it is possible to use Rspack as a replacement for Webpack. At the moment, only local builds for applications or child-app are supported.
 
-`tramvai start --experimentalRspack`
+Run tramvai with CLI option:
+
+`tramvai start app --experimentalRspack`
+
+Or with env variable:
+
+`TRAMVAI_RSPACK=1 tramvai start`
 
 Also you need to install rspack plugin:
 

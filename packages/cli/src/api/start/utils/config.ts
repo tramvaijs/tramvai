@@ -55,6 +55,10 @@ export function hasSwcTranspiler(config: Config) {
   });
 }
 
+export function isRspackEnabled(params: Params) {
+  return process.env.TRAMVAI_RSPACK ?? params.experimentalRspack;
+}
+
 export function createDevServerApi(devServer) {
   return {
     server: devServer.server,

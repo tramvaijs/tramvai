@@ -17,8 +17,8 @@ export function showBanner(
 
   titleLines.push(`${chalk.yellow.bold('tramvai cli')}\n`);
 
-  titleLines.push(`${label('Bundler')}          ${options.transpiler.name}`);
-  titleLines.push(`${label('Transpiler')}       ${options.bundler}`);
+  titleLines.push(`${label('Bundler')}          ${options.bundler}`);
+  titleLines.push(`${label('Transpiler')}       ${options.transpiler.name}`);
 
   // Features
   if (config.projectType !== 'application') {

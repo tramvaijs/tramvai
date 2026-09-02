@@ -8,6 +8,7 @@ import type { Builder } from '../../typings/build/Builder';
 import { ConvertToSchema } from '../../schema/ConfigSchema';
 import { ApplicationConfigEntry } from '../../typings/configEntry/application';
 import { ChildAppConfigEntry } from '../../typings/configEntry/child-app';
+import { isRspackEnabled } from './utils/config';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all';
@@ -70,7 +71,7 @@ export default createCommand({
         // eslint-disable-next-line no-case-declarations
         const { startApplication, startExperimentalApplication } = require('./application');
 
-        if (options.experimentalRspack) {
+        if (isRspackEnabled(options)) {
           return startExperimentalApplication(di);
         }
 
@@ -83,7 +84,7 @@ export default createCommand({
         // eslint-disable-next-line no-case-declarations
         const { startExperimentalChildApp, startChildApp } = require('./child-app');
 
-        if (options.experimentalRspack) {
+        if (isRspackEnabled(options)) {
           return startExperimentalChildApp(di);
         }
 
