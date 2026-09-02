@@ -8,6 +8,7 @@ import type { Builder } from '../../typings/build/Builder';
 import { ConvertToSchema } from '../../schema/ConfigSchema';
 import { ApplicationConfigEntry } from '../../typings/configEntry/application';
 import { ChildAppConfigEntry } from '../../typings/configEntry/child-app';
+import { isRspackEnabled } from './utils/config';
 
 export type Params = WithConfig<{
   buildType?: 'server' | 'client' | 'all';
@@ -72,7 +73,7 @@ export default createCommand({
           return startWebpackApplication(di);
         }
 
-        if (options.experimentalRspack) {
+        if (isRspackEnabled(options)) {
           const { startRspackApplication } = require('./application.experimental');
           return startRspackApplication(di);
         }
@@ -91,7 +92,7 @@ export default createCommand({
           return startWebpackChildApp(di);
         }
 
-        if (options.experimentalRspack) {
+        if (isRspackEnabled(options)) {
           const { startRspackChildApp } = require('./child-app.experimental');
           return startRspackChildApp(di);
         }
