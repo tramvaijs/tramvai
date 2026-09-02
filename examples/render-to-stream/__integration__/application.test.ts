@@ -210,6 +210,7 @@ describe('render-to-stream', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Main Page
         Child Component
         Error boundary
@@ -249,6 +250,7 @@ describe('render-to-stream', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Id Page
         Response: foo
         this Footer in render-to-stream"
@@ -275,6 +277,7 @@ describe('render-to-stream', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Id Page
         Loading long...
         this Footer in render-to-stream"
@@ -293,6 +296,7 @@ describe('render-to-stream', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Id Page
         Response: bar
         this Footer in render-to-stream"

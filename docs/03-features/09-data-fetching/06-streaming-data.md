@@ -14,6 +14,7 @@ Experimental feature
 Imagine that you have a slow API call that returns a large amount of data, which is important to display to the user fast as possible, e.g. flight tickets or hotels search results.
 
 Waiting for this data at server-side is not optimal, because user will see a blank page for a seconds. Usually, you will run this API call on the client-side, and results will be displayed very later, after this steps:
+
 - page response finished
 - static assets are loaded (JS, CSS)
 - [hydration](03-features/010-rendering/03-hydration.md) is completed
@@ -94,14 +95,12 @@ const Page: PageComponent = () => {
       <Header />
       // highlight-start
       <Suspense fallback={<div>Loading...</div>}>
-        <Await action={deferredAction}>
-          {(data) => <div>Result: {JSON.stringify(data)}</div>}
-        </Await>
+        <Await action={deferredAction}>{(data) => <div>Result: {JSON.stringify(data)}</div>}</Await>
       </Suspense>
       // highlight-end
       <Footer />
     </>
-  )
+  );
 };
 
 // highlight-next-line
@@ -130,7 +129,7 @@ Let's update our previous example:
 import { declareAction } from '@tramvai/core';
 import { PageComponent } from '@tramvai/react';
 import { Await } from '@tramvai/module-common';
-    // highlight-next-line
+// highlight-next-line
 import { useRoute } from '@tinkoff/router';
 
 const deferredAction = declareAction({
@@ -156,13 +155,11 @@ const Page: PageComponent = () => {
     <>
       <Header />
       <Suspense fallback={<div>Loading...</div>} key={params.id}>
-        <Await action={deferredAction}>
-          {(data) => <div>Result: {JSON.stringify(data)}</div>}
-        </Await>
+        <Await action={deferredAction}>{(data) => <div>Result: {JSON.stringify(data)}</div>}</Await>
       </Suspense>
       <Footer />
     </>
-  )
+  );
 };
 
 Page.actions = [deferredAction];
@@ -185,20 +182,18 @@ const RootCmp = () => {
   return (
     <>
       <Suspense fallback={<div>Loading...</div>}>
-        <Await action={deferredAction}>
-          {(data) => <LazyDataCmp data={data} />}
-        </Await>
+        <Await action={deferredAction}>{(data) => <LazyDataCmp data={data} />}</Await>
       </Suspense>
     </>
-  )
+  );
 };
 ```
 
-### Use deferred actions data outside React components
+### Sync deferred actions data to the store
 
-Deferred Actions + `Suspense` and `Await` has one important limitation - deferred data is used only inside React components, and you can't dispatch deferred data to the reducer at server-side in this actions, because only initial state will be passed to client with app shell.
+Besides using deferred data inside React components with `Await`, you can update the store directly from a Deferred Action. In [streaming rendering](03-features/010-rendering/06-streaming.md) mode, every store event dispatched inside a Deferred Action is **automatically streamed to the client and replayed into the store**.
 
-Meaning this **will not** work:
+So you can just call `this.dispatch(...)` inside a Deferred Action:
 
 ```ts
 const deferredAction = declareAction({
@@ -207,7 +202,7 @@ const deferredAction = declareAction({
   async fn() {
     const { payload } = await this.deps.httpClient.get('/slow-endpoint');
 
-    // it is too late, store initial state already sent to client
+    // this event will be streamed to the client and applied to the store
     // highlight-next-line
     this.dispatch(slowEndpointReducerSuccessEvent(payload));
   },
@@ -217,7 +212,73 @@ const deferredAction = declareAction({
 });
 ```
 
-As a workaround, you can wait Deferred Actions manually at client-side in usual action. All deferred actions available in `DEFERRED_ACTIONS_MAP_TOKEN`. Let's update our first example:
+Because events are streamed as they are dispatched, a single Deferred Action can `dispatch` multiple times during its execution, and every update will reach the client store in order.
+
+:::info Requirements
+
+- The target reducer must be registered as a [page reducer](03-features/08-state-management.md) (`Page.reducers`), so the store exists on the client to receive the streamed events.
+- Event payload must be serializable.
+
+:::
+
+#### Custom event serialization
+
+Before an event is streamed, it is serialized into a string that is embedded into an inline `<script>` in the response. By default `tramvai` uses `safeStringify` (from `@tramvai/safe-strings`), which handles circular references and is safe to inline into the page.
+
+If the default serializer does not fit your case, you can provide your own via the `STORE_SYNC_EVENTS_SERIALIZE_TOKEN` token. It receives a `StoreSyncEvent` (`{ type, payload, store }`) and must return a string that is a valid JS expression, safe to inline into a `<script>` tag:
+
+```ts
+import { provide } from '@tramvai/core';
+import { STORE_SYNC_EVENTS_SERIALIZE_TOKEN } from '@tramvai/tokens-render';
+
+const provider = provide({
+  provide: STORE_SYNC_EVENTS_SERIALIZE_TOKEN,
+  useValue: (event) => myCustomSerialize(event),
+});
+```
+
+#### Nested actions inside a deferred action
+
+You can call other actions from a Deferred Action with `this.executeAction(...)`, but there is an important distinction between nested regular and nested deferred actions.
+
+**Regular (non-deferred) nested actions work as expected.** They execute within the parent Deferred Action's context, so their dispatched events are streamed too:
+
+```ts
+const nestedAction = declareAction({
+  name: 'nested',
+  async fn() {
+    const { payload } = await this.deps.httpClient.get('/another-slow-endpoint');
+
+    // streamed to the client, because it runs inside the deferred action context
+    this.dispatch(anotherReducerSuccessEvent(payload));
+  },
+  deps: {
+    httpClient: HTTP_CLIENT,
+  },
+});
+
+const rootDeferredAction = declareAction({
+  name: 'rootDeferred',
+  deferred: true,
+  async fn() {
+    // `await` keeps the response stream open until the nested action finishes
+    // highlight-next-line
+    await this.executeAction(nestedAction);
+  },
+});
+```
+
+:::caution Nested deferred actions are not supported
+
+Starting **another Deferred Action** (`deferred: true`) from inside an action is **not** guaranteed to stream its events. Only **page** Deferred Actions are awaited before the response stream is closed. A nested Deferred Action resolves immediately (it is non-blocking by design), so nobody waits for its result and the response stream may close before its events are dispatched — the events would then be lost.
+
+Use `deferred: true` only for **page** actions (`Page.actions`). For nested work started from within a Deferred Action, use regular actions.
+
+:::
+
+#### Manual synchronization (alternative)
+
+If you can't use the automatic streaming above — for example, streaming rendering is disabled, or you need custom control over when data lands in the store — you can wait for a Deferred Action manually at client-side in a regular action. All deferred actions are available in `DEFERRED_ACTIONS_MAP_TOKEN`:
 
 ```tsx
 // deferredAction without any changes
@@ -235,18 +296,14 @@ const DeferredState = createReducer({
 const deferredStateSyncAction = declareAction({
   name: 'deferredStateSync',
   async fn() {
-    // use deferred action name as a key 
-    const deferred = this.deps.deferredActionsMap.get(
-      deferredAction.name
-    );
+    // use deferred action name as a key
+    const deferred = this.deps.deferredActionsMap.get(deferredAction.name);
 
     // wait for deferred promise (in real-world case don't forget to handle error case)
     await deferred!.promise;
 
     // sync deferred data with our new store
-    this.dispatch(
-      deferredState.events.success(deferred!.resolveData)
-    );
+    this.dispatch(deferredState.events.success(deferred!.resolveData));
   },
   deps: {
     deferredActionsMap: DEFERRED_ACTIONS_MAP_TOKEN,
@@ -271,8 +328,8 @@ const DeferredStateCmp = () => {
         <div>{`Response: ${state.payload.data}`}</div>
       )}
     </>
-  )
-}
+  );
+};
 
 const Page: PageComponent = () => {
   return (
@@ -280,9 +337,7 @@ const Page: PageComponent = () => {
       <h1>Deferred State Page</h1>
 
       <Suspense fallback={<div>Loading...</div>}>
-        <Await action={deferredAction}>
-          {() => <DeferredStateCmp />}
-        </Await>
+        <Await action={deferredAction}>{() => <DeferredStateCmp />}</Await>
       </Suspense>
     </>
   );
@@ -294,5 +349,3 @@ Page.actions = [deferredAction];
 
 export default Page;
 ```
-
-Without `Suspense` and `Await`, `tramvai` will stream only deferred data to the client, for React all this component will be rendered as app shell, at first HTML chunk.

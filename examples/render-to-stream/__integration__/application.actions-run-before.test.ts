@@ -57,6 +57,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Page
         Response: ok
         Response: ok
@@ -86,6 +87,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Id Page
         Response: foo
         this Footer in render-to-stream"
@@ -112,6 +114,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Id Page
         Loading long...
         this Footer in render-to-stream"
@@ -130,6 +133,7 @@ describe('render-to-stream. actions run mode - before', () => {
         Deferred Foo
         Deferred Bar
         Deferred Baz
+        Deferred State Sync
         Deferred Id Page
         Response: bar
         this Footer in render-to-stream"

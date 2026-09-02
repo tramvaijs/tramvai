@@ -8,11 +8,11 @@ export class Deferred<T> {
   rejectReason: Error | undefined;
 
   isResolved = () => {
-    return typeof this.resolveData !== 'undefined';
+    return this.status === 'resolved';
   };
 
   isRejected = () => {
-    return typeof this.rejectReason !== 'undefined';
+    return this.status === 'rejected';
   };
 
   reset = () => {

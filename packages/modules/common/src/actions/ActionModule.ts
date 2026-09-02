@@ -20,6 +20,7 @@ import {
   COMMAND_LINE_EXECUTION_CONTEXT_TOKEN,
   DEFERRED_ACTIONS_MAP_TOKEN,
   LIMIT_ACTION_GLOBAL_TIME_RUN,
+  ASYNC_LOCAL_STORAGE_TOKEN,
   ACTION_EXECUTION_HOOKS_TOKEN,
   ActionStartHookData,
   ActionEndHookData,
@@ -104,6 +105,7 @@ export { alwaysCondition, onlyServer, onlyBrowser, pageServer, pageBrowser, dyna
         serverResponseStream: optional(SERVER_RESPONSE_STREAM),
         router: ROUTER_TOKEN,
         childAppConfig: optional(CHILD_APP_INTERNAL_CONFIG_TOKEN),
+        storage: optional(ASYNC_LOCAL_STORAGE_TOKEN),
       },
     }),
     provide({

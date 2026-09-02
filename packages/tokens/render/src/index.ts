@@ -2,6 +2,7 @@ import type { ReactElement, ComponentType } from 'react';
 import { Scope, createToken } from '@tinkoff/dippy';
 import { StorageRecord } from '@tinkoff/htmlpagebuilder';
 import type { UniversalErrorBoundaryFallbackProps } from '@tramvai/react';
+import type { Middleware } from '@tramvai/types-actions-state-context';
 import type { JSX } from 'react';
 import * as ResourceSlot from './slots';
 
@@ -229,6 +230,20 @@ export type ReactServerRenderMode = 'sync' | 'streaming' | 'blocking';
 export const REACT_SERVER_RENDER_MODE = createToken<ReactServerRenderMode>('reactServerRenderMode');
 
 export const REACT_STREAMING_RENDER_TIMEOUT = createToken<number>('react streaming render timeout');
+
+export interface StoreSyncEvent {
+  type: string;
+  payload: any;
+  store: string | null;
+}
+
+export const STORE_SYNC_EVENTS_SERIALIZE_TOKEN = createToken<(event: StoreSyncEvent) => string>(
+  'tramvai storeSyncEventsSerialize'
+);
+
+export const STORE_SYNC_EVENTS_TOKEN = createToken<Middleware & { startStreaming: () => void }>(
+  'tramvai storeSyncEventsController'
+);
 
 export interface WebpackStats {
   assetsByChunkName: Record<string, string[]>;

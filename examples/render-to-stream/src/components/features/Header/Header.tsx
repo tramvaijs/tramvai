@@ -33,6 +33,9 @@ export const Header = () => (
       <li>
         <Link url="/deferred/baz/">Deferred Baz</Link>
       </li>
+      <li>
+        <Link url="/deferred-state-sync/">Deferred State Sync</Link>
+      </li>
     </ul>
   </div>
 );
