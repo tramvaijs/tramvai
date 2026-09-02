@@ -1,6 +1,7 @@
 import { expectTypeOf } from 'expect-type';
-import type { InfiniteData } from '@tanstack/react-query';
+import type { InfiniteData, QueryKey } from '@tanstack/react-query';
 import { createToken } from '@tinkoff/dippy';
+import type { SafeUseInfiniteQueryOptions } from './create';
 import { createInfiniteQuery } from './create';
 import { useInfiniteQuery } from './use';
 
@@ -106,5 +107,20 @@ describe('fork', () => {
     const fork = query.fork({});
 
     expectTypeOf(fork).toEqualTypeOf<ReturnType<typeof query.fork>>();
+  });
+});
+
+// `SafeUseInfiniteQueryOptions` picks the `UseInfiniteQueryOptions` generic parameters layout
+// based on the installed @tanstack/react-query version. When that detection breaks, generic
+// arguments silently land in the wrong slots instead of failing loudly, so guard it here.
+describe('SafeUseInfiniteQueryOptions', () => {
+  type Options = SafeUseInfiniteQueryOptions<string, Error, string, QueryKey, number>;
+
+  it('resolves TPageParam to the page param options', () => {
+    expectTypeOf<Options['initialPageParam']>().toEqualTypeOf<number>();
+  });
+
+  it('resolves TQueryKey to the query key', () => {
+    expectTypeOf<NonNullable<Options['queryKey']>>().toEqualTypeOf<QueryKey>();
   });
 });

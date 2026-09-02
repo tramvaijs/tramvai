@@ -1,9 +1,5 @@
 import identity from '@tinkoff/utils/function/identity';
-import type {
-  QueryKey,
-  UseInfiniteQueryOptions,
-  InfiniteQueryObserverOptions,
-} from '@tanstack/react-query';
+import type { QueryKey, UseInfiniteQueryOptions } from '@tanstack/react-query';
 import type { ActionContext } from '@tramvai/core';
 import { declareAction } from '@tramvai/core';
 import { QUERY_CLIENT_TOKEN } from '@tramvai/module-react-query';
@@ -18,18 +14,47 @@ import { resolveDI } from '../shared/resolveDI';
 import { mapQuerySignalToxecutionContext } from '../shared/signal';
 import { createUniqueActionKeyForQuery } from '../shared/createUniqueActionKeyForQuery';
 
-// `UseInfiniteQueryOptions` types is incompatible between v4 and v5
-// also, this helper will work properly only for v4 or >=5.80,
-// because for >=5 <5.80 range there is 6 generic parameters in `UseInfiniteQueryOptions`
+// `UseInfiniteQueryOptions` generic parameters are incompatible between the supported RQ versions:
+// - v4:        `<TQueryFnData, TError, TData, TQueryData, TQueryKey>`
+// - >=5 <5.80: `<TQueryFnData, TError, TData, TQueryData, TQueryKey, TPageParam>`
+// - >=5.80:    `<TQueryFnData, TError, TData, TQueryKey, TPageParam>`
+//
+// So we detect the layout by instantiating `UseInfiniteQueryOptions` with a marker type in the
+// 5th slot and checking whether it lands on `initialPageParam`. Sniffing for a specific RQ
+// feature instead is not reliable - e.g. `experimental_prefetchInRender`, used here before,
+// was removed in RQ 5.9x and silently switched the whole type to the v4 layout.
+//
+// The marker is a valid `QueryKey`, so it doesn't violate the `TQueryKey extends QueryKey`
+// constraint on the layouts where the 5th slot is `TQueryKey`.
+interface PageParamProbe {
+  readonly __tramvaiPageParamProbe: true;
+}
+
+type IsPageParamFifthGenericParameter = UseInfiniteQueryOptions<
+  unknown,
+  Error,
+  unknown,
+  QueryKey,
+  readonly [PageParamProbe]
+> extends { initialPageParam?: readonly [PageParamProbe] }
+  ? true
+  : false;
+
+// this helper works properly only for v4 or >=5.80, for the >=5 <5.80 range it falls back
+// to the v4 layout.
+// `@ts-ignore` (and not `@ts-expect-error`) is required on both branches: only one of them is
+// valid for the currently installed RQ version, and the other one violates the
+// `TQueryKey extends QueryKey` constraint.
 export type SafeUseInfiniteQueryOptions<
   TQueryFnData = unknown,
   TError = unknown,
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
   TPageParam = unknown,
-> = InfiniteQueryObserverOptions extends { experimental_prefetchInRender?: boolean }
-  ? UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>
-  : // @ts-expect-error backward compatibility with RQ v4
+> = IsPageParamFifthGenericParameter extends true
+  ? // @ts-ignore RQ >=5.80
+    UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>
+  : // @ts-ignore backward compatibility with RQ v4
     UseInfiniteQueryOptions<TQueryFnData, TError, TData, TData, TQueryKey>;
 
 const convertToRawQuery = <Options, PageParam, Result, Deps extends ProviderDeps>(
