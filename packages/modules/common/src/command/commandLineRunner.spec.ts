@@ -1,5 +1,7 @@
 import { createContainer } from '@tinkoff/dippy';
+import { TapableHooks } from '@tinkoff/hook-runner';
 import { ExecutionContextManager } from '../executionContext/executionContextManager';
+import type { CommandLine } from './commandLineRunner';
 import { CommandLineRunner } from './commandLineRunner';
 
 const lines = {
@@ -51,7 +53,7 @@ const LoggerMock: any = (name: any) => ({ log: () => {}, error: () => {}, debug:
 
 const ExecutionEndHandlerMock = jest.fn();
 
-function generateBaseIt(type: string, status: string, result: string[]) {
+function generateBaseIt(type: string, status: CommandLine, result: string[]) {
   const actual: string[] = [];
   const { di } = factoryTestActions(actual);
 
@@ -61,6 +63,8 @@ function generateBaseIt(type: string, status: string, result: string[]) {
     logger: LoggerMock,
     executionContextManager: new ExecutionContextManager(),
     executionEndHandlers: [ExecutionEndHandlerMock],
+    hookFactory: new TapableHooks(),
+    plugins: [],
   });
 
   return flow.run(type as any, status).then(() => {
@@ -122,6 +126,8 @@ describe('CommandLineRunner', () => {
         logger: LoggerMock,
         executionContextManager: new ExecutionContextManager(),
         executionEndHandlers: [ExecutionEndHandlerMock],
+        hookFactory: new TapableHooks(),
+        plugins: [],
       });
 
       expect.assertions(3);
@@ -134,5 +140,73 @@ describe('CommandLineRunner', () => {
 
       expect(ExecutionEndHandlerMock).toHaveBeenCalledTimes(1);
     });
+  });
+
+  it('hooks and plugins', async () => {
+    const { di } = factoryTestActions([]);
+    const runLinePluginMock = jest.fn();
+    const runCommandPluginMock = jest.fn();
+    const runCommandFnPluginMock = jest.fn();
+    const plugin = {
+      apply(commandLineRunner: CommandLineRunner) {
+        commandLineRunner.runLineHook.tapPromise('test', runLinePluginMock);
+        commandLineRunner.runCommandHook.tapPromise('test', runCommandPluginMock);
+        commandLineRunner.runCommandFnHook.tapPromise('test', runCommandFnPluginMock);
+      },
+    };
+
+    const flow = new CommandLineRunner({
+      lines: lines as any,
+      rootDi: di,
+      logger: LoggerMock,
+      executionContextManager: new ExecutionContextManager(),
+      executionEndHandlers: [],
+      hookFactory: new TapableHooks(),
+      plugins: [plugin],
+    });
+
+    expect.assertions(9);
+
+    expect(runLinePluginMock).not.toHaveBeenCalled();
+    expect(runCommandPluginMock).not.toHaveBeenCalled();
+    expect(runCommandFnPluginMock).not.toHaveBeenCalled();
+
+    await flow.run('server', 'init');
+
+    expect(runLinePluginMock).toHaveBeenCalledWith(
+      {},
+      { di, env: 'server', line: 'init' },
+      undefined
+    );
+    expect(runCommandPluginMock).toHaveBeenNthCalledWith(
+      1,
+      {},
+      { di, env: 'server', line: 'init', command: 'A' },
+      undefined
+    );
+    expect(runCommandPluginMock).toHaveBeenNthCalledWith(
+      2,
+      {},
+      { di, env: 'server', line: 'init', command: 'B' },
+      undefined
+    );
+    expect(runCommandFnPluginMock).toHaveBeenNthCalledWith(
+      1,
+      {},
+      { di, line: 'init', command: 'A', fn: di.get('A') },
+      undefined
+    );
+    expect(runCommandFnPluginMock).toHaveBeenNthCalledWith(
+      2,
+      {},
+      { di, line: 'init', command: 'B', fn: di.get('B')[0] },
+      undefined
+    );
+    expect(runCommandFnPluginMock).toHaveBeenNthCalledWith(
+      3,
+      {},
+      { di, line: 'init', command: 'B', fn: di.get('B')[1] },
+      undefined
+    );
   });
 });

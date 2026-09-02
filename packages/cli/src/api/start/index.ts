@@ -67,12 +67,18 @@ export default createCommand({
 
     switch (configEntry.type) {
       case 'application':
-        // eslint-disable-next-line no-case-declarations
-        const { startApplication, startExperimentalApplication } = require('./application');
+        if (options.experimentalWebpackWorkerThreads) {
+          const { startWebpackApplication } = require('./application.experimental');
+          return startWebpackApplication(di);
+        }
 
         if (options.experimentalRspack) {
-          return startExperimentalApplication(di);
+          const { startRspackApplication } = require('./application.experimental');
+          return startRspackApplication(di);
         }
+
+        // eslint-disable-next-line no-case-declarations
+        const { startApplication } = require('./application');
 
         return startApplication(di);
       case 'module':
@@ -80,12 +86,18 @@ export default createCommand({
         const { startModule } = require('./module');
         return startModule(di);
       case 'child-app':
-        // eslint-disable-next-line no-case-declarations
-        const { startExperimentalChildApp, startChildApp } = require('./child-app');
+        if (options.experimentalWebpackWorkerThreads) {
+          const { startWebpackChildApp } = require('./child-app.experimental');
+          return startWebpackChildApp(di);
+        }
 
         if (options.experimentalRspack) {
-          return startExperimentalChildApp(di);
+          const { startRspackChildApp } = require('./child-app.experimental');
+          return startRspackChildApp(di);
         }
+
+        // eslint-disable-next-line no-case-declarations
+        const { startChildApp } = require('./child-app');
 
         return startChildApp(di);
     }

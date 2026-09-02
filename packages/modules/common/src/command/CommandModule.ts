@@ -15,7 +15,7 @@ import { Scope, optional, provide } from '@tinkoff/dippy';
 import { COMMAND_LINE_EXECUTION_END_TOKEN } from '@tramvai/tokens-core-private';
 import { TramvaiHookModule } from '../hook/HookModule';
 import { lines } from './defaultLines';
-import { CommandLineRunner } from './commandLineRunner.new';
+import { CommandLineRunner } from './commandLineRunner';
 
 @Module({
   imports: [TramvaiHookModule],

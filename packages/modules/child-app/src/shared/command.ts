@@ -51,7 +51,17 @@ export class CommandLineRunner implements ChildAppCommandLineRunner {
       executionContext?.abortSignal?.aborted ||
       (typeof window === 'undefined' && !executionContext)
     ) {
-      this.log.error({
+      const abortSignalReason = executionContext?.abortSignal.reason;
+      const reasonIsObject = typeof abortSignalReason === 'object';
+
+      const isExpectedError =
+        // If we didn't have execution context, it mean that Root App command line was failed/aborted,
+        // so Child App can't be a reason, and `debug` log level is enough
+        !executionContext ||
+        (reasonIsObject && isSilentError(abortSignalReason)) ||
+        (reasonIsObject && abortSignalReason.reason && isSilentError(abortSignalReason.reason));
+
+      this.log[isExpectedError ? 'error' : 'debug']({
         event: 'host-exection-context-aborted',
         message: `Child App command line run was prevented from executing because ${
           executionContext?.abortSignal?.aborted

@@ -2,7 +2,7 @@ import {
   CHILD_APP_CONFIG_FIELDS,
   CHILD_APP_EXPERIMENTS_FIELDS,
   mapChildAppProjectToNewConfig,
-} from './child-app';
+} from './child-app.experimental';
 import type { ChildAppConfigEntry } from '../../typings/configEntry/child-app';
 
 function createAccessTracker<T extends Record<string, any>>(
@@ -78,6 +78,7 @@ function createFullChildAppConfig(): Required<ChildAppConfigEntry> {
     alias: { '@': './src' },
     svgo: { plugins: [{ name: 'preset-default', params: {} }] },
     imageOptimization: { enabled: true, options: {} },
+    transpileOnlyModernLibs: false,
     webpack: {
       resolveAlias: { stream: 'stream-browserify' },
       provide: { Buffer: ['buffer', 'Buffer'] },

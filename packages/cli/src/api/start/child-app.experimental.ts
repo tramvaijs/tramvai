@@ -81,7 +81,15 @@ declare global {
   var __TRAMVAI_EXIT_HANDLERS__: Array<() => Promise<any>>;
 }
 
-export const startExperimentalChildApp = async (di: Container): Result => {
+export const startWebpackChildApp = (di: Container) => {
+  return baseStartChildApp('webpack', di);
+};
+
+export const startRspackChildApp = (di: Container) => {
+  return baseStartChildApp('rspack', di);
+};
+
+async function baseStartChildApp(builder: 'webpack' | 'rspack', di: Container): Result {
   const configEntry = di.get(CONFIG_ENTRY_TOKEN);
   const options = di.get(COMMAND_PARAMETERS_TOKEN as Params);
   const rootDir = di.get(CONFIG_ROOT_DIR_TOKEN);
@@ -106,7 +114,7 @@ export const startExperimentalChildApp = async (di: Container): Result => {
   const extraConfiguration: Partial<Configuration> = {
     projects,
     plugins: [
-      '@tramvai/plugin-webpack-builder',
+      `@tramvai/plugin-${builder}-builder`,
       hasSwcTranspiler(content)
         ? '@tramvai/plugin-swc-transpiler'
         : '@tramvai/plugin-babel-transpiler',
@@ -130,7 +138,7 @@ export const startExperimentalChildApp = async (di: Container): Result => {
   }
 
   return createDevServerApi(devServer);
-};
+}
 
 function mapTramvaiJsonToNewTsConfig({ rootDir }: { rootDir: string }) {
   const { content } = getTramvaiConfig(rootDir);
@@ -276,8 +284,8 @@ export function mapChildAppProjectToNewConfig(projectName: string, project: Conf
       case 'alias':
       case 'enableFillActionNamePlugin':
       case 'excludesPresetEnv':
-      case 'transpileOnlyModernLibs':
       case 'threadLoader':
+      case 'transpileOnlyModernLibs':
       case 'terser':
       case 'cssMinimize':
       case 'notifications':
