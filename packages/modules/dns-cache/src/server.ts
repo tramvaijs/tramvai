@@ -14,7 +14,7 @@ import {
   UndiciDnsCacheStorage,
   createDnsInterceptor,
 } from './dns-interceptor';
-import { DNS_INTERCEPTOR_OPTIONS_TOKEN } from './tokens';
+import { DEFAULT_DNS_INTERCEPTOR_OPTIONS_TOKEN, DNS_INTERCEPTOR_OPTIONS_TOKEN } from './tokens';
 
 export * from './tokens';
 
@@ -24,21 +24,12 @@ export const TramvaiDnsCacheModule = declareModule({
   providers: [
     provide({
       provide: HTTP_CLIENT_AGENT_INTERCEPTORS,
-      useFactory: ({ envManager, storage, ipHostCache, requestMetrics, dnsInterceptorOptions }) => {
-        const enabledFromEnv = envManager.get('DNS_LOOKUP_CACHE_ENABLE');
-        const maxTTLFromEnv = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
-        const maxItemsFromEnv = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
-
-        const dnsLookupEnabled =
-          enabledFromEnv === 'true' ? enabledFromEnv : dnsInterceptorOptions.enabled;
-        const maxTTL = !Number.isNaN(maxTTLFromEnv) ? maxTTLFromEnv : dnsInterceptorOptions.maxTTL;
-        const maxItems = !Number.isNaN(maxItemsFromEnv)
-          ? maxItemsFromEnv
-          : dnsInterceptorOptions.maxItems;
+      useFactory: ({ storage, ipHostCache, requestMetrics, dnsInterceptorOptions }) => {
+        const { enabled, maxTTL, maxItems, dualStack, affinity } = dnsInterceptorOptions;
 
         const { dnsResolveDuration } = requestMetrics;
 
-        if (!dnsLookupEnabled) {
+        if (!enabled) {
           return function noopInterceptor(dispatch) {
             return function noopInterceptorDispatch(opts, handler) {
               return dispatch(opts, handler);
@@ -53,8 +44,8 @@ export const TramvaiDnsCacheModule = declareModule({
             dnsResolveDuration.observe({ service: hostname }, lookupDuration),
           maxTTL,
           maxItems,
-          dualStack: dnsInterceptorOptions.dualStack,
-          affinity: dnsInterceptorOptions.affinity,
+          dualStack,
+          affinity,
         });
 
         (dnsInterceptor as any).__tramvai_dns_interceptor = true;
@@ -62,7 +53,6 @@ export const TramvaiDnsCacheModule = declareModule({
         return dnsInterceptor;
       },
       deps: {
-        envManager: ENV_MANAGER_TOKEN,
         storage: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
         requestMetrics: REQUEST_METRICS_INSTANCES,
         ipHostCache: optional(METRICS_IP_HOST_CACHE),
@@ -72,12 +62,12 @@ export const TramvaiDnsCacheModule = declareModule({
     provide({
       provide: commandLineListTokens.init,
       multi: true,
-      useFactory: ({ envManager, cache }) => {
-        if (envManager.get('DNS_LOOKUP_CACHE_ENABLE') !== 'true') {
+      useFactory: ({ cache, dnsInterceptorOptions }) => {
+        if (!dnsInterceptorOptions.enabled) {
           return noop;
         }
         return function addDnsLookupCache() {
-          const maxTtl = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+          const { maxTTL: maxTtl } = dnsInterceptorOptions;
           const cacheable = new CacheableLookup({
             cache,
             maxTtl,
@@ -133,16 +123,15 @@ export const TramvaiDnsCacheModule = declareModule({
         };
       },
       deps: {
-        envManager: ENV_MANAGER_TOKEN,
         cache: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
+        dnsInterceptorOptions: DNS_INTERCEPTOR_OPTIONS_TOKEN,
       },
     }),
     provide({
       provide: DNS_CACHEABLE_LOOKUP_CACHE_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ envManager, createCache }) => {
-        const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
-        const dnsTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+      useFactory: ({ createCache, dnsInterceptorOptions }) => {
+        const { maxItems: max, maxTTL: dnsTTL } = dnsInterceptorOptions;
 
         const cache = createCache('memory', { name: 'dns-lookup-http', max, ttl: dnsTTL });
 
@@ -165,15 +154,14 @@ export const TramvaiDnsCacheModule = declareModule({
       },
       deps: {
         createCache: CREATE_CACHE_TOKEN,
-        envManager: ENV_MANAGER_TOKEN,
+        dnsInterceptorOptions: DNS_INTERCEPTOR_OPTIONS_TOKEN,
       },
     }),
     provide({
       provide: DNS_UNDICI_LOOKUP_CACHE_TOKEN,
       scope: Scope.SINGLETON,
-      useFactory: ({ envManager, createCache }) => {
-        const max = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
-        const dnsTTL = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+      useFactory: ({ createCache, dnsInterceptorOptions }) => {
+        const { maxItems: max, maxTTL: dnsTTL } = dnsInterceptorOptions;
 
         const cache = createCache('memory', { name: 'dns-lookup', max, ttl: dnsTTL });
 
@@ -199,17 +187,40 @@ export const TramvaiDnsCacheModule = declareModule({
       },
       deps: {
         createCache: CREATE_CACHE_TOKEN,
+        dnsInterceptorOptions: DNS_INTERCEPTOR_OPTIONS_TOKEN,
+      },
+    }),
+    provide({
+      provide: DEFAULT_DNS_INTERCEPTOR_OPTIONS_TOKEN,
+      useFactory: ({ envManager }) => {
+        const defaults = {
+          enabled: true,
+          maxTTL: 10000,
+          maxItems: 200,
+          dualStack: true,
+          affinity: 4 as const,
+        };
+
+        const enabledFromEnv = envManager.get('DNS_LOOKUP_CACHE_ENABLE');
+        const maxTTLFromEnv = Number(envManager.get('DNS_LOOKUP_CACHE_TTL'));
+        const maxItemsFromEnv = Number(envManager.get('DNS_LOOKUP_CACHE_LIMIT'));
+
+        return {
+          ...defaults,
+          enabled: enabledFromEnv === undefined ? defaults.enabled : enabledFromEnv === 'true',
+          maxTTL: !Number.isNaN(maxTTLFromEnv) ? maxTTLFromEnv : defaults.maxTTL,
+          maxItems: !Number.isNaN(maxItemsFromEnv) ? maxItemsFromEnv : defaults.maxItems,
+        };
+      },
+      deps: {
         envManager: ENV_MANAGER_TOKEN,
       },
     }),
     provide({
       provide: DNS_INTERCEPTOR_OPTIONS_TOKEN,
-      useValue: {
-        enabled: true,
-        maxTTL: 10000,
-        maxItems: 200,
-        dualStack: true,
-        affinity: 4,
+      useFactory: ({ defaultOptions }) => defaultOptions,
+      deps: {
+        defaultOptions: DEFAULT_DNS_INTERCEPTOR_OPTIONS_TOKEN,
       },
     }),
     provide({

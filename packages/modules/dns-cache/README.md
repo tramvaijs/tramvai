@@ -55,6 +55,21 @@ const provider = provide({
 });
 ```
 
+To override only a few options and keep the rest (including env-based ones) at their defaults, use `DEFAULT_DNS_INTERCEPTOR_OPTIONS_TOKEN`:
+
+```ts
+import {
+  DEFAULT_DNS_INTERCEPTOR_OPTIONS_TOKEN,
+  DNS_INTERCEPTOR_OPTIONS_TOKEN,
+} from '@tramvai/module-dns-cache';
+
+const provider = provide({
+  provide: DNS_INTERCEPTOR_OPTIONS_TOKEN,
+  useFactory: ({ defaults }) => ({ ...defaults, maxItems: 500 }),
+  deps: { defaults: DEFAULT_DNS_INTERCEPTOR_OPTIONS_TOKEN },
+});
+```
+
 Also, you can override a few options via environment variables:
 
 #### Enable/disable
