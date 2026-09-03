@@ -28,7 +28,7 @@
     "@tramvai/tokens-render": "0.0.0-stub"
   },
   "devDependencies": {
-    "@tanstack/react-query": "^5.90.21"
+    "@tanstack/react-query": "~5.90.21"
   },
   "peerDependencies": {
     "@tinkoff/dippy": "^1.0.0",
