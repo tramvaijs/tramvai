@@ -1,5 +1,6 @@
 /* eslint-disable max-statements, complexity */
 import { Writable } from 'node:stream';
+import path from 'node:path';
 
 import webpack from 'webpack';
 import type { Configuration, WebpackPluginInstance } from 'webpack';
@@ -149,12 +150,19 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
     },
   });
 
+  // TCORE-5228 FIXME: a bare `virtual:tramvai/browserslist` request is marked as removed by webpack,
+  // and it leads to immediate rebuild after initial compilation, so the module is registered by
+  // an absolute path inside the application `node_modules`, and aliased to the same path.
+  // The path must be built from `rootDir`: a hardcoded `/node_modules/...` is resolvable on POSIX only,
+  // on Windows the resolver looks for `<drive>:\node_modules\...` and the module is not found
+  const virtualBrowserslistPath = path.join(
+    config.rootDir,
+    'node_modules',
+    'virtual-tramvai-browserslist.js'
+  );
+
   const virtualModulesPlugin = new VirtualModulesPlugin({
-    // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/browserslist.js`,
-    // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
-    // 'virtual:tramvai/browserslist': `export default ${browserslistConfig}`,
-    // alias from @tramvai/cli/lib/external/browserslist-normalized-file-config will be resolved to this request
-    '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
+    [virtualBrowserslistPath]: `export default ${browserslistConfig}`,
   });
 
   if (transpiler.warmupThreadLoader) {
@@ -237,8 +245,7 @@ export const webpackConfig: WebpackConfigurationFactory = async ({ di }) => {
         // backward compatibility for old @tramvai/cli file-system pages mechanism
         '@tramvai/cli/lib/external/pages': '@tramvai/api/lib/virtual/file-system-pages',
         // backward compatibility for old @tramvai/cli normalized browserslist mechanism
-        '@tramvai/cli/lib/external/browserslist-normalized-file-config':
-          'virtual:tramvai/browserslist',
+        '@tramvai/cli/lib/external/browserslist-normalized-file-config': virtualBrowserslistPath,
         ...alias,
       },
       plugins: [...resolveOptions.plugins],

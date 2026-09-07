@@ -1,5 +1,6 @@
 /* eslint-disable max-statements, complexity */
 import { Writable } from 'node:stream';
+import path from 'node:path';
 import webpack from 'webpack';
 import type { Configuration } from 'webpack';
 import VirtualModulesPlugin from 'webpack-virtual-modules';
@@ -114,17 +115,21 @@ export const webpackConfig: WebpackConfigurationFactory = async ({
 export { appConfig };
 export default appConfig;`;
 
+  // TCORE-5228 FIXME: bare `virtual:tramvai/*` requests are marked as removed by webpack,
+  // and it leads to immediate rebuild after initial compilation, so the modules are registered by
+  // absolute paths inside the application `node_modules`, and aliased to the same paths.
+  // The paths must be built from `rootDir`: a hardcoded `/node_modules/...` is resolvable on POSIX only,
+  // on Windows the resolver looks for `<drive>:\node_modules\...` and the modules are not found
+  const virtualConfigPath = path.join(config.rootDir, 'node_modules', 'virtual-tramvai-config.js');
+  const virtualBrowserslistPath = path.join(
+    config.rootDir,
+    'node_modules',
+    'virtual-tramvai-browserslist.js'
+  );
+
   const virtualModulesPlugin = new VirtualModulesPlugin({
-    // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/config.js`,
-    // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
-    // 'virtual:tramvai/config': virtualTramvaiConfig,
-    // alias from @tramvai/cli/lib/external/config will be resolved to this request
-    '/node_modules/virtual:tramvai/config.js': virtualTramvaiConfig,
-    // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/browserslist.js`,
-    // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
-    // 'virtual:tramvai/browserslist': `export default ${browserslistConfig}`,
-    // alias from @tramvai/cli/lib/external/browserslist-normalized-file-config will be resolved to this request
-    '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
+    [virtualConfigPath]: virtualTramvaiConfig,
+    [virtualBrowserslistPath]: `export default ${browserslistConfig}`,
   });
 
   if (transpiler.warmupThreadLoader) {
@@ -207,10 +212,9 @@ export default appConfig;`;
         // backward compatibility for old @tramvai/cli file-system papi mechanism
         '@tramvai/cli/lib/external/api': '@tramvai/api/lib/virtual/file-system-papi',
         // backward compatibility for old @tramvai/cli config mechanism
-        '@tramvai/cli/lib/external/config': 'virtual:tramvai/config',
+        '@tramvai/cli/lib/external/config': virtualConfigPath,
         // backward compatibility for old @tramvai/cli normalized browserslist mechanism
-        '@tramvai/cli/lib/external/browserslist-normalized-file-config':
-          'virtual:tramvai/browserslist',
+        '@tramvai/cli/lib/external/browserslist-normalized-file-config': virtualBrowserslistPath,
         ...(isRootErrorBoundaryEnabled
           ? { '@/__private__/error': config.fileSystemPages!.rootErrorBoundaryPath }
           : {}),
