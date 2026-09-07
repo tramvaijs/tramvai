@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
     inputs:
       os:
@@ -22,6 +24,10 @@ env:
 
 jobs:
   bootstrap:
+    # on pull requests the smoke test is opt-in via the "smoke" label,
+    # the full matrix is too heavy to run on every PR
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'smoke')
+
     strategy:
       # every OS should be checked even if another one has already failed
       fail-fast: false
