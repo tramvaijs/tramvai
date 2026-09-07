@@ -64,7 +64,7 @@ const devDependencies = [
   'husky@^4',
   'lint-staged',
   '@tramvai/prettier-config',
-  'typescript',
+  'typescript@^5.1.0',
   'source-map',
   'webpack-sources',
 ];

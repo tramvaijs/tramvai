@@ -44,6 +44,6 @@
     "@types/yargs": "^15.0.5"
   },
   "peerDependencies": {
-    "typescript": "*"
+    "typescript": ">=4 <7"
   }
 }

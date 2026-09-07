@@ -4,6 +4,18 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      os:
+        description: 'OS to run the smoke test on'
+        type: choice
+        required: false
+        default: all
+        options:
+          - all
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
 
 env:
   CI: true
@@ -11,8 +23,10 @@ env:
 jobs:
   bootstrap:
     strategy:
+      # every OS should be checked even if another one has already failed
+      fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.os != 'all' && format('["{0}"]', inputs.os) || '["ubuntu-latest", "windows-latest", "macos-latest"]') }}
 
     runs-on: ${{ matrix.os }}
 

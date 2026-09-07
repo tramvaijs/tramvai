@@ -27,6 +27,31 @@ const SERVER_BUILD_TID = 1;
 const CLIENT_BUILD_TID = 2;
 const SERVER_RUNNER_TID = 3;
 
+type BuildError = {
+  message: string;
+  stack?: string;
+  moduleName?: string;
+  loc?: string;
+  details?: string;
+};
+
+// webpack errors are reported as structured objects, and `console` prints them as `[Object]`,
+// so they are formatted to a plain string, otherwise a failed compilation is impossible to debug
+function formatBuildErrors(errors: BuildError[] = []): string {
+  if (errors.length === 0) {
+    return 'no error details provided by webpack';
+  }
+
+  return errors
+    .map((error, index) => {
+      const source = [error.moduleName, error.loc].filter(Boolean).join(' ');
+      const body = [error.message, error.details].filter(Boolean).join('\n');
+
+      return `[${index + 1}/${errors.length}]${source ? ` ${source}` : ''}\n${body}`;
+    })
+    .join('\n\n');
+}
+
 export function createDevServer({
   inputParameters,
   portManager,
@@ -289,6 +314,13 @@ export function createDevServer({
           }
         });
         serverWebpackWorker.subscribe(BUILD_FAILED, (data) => {
+          logger.event({
+            type: 'error',
+            event: 'webpack-builder',
+            message: 'Server compilation failed',
+            payload: `\n${formatBuildErrors(data.errors)}`,
+          });
+
           serverReject(data.errors);
 
           compileServerAfterBuild();
@@ -343,6 +375,13 @@ export function createDevServer({
           }
         });
         clientWebpackWorker.subscribe(BUILD_FAILED, (data) => {
+          logger.event({
+            type: 'error',
+            event: 'webpack-builder',
+            message: 'Client compilation failed',
+            payload: `\n${formatBuildErrors(data.errors)}`,
+          });
+
           clientReject(data.errors);
 
           if (measureClientWebpackWorker) {
