@@ -53,7 +53,13 @@ const tramvaiPackagesPaths = [...tramvaiScopes, ...tinkoffPackages].map((package
 function isTramvaiResource(resource: string | undefined) {
   if (!resource) return false;
 
-  return tramvaiPackagesPaths.some((tramvaiPackagePath) => resource.includes(tramvaiPackagePath));
+  // `resource` is an absolute path, on Windows it is separated with a backslash,
+  // while the paths above are always built with a forward slash
+  const normalizedResource = resource.replace(/\\/g, '/');
+
+  return tramvaiPackagesPaths.some((tramvaiPackagePath) =>
+    normalizedResource.includes(tramvaiPackagePath)
+  );
 }
 
 // based on [nextjs code](https://github.com/vercel/next.js/blob/aaeb349ce3e8c4c3435a43a29af4379266818e7b/packages/next/build/webpack-config.ts#L707)

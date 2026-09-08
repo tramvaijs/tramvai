@@ -20,7 +20,8 @@ export const legacyUniversalReplace: Plugin<InnerState> = (api) => {
       ImportDeclaration(path) {
         const { filename } = this.file.opts;
 
-        const isTramvaiReact = /tramvai\/react/.test(filename);
+        // `filename` is an absolute path, on Windows it is separated with a backslash
+        const isTramvaiReact = /tramvai[\\/]react/.test(filename);
 
         const { value: source } = path.get('source').node;
         if (

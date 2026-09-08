@@ -1,5 +1,6 @@
 /* eslint-disable complexity */
 /* eslint-disable max-statements */
+import path from 'node:path';
 
 import rspack, { Configuration, RuleSetRule } from '@rspack/core';
 import {
@@ -90,6 +91,16 @@ export const rspackConfig: RspackConfigurationFactory = async (config): Promise<
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
   const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
 
+  // virtual modules are registered by absolute paths inside the application `node_modules`,
+  // and aliased to the same paths - so they neither depend on the filesystem root layout,
+  // nor contain a `:`, which is not allowed in Windows file names
+  const virtualConfigPath = path.join(rootDir, 'node_modules', 'virtual-tramvai-config.js');
+  const virtualBrowserslistPath = path.join(
+    rootDir,
+    'node_modules',
+    'virtual-tramvai-browserslist.js'
+  );
+
   const stylesConfiguration = createStylesConfiguration({
     di,
     // we don't need the css on server, but it's needed to generate proper classnames in js
@@ -178,10 +189,9 @@ export default appConfig;`;
         // backward compatibility for old @tramvai/cli file-system papi mechanism
         '@tramvai/cli/lib/external/api': '@tramvai/api/lib/virtual/file-system-papi',
         // backward compatibility for old @tramvai/cli config mechanism
-        '@tramvai/cli/lib/external/config': 'virtual:tramvai/config',
+        '@tramvai/cli/lib/external/config': virtualConfigPath,
         // backward compatibility for old @tramvai/cli normalized browserslist mechanism
-        '@tramvai/cli/lib/external/browserslist-normalized-file-config':
-          'virtual:tramvai/browserslist',
+        '@tramvai/cli/lib/external/browserslist-normalized-file-config': virtualBrowserslistPath,
         ...(isRootErrorBoundaryEnabled
           ? { '@/__private__/error': config.fileSystemPages!.rootErrorBoundaryPath }
           : {}),
@@ -278,16 +288,8 @@ export default appConfig;`;
     plugins: [
       ...stylesConfiguration.plugins,
       new rspack.experiments.VirtualModulesPlugin({
-        // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/config.js`,
-        // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
-        // 'virtual:tramvai/config': virtualTramvaiConfig,
-        // alias from @tramvai/cli/lib/external/config will be resolved to this request
-        '/node_modules/virtual:tramvai/config.js': virtualTramvaiConfig,
-        // TCORE-5228 FIXME: when `@tramvai/cli/lib/external/config` import is used, it will resolve to `/node_modules/virtual:tramvai/browserslist.js`,
-        // and this virtual module marked as removed by webpack, and it leads to immediate rebuild after initial compilation
-        // 'virtual:tramvai/browserslist': `export default ${browserslistConfig}`,
-        // alias from @tramvai/cli/lib/external/browserslist-normalized-file-config will be resolved to this request
-        '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
+        [virtualConfigPath]: virtualTramvaiConfig,
+        [virtualBrowserslistPath]: `export default ${browserslistConfig}`,
       }),
       config.benchmark &&
         // require `@rsdoctor/rspack-plugin` here to speed up webpack worker initialization when benchmarking is not used

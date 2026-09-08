@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import { Compiler, Compilation, StatsCompilation } from 'webpack';
 
 import { getPolyfillCondition, getMaxBrowserVersionsByFeatures } from './polyfillCondition';
@@ -29,7 +31,7 @@ export class PolyfillConditionPlugin {
 
           for (const module of polyfillModules) {
             // @ts-ignore
-            if (module.resource && /\/core-js\/modules\//.test(module.resource)) {
+            if (module.resource && /[\\/]core-js[\\/]modules[\\/]/.test(module.resource)) {
               coreJsModules.push(module);
             }
           }
@@ -63,6 +65,8 @@ export class PolyfillConditionPlugin {
 }
 
 // node_modules/core-js/modules/es.array.push.js => es.array.push
+// `module.resource` is an absolute path, so it is parsed with `path` and not as a POSIX string,
+// otherwise nothing is found on Windows
 function getFeatureNameFromModulePath(modulePath: string) {
-  return modulePath.split('/').at(-1)?.replace(/\.js$/, '');
+  return path.basename(modulePath, '.js');
 }

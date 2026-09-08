@@ -1,5 +1,7 @@
 /* eslint-disable max-statements */
 /* eslint-disable complexity */
+import path from 'node:path';
+
 import { Compilation, RuleSetRule, HotModuleReplacementPlugin } from '@rspack/core';
 import rspack, { Configuration as RspackConfiguration } from '@rspack/core';
 import ReactRefreshPlugin from '@rspack/plugin-react-refresh';
@@ -133,6 +135,15 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
   const normalizedBrowserslistConfig = normalizeBrowserslistConfig(config);
   const browserslistConfig = JSON.stringify(normalizedBrowserslistConfig);
 
+  // the virtual module is registered by an absolute path inside the application `node_modules`,
+  // and aliased to the same path - so it neither depends on the filesystem root layout,
+  // nor contains a `:`, which is not allowed in Windows file names
+  const virtualBrowserslistPath = path.join(
+    rootDir,
+    'node_modules',
+    'virtual-tramvai-browserslist.js'
+  );
+
   const stylesConfiguration = createStylesConfiguration({
     di,
     emitCssChunks: true,
@@ -238,8 +249,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
         // backward compatibility for old @tramvai/cli file-system pages mechanism
         '@tramvai/cli/lib/external/pages': '@tramvai/api/lib/virtual/file-system-pages',
         // backward compatibility for old @tramvai/cli normalized browserslist mechanism
-        '@tramvai/cli/lib/external/browserslist-normalized-file-config':
-          'virtual:tramvai/browserslist',
+        '@tramvai/cli/lib/external/browserslist-normalized-file-config': virtualBrowserslistPath,
         ...alias,
       },
     },
@@ -370,7 +380,7 @@ export const rspackConfig: RspackConfigurationFactory = async (config) => {
     plugins: [
       ...buildRspackConfig.plugins!,
       new rspack.experiments.VirtualModulesPlugin({
-        '/node_modules/virtual:tramvai/browserslist.js': `export default ${browserslistConfig}`,
+        [virtualBrowserslistPath]: `export default ${browserslistConfig}`,
       }),
       new StatsWriterPlugin({
         filename: STATS_FILE_NAME,
