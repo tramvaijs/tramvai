@@ -70,6 +70,24 @@ jobs:
         working-directory: ../smoke-bootstrap
         run: tramvai-debug update prerelease
 
+      # by default the generated application installs published `prerelease` packages,
+      # so on pull request and manual runs the locally built ones are installed instead,
+      # otherwise changes from the branch are not checked at all
+      - name: Use local packages in application
+        if: github.event_name != 'push'
+        shell: bash
+        run: |
+          set -e
+          # workspace packages have the `0.0.0-stub` version, replace it with the real one
+          yarn build:change-versions
+          mkdir -p ../packs
+          for pkg in api plugin-base-builder plugin-webpack-builder; do
+            # the `./` prefix is required, otherwise npm treats the path as a GitHub shorthand
+            npm pack "./packages/$pkg" --pack-destination ../packs
+          done
+          cd ../smoke-bootstrap
+          npm install --no-save --no-audit --no-fund ../packs/*.tgz
+
       - name: Install Playwright
         working-directory: ../smoke-bootstrap
         run: yarn playwright install
