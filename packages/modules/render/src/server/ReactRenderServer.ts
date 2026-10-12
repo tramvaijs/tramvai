@@ -22,6 +22,7 @@ import type {
 } from '@tramvai/tokens-server-private';
 import { renderReact } from '../react';
 import { flushFiles } from './blocks/utils/flushFiles';
+import type { ServerStreamingTransport } from './streamingTransport/transport';
 
 type StreamingTimeout = ExtractDependencyType<typeof REACT_STREAMING_RENDER_TIMEOUT>;
 type DeferredActions = ExtractDependencyType<typeof DEFERRED_ACTIONS_ROOT_MAP_TOKEN>;
@@ -161,6 +162,8 @@ export class ReactRenderServer {
 
   renderMode: typeof REACT_SERVER_RENDER_MODE;
 
+  streamingTransport: ServerStreamingTransport | null;
+
   // eslint-disable-next-line sort-class-members/sort-class-members
   constructor({
     context,
@@ -174,6 +177,7 @@ export class ReactRenderServer {
     streamingTimeout,
     deferredActions,
     tramvaiHooks,
+    streamingTransport,
   }) {
     this.context = context;
     this.customRender = customRender;
@@ -186,6 +190,7 @@ export class ReactRenderServer {
     this.streamingTimeout = streamingTimeout;
     this.deferredActions = deferredActions;
     this.tramvaiHooks = tramvaiHooks;
+    this.streamingTransport = streamingTransport;
   }
 
   render({
@@ -262,6 +267,8 @@ export class ReactRenderServer {
 
             // here all HTML are ready except suspended components
             pipe(htmlWritable);
+            // shell is already placed into the response tasks queue
+            this.streamingTransport?.onShellSent();
 
             // resolve empty HTML, because we will stream it later
             resolve('');
@@ -321,6 +328,9 @@ export class ReactRenderServer {
             reason: `${timeout}ms timeout exceeded`,
             unfinishedActions,
           });
+
+          // reject unsettled streamed values, while response stream is still open
+          this.streamingTransport?.abort(reason);
 
           // abort render stream
           abort(reason);

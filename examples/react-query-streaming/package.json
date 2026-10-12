@@ -1,0 +1,34 @@
+{
+  "name": "react-query-streaming",
+  "version": "0.0.0-stub",
+  "private": true,
+  "description": "Playground for streaming react-query data with deferred actions",
+  "scripts": {
+    "start:host": "tramvai start rq-streaming-host",
+    "start:child": "tramvai start rq-streaming-child --port 4140 --resolveSymlinks=false"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "~5.102.5",
+    "@tinkoff/dippy": "^1.0.0",
+    "@tramvai/child-app-core": "0.0.0-stub",
+    "@tramvai/core": "0.0.0-stub",
+    "@tramvai/module-child-app": "0.0.0-stub",
+    "@tramvai/module-common": "0.0.0-stub",
+    "@tramvai/module-react-query": "0.0.0-stub",
+    "@tramvai/module-render": "0.0.0-stub",
+    "@tramvai/module-router": "0.0.0-stub",
+    "@tramvai/module-server": "0.0.0-stub",
+    "@tramvai/react": "0.0.0-stub",
+    "@tramvai/react-query": "0.0.0-stub",
+    "@tramvai/tokens-common": "0.0.0-stub",
+    "@tramvai/tokens-render": "0.0.0-stub",
+    "@tramvai/tokens-router": "0.0.0-stub",
+    "react": "19.0.1",
+    "react-dom": "19.0.1",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@tramvai/cli": "0.0.0-stub",
+    "@types/react": "^19.0.6"
+  }
+}

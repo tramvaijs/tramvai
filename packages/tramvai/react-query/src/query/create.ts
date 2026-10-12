@@ -14,6 +14,7 @@ import { normalizeKey } from '../shared/normalizeKey';
 import { resolveDI } from '../shared/resolveDI';
 import { mapQuerySignalToxecutionContext } from '../shared/signal';
 import { createUniqueActionKeyForQuery } from '../shared/createUniqueActionKeyForQuery';
+import { createPrefetchAction, warnDeferredFetchAction } from '../shared/prefetchAction';
 
 const convertToRawQuery = <Options, Result, Deps extends ProviderDeps>(
   query: Query<Options, Result, Deps>,
@@ -74,26 +75,24 @@ export const createQuery = <Options, Result, Deps extends ProviderDeps = {}>(
     raw: (diOrContext: ActionContext | Container, options: Options) => {
       return convertToRawQuery(query, resolveDI(diOrContext), options);
     },
-    prefetchAction: (options: Options) => {
-      return declareAction({
+    prefetchAction: (options: Options, { deferred = queryParameters.deferred ?? false } = {}) => {
+      return createPrefetchAction({
         name: `queryPrefetch:${query.actionNamePostfix}`,
-        fn() {
-          return this.deps.queryClient.prefetchQuery(
-            convertToRawQuery(query, this.deps.di, options)
-          );
-        },
-        deps: {
-          di: DI_TOKEN,
-          queryClient: QUERY_CLIENT_TOKEN,
-          logger: LOGGER_TOKEN,
-        },
         conditions,
+        deferred,
+        getQueryOptions: (di) => convertToRawQuery(query, di, options),
+        prefetch: (queryClient, rawQuery) => queryClient.prefetchQuery(rawQuery),
       });
     },
     fetchAction: (options: Options) => {
       return declareAction({
         name: `queryFetch:${query.actionNamePostfix}`,
         fn() {
+          warnDeferredFetchAction(this.deps.logger, {
+            deferred: queryParameters.deferred,
+            actionNamePostfix: query.actionNamePostfix,
+          });
+
           return this.deps.queryClient.fetchQuery(convertToRawQuery(query, this.deps.di, options));
         },
         deps: {

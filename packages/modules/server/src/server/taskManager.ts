@@ -34,9 +34,17 @@ export class ServerResponseTaskManager implements IServerResponseTaskManager {
     }
   }
 
-  closeQueue() {
-    return Promise.all(this.processedTasks).finally(() => {
+  async closeQueue() {
+    try {
+      let count: number;
+
+      // tasks can be pushed while waiting, e.g. data streamed after suspended components are resolved
+      do {
+        count = this.processedTasks.length;
+        await Promise.all(this.processedTasks);
+      } while (count !== this.processedTasks.length);
+    } finally {
       this.status = 'closed';
-    });
+    }
   }
 }

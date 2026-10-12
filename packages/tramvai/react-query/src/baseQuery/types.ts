@@ -1,6 +1,7 @@
 import type { ActionConditionsParameters, ActionContext, TramvaiAction } from '@tramvai/core';
 import type { QueryKey as ReactQueryKey, QueryOptions } from '@tanstack/react-query';
 import type { Container, ProvideDepsIterator, ProviderDeps } from '@tinkoff/dippy';
+import type { PrefetchActionConfig } from '../shared/prefetchAction';
 
 export const QUERY_PARAMETERS = '__query_parameters__';
 
@@ -26,6 +27,12 @@ export type CreateQueryOptionsWithSerializableKey<Options, Deps extends Provider
   deps?: Deps;
 
   conditions?: ActionConditionsParameters;
+
+  /**
+   * Do not wait for the query in `prefetchAction`, the result will be streamed to the client.
+   * Requires streaming rendering, otherwise the query is awaited as a regular one.
+   */
+  deferred?: boolean;
 };
 
 export type CreateQueryOptionsWithNonSerializableKey<Options, Deps extends ProviderDeps> = {
@@ -38,6 +45,12 @@ export type CreateQueryOptionsWithNonSerializableKey<Options, Deps extends Provi
   deps?: Deps;
 
   conditions?: ActionConditionsParameters;
+
+  /**
+   * Do not wait for the query in `prefetchAction`, the result will be streamed to the client.
+   * Requires streaming rendering, otherwise the query is awaited as a regular one.
+   */
+  deferred?: boolean;
 };
 
 export type BaseCreateQueryOptions<Options, Deps extends ProviderDeps> =
@@ -53,7 +66,7 @@ export interface BaseQuery<Options, TCreateQuery, TQuery, TUseQuery> {
    */
   raw(context: ActionContext, options?: Options): TUseQuery;
 
-  prefetchAction(options?: Options): TramvaiAction<[], Promise<void>, any>;
+  prefetchAction(options?: Options, config?: PrefetchActionConfig): TramvaiAction<[], Promise<void>, any>;
 
   actionNamePostfix: string;
 }

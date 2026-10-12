@@ -1,0 +1,36 @@
+{
+  "$schema": "../../node_modules/@tramvai/cli/schema.json",
+  "analytics": {
+    "enabled": false
+  },
+  "projects": {
+    "rq-streaming-host": {
+      "name": "rq-streaming-host",
+      "root": "host",
+      "type": "application",
+      "fileSystemPages": {
+        "enabled": true,
+        "pagesDir": false
+      },
+      "shared": {
+        "deps": ["@tramvai/react-query", "@tramvai/module-react-query", "@tanstack/react-query"]
+      },
+      "hotRefresh": {
+        "enabled": true
+      },
+      "experiments": {
+        "transpilation": {
+          "loader": "swc"
+        }
+      }
+    },
+    "rq-streaming-child": {
+      "name": "rq-streaming-child",
+      "root": "child-app",
+      "type": "child-app",
+      "shared": {
+        "deps": ["@tramvai/react-query", "@tramvai/module-react-query", "@tanstack/react-query"]
+      }
+    }
+  }
+}

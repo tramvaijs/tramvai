@@ -221,6 +221,97 @@ export default function Article() {
 Article.actions = [query.prefetchAction()];
 ```
 
+### Streaming deferred queries
+
+:::caution
+
+Experimental feature, requires [streaming rendering](03-features/010-rendering/06-streaming.md) and `@tanstack/react-query@>=5.100.2`. Older versions, including v4, are not supported, keep the feature disabled for them.
+
+:::
+
+Slow queries can be streamed to the client instead of blocking the page response, the same way as [Deferred Actions](03-features/09-data-fetching/06-streaming-data.md).
+
+Streaming is disabled by default, enable it in the application (and in each Child App which uses deferred queries):
+
+```ts
+import { provide } from '@tramvai/core';
+import { QUERY_STREAMING_ENABLED_TOKEN } from '@tramvai/module-react-query';
+
+const provider = provide({
+  provide: QUERY_STREAMING_ENABLED_TOKEN,
+  useValue: true,
+});
+```
+
+Mark the query as `deferred` and prefetch it as usual:
+
+```tsx
+import { Suspense } from 'react';
+import { createQuery, useQuery, useSuspenseQuery } from '@tramvai/react-query';
+
+const query = createQuery({
+  key: ['tickets'],
+  fn() {
+    return this.deps.httpClient.get('/slow-endpoint');
+  },
+  deps: {
+    httpClient: HTTP_CLIENT,
+  },
+  // highlight-next-line
+  deferred: true,
+});
+
+const Tickets = () => {
+  // highlight-next-line
+  const { data } = useSuspenseQuery(query);
+
+  return <div>{JSON.stringify(data)}</div>;
+};
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Tickets />
+    </Suspense>
+  );
+}
+
+Page.actions = [query.prefetchAction()];
+```
+
+How it works:
+
+- `prefetchAction` of a deferred query starts the request at server-side, but does not wait for it, so application shell is sent to the client immediately
+- the query, which is still in flight, is passed to the client together with the state, and its result is streamed later in the same response
+- at client-side the query waits for the streamed result instead of fetching it again
+- queries started after the state is passed to the client (by nested queries or suspended components) are streamed the same way
+
+Both hooks are supported:
+
+- `useSuspenseQuery` (and `useSuspenseInfiniteQuery`) - ready HTML of the nearest `Suspense` boundary is streamed too, content is visible before the client code is loaded
+- `useQuery` (and `useInfiniteQuery`) - application shell contains loading state, and the data is rendered after hydration, but without additional request from the browser
+
+:::info
+
+- deferred queries are awaited as regular ones without streaming rendering or when `QUERY_STREAMING_ENABLED_TOKEN` is not enabled
+- at client-side `prefetchAction` of a deferred query does not block page transition
+- `deferred` option can be overridden for a specific page - `query.prefetchAction(options, { deferred: false })`
+- when the query fails at server-side, it is immediately fetched again at client-side with the options of the components (including `retry`), without error state in between
+- server-side retries are disabled for streamed queries, because they only delay the client fallback and usually do not fit into the response stream timeout. If `retry` is set explicitly in the query options, it is used at server-side too
+- server error details are not passed to the client in production, in development mode error message and status are logged to the browser console
+- query, which is not settled within [response stream timeout](03-features/010-rendering/06-streaming.md#response-stream-timeout), is rejected for the client and fetched at client-side
+- `fetchAction` result is awaited by the caller, so `deferred` option is ignored for it
+
+:::
+
+#### Suspense queries without prefetch
+
+With streaming rendering, `useSuspenseQuery` will fetch the query during server-side rendering even without `prefetchAction`, and the result will be streamed to the client. Still, prefer `prefetchAction` - it starts all page queries in parallel before rendering, both for the first load and for SPA transitions, while suspense queries without prefetch are fetched one by one when the components are rendered (request waterfalls).
+
+Without streaming rendering, suspense query without data renders `Suspense` fallback at server-side, and the query is fetched at client-side.
+
+`useQuery` never fetches the query at server-side.
+
 ### Dependencies
 
 Queries has full Dependency Injection support, so you can declare dependencies like in [DI providers](concepts/provider.md), in `deps` property. These dependencies will be available in the action `fn` and `key` functions as `this.deps` property.
@@ -592,7 +683,11 @@ const newQuery = query.fork({
 
 #### `prefetchAction`
 
-Return a tramvai action that can be used to prefetch current query
+Return a tramvai action that can be used to prefetch current query.
+
+Accepts query options and config as the second argument:
+
+- `deferred` - do not wait for the query, overrides `deferred` option of the query, see [Streaming deferred queries](#streaming-deferred-queries)
 
 ```ts
 export default function PageComponent() {
@@ -642,6 +737,8 @@ const query = createQuery({
   },
 });
 ```
+
+Options `key`, `fn`, `deps`, `conditions` and `queryOptions` are described in [Examples](#examples). The `deferred` option makes `prefetchAction` non-blocking, see [Streaming deferred queries](#streaming-deferred-queries). It is also available for `createInfiniteQuery`.
 
 #### Unique query parameters
 
@@ -697,6 +794,22 @@ export function Component() {
   const { data, isLoading } = useQuery(query);
 
   return <div>{isLoading ? 'loading...' : data}</div>;
+}
+```
+
+### `useSuspenseQuery`
+
+React hook for working with `Query` object, suspends rendering until the query is resolved
+
+[react-query docs](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseQuery)
+
+```ts
+import { useSuspenseQuery } from '@tramvai/react-query';
+
+export function Component() {
+  const { data } = useSuspenseQuery(query);
+
+  return <div>{data}</div>;
 }
 ```
 
@@ -785,6 +898,13 @@ export function Component() {
   );
 }
 ```
+
+
+### `useSuspenseInfiniteQuery`
+
+React hook for working with the `InfiniteQuery` object, suspends rendering until the first page is resolved
+
+[react-query docs](https://tanstack.com/query/latest/docs/framework/react/reference/useSuspenseInfiniteQuery)
 
 ### `createMutation`
 

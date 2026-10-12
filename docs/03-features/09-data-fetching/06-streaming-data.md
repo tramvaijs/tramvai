@@ -49,6 +49,12 @@ At client side, application shell hydration will be started as soon as possible.
 
 ## Usage
 
+:::tip
+
+If you are using `@tramvai/react-query`, deferred queries are supported out of the box, see [Streaming deferred queries](03-features/09-data-fetching/04-react-query.md#streaming-deferred-queries)
+
+:::
+
 ### Prerequisites
 
 For this feature to work, you need to install `react>=18` version and enable [streaming rendering](03-features/010-rendering/06-streaming.md):

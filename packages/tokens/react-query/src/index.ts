@@ -37,3 +37,19 @@ export const QUERY_CLIENT_DEHYDRATED_STATE_TOKEN = createToken<DehydratedState>(
 export const QUERY_DEHYDRATE_STATE_NAME_TOKEN = createToken<string>(
   'reactQuery dehydrate state name'
 );
+
+/**
+ * @description
+ * Enables streaming of deferred queries, `false` by default.
+ * Requires streaming rendering (`REACT_SERVER_RENDER_MODE` is `streaming`) and `@tanstack/react-query@>=5.100.2`
+ */
+export const QUERY_STREAMING_ENABLED_TOKEN = createToken<boolean>('reactQuery streaming enabled');
+
+/**
+ * @description
+ * `true` when queries, which are still in flight at server-side dehydration, are streamed to the client in the current request:
+ * streaming is enabled by `QUERY_STREAMING_ENABLED_TOKEN` and the response is streamed.
+ * Deferred queries prefetch is not awaited only in this case, otherwise they behave as regular ones.
+ * Computed value, use `QUERY_STREAMING_ENABLED_TOKEN` to enable streaming
+ */
+export const QUERY_STREAMING_ACTIVE_TOKEN = createToken<boolean>('reactQuery streaming active');

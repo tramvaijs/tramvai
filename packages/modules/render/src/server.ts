@@ -20,6 +20,7 @@ import {
   RESOURCES_REGISTRY,
   RENDER_SLOTS,
   CUSTOM_RENDER,
+  STREAMING_TRANSPORT_TOKEN,
   POLYFILL_CONDITION,
   EXTEND_RENDER,
   HTML_ATTRS,
@@ -52,6 +53,7 @@ import { LayoutModule } from './shared/LayoutModule';
 import { providers as sharedProviders } from './shared/providers';
 import { fetchWebpackStats } from './server/blocks/utils/fetchWebpackStats';
 import { streamedStateSyncProviders } from './server/streamingState/providers';
+import { streamingTransportProviders } from './server/streamingTransport/providers';
 
 export { TramvaiRetryAssetsModule } from './retry-assets/server';
 export { PageErrorStore, setPageErrorEvent };
@@ -77,6 +79,7 @@ export const DEFAULT_POLYFILL_CONDITION = 'false';
   providers: [
     ...sharedProviders,
     ...streamedStateSyncProviders,
+    ...streamingTransportProviders,
     provide({
       provide: RESOURCES_REGISTRY,
       useClass: ResourcesRegistry,
@@ -296,6 +299,7 @@ Page Error Boundary will be rendered for the client`,
         streamingTimeout: REACT_STREAMING_RENDER_TIMEOUT,
         deferredActions: DEFERRED_ACTIONS_ROOT_MAP_TOKEN,
         tramvaiHooks: TRAMVAI_HOOKS_TOKEN,
+        streamingTransport: optional(STREAMING_TRANSPORT_TOKEN),
       },
     }),
     provide({

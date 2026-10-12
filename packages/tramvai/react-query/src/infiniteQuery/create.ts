@@ -17,8 +17,9 @@ import { normalizeKey } from '../shared/normalizeKey';
 import { resolveDI } from '../shared/resolveDI';
 import { mapQuerySignalToxecutionContext } from '../shared/signal';
 import { createUniqueActionKeyForQuery } from '../shared/createUniqueActionKeyForQuery';
+import { createPrefetchAction, warnDeferredFetchAction } from '../shared/prefetchAction';
 
-// `UseInfiniteQueryOptions` types is incompatible between v4 and v5
+// `UseInfiniteQueryOptions` types is incompatible between v4 and v5 (`initialPageParam` is required only in v5)
 // also, this helper will work properly only for v4 or >=5.80,
 // because for >=5 <5.80 range there is 6 generic parameters in `UseInfiniteQueryOptions`
 export type SafeUseInfiniteQueryOptions<
@@ -27,7 +28,7 @@ export type SafeUseInfiniteQueryOptions<
   TData = TQueryFnData,
   TQueryKey extends QueryKey = QueryKey,
   TPageParam = unknown,
-> = InfiniteQueryObserverOptions extends { experimental_prefetchInRender?: boolean }
+> = InfiniteQueryObserverOptions extends { initialPageParam: unknown }
   ? UseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>
   : // @ts-expect-error backward compatibility with RQ v4
     UseInfiniteQueryOptions<TQueryFnData, TError, TData, TData, TQueryKey>;
@@ -116,26 +117,24 @@ export const createInfiniteQuery = <
     raw: (diOrContext: ActionContext | Container, options: Options) => {
       return convertToRawQuery(query, resolveDI(diOrContext), options);
     },
-    prefetchAction: (options: Options) => {
-      return declareAction({
+    prefetchAction: (options: Options, { deferred = queryParameters.deferred ?? false } = {}) => {
+      return createPrefetchAction({
         name: `infiniteQueryPrefetch:${query.actionNamePostfix}`,
-        fn() {
-          return this.deps.queryClient.prefetchInfiniteQuery(
-            convertToRawQuery(query, this.deps.di, options)
-          );
-        },
-        deps: {
-          di: DI_TOKEN,
-          queryClient: QUERY_CLIENT_TOKEN,
-          logger: LOGGER_TOKEN,
-        },
         conditions,
+        deferred,
+        getQueryOptions: (di) => convertToRawQuery(query, di, options),
+        prefetch: (queryClient, rawQuery) => queryClient.prefetchInfiniteQuery(rawQuery),
       });
     },
     fetchAction: (options: Options) => {
       return declareAction({
         name: `infiniteQueryFetch:${query.actionNamePostfix}`,
         fn() {
+          warnDeferredFetchAction(this.deps.logger, {
+            deferred: queryParameters.deferred,
+            actionNamePostfix: query.actionNamePostfix,
+          });
+
           return this.deps.queryClient.fetchInfiniteQuery(
             convertToRawQuery(query, this.deps.di, options)
           );

@@ -1,6 +1,15 @@
 import { useMemo } from 'react';
-import type { InfiniteData, QueryKey, UseInfiniteQueryResult } from '@tanstack/react-query';
-import { useInfiniteQuery as useOriginalInfiniteQuery } from '@tanstack/react-query';
+import type {
+  InfiniteData,
+  QueryKey,
+  UseInfiniteQueryResult,
+  UseSuspenseInfiniteQueryOptions,
+  UseSuspenseInfiniteQueryResult,
+} from '@tanstack/react-query';
+import {
+  useInfiniteQuery as useOriginalInfiniteQuery,
+  useSuspenseInfiniteQuery as useOriginalSuspenseInfiniteQuery,
+} from '@tanstack/react-query';
 import type { ProviderDeps } from '@tinkoff/dippy';
 import { useDiContainer } from '@tramvai/react';
 import type { InfiniteQuery } from './types';
@@ -58,4 +67,33 @@ function useInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>
   return useOriginalInfiniteQuery<Result, Error, Result, QueryKey>(resultQuery);
 }
 
-export { useInfiniteQuery };
+function useSuspenseInfiniteQuery<Options extends void, PageParam, Result, Deps extends ProviderDeps>(
+  query: InfiniteQuery<Options, PageParam, Result, Deps>
+): UseSuspenseInfiniteQueryResult<InfiniteData<Result, PageParam>, Error>;
+function useSuspenseInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>(
+  query: InfiniteQuery<Options, PageParam, Result, Deps>,
+  options: Options
+): UseSuspenseInfiniteQueryResult<InfiniteData<Result, PageParam>, Error>;
+/**
+ * Suspends rendering until the first page is resolved.
+ * Use with deferred queries to stream ready HTML of the nearest `Suspense` boundary to the client.
+ */
+function useSuspenseInfiniteQuery<Options, PageParam, Result, Deps extends ProviderDeps>(
+  query: InfiniteQuery<Options, PageParam, Result, Deps>,
+  options?: Options
+): UseSuspenseInfiniteQueryResult<InfiniteData<Result, PageParam>, Error> {
+  const di = useDiContainer();
+  const resultQuery = useMemo(() => query.raw(di, options as Options), [query, di, options]);
+
+  return useOriginalSuspenseInfiniteQuery(
+    resultQuery as unknown as UseSuspenseInfiniteQueryOptions<
+      Result,
+      Error,
+      InfiniteData<Result, PageParam>,
+      QueryKey,
+      PageParam
+    >
+  );
+}
+
+export { useInfiniteQuery, useSuspenseInfiniteQuery };

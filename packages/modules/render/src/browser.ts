@@ -18,11 +18,13 @@ import {
   USE_REACT_STRICT_MODE,
   REACT_SERVER_RENDER_MODE,
   DEFAULT_ERROR_BOUNDARY_COMPONENT,
+  STREAMING_TRANSPORT_REGISTRY_TOKEN,
 } from '@tramvai/tokens-render';
 import { PageErrorStore, setPageErrorEvent, beforeResolveHooksToken } from '@tramvai/module-router';
 import { ERROR_BOUNDARY_TOKEN } from '@tramvai/react';
 import { rendering as renderInBrowser } from './client';
 import { processStreamedEvents } from './client/streamingState/processStreamedEvents';
+import { getStreamingRegistry } from './client/streamingTransport';
 import type { RenderModuleConfig } from './shared/types';
 import { LayoutModule } from './shared/LayoutModule';
 import { providers as sharedProviders } from './shared/providers';
@@ -43,6 +45,11 @@ const throwErrorInDev = (logger: typeof LOGGER_TOKEN) => {
   imports: [LayoutModule],
   providers: [
     ...sharedProviders,
+    provide({
+      provide: STREAMING_TRANSPORT_REGISTRY_TOKEN,
+      scope: Scope.SINGLETON,
+      useFactory: getStreamingRegistry,
+    }),
     provide({
       provide: commandLineListTokens.clear,
       multi: true,

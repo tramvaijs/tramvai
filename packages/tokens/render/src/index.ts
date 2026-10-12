@@ -245,6 +245,65 @@ export const STORE_SYNC_EVENTS_TOKEN = createToken<Middleware & { startStreaming
   'tramvai storeSyncEventsController'
 );
 
+/**
+ * Server-side part of the transport for data, which is streamed to the client after the application shell.
+ *
+ * Supports two kinds of data:
+ * - values by key, resolved once (e.g. results of the deferred requests)
+ * - ordered channels of events, buffered until the client subscribes
+ *
+ * Keys and channels are shared by all features, use a feature prefix, e.g. `react-query:...`
+ */
+export interface StreamingTransport {
+  /**
+   * Streams the promise result by key, response stream is kept open until it is settled.
+   * Promise is rejected when it exceeds the response stream timeout (`REACT_STREAMING_RENDER_TIMEOUT`).
+   * Error details (name, message, status) are sent to the client only in development mode
+   */
+  stream(key: string, promise: Promise<unknown>): void;
+  emit(channel: string, payload: unknown): void;
+  /**
+   * Called when the response stream is finished
+   */
+  onFinish(callback: () => void): void;
+}
+
+/**
+ * @description
+ * Server-side streaming transport, `null` when the response is not streamed (`REACT_SERVER_RENDER_MODE` is not `streaming`)
+ */
+export const STREAMING_TRANSPORT_TOKEN = createToken<StreamingTransport | null>(
+  'tramvai streaming transport'
+);
+
+export interface StreamedValueRejectedError extends Error {
+  name: 'StreamedValueRejectedError';
+  /**
+   * Status of the server error, only in development mode
+   */
+  status?: number;
+}
+
+export interface StreamingTransportRegistry {
+  /**
+   * Promise for the value by key, can be requested before the value is streamed.
+   * Rejected with `StreamedValueRejectedError`, with server error details only in development mode
+   */
+  get(key: string): Promise<unknown>;
+  /**
+   * Single listener per channel, already streamed events are passed immediately
+   */
+  subscribe(channel: string, listener: (payload: any) => void): void;
+}
+
+/**
+ * @description
+ * Client-side registry of streamed data
+ */
+export const STREAMING_TRANSPORT_REGISTRY_TOKEN = createToken<StreamingTransportRegistry>(
+  'tramvai streaming transport registry'
+);
+
 export interface WebpackStats {
   assetsByChunkName: Record<string, string[]>;
   integrities?: Record<string, string>;
