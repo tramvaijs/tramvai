@@ -1,7 +1,7 @@
 import type { FunctionComponent } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useIsomorphicLayoutEffect } from '@tinkoff/react-hooks';
-import { Deferred } from '@tramvai/core';
 
 import type { ViewTransitionState } from '../context';
 import { RouteContext, RouterContext, UrlContext, ViewTransitionContext } from '../context';
@@ -32,26 +32,19 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
     url: router.getLastUrl() ?? router.getCurrentUrl(),
   }));
 
-  // Router state that will be applied to the DOM.
-  const [pendingState, setPendingState] = useState<RouterState | null>(null);
-
   // View transition state for context.
   const [viewTransitionState, setViewTransitionState] = useState<ViewTransitionState>({
     isTransitioning: false,
   });
 
-  // Deferred render promise, that resolves when the DOM updates after a navigation.
-  const [renderDeferred, setRenderDeferred] = useState<Deferred<void> | null>(null);
+  // Navigation with view transition started by the router.
+  const viewTransitionNavigation = useRef<Navigation | null>(null);
 
   const updateRouterState = (navigation: Navigation) => {
-    if (document.startViewTransition !== undefined && navigation.viewTransition) {
-      setPendingState({ route: navigation.to, url: navigation.url });
-
-      setViewTransitionState({
-        isTransitioning: true,
-        currentRoute: navigation.from,
-        nextRoute: navigation.to,
-        types: navigation.viewTransitionTypes,
+    // inside the view transition update callback DOM should be updated synchronously
+    if (viewTransitionNavigation.current === navigation) {
+      flushSync(() => {
+        setState({ route: navigation.to, url: navigation.url });
       });
 
       return;
@@ -68,50 +61,39 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
   // will not be a part of the bundle in case of truly condition
   if (process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (viewTransitionState.isTransitioning) {
-        setRenderDeferred(new Deferred<void>());
-      }
-    }, [viewTransitionState.isTransitioning]);
+    useIsomorphicLayoutEffect(() => {
+      const untapStart = router.internalHooks['router:view-transition-start'].tap(
+        'react-provider',
+        (_, navigation) => {
+          viewTransitionNavigation.current = navigation;
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (renderDeferred !== null && pendingState !== null) {
-        const update = async () => {
-          startReactTransition(() => {
-            setState(pendingState);
+          // leaving page should be rendered with actual view transition state before the snapshot
+          flushSync(() => {
+            setViewTransitionState({
+              isTransitioning: true,
+              currentRoute: navigation.from,
+              nextRoute: navigation.to,
+              types: navigation.viewTransitionTypes,
+            });
           });
-
-          await renderDeferred.promise;
-        };
-        let transition: ViewTransition;
-        if (window.ViewTransition && 'types' in window.ViewTransition.prototype) {
-          transition = document.startViewTransition({
-            update,
-            types: viewTransitionState.isTransitioning ? viewTransitionState.types : undefined,
-          });
-        } else {
-          transition = document.startViewTransition(update);
         }
-        // eslint-disable-next-line promise/catch-or-return
-        transition.finished.finally(() => {
-          setRenderDeferred(null);
-          setPendingState(null);
-          setViewTransitionState({ isTransitioning: false });
-        });
-      }
-    }, [pendingState, renderDeferred, viewTransitionState]);
+      );
+      const untapEnd = router.internalHooks['router:view-transition-end'].tap(
+        'react-provider',
+        (_, navigation) => {
+          // skipped transition can end after the start of the next one
+          if (viewTransitionNavigation.current === navigation) {
+            viewTransitionNavigation.current = null;
+            setViewTransitionState({ isTransitioning: false });
+          }
+        }
+      );
 
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      if (
-        renderDeferred !== null &&
-        pendingState !== null &&
-        state.route.actualPath === pendingState.route.actualPath
-      ) {
-        renderDeferred.resolve();
-      }
-    }, [state, renderDeferred, pendingState]);
+      return () => {
+        untapStart();
+        untapEnd();
+      };
+    }, [router]);
   }
 
   return (

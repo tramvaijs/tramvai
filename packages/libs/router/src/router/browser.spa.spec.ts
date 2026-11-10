@@ -2397,5 +2397,96 @@ describe('router/browser-spa', () => {
         })
       );
     });
+
+    describe('commit', () => {
+      let update: () => Promise<void>;
+      const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+      let resolveFinished: () => void;
+      const mockSkipTransition = jest.fn();
+
+      beforeEach(() => {
+        update = undefined;
+        mockSkipTransition.mockClear();
+
+        document.startViewTransition = jest.fn((cb: () => void) => {
+          return {
+            ready: Promise.resolve(),
+            finished: new Promise<void>((resolve) => {
+              resolveFinished = resolve;
+            }),
+            updateCallbackDone: new Promise<void>((resolve) => {
+              update = async () => {
+                await cb();
+                resolve();
+              };
+            }),
+            skipTransition: mockSkipTransition,
+          };
+        });
+      });
+
+      afterEach(() => {
+        delete document.startViewTransition;
+      });
+
+      it('should commit navigation inside view transition update callback', async () => {
+        const mockChange = jest.fn();
+        const mockAfter = jest.fn();
+        const mockStart = jest.fn();
+        const mockEnd = jest.fn();
+
+        router.registerSyncHook('change', mockChange);
+        router.registerHook('afterNavigate', mockAfter);
+        router.internalHooks['router:view-transition-start'].tap('test', mockStart);
+        router.internalHooks['router:view-transition-end'].tap('test', mockEnd);
+
+        const promise = router.navigate({ url: '/child1/', viewTransition: true });
+
+        await flush();
+
+        expect(document.startViewTransition).toHaveBeenCalledTimes(1);
+
+        expect(mockStart).toHaveBeenCalledTimes(1);
+        expect(mockChange).not.toHaveBeenCalled();
+        expect(mockPush).not.toHaveBeenCalled();
+        expect(router.getLastRoute()).toMatchObject({ actualPath: '/' });
+        expect(router.getCurrentRoute()).toMatchObject({ actualPath: '/child1/' });
+
+        await update();
+        await promise;
+
+        expect(mockChange).toHaveBeenCalledTimes(1);
+        expect(mockPush).toHaveBeenCalledTimes(1);
+        expect(mockAfter).toHaveBeenCalledTimes(1);
+        expect(router.getLastRoute()).toMatchObject({ actualPath: '/child1/' });
+        expect(mockEnd).not.toHaveBeenCalled();
+
+        resolveFinished();
+
+        await flush();
+
+        expect(mockEnd).toHaveBeenCalledTimes(1);
+      });
+
+      it('should not commit navigation cancelled before update callback', async () => {
+        const mockChange = jest.fn();
+
+        router.registerSyncHook('change', mockChange);
+
+        router.navigate({ url: '/child1/', viewTransition: true });
+
+        await flush();
+
+        expect(document.startViewTransition).toHaveBeenCalledTimes(1);
+
+        router.cancel();
+
+        await update();
+
+        expect(mockSkipTransition).toHaveBeenCalledTimes(1);
+        expect(mockChange).not.toHaveBeenCalled();
+        expect(router.getLastRoute()).toMatchObject({ actualPath: '/' });
+      });
+    });
   });
 });

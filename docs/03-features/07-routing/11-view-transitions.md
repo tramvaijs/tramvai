@@ -53,32 +53,6 @@ provide({
 
 Third, you should pass property named `viewTransion` to your navigation. It can be either prop of a `Link` component or a navigation parameter:
 
-:::warning
-
-`reactTransitions` is incompatible with direct [`router` store](03-features/07-routing/03-working-with-url.md#routerstore-reducer) usage in React components.
-
-Bad:
-
-```ts
-const route = useStore(RouterStore);
-```
-
-```ts
-const route = useSelector('router', (state) => state.router);
-```
-
-Good:
-
-```ts
-const route = useRoute();
-```
-
-```ts
-const route = pageService.getCurrentRoute();
-```
-
-:::
-
 :::tip
 
 Using the view transitions assumes, that all actions should be executed before navigation, so consider to set `ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN: 'before'`.
@@ -358,6 +332,14 @@ The router saves applied transitions in `sessionStorage` by navigation index (yo
 5. **Programmatic forward navigation without `viewTransition`** — if there is a stored entry at the current history index (from a previous navigation that had view transition), the entry is **removed** to keep the map clean. View transition is **not applied**.
 
 In all cases, the router also automatically adds a navigation type (`tramvai_vt_forward` or `tramvai_vt_back`) to the `viewTransitionTypes` array, unless one was already provided.
+
+### Navigation commit
+
+For navigations with view transition, router calls `document.startViewTransition` after `beforeNavigate` hooks, and commits navigation inside the update callback, when the snapshot of the leaving page is already captured. So browser url, `router.getLastRoute()`, `RouterStore`, `change` hooks and `useRoute` / `useUrl` are all updated at the same time, together with the DOM, and the leaving page will never be rendered with the next route state. `afterNavigate` hooks are executed after that, without waiting for the end of animation.
+
+`router.getCurrentRoute()` and `router.getCurrentUrl()` return the next route from the start of navigation, as for any other navigation.
+
+Hooks `router:view-transition-start` (before the snapshot of the leaving page) and `router:view-transition-end` (animation is finished or skipped) are available in `router.internalHooks`.
 
 ### Diagram
 

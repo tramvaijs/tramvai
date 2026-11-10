@@ -79,6 +79,8 @@ Router provides a set of tapable hooks which can be useful for monitoring:
 - `Router.internalHooks.router:resolve-route`
 - `Router.internalHooks.router:resolve-url`
 - `Router.internalHooks.router:resolve-view-transition`
+- `Router.internalHooks.router:view-transition-start`
+- `Router.internalHooks.router:view-transition-end`
 
 ### Navigation hooks
 

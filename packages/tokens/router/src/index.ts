@@ -90,6 +90,8 @@ export type PageServiceComponentType =
 export interface PageService {
   getCurrentRoute(): NavigationRoute;
   getCurrentUrl(): ReturnType<AbstractRouter['getCurrentUrl']>;
+  getLastRoute(): NavigationRoute;
+  getLastUrl(): ReturnType<AbstractRouter['getLastUrl']>;
   getConfig(route?: Route): RouteConfig;
   getContent(route?: Route): Record<string, any>;
   getMeta(route?: Route): RouteConfig['meta'];

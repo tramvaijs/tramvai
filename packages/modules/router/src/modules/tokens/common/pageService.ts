@@ -31,6 +31,14 @@ export class PageService implements PageServiceInterface {
     return this.router.getCurrentUrl();
   }
 
+  getLastRoute(): NavigationRoute {
+    return this.router.getLastRoute();
+  }
+
+  getLastUrl(): Url {
+    return this.router.getLastUrl();
+  }
+
   getConfig(route: Route = this.getCurrentRoute()) {
     return route?.config ?? {};
   }

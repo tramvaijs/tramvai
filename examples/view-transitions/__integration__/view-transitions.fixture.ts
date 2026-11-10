@@ -15,16 +15,21 @@ export class ViewTransitionsComponentObject {
       window.__viewTransitions__ = [];
 
       // @ts-ignore
-      document.startViewTransition = ({ types }) => {
-        window.__viewTransitions__.push({
-          pathname: window.location.pathname,
-          types,
-        });
+      document.startViewTransition = ({ update, types }) => {
+        // router commits navigation inside the update callback
+        const updateCallbackDone = Promise.resolve()
+          .then(update)
+          .then(() => {
+            window.__viewTransitions__.push({
+              pathname: window.location.pathname,
+              types,
+            });
+          });
 
         return {
-          ready: Promise.resolve(),
-          finished: Promise.resolve(),
-          updateCallbackDone: Promise.resolve(),
+          ready: updateCallbackDone,
+          finished: updateCallbackDone,
+          updateCallbackDone,
           skipTransition: () => {},
         };
       };

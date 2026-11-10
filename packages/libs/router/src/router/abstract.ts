@@ -118,6 +118,8 @@ export abstract class AbstractRouter {
         viewTransitionTypes?: string[];
       } | null
     >;
+    'router:view-transition-start': SyncTapableHookInstance<Navigation, void>;
+    'router:view-transition-end': SyncTapableHookInstance<Navigation, void>;
   };
 
   public readonly navigateHook: AsyncTapableHookInstance<{
@@ -219,7 +221,7 @@ export abstract class AbstractRouter {
 
       await this.runHooks('beforeNavigate', navigation);
 
-      this.commitNavigation(navigation);
+      await this.commitNavigation(navigation);
 
       await this.runHooks('afterNavigate', navigation);
     });
@@ -227,7 +229,7 @@ export abstract class AbstractRouter {
     this.runUpdateHook.tapPromise('router', async (_, { navigation }) => {
       await this.runHooks('beforeUpdateCurrent', navigation);
 
-      this.commitNavigation(navigation);
+      await this.commitNavigation(navigation);
 
       await this.runHooks('afterUpdateCurrent', navigation);
     });
@@ -249,6 +251,8 @@ export abstract class AbstractRouter {
       'router:resolve-view-transition': this.hooksFactory.createSync(
         'router:resolve-view-transition'
       ),
+      'router:view-transition-start': this.hooksFactory.createSync('router:view-transition-start'),
+      'router:view-transition-end': this.hooksFactory.createSync('router:view-transition-end'),
     };
 
     this.internalHooks['router:add-route'].tap('router', (_, route) => {
@@ -331,7 +335,7 @@ export abstract class AbstractRouter {
     return this.lastNavigation;
   }
 
-  protected commitNavigation(navigation: Navigation) {
+  protected commitNavigation(navigation: Navigation): void | Promise<void> {
     logger.debug({
       event: 'commit-navigation',
       navigation,

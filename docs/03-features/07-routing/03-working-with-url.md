@@ -115,8 +115,10 @@ export const Component = () => {
 
 This service is intended for use in DI providers and actions, also it is a performant option to get route information in React components, e.g. in callback functions, when you don't need to rerender component when route is changed.
 
-- `getCurrentRoute()` - get the current route
-- `getCurrentUrl()` - object-result of parsing the current url
+- `getCurrentRoute()` - get the current route. While navigation is in progress, it is the route we are navigating to
+- `getCurrentUrl()` - object-result of parsing the current url. While navigation is in progress, it is the url we are navigating to
+- `getLastRoute()` - get the route of the last completed navigation, i.e. the page that is displayed right now
+- `getLastUrl()` - object-result of parsing the url of the last completed navigation
 - `getConfig()` - get the config of the current page (`route.config` property)
 - `getContent()` - get content for the current page (`route.config.content` property)
 - `getMeta()` - get the meta for the current page (`route.config.meta` property)

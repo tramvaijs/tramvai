@@ -170,7 +170,7 @@ export class Router extends ClientRouter {
     return this.delayedPromise;
   }
 
-  protected commitNavigation(navigation: Navigation) {
+  protected async commitNavigation(navigation: Navigation) {
     // if we have parallel navigation do not update current url, as it outdated anyway
     if (navigation.skipped) {
       logger.debug({
@@ -181,7 +181,43 @@ export class Router extends ClientRouter {
       return;
     }
 
-    return super.commitNavigation(navigation);
+    if (!navigation.viewTransition || typeof document.startViewTransition !== 'function') {
+      return super.commitNavigation(navigation);
+    }
+
+    this.internalHooks['router:view-transition-start'].call(navigation);
+
+    // commit inside the update callback, when the old page snapshot is already captured,
+    // so router state, url and DOM are changed at the same time
+    const update = () => {
+      // navigation can be cancelled while waiting for the snapshot
+      if (navigation.skipped) {
+        logger.debug({
+          event: 'delay-ignore-commit',
+          navigation,
+        });
+
+        transition.skipTransition();
+        return;
+      }
+
+      return super.commitNavigation(navigation);
+    };
+
+    const transition: ViewTransition =
+      window.ViewTransition && 'types' in window.ViewTransition.prototype
+        ? document.startViewTransition({ update, types: navigation.viewTransitionTypes })
+        : document.startViewTransition(update);
+
+    // rejected when transition is skipped or aborted, it is expected
+    transition.ready.catch(() => {});
+    transition.finished
+      .catch(() => {})
+      .then(() => {
+        this.internalHooks['router:view-transition-end'].call(navigation);
+      });
+
+    await transition.updateCallbackDone;
   }
 
   protected async runGuards(navigation: Navigation) {
