@@ -53,6 +53,30 @@ provide({
 
 Third, you should pass property named `viewTransion` to your navigation. It can be either prop of a `Link` component or a navigation parameter:
 
+:::warning
+
+With `reactTransitions` enabled, do not use [`router` store](03-features/07-routing/03-working-with-url.md#routerstore-reducer) directly in React components. Store is updated synchronously, but the next route is rendered as a React transition, so the leaving page will be rendered once with the next route from the store. This render is not visible because the page is frozen by the browser, but components and their effects will run with the next route.
+
+Bad:
+
+```ts
+const route = useStore(RouterStore);
+```
+
+```ts
+const route = useSelector('router', (state) => state.router);
+```
+
+Good:
+
+```ts
+const route = useRoute();
+```
+
+Without `reactTransitions` the store and `useRoute` are updated in the same render.
+
+:::
+
 :::tip
 
 Using the view transitions assumes, that all actions should be executed before navigation, so consider to set `ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN: 'before'`.
@@ -335,11 +359,17 @@ In all cases, the router also automatically adds a navigation type (`tramvai_vt_
 
 ### Navigation commit
 
-For navigations with view transition, router calls `document.startViewTransition` after `beforeNavigate` hooks, and commits navigation inside the update callback, when the snapshot of the leaving page is already captured. So browser url, `router.getLastRoute()`, `RouterStore`, `change` hooks and `useRoute` / `useUrl` are all updated at the same time, together with the DOM, and the leaving page will never be rendered with the next route state. `afterNavigate` hooks are executed after that, without waiting for the end of animation.
+For navigations with view transition, router calls `document.startViewTransition` after `beforeNavigate` hooks, and commits navigation inside the update callback, when the snapshot of the leaving page is already captured. So browser url, `router.getLastRoute()`, `RouterStore` and `change` hooks are updated when the page is already frozen by the browser, and the leaving page will never be displayed with the next route state. `afterNavigate` hooks are executed right after the commit, without waiting for the next page render and the end of animation.
 
 `router.getCurrentRoute()` and `router.getCurrentUrl()` return the next route from the start of navigation, as for any other navigation.
 
-Hooks `router:view-transition-start` (before the snapshot of the leaving page) and `router:view-transition-end` (animation is finished or skipped) are available in `router.internalHooks`.
+Update callback is completed when React renders the next route. With `reactTransitions` enabled, if the next page is suspended, React will wait for it without showing a fallback of already visible `Suspense` boundaries, and the page will be frozen all this time, so it is better to prepare everything before the navigation.
+
+Router provides `internalHooks` for view transition lifecycle:
+
+- `router:view-transition-start` - async, before `document.startViewTransition` call, leaving page is still displayed
+- `router:view-transition-update` - async, inside the update callback after navigation commit, update callback is waiting for it
+- `router:view-transition-end` - sync, animation is finished or skipped
 
 ### Diagram
 

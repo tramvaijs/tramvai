@@ -118,7 +118,8 @@ export abstract class AbstractRouter {
         viewTransitionTypes?: string[];
       } | null
     >;
-    'router:view-transition-start': SyncTapableHookInstance<Navigation, void>;
+    'router:view-transition-start': AsyncParallelTapableHookInstance<Navigation>;
+    'router:view-transition-update': AsyncParallelTapableHookInstance<Navigation>;
     'router:view-transition-end': SyncTapableHookInstance<Navigation, void>;
   };
 
@@ -251,7 +252,12 @@ export abstract class AbstractRouter {
       'router:resolve-view-transition': this.hooksFactory.createSync(
         'router:resolve-view-transition'
       ),
-      'router:view-transition-start': this.hooksFactory.createSync('router:view-transition-start'),
+      'router:view-transition-start': this.hooksFactory.createAsyncParallel(
+        'router:view-transition-start'
+      ),
+      'router:view-transition-update': this.hooksFactory.createAsyncParallel(
+        'router:view-transition-update'
+      ),
       'router:view-transition-end': this.hooksFactory.createSync('router:view-transition-end'),
     };
 

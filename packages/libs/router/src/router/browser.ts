@@ -185,11 +185,18 @@ export class Router extends ClientRouter {
       return super.commitNavigation(navigation);
     }
 
-    this.internalHooks['router:view-transition-start'].call(navigation);
+    // leaving page should be rendered with view transition state before the snapshot
+    await this.internalHooks['router:view-transition-start'].callPromise(navigation);
+
+    let commitError: Error | undefined;
+    let resolveCommit: () => void;
+    const commit = new Promise<void>((resolve) => {
+      resolveCommit = resolve;
+    });
 
     // commit inside the update callback, when the old page snapshot is already captured,
     // so router state, url and DOM are changed at the same time
-    const update = () => {
+    const update = async () => {
       // navigation can be cancelled while waiting for the snapshot
       if (navigation.skipped) {
         logger.debug({
@@ -198,10 +205,20 @@ export class Router extends ClientRouter {
         });
 
         transition.skipTransition();
+        resolveCommit();
         return;
       }
 
-      return super.commitNavigation(navigation);
+      try {
+        super.commitNavigation(navigation);
+      } catch (error) {
+        commitError = error;
+      }
+
+      resolveCommit();
+
+      // keep the snapshot of the leaving page until the next page is rendered
+      await this.internalHooks['router:view-transition-update'].callPromise(navigation);
     };
 
     const transition: ViewTransition =
@@ -217,7 +234,11 @@ export class Router extends ClientRouter {
         this.internalHooks['router:view-transition-end'].call(navigation);
       });
 
-    await transition.updateCallbackDone;
+    await commit;
+
+    if (commitError) {
+      throw commitError;
+    }
   }
 
   protected async runGuards(navigation: Navigation) {

@@ -1,7 +1,7 @@
 import type { FunctionComponent } from 'react';
 import React, { useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
 import { useIsomorphicLayoutEffect } from '@tinkoff/react-hooks';
+import { Deferred } from '@tramvai/core';
 
 import type { ViewTransitionState } from '../context';
 import { RouteContext, RouterContext, UrlContext, ViewTransitionContext } from '../context';
@@ -37,19 +37,14 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
     isTransitioning: false,
   });
 
-  // Navigation with view transition started by the router.
-  const viewTransitionNavigation = useRef<Navigation | null>(null);
+  // Active view transition with promises, that resolves when the DOM updates.
+  const viewTransition = useRef<{
+    navigation: Navigation;
+    started: Deferred<void>;
+    updated: Deferred<void>;
+  } | null>(null);
 
   const updateRouterState = (navigation: Navigation) => {
-    // inside the view transition update callback DOM should be updated synchronously
-    if (viewTransitionNavigation.current === navigation) {
-      flushSync(() => {
-        setState({ route: navigation.to, url: navigation.url });
-      });
-
-      return;
-    }
-
     startReactTransition(() => {
       setState({ route: navigation.to, url: navigation.url });
     });
@@ -62,28 +57,43 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
   if (process.env.__TRAMVAI_VIEW_TRANSITIONS === 'true') {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useIsomorphicLayoutEffect(() => {
-      const untapStart = router.internalHooks['router:view-transition-start'].tap(
+      const untapStart = router.internalHooks['router:view-transition-start'].tapPromise(
         'react-provider',
-        (_, navigation) => {
-          viewTransitionNavigation.current = navigation;
+        async (_, navigation) => {
+          // do not block update callback of the interrupted transition
+          viewTransition.current?.updated.resolve();
+          viewTransition.current = {
+            navigation,
+            started: new Deferred<void>(),
+            updated: new Deferred<void>(),
+          };
 
-          // leaving page should be rendered with actual view transition state before the snapshot
-          flushSync(() => {
-            setViewTransitionState({
-              isTransitioning: true,
-              currentRoute: navigation.from,
-              nextRoute: navigation.to,
-              types: navigation.viewTransitionTypes,
-            });
+          setViewTransitionState({
+            isTransitioning: true,
+            currentRoute: navigation.from,
+            nextRoute: navigation.to,
+            types: navigation.viewTransitionTypes,
           });
+
+          await viewTransition.current.started.promise;
+        }
+      );
+      const untapUpdate = router.internalHooks['router:view-transition-update'].tapPromise(
+        'react-provider',
+        async (_, navigation) => {
+          if (viewTransition.current?.navigation === navigation) {
+            await viewTransition.current.updated.promise;
+          }
         }
       );
       const untapEnd = router.internalHooks['router:view-transition-end'].tap(
         'react-provider',
         (_, navigation) => {
           // skipped transition can end after the start of the next one
-          if (viewTransitionNavigation.current === navigation) {
-            viewTransitionNavigation.current = null;
+          if (viewTransition.current?.navigation === navigation) {
+            viewTransition.current.started.resolve();
+            viewTransition.current.updated.resolve();
+            viewTransition.current = null;
             setViewTransitionState({ isTransitioning: false });
           }
         }
@@ -91,9 +101,27 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
 
       return () => {
         untapStart();
+        untapUpdate();
         untapEnd();
       };
     }, [router]);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useIsomorphicLayoutEffect(() => {
+      if (
+        viewTransitionState.isTransitioning &&
+        viewTransition.current?.navigation.to === viewTransitionState.nextRoute
+      ) {
+        viewTransition.current.started.resolve();
+      }
+    }, [viewTransitionState]);
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useIsomorphicLayoutEffect(() => {
+      if (viewTransition.current?.navigation.to === state.route) {
+        viewTransition.current.updated.resolve();
+      }
+    }, [state]);
   }
 
   return (

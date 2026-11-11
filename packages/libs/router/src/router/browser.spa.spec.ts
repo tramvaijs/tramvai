@@ -2437,7 +2437,7 @@ describe('router/browser-spa', () => {
 
         router.registerSyncHook('change', mockChange);
         router.registerHook('afterNavigate', mockAfter);
-        router.internalHooks['router:view-transition-start'].tap('test', mockStart);
+        router.internalHooks['router:view-transition-start'].tapPromise('test', mockStart);
         router.internalHooks['router:view-transition-end'].tap('test', mockEnd);
 
         const promise = router.navigate({ url: '/child1/', viewTransition: true });
@@ -2452,8 +2452,25 @@ describe('router/browser-spa', () => {
         expect(router.getLastRoute()).toMatchObject({ actualPath: '/' });
         expect(router.getCurrentRoute()).toMatchObject({ actualPath: '/child1/' });
 
-        await update();
+        let resolveRender: () => void;
+        const mockUpdate = jest.fn(
+          () =>
+            new Promise<void>((resolve) => {
+              resolveRender = resolve;
+            })
+        );
+
+        router.internalHooks['router:view-transition-update'].tapPromise('test', mockUpdate);
+
+        const updatePromise = update();
+
+        // navigation is not blocked by the render of the next page
         await promise;
+
+        expect(mockUpdate).toHaveBeenCalledTimes(1);
+
+        resolveRender();
+        await updatePromise;
 
         expect(mockChange).toHaveBeenCalledTimes(1);
         expect(mockPush).toHaveBeenCalledTimes(1);
