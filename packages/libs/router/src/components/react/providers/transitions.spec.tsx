@@ -1,25 +1,29 @@
 /**
  * @jest-environment @tramvai/test-unit-jest/lib/jsdom-environment
  */
-import React, { useSyncExternalStore } from 'react';
-import { render } from '@testing-library/react';
-import { parse } from '@tinkoff/url';
 import type { Navigation } from '../../../types';
-import { Router } from '../../../router/browser';
-import { useRoute } from '../useRoute';
-import { useViewTransition } from '../useViewTransition';
+import type { Router as BrowserRouter } from '../../../router/browser';
+
+// React scheduler captures timers on import, so load it only after switching to real timers
+jest.useRealTimers();
+jest.resetModules();
 
 process.env.__TRAMVAI_VIEW_TRANSITIONS = 'true';
 
-// eslint-disable-next-line import/first
+/* eslint-disable @typescript-eslint/no-var-requires */
+const React = require('react');
+const { render } = require('@testing-library/react');
+const { parse } = require('@tinkoff/url');
+const { Router } = require('../../../router/browser');
+const { useRoute } = require('../useRoute');
+const { useViewTransition } = require('../useViewTransition');
 const { TransitionsProvider } = require('./transitions');
-
-jest.useRealTimers();
+/* eslint-enable @typescript-eslint/no-var-requires */
 
 const flush = () => new Promise<void>((resolve) => setTimeout(resolve, 20));
 
 describe('react/TransitionsProvider', () => {
-  let router: Router;
+  let router: BrowserRouter;
   let update: () => Promise<void>;
   let resolveFinished: () => void;
   let storeRoute: string;
@@ -30,8 +34,8 @@ describe('react/TransitionsProvider', () => {
 
   const Page = () => {
     const route = useRoute();
-    const store = useSyncExternalStore(
-      (cb) => {
+    const store = React.useSyncExternalStore(
+      (cb: () => void) => {
         storeListener = cb;
         return () => {};
       },
