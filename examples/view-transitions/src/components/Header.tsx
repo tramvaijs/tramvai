@@ -1,10 +1,12 @@
 import { Link } from '@tramvai/module-router';
 
 import { HEADER_LINK_ID } from '../test-ids';
+import { RouterStoreProbe } from '../perf/RouterStoreProbe';
 
 export default function Header() {
   return (
     <nav className="w-full border-b bg-white">
+      <RouterStoreProbe />
       <div className="w-full container mx-auto max-w-screen-lg px-6 lg:px-0 flex flex-wrap items-center mt-0 py-6">
         <div>
           <Link

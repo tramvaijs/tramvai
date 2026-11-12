@@ -3,6 +3,7 @@ import { createEvent, createReducer } from '@tramvai/state';
 
 import { ROUTER_TOKEN } from '@tramvai/tokens-router';
 import type { AlbumWithTracks } from '../types';
+import { mark } from '../perf/marks';
 
 export const albumLoaded = createEvent<AlbumWithTracks>('album loaded');
 
@@ -17,6 +18,8 @@ export const AlbumStore = createReducer<Record<string, AlbumWithTracks>>('album'
 export const getAlbumByIdAction = declareAction({
   name: 'get-album-by-id',
   async fn() {
+    mark('action get-album-by-id');
+
     const { params } = this.deps.router.getCurrentRoute();
 
     if (params.id !== undefined) {

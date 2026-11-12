@@ -27,6 +27,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Player from './components/Player';
 import { layoutWrapper } from './contexts/PlayerContext';
+import { perfRouterPlugin, spaActionsMode } from './perf/marks';
 
 import './index.global.css';
 
@@ -54,7 +55,11 @@ createApp({
     }),
     provide({
       provide: ROUTER_SPA_ACTIONS_RUN_MODE_TOKEN,
-      useValue: 'before',
+      useValue: spaActionsMode,
+    }),
+    provide({
+      provide: ROUTER_PLUGIN,
+      useValue: perfRouterPlugin,
     }),
     provide({
       provide: AUTOSCROLL_BEHAVIOR_MODE_TOKEN,

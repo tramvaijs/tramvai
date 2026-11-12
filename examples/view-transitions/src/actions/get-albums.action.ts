@@ -4,6 +4,7 @@ import { createEvent, createReducer } from '@tramvai/state';
 import type { Album } from '../types';
 
 import albums from './data/albums.json';
+import { mark } from '../perf/marks';
 
 export const albumsLoaded = createEvent<Album[]>('albums loaded');
 
@@ -15,6 +16,8 @@ export const AlbumsStore = createReducer<Album[]>('albums', []).on(
 export const getAlbumsAction = declareAction({
   name: 'get-albums',
   async fn() {
+    mark('action get-albums');
+
     this.dispatch(albumsLoaded(albums));
   },
   conditions: {
