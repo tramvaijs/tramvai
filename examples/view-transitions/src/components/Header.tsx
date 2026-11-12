@@ -42,6 +42,9 @@ export default function Header() {
             <span className="inline-block pl-2">Music Library</span>
           </Link>
         </div>
+        <Link url="/desync/1" viewTransition className="ml-auto text-gray-700 hover:text-pink-500">
+          Router store desync
+        </Link>
       </div>
     </nav>
   );
