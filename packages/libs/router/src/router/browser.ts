@@ -1,3 +1,4 @@
+import { Deferred } from '@tramvai/core';
 import type { Options } from './abstract';
 import { ClientRouter } from './client';
 import type { HookName, Navigation } from '../types';
@@ -188,34 +189,24 @@ export class Router extends ClientRouter {
     // leaving page should be rendered with view transition state before the snapshot
     await this.internalHooks['router:view-transition-start'].callPromise(navigation);
 
-    let commitError: Error | undefined;
-    let resolveCommit: () => void;
-    const commit = new Promise<void>((resolve) => {
-      resolveCommit = resolve;
-    });
+    const commit = new Deferred<void>();
 
     // commit inside the update callback, when the old page snapshot is already captured,
     // so router state, url and DOM are changed at the same time
     const update = async () => {
       // navigation can be cancelled while waiting for the snapshot
       if (navigation.skipped) {
-        logger.debug({
-          event: 'delay-ignore-commit',
-          navigation,
-        });
-
         transition.skipTransition();
-        resolveCommit();
+        commit.resolve();
         return;
       }
 
       try {
         super.commitNavigation(navigation);
+        commit.resolve();
       } catch (error) {
-        commitError = error;
+        commit.reject(error);
       }
-
-      resolveCommit();
 
       // keep the snapshot of the leaving page until the next page is rendered
       await this.internalHooks['router:view-transition-update'].callPromise(navigation);
@@ -234,11 +225,7 @@ export class Router extends ClientRouter {
         this.internalHooks['router:view-transition-end'].call(navigation);
       });
 
-    await commit;
-
-    if (commitError) {
-      throw commitError;
-    }
+    await commit.promise;
   }
 
   protected async runGuards(navigation: Navigation) {

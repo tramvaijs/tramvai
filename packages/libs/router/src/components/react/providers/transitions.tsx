@@ -60,7 +60,8 @@ export const TransitionsProvider: FunctionComponent<RouterProviderProps> = ({
       const untapStart = router.internalHooks['router:view-transition-start'].tapPromise(
         'react-provider',
         async (_, navigation) => {
-          // do not block update callback of the interrupted transition
+          // do not block the interrupted transition
+          viewTransition.current?.started.resolve();
           viewTransition.current?.updated.resolve();
           viewTransition.current = {
             navigation,
